@@ -1,0 +1,467 @@
+FOUND 6 PARQUET FILES
+
+====================================================================================================
+FILE: alaska_base_map.parquet
+====================================================================================================
+Shape: (9, 169)
+CRS: {"$schema": "https://proj.org/schemas/v0.7/projjson.schema.json", "type": "ProjectedCRS", "name": "NAD83 / Alaska Albers", "base_crs": {"name": "NAD83", "datum": {"type": "GeodeticReferenceFrame", "name": "North American Datum 1983", "ellipsoid": {"name": "GRS 1980", "semi_major_axis": 6378137, "inverse_flattening": 298.257222101}}, "coordinate_system": {"subtype": "ellipsoidal", "axis": [{"name": "Geodetic latitude", "abbreviation": "Lat", "direction": "north", "unit": "degree"}, {"name": "Geodetic longitude", "abbreviation": "Lon", "direction": "east", "unit": "degree"}]}, "id": {"authority": "EPSG", "code": 4269}}, "conversion": {"name": "Alaska Albers (meter)", "method": {"name": "Albers Equal Area", "id": {"authority": "EPSG", "code": 9822}}, "parameters": [{"name": "Latitude of false origin", "value": 50, "unit": "degree", "id": {"authority": "EPSG", "code": 8821}}, {"name": "Longitude of false origin", "value": -154, "unit": "degree", "id": {"authority": "EPSG", "code": 8822}}, {"name": "Latitude of 1st standard parallel", "value": 55, "unit": "degree", "id": {"authority": "EPSG", "code": 8823}}, {"name": "Latitude of 2nd standard parallel", "value": 65, "unit": "degree", "id": {"authority": "EPSG", "code": 8824}}, {"name": "Easting at false origin", "value": 0, "unit": "metre", "id": {"authority": "EPSG", "code": 8826}}, {"name": "Northing at false origin", "value": 0, "unit": "metre", "id": {"authority": "EPSG", "code": 8827}}]}, "coordinate_system": {"subtype": "Cartesian", "axis": [{"name": "Easting", "abbreviation": "X", "direction": "east", "unit": "metre"}, {"name": "Northing", "abbreviation": "Y", "direction": "north", "unit": "metre"}]}, "scope": "Topographic mapping (small scale).", "area": "United States (USA) - Alaska.", "bbox": {"south_latitude": 51.3, "west_longitude": 172.42, "north_latitude": 71.4, "east_longitude": -129.99}, "id": {"authority": "EPSG", "code": 3338}}
+Geometry Types: {'Polygon': 9}
+
+COLUMNS:
+['featurecla', 'scalerank', 'LABELRANK', 'SOVEREIGNT', 'SOV_A3', 'ADM0_DIF', 'LEVEL', 'TYPE', 'TLC', 'ADMIN', 'ADM0_A3', 'GEOU_DIF', 'GEOUNIT', 'GU_A3', 'SU_DIF', 'SUBUNIT', 'SU_A3', 'BRK_DIFF', 'NAME', 'NAME_LONG', 'BRK_A3', 'BRK_NAME', 'BRK_GROUP', 'ABBREV', 'POSTAL', 'FORMAL_EN', 'FORMAL_FR', 'NAME_CIAWF', 'NOTE_ADM0', 'NOTE_BRK', 'NAME_SORT', 'NAME_ALT', 'MAPCOLOR7', 'MAPCOLOR8', 'MAPCOLOR9', 'MAPCOLOR13', 'POP_EST', 'POP_RANK', 'POP_YEAR', 'GDP_MD', 'GDP_YEAR', 'ECONOMY', 'INCOME_GRP', 'FIPS_10', 'ISO_A2', 'ISO_A2_EH', 'ISO_A3', 'ISO_A3_EH', 'ISO_N3', 'ISO_N3_EH', 'UN_A3', 'WB_A2', 'WB_A3', 'WOE_ID', 'WOE_ID_EH', 'WOE_NOTE', 'ADM0_ISO', 'ADM0_DIFF', 'ADM0_TLC', 'ADM0_A3_US', 'ADM0_A3_FR', 'ADM0_A3_RU', 'ADM0_A3_ES', 'ADM0_A3_CN', 'ADM0_A3_TW', 'ADM0_A3_IN', 'ADM0_A3_NP', 'ADM0_A3_PK', 'ADM0_A3_DE', 'ADM0_A3_GB', 'ADM0_A3_BR', 'ADM0_A3_IL', 'ADM0_A3_PS', 'ADM0_A3_SA', 'ADM0_A3_EG', 'ADM0_A3_MA', 'ADM0_A3_PT', 'ADM0_A3_AR', 'ADM0_A3_JP', 'ADM0_A3_KO', 'ADM0_A3_VN', 'ADM0_A3_TR', 'ADM0_A3_ID', 'ADM0_A3_PL', 'ADM0_A3_GR', 'ADM0_A3_IT', 'ADM0_A3_NL', 'ADM0_A3_SE', 'ADM0_A3_BD', 'ADM0_A3_UA', 'ADM0_A3_UN', 'ADM0_A3_WB', 'CONTINENT', 'REGION_UN', 'SUBREGION', 'REGION_WB', 'NAME_LEN', 'LONG_LEN', 'ABBREV_LEN', 'TINY', 'HOMEPART', 'MIN_ZOOM', 'MIN_LABEL', 'MAX_LABEL', 'LABEL_X', 'LABEL_Y', 'NE_ID', 'WIKIDATAID', 'NAME_AR', 'NAME_BN', 'NAME_DE', 'NAME_EN', 'NAME_ES', 'NAME_FA', 'NAME_FR', 'NAME_EL', 'NAME_HE', 'NAME_HI', 'NAME_HU', 'NAME_ID', 'NAME_IT', 'NAME_JA', 'NAME_KO', 'NAME_NL', 'NAME_PL', 'NAME_PT', 'NAME_RU', 'NAME_SV', 'NAME_TR', 'NAME_UK', 'NAME_UR', 'NAME_VI', 'NAME_ZH', 'NAME_ZHT', 'FCLASS_ISO', 'TLC_DIFF', 'FCLASS_TLC', 'FCLASS_US', 'FCLASS_FR', 'FCLASS_RU', 'FCLASS_ES', 'FCLASS_CN', 'FCLASS_TW', 'FCLASS_IN', 'FCLASS_NP', 'FCLASS_PK', 'FCLASS_DE', 'FCLASS_GB', 'FCLASS_BR', 'FCLASS_IL', 'FCLASS_PS', 'FCLASS_SA', 'FCLASS_EG', 'FCLASS_MA', 'FCLASS_PT', 'FCLASS_AR', 'FCLASS_JP', 'FCLASS_KO', 'FCLASS_VN', 'FCLASS_TR', 'FCLASS_ID', 'FCLASS_PL', 'FCLASS_GR', 'FCLASS_IT', 'FCLASS_NL', 'FCLASS_SE', 'FCLASS_BD', 'FCLASS_UA', 'geometry']
+
+DTYPES:
+featurecla         str
+scalerank        int32
+LABELRANK        int32
+SOVEREIGNT         str
+SOV_A3             str
+                ...   
+FCLASS_NL          str
+FCLASS_SE          str
+FCLASS_BD          str
+FCLASS_UA          str
+geometry      geometry
+Length: 169, dtype: object
+
+MISSING VALUES (TOP 20):
+BRK_GROUP    9
+FORMAL_FR    9
+NOTE_ADM0    9
+NOTE_BRK     9
+NAME_ALT     9
+ADM0_DIFF    9
+TLC_DIFF     9
+FCLASS_US    9
+FCLASS_FR    9
+FCLASS_RU    9
+FCLASS_ES    9
+FCLASS_CN    9
+FCLASS_TW    9
+FCLASS_IN    9
+FCLASS_NP    9
+FCLASS_PK    9
+FCLASS_DE    9
+FCLASS_GB    9
+FCLASS_BR    9
+FCLASS_IL    9
+dtype: int64
+
+TOTAL BOUNDS: [ -876401.76126598 -3233505.30834021  1492614.3490752   2375023.15304245]
+
+SAMPLE ROWS:
+        featurecla  scalerank  LABELRANK                SOVEREIGNT SOV_A3  ADM0_DIF  LEVEL     TYPE TLC                     ADMIN ADM0_A3  \
+4  Admin-0 country          1          2  United States of America    US1         1      2  Country   1  United States of America     USA   
+4  Admin-0 country          1          2  United States of America    US1         1      2  Country   1  United States of America     USA   
+4  Admin-0 country          1          2  United States of America    US1         1      2  Country   1  United States of America     USA   
+
+   GEOU_DIF                   GEOUNIT GU_A3  SU_DIF        SUBUNIT SU_A3  BRK_DIFF                      NAME      NAME_LONG BRK_A3  \
+4         0  United States of America   USA       0  United States   USA         0  United States of America  United States    USA   
+4         0  United States of America   USA       0  United States   USA         0  United States of America  United States    USA   
+4         0  United States of America   USA       0  United States   USA         0  United States of America  United States    USA   
+
+        BRK_NAME BRK_GROUP  ABBREV POSTAL                 FORMAL_EN FORMAL_FR     NAME_CIAWF NOTE_ADM0 NOTE_BRK                 NAME_SORT  \
+4  United States      None  U.S.A.     US  United States of America       NaN  United States       NaN      NaN  United States of America   
+4  United States      None  U.S.A.     US  United States of America       NaN  United States       NaN      NaN  United States of America   
+4  United States      None  U.S.A.     US  United States of America       NaN  United States       NaN      NaN  United States of America   
+
+  NAME_ALT  MAPCOLOR7  MAPCOLOR8  MAPCOLOR9  MAPCOLOR13      POP_EST  POP_RANK  POP_YEAR    GDP_MD  GDP_YEAR                  ECONOMY  \
+4      NaN          4          5          1           1  328239523.0        17      2019  21433226      2019  1. Developed region: G7   
+4      NaN          4          5          1           1  328239523.0        17      2019  21433226      2019  1. Developed region: G7   
+4      NaN          4          5          1           1  328239523.0        17      2019  21433226      2019  1. Developed region: G7   
+
+             INCOME_GRP FIPS_10 ISO_A2 ISO_A2_EH ISO_A3 ISO_A3_EH ISO_N3 ISO_N3_EH  ...          NAME_ID                NAME_IT  NAME_JA  \
+4  1. High income: OECD      US     US        US    USA       USA    840       840  ...  Amerika Serikat  Stati Uniti d'America  アメリカ合衆国   
+4  1. High income: OECD      US     US        US    USA       USA    840       840  ...  Amerika Serikat  Stati Uniti d'America  アメリカ合衆国   
+4  1. High income: OECD      US     US        US    USA       USA    840       840  ...  Amerika Serikat  Stati Uniti d'America  アメリカ合衆国   
+
+   NAME_KO                       NAME_NL            NAME_PL         NAME_PT NAME_RU NAME_SV                      NAME_TR  \
+4       미국  Verenigde Staten van Amerika  Stany Zjednoczone  Estados Unidos     США     USA  Amerika Birleşik Devletleri   
+4       미국  Verenigde Staten van Amerika  Stany Zjednoczone  Estados Unidos     США     USA  Amerika Birleşik Devletleri   
+4       미국  Verenigde Staten van Amerika  Stany Zjednoczone  Estados Unidos     США     USA  Amerika Birleşik Devletleri   
+
+                   NAME_UK                 NAME_UR NAME_VI NAME_ZH NAME_ZHT       FCLASS_ISO TLC_DIFF       FCLASS_TLC FCLASS_US  \
+4  Сполучені Штати Америки  ریاستہائے متحدہ امریکا  Hoa Kỳ      美国       美國  Admin-0 country      NaN  Admin-0 country       NaN   
+4  Сполучені Штати Америки  ریاستہائے متحدہ امریکا  Hoa Kỳ      美国       美國  Admin-0 country      NaN  Admin-0 country       NaN   
+4  Сполучені Штати Америки  ریاستہائے متحدہ امریکا  Hoa Kỳ      美国       美國  Admin-0 country      NaN  Admin-0 country       NaN   
+
+  FCLASS_FR FCLASS_RU FCLASS_ES FCLASS_CN FCLASS_TW FCLASS_IN FCLASS_NP FCLASS_PK FCLASS_DE FCLASS_GB FCLASS_BR FCLASS_IL FCLASS_PS  \
+4       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN   
+4       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN   
+4       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN   
+
+  FCLASS_SA FCLASS_EG FCLASS_MA FCLASS_PT FCLASS_AR FCLASS_JP FCLASS_KO FCLASS_VN  FCLASS_TR  FCLASS_ID FCLASS_PL FCLASS_GR FCLASS_IT  \
+4       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN        NaN        NaN       NaN       NaN       NaN   
+4       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN        NaN        NaN       NaN       NaN       NaN   
+4       NaN       NaN       NaN       NaN       NaN       NaN       NaN       NaN        NaN        NaN       NaN       NaN       NaN   
+
+  FCLASS_NL  FCLASS_SE  FCLASS_BD  FCLASS_UA                                           geometry  
+4       NaN        NaN        NaN        NaN  POLYGON ((-167364.771 -3121867.186, -146321.01...  
+4       NaN        NaN        NaN        NaN  POLYGON ((-236193.031 -3053572.893, -246450.15...  
+4       NaN        NaN        NaN        NaN  POLYGON ((-324730.797 -3010123.02, -328831.978...  
+
+[3 rows x 169 columns]
+
+NUMERIC SUMMARY:
+            count          mean  std           min           25%           50%           75%           max
+scalerank     9.0  1.000000e+00  0.0  1.000000e+00  1.000000e+00  1.000000e+00  1.000000e+00  1.000000e+00
+LABELRANK     9.0  2.000000e+00  0.0  2.000000e+00  2.000000e+00  2.000000e+00  2.000000e+00  2.000000e+00
+ADM0_DIF      9.0  1.000000e+00  0.0  1.000000e+00  1.000000e+00  1.000000e+00  1.000000e+00  1.000000e+00
+LEVEL         9.0  2.000000e+00  0.0  2.000000e+00  2.000000e+00  2.000000e+00  2.000000e+00  2.000000e+00
+GEOU_DIF      9.0  0.000000e+00  0.0  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00
+SU_DIF        9.0  0.000000e+00  0.0  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00
+BRK_DIFF      9.0  0.000000e+00  0.0  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00
+MAPCOLOR7     9.0  4.000000e+00  0.0  4.000000e+00  4.000000e+00  4.000000e+00  4.000000e+00  4.000000e+00
+MAPCOLOR8     9.0  5.000000e+00  0.0  5.000000e+00  5.000000e+00  5.000000e+00  5.000000e+00  5.000000e+00
+MAPCOLOR9     9.0  1.000000e+00  0.0  1.000000e+00  1.000000e+00  1.000000e+00  1.000000e+00  1.000000e+00
+MAPCOLOR13    9.0  1.000000e+00  0.0  1.000000e+00  1.000000e+00  1.000000e+00  1.000000e+00  1.000000e+00
+POP_EST       9.0  3.282395e+08  0.0  3.282395e+08  3.282395e+08  3.282395e+08  3.282395e+08  3.282395e+08
+POP_RANK      9.0  1.700000e+01  0.0  1.700000e+01  1.700000e+01  1.700000e+01  1.700000e+01  1.700000e+01
+POP_YEAR      9.0  2.019000e+03  0.0  2.019000e+03  2.019000e+03  2.019000e+03  2.019000e+03  2.019000e+03
+GDP_MD        9.0  2.143323e+07  0.0  2.143323e+07  2.143323e+07  2.143323e+07  2.143323e+07  2.143323e+07
+GDP_YEAR      9.0  2.019000e+03  0.0  2.019000e+03  2.019000e+03  2.019000e+03  2.019000e+03  2.019000e+03
+WOE_ID        9.0  2.342498e+07  0.0  2.342498e+07  2.342498e+07  2.342498e+07  2.342498e+07  2.342498e+07
+WOE_ID_EH     9.0  2.342498e+07  0.0  2.342498e+07  2.342498e+07  2.342498e+07  2.342498e+07  2.342498e+07
+ADM0_A3_UN    9.0 -9.900000e+01  0.0 -9.900000e+01 -9.900000e+01 -9.900000e+01 -9.900000e+01 -9.900000e+01
+ADM0_A3_WB    9.0 -9.900000e+01  0.0 -9.900000e+01 -9.900000e+01 -9.900000e+01 -9.900000e+01 -9.900000e+01
+NAME_LEN      9.0  2.400000e+01  0.0  2.400000e+01  2.400000e+01  2.400000e+01  2.400000e+01  2.400000e+01
+LONG_LEN      9.0  1.300000e+01  0.0  1.300000e+01  1.300000e+01  1.300000e+01  1.300000e+01  1.300000e+01
+ABBREV_LEN    9.0  6.000000e+00  0.0  6.000000e+00  6.000000e+00  6.000000e+00  6.000000e+00  6.000000e+00
+TINY          9.0 -9.900000e+01  0.0 -9.900000e+01 -9.900000e+01 -9.900000e+01 -9.900000e+01 -9.900000e+01
+HOMEPART      9.0  1.000000e+00  0.0  1.000000e+00  1.000000e+00  1.000000e+00  1.000000e+00  1.000000e+00
+MIN_ZOOM      9.0  0.000000e+00  0.0  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00
+MIN_LABEL     9.0  1.700000e+00  0.0  1.700000e+00  1.700000e+00  1.700000e+00  1.700000e+00  1.700000e+00
+MAX_LABEL     9.0  5.700000e+00  0.0  5.700000e+00  5.700000e+00  5.700000e+00  5.700000e+00  5.700000e+00
+LABEL_X       9.0 -9.748260e+01  0.0 -9.748260e+01 -9.748260e+01 -9.748260e+01 -9.748260e+01 -9.748260e+01
+LABEL_Y       9.0  3.953848e+01  0.0  3.953848e+01  3.953848e+01  3.953848e+01  3.953848e+01  3.953848e+01
+NE_ID         9.0  1.159321e+09  0.0  1.159321e+09  1.159321e+09  1.159321e+09  1.159321e+09  1.159321e+09
+
+CATEGORICAL VALUES (FIRST FEW PER COLUMN):
+featurecla: <ArrowStringArray>
+['Admin-0 country']
+Length: 1, dtype: str
+SOVEREIGNT: <ArrowStringArray>
+['United States of America']
+Length: 1, dtype: str
+SOV_A3: <ArrowStringArray>
+['US1']
+Length: 1, dtype: str
+TYPE: <ArrowStringArray>
+['Country']
+Length: 1, dtype: str
+TLC: <ArrowStringArray>
+['1']
+Length: 1, dtype: str
+ADMIN: <ArrowStringArray>
+['United States of America']
+Length: 1, dtype: str
+ADM0_A3: <ArrowStringArray>
+['USA']
+Length: 1, dtype: str
+GEOUNIT: <ArrowStringArray>
+['United States of America']
+Length: 1, dtype: str
+GU_A3: <ArrowStringArray>
+['USA']
+Length: 1, dtype: str
+SUBUNIT: <ArrowStringArray>
+['United States']
+Length: 1, dtype: str
+
+====================================================================================================
+FILE: clean_2d_seismic.parquet
+====================================================================================================
+Shape: (26, 7)
+CRS: {"$schema": "https://proj.org/schemas/v0.7/projjson.schema.json", "type": "ProjectedCRS", "name": "NAD83 / Alaska Albers", "base_crs": {"name": "NAD83", "datum": {"type": "GeodeticReferenceFrame", "name": "North American Datum 1983", "ellipsoid": {"name": "GRS 1980", "semi_major_axis": 6378137, "inverse_flattening": 298.257222101}}, "coordinate_system": {"subtype": "ellipsoidal", "axis": [{"name": "Geodetic latitude", "abbreviation": "Lat", "direction": "north", "unit": "degree"}, {"name": "Geodetic longitude", "abbreviation": "Lon", "direction": "east", "unit": "degree"}]}, "id": {"authority": "EPSG", "code": 4269}}, "conversion": {"name": "Alaska Albers (meter)", "method": {"name": "Albers Equal Area", "id": {"authority": "EPSG", "code": 9822}}, "parameters": [{"name": "Latitude of false origin", "value": 50, "unit": "degree", "id": {"authority": "EPSG", "code": 8821}}, {"name": "Longitude of false origin", "value": -154, "unit": "degree", "id": {"authority": "EPSG", "code": 8822}}, {"name": "Latitude of 1st standard parallel", "value": 55, "unit": "degree", "id": {"authority": "EPSG", "code": 8823}}, {"name": "Latitude of 2nd standard parallel", "value": 65, "unit": "degree", "id": {"authority": "EPSG", "code": 8824}}, {"name": "Easting at false origin", "value": 0, "unit": "metre", "id": {"authority": "EPSG", "code": 8826}}, {"name": "Northing at false origin", "value": 0, "unit": "metre", "id": {"authority": "EPSG", "code": 8827}}]}, "coordinate_system": {"subtype": "Cartesian", "axis": [{"name": "Easting", "abbreviation": "X", "direction": "east", "unit": "metre"}, {"name": "Northing", "abbreviation": "Y", "direction": "north", "unit": "metre"}]}, "scope": "Topographic mapping (small scale).", "area": "United States (USA) - Alaska.", "bbox": {"south_latitude": 51.3, "west_longitude": 172.42, "north_latitude": 71.4, "east_longitude": -129.99}, "id": {"authority": "EPSG", "code": 3338}}
+Geometry Types: {'MultiLineString': 23, 'LineString': 3}
+
+COLUMNS:
+['survey_name', 'year_acquired', 'year_released', 'company', 'line_miles', 'geometry', 'type']
+
+DTYPES:
+survey_name           str
+year_acquired     float64
+year_released     float64
+company               str
+line_miles        float64
+geometry         geometry
+type                  str
+dtype: object
+
+MISSING VALUES (TOP 20):
+year_released    5
+line_miles       5
+company          2
+year_acquired    1
+dtype: int64
+
+TOTAL BOUNDS: [ -96035.5012 1079234.1069  421865.0263 2295997.1922]
+
+SAMPLE ROWS:
+                                 survey_name  year_acquired  year_released                                            company  line_miles  \
+0  Pike Bottom Hole Planning 2D Reprocessing            NaN         2018.0                                WesternGeco and CPA      153.75   
+1                                Stingray 2D         2011.0         2021.0  Northern Exploration Services LLC & Fairfield ...        2.24   
+2                     Nenana Basin 2D (2005)         2005.0         2019.0              Weiman GeoScience & Geo Concepts Inc.      197.21   
+
+                                            geometry type  
+0  MULTILINESTRING ((236731.989 2285481.315, 2363...   2D  
+1  LINESTRING (119286.705 1207419.074, 119270.506...   2D  
+2  MULTILINESTRING ((209578.634 1602304.698, 2095...   2D  
+
+NUMERIC SUMMARY:
+               count         mean        std      min      25%     50%      75%      max
+year_acquired   25.0  2011.120000   4.216238  2004.00  2007.00  2012.0  2014.00  2017.00
+year_released   21.0  2020.952381   3.024503  2017.00  2018.00  2021.0  2024.00  2025.00
+line_miles      21.0   102.882381  98.103400     0.43    16.51    96.7   165.64   375.05
+
+CATEGORICAL VALUES (FIRST FEW PER COLUMN):
+survey_name: <ArrowStringArray>
+[                 'Pike Bottom Hole Planning 2D Reprocessing',                                                'Stingray 2D',
+                                     'Nenana Basin 2D (2005)',                                             'White Hills 2D',
+                                               'Moquawkie 2D',                           'Shadura 2D (2D/3D Sold as a set)',
+                               'Toolik 2D (aka Foothills 2D)',                                                 'Iniskin 2D',
+                                       'Nenana Basin 2D 2016',                                                'Ikpikpuk 2D',
+                                                  'Sagwon 2D',                                           'Kenai 2D Seismic',
+                                         'Franklin Bluffs 2D',                             'Umiat 2D (2D/3D Sold as a set)',
+                            'Seismic Technology 2D Test Line',                                       'North Nenana 2D 2012',
+                      'Nenana Basin 2D (2D/3D Sold as a set)', 'Yukon Flats Interior Alaska Seismic AKA Stevens Village 2D',
+                                        'Rock Flour South 2D',                         'Totchaket 2D (2D/3D Sold as a set)']
+Length: 20, dtype: str
+company: <ArrowStringArray>
+[                                'WesternGeco and CPA', 'Northern Exploration Services LLC & Fairfield Nodal',
+               'Weiman GeoScience & Geo Concepts Inc.',                                            'Paradigm',
+                                 'Veritas Geoservices',                                                'NEOS',
+                                 'Thrust Belt Imaging',                                    'Seismic Ventures',
+                                         'CGG Veritas',                                   'Seismic Solutions',
+                   'Reservoir Geophysical Corporation',                                        'Schlumberger',
+                                     'Fairfield Nodal',                                                 'PGS',
+                                         'Geokinetics',                              'CGG Subsurface Imaging',
+                                  'Summit Geophysical',                                      'FairfieldNodal',
+                                      'GeoEnergy, Inc',                                     'GeoEnergy, Inc.']
+Length: 20, dtype: str
+type: <ArrowStringArray>
+['2D']
+Length: 1, dtype: str
+
+====================================================================================================
+FILE: clean_3d_seismic.parquet
+====================================================================================================
+Shape: (36, 8)
+CRS: {"$schema": "https://proj.org/schemas/v0.7/projjson.schema.json", "type": "ProjectedCRS", "name": "NAD83 / Alaska Albers", "base_crs": {"name": "NAD83", "datum": {"type": "GeodeticReferenceFrame", "name": "North American Datum 1983", "ellipsoid": {"name": "GRS 1980", "semi_major_axis": 6378137, "inverse_flattening": 298.257222101}}, "coordinate_system": {"subtype": "ellipsoidal", "axis": [{"name": "Geodetic latitude", "abbreviation": "Lat", "direction": "north", "unit": "degree"}, {"name": "Geodetic longitude", "abbreviation": "Lon", "direction": "east", "unit": "degree"}]}, "id": {"authority": "EPSG", "code": 4269}}, "conversion": {"name": "Alaska Albers (meter)", "method": {"name": "Albers Equal Area", "id": {"authority": "EPSG", "code": 9822}}, "parameters": [{"name": "Latitude of false origin", "value": 50, "unit": "degree", "id": {"authority": "EPSG", "code": 8821}}, {"name": "Longitude of false origin", "value": -154, "unit": "degree", "id": {"authority": "EPSG", "code": 8822}}, {"name": "Latitude of 1st standard parallel", "value": 55, "unit": "degree", "id": {"authority": "EPSG", "code": 8823}}, {"name": "Latitude of 2nd standard parallel", "value": 65, "unit": "degree", "id": {"authority": "EPSG", "code": 8824}}, {"name": "Easting at false origin", "value": 0, "unit": "metre", "id": {"authority": "EPSG", "code": 8826}}, {"name": "Northing at false origin", "value": 0, "unit": "metre", "id": {"authority": "EPSG", "code": 8827}}]}, "coordinate_system": {"subtype": "Cartesian", "axis": [{"name": "Easting", "abbreviation": "X", "direction": "east", "unit": "metre"}, {"name": "Northing", "abbreviation": "Y", "direction": "north", "unit": "metre"}]}, "scope": "Topographic mapping (small scale).", "area": "United States (USA) - Alaska.", "bbox": {"south_latitude": 51.3, "west_longitude": 172.42, "north_latitude": 71.4, "east_longitude": -129.99}, "id": {"authority": "EPSG", "code": 3338}}
+Geometry Types: {'Polygon': 21, 'MultiPolygon': 15}
+
+COLUMNS:
+['survey_name', 'year_acquired', 'year_released', 'company', 'square_miles', 'survey_type', 'geometry', 'type']
+
+DTYPES:
+survey_name           str
+year_acquired       int64
+year_released     float64
+company               str
+square_miles      float64
+survey_type           str
+geometry         geometry
+type                  str
+dtype: object
+
+MISSING VALUES (TOP 20):
+year_released    5
+square_miles     5
+company          2
+dtype: int64
+
+TOTAL BOUNDS: [ -74902.8108 1086763.49    242037.431  2340610.0814]
+
+SAMPLE ROWS:
+                                         survey_name  year_acquired  year_released                company  square_miles survey_type  \
+0                      Aklaq, Smith Bay & Simpson 3D           2008         2019.0            WesternGeco        602.04          3D   
+1                                        Big Bend 3D           2014         2024.0  Geotrace Technologies         83.71          3D   
+2  Big Island / North Island 3D (aka North Slope ...           2008         2019.0            CGG Veritas        199.39          3D   
+
+                                            geometry type  
+0  POLYGON ((-44307.807 2276329.172, -44321.591 2...   3D  
+1  POLYGON ((118028.644 2220795.829, 117994.58 22...   3D  
+2  POLYGON ((108559.168 2236399.912, 107975.721 2...   3D  
+
+NUMERIC SUMMARY:
+               count         mean         std      min       25%      50%       75%      max
+year_acquired   36.0  2010.472222    3.909593  2004.00  2007.000  2011.50  2014.000  2017.00
+year_released   31.0  2021.225806    3.252790  2017.00  2018.000  2023.00  2024.000  2026.00
+square_miles    31.0   175.712258  169.885063    10.77    51.775   123.08   241.005   670.41
+
+CATEGORICAL VALUES (FIRST FEW PER COLUMN):
+survey_name: <ArrowStringArray>
+[                             'Aklaq, Smith Bay & Simpson 3D',                                                'Big Bend 3D',
+ 'Big Island / North Island 3D (aka North Slope Winter 2007)',                                  'Cook Inlet Tyonek 3D (R2)',
+                                                   'Cosmo 3D',                                              'Deep Creek 3D',
+                                'Granite Point Transition 3D',                         'Great Bear 2012 Seismic 3D (Alcor)',
+                        'Great Bear 2013 Seismic 3D (Dalton)',                                 'Great Bear 2014 Seismic 3D',
+                                 'Great Bear 2015 Seismic 3D',                                 'Great Bear 2016 Seismic 3D',
+                               'Gubik 3D (aka East Umiat 3D)',                                   'Harrison Bay 3D (Conoco)',
+                                      'Harrison Bay 3D (FEX)',                                               'Horseshoe 3D',
+                                               'Kad River 3D',                                              'Kenai Loop 3D',
+                                             'Nanuq South 3D',                                          'NE NPRA - SOA Cut']
+Length: 20, dtype: str
+company: <ArrowStringArray>
+[                                                                                                                 'WesternGeco',
+                                                                                                        'Geotrace Technologies',
+                                                                                                                  'CGG Veritas',
+                                                                                                               'FairfieldNodal',
+                                                                                                                  'Geokinetics',
+                                                                                                  'Global Geophysical Services',
+ 'Weems Geophysical Inc;eSeis, Inc.;Global Geophysical Services, Inc.;Flamingo Seismic Solutions, Inc.;Lumina Geophysical, LLC',
+                                                                                                          'Veritas Geoservices',
+                                                                                                   'WesternGeco & Schlumberger',
+                                                                                                          'Kelman Technologies',
+                                                                                                                 'Schlumberger',
+                                                                                                                         'NEOS',
+                                                                                                   'CGG Services (Canada) Inc.',
+                                                                                                             'Seismic Ventures',
+                                                                                                                 'Crescent Geo']
+Length: 15, dtype: str
+survey_type: <ArrowStringArray>
+['3D', '2D and 3D']
+Length: 2, dtype: str
+type: <ArrowStringArray>
+['3D']
+Length: 1, dtype: str
+
+====================================================================================================
+FILE: clean_well_locations.parquet
+====================================================================================================
+Shape: (10250, 4)
+CRS: {"$schema": "https://proj.org/schemas/v0.7/projjson.schema.json", "type": "ProjectedCRS", "name": "NAD83 / Alaska Albers", "base_crs": {"name": "NAD83", "datum": {"type": "GeodeticReferenceFrame", "name": "North American Datum 1983", "ellipsoid": {"name": "GRS 1980", "semi_major_axis": 6378137, "inverse_flattening": 298.257222101}}, "coordinate_system": {"subtype": "ellipsoidal", "axis": [{"name": "Geodetic latitude", "abbreviation": "Lat", "direction": "north", "unit": "degree"}, {"name": "Geodetic longitude", "abbreviation": "Lon", "direction": "east", "unit": "degree"}]}, "id": {"authority": "EPSG", "code": 4269}}, "conversion": {"name": "Alaska Albers (meter)", "method": {"name": "Albers Equal Area", "id": {"authority": "EPSG", "code": 9822}}, "parameters": [{"name": "Latitude of false origin", "value": 50, "unit": "degree", "id": {"authority": "EPSG", "code": 8821}}, {"name": "Longitude of false origin", "value": -154, "unit": "degree", "id": {"authority": "EPSG", "code": 8822}}, {"name": "Latitude of 1st standard parallel", "value": 55, "unit": "degree", "id": {"authority": "EPSG", "code": 8823}}, {"name": "Latitude of 2nd standard parallel", "value": 65, "unit": "degree", "id": {"authority": "EPSG", "code": 8824}}, {"name": "Easting at false origin", "value": 0, "unit": "metre", "id": {"authority": "EPSG", "code": 8826}}, {"name": "Northing at false origin", "value": 0, "unit": "metre", "id": {"authority": "EPSG", "code": 8827}}]}, "coordinate_system": {"subtype": "Cartesian", "axis": [{"name": "Easting", "abbreviation": "X", "direction": "east", "unit": "metre"}, {"name": "Northing", "abbreviation": "Y", "direction": "north", "unit": "metre"}]}, "scope": "Topographic mapping (small scale).", "area": "United States (USA) - Alaska.", "bbox": {"south_latitude": 51.3, "west_longitude": 172.42, "north_latitude": 71.4, "east_longitude": -129.99}, "id": {"authority": "EPSG", "code": 3338}}
+Geometry Types: {'Point': 9894, nan: 356}
+
+COLUMNS:
+['operator', 'field', 'geometry', 'type']
+
+DTYPES:
+operator         str
+field            str
+geometry    geometry
+type             str
+dtype: object
+
+MISSING VALUES (TOP 20):
+geometry    356
+field         1
+dtype: int64
+
+TOTAL BOUNDS: [-773132.1263  527486.996   876794.3231 2371105.4057]
+
+SAMPLE ROWS:
+                          operator         field                        geometry  type
+0                  Romig Park Inc.  *EXPLORATORY  POINT (215783.293 1246044.842)  well
+1    Anchorage Oil and Development  *EXPLORATORY  POINT (226155.243 1254603.559)  well
+2  Union Oil Company of California  *EXPLORATORY  POINT (217961.219 1267479.561)  well
+
+NUMERIC SUMMARY: NONE
+
+CATEGORICAL VALUES (FIRST FEW PER COLUMN):
+operator: <ArrowStringArray>
+[                      'Romig Park Inc.',         'Anchorage Oil and Development',       'Union Oil Company of California',
+            'Atlantic Richfield Company',      'ASRC Energy Services Alaska, Inc',                   'Austral Oil Company',
+                'Wallace Mining Company',                        'BP Alaska Inc.',                     'Aledo Oil Company',
+                    'US Bureau of Mines',         'Anchorage Oil and Gas Company',                          'Pan American',
+               'Hill Production Company',                           'Lovely, Lum',          'Little Petroleum Corporation',
+             'Harbinger Oil Corporation',     'American Quasar Petroleum Company',          'Great Plains (American) Inc.',
+                      'ARCO Alaska Inc.', 'Pioneer Natural Resources Alaska Inc.']
+Length: 20, dtype: str
+field: <ArrowStringArray>
+[            '*EXPLORATORY',                  'PIONEER',                  'HOUSTON',      '*STRATIGRAPHIC TEST',
+                   'BARROW',                  'WALAKPA',              'PRUDHOE BAY',            'KUPARUK RIVER',
+              'MILNE POINT',                 'ENDICOTT',                'NORTHSTAR',                   'BADAMI',
+               'NIKAITCHUQ', '*EXPLORATORY, GEOTHERMAL',                  'KATALLA',                  'RED DOG',
+               'PT THOMSON',                 'OOOGURUK',           'COLVILLE RIVER',       'SOUTHERN MILUVEACH']
+Length: 20, dtype: str
+type: <ArrowStringArray>
+['well']
+Length: 1, dtype: str
+
+====================================================================================================
+FILE: north_slope_assessment_units.parquet
+====================================================================================================
+Shape: (6, 6)
+CRS: {"$schema": "https://proj.org/schemas/v0.7/projjson.schema.json", "type": "ProjectedCRS", "name": "NAD83 / Alaska Albers", "base_crs": {"name": "NAD83", "datum": {"type": "GeodeticReferenceFrame", "name": "North American Datum 1983", "ellipsoid": {"name": "GRS 1980", "semi_major_axis": 6378137, "inverse_flattening": 298.257222101}}, "coordinate_system": {"subtype": "ellipsoidal", "axis": [{"name": "Geodetic latitude", "abbreviation": "Lat", "direction": "north", "unit": "degree"}, {"name": "Geodetic longitude", "abbreviation": "Lon", "direction": "east", "unit": "degree"}]}, "id": {"authority": "EPSG", "code": 4269}}, "conversion": {"name": "Alaska Albers (meter)", "method": {"name": "Albers Equal Area", "id": {"authority": "EPSG", "code": 9822}}, "parameters": [{"name": "Latitude of false origin", "value": 50, "unit": "degree", "id": {"authority": "EPSG", "code": 8821}}, {"name": "Longitude of false origin", "value": -154, "unit": "degree", "id": {"authority": "EPSG", "code": 8822}}, {"name": "Latitude of 1st standard parallel", "value": 55, "unit": "degree", "id": {"authority": "EPSG", "code": 8823}}, {"name": "Latitude of 2nd standard parallel", "value": 65, "unit": "degree", "id": {"authority": "EPSG", "code": 8824}}, {"name": "Easting at false origin", "value": 0, "unit": "metre", "id": {"authority": "EPSG", "code": 8826}}, {"name": "Northing at false origin", "value": 0, "unit": "metre", "id": {"authority": "EPSG", "code": 8827}}]}, "coordinate_system": {"subtype": "Cartesian", "axis": [{"name": "Easting", "abbreviation": "X", "direction": "east", "unit": "metre"}, {"name": "Northing", "abbreviation": "Y", "direction": "north", "unit": "metre"}]}, "scope": "Topographic mapping (small scale).", "area": "United States (USA) - Alaska.", "bbox": {"south_latitude": 51.3, "west_longitude": 172.42, "north_latitude": 71.4, "east_longitude": -129.99}, "id": {"authority": "EPSG", "code": 3338}}
+Geometry Types: {'Polygon': 5, 'MultiPolygon': 1}
+
+COLUMNS:
+['region', 'province', 'tps_name', 'au_name', 'geometry', 'type']
+
+DTYPES:
+region           str
+province         str
+tps_name         str
+au_name          str
+geometry    geometry
+type             str
+dtype: object
+
+MISSING VALUES (TOP 20):
+Series([], dtype: int64)
+
+TOTAL BOUNDS: [ -83229.5877 2038506.7777  316844.8399 2298163.1036]
+
+SAMPLE ROWS:
+          region         province                 tps_name                     au_name                                           geometry  \
+0  North America  Northern Alaska  Arctic Alaska Composite             Brookian Topset  POLYGON ((173707.896 2296873.985, 173727.927 2...   
+1  North America  Northern Alaska  Arctic Alaska Composite  Brookian Foreset-Bottomset  POLYGON ((173707.896 2296873.985, 173727.927 2...   
+2  North America  Northern Alaska  Arctic Alaska Composite    Beaufortian Strata North  POLYGON ((173707.896 2296873.985, 173727.927 2...   
+
+              type  
+0  assessment_unit  
+1  assessment_unit  
+2  assessment_unit  
+
+NUMERIC SUMMARY: NONE
+
+CATEGORICAL VALUES (FIRST FEW PER COLUMN):
+region: <ArrowStringArray>
+['North America']
+Length: 1, dtype: str
+province: <ArrowStringArray>
+['Northern Alaska']
+Length: 1, dtype: str
+tps_name: <ArrowStringArray>
+['Arctic Alaska Composite']
+Length: 1, dtype: str
+au_name: <ArrowStringArray>
+[           'Brookian Topset', 'Brookian Foreset-Bottomset',   'Beaufortian Strata North',   'Beaufortian Strata South',
+   'Ellesmerian Strata North',   'Ellesmerian Strata South']
+Length: 6, dtype: str
+type: <ArrowStringArray>
+['assessment_unit']
+Length: 1, dtype: str
+
+====================================================================================================
+FILE: north_slope_extent.parquet
+====================================================================================================
+Shape: (1, 2)
+CRS: {"$schema": "https://proj.org/schemas/v0.7/projjson.schema.json", "type": "ProjectedCRS", "name": "NAD83 / Alaska Albers", "base_crs": {"name": "NAD83", "datum": {"type": "GeodeticReferenceFrame", "name": "North American Datum 1983", "ellipsoid": {"name": "GRS 1980", "semi_major_axis": 6378137, "inverse_flattening": 298.257222101}}, "coordinate_system": {"subtype": "ellipsoidal", "axis": [{"name": "Geodetic latitude", "abbreviation": "Lat", "direction": "north", "unit": "degree"}, {"name": "Geodetic longitude", "abbreviation": "Lon", "direction": "east", "unit": "degree"}]}, "id": {"authority": "EPSG", "code": 4269}}, "conversion": {"name": "Alaska Albers (meter)", "method": {"name": "Albers Equal Area", "id": {"authority": "EPSG", "code": 9822}}, "parameters": [{"name": "Latitude of false origin", "value": 50, "unit": "degree", "id": {"authority": "EPSG", "code": 8821}}, {"name": "Longitude of false origin", "value": -154, "unit": "degree", "id": {"authority": "EPSG", "code": 8822}}, {"name": "Latitude of 1st standard parallel", "value": 55, "unit": "degree", "id": {"authority": "EPSG", "code": 8823}}, {"name": "Latitude of 2nd standard parallel", "value": 65, "unit": "degree", "id": {"authority": "EPSG", "code": 8824}}, {"name": "Easting at false origin", "value": 0, "unit": "metre", "id": {"authority": "EPSG", "code": 8826}}, {"name": "Northing at false origin", "value": 0, "unit": "metre", "id": {"authority": "EPSG", "code": 8827}}]}, "coordinate_system": {"subtype": "Cartesian", "axis": [{"name": "Easting", "abbreviation": "X", "direction": "east", "unit": "metre"}, {"name": "Northing", "abbreviation": "Y", "direction": "north", "unit": "metre"}]}, "scope": "Topographic mapping (small scale).", "area": "United States (USA) - Alaska.", "bbox": {"south_latitude": 51.3, "west_longitude": 172.42, "north_latitude": 71.4, "east_longitude": -129.99}, "id": {"authority": "EPSG", "code": 3338}}
+Geometry Types: {'Polygon': 1}
+
+COLUMNS:
+['name', 'geometry']
+
+DTYPES:
+name             str
+geometry    geometry
+dtype: object
+
+MISSING VALUES (TOP 20):
+Series([], dtype: int64)
+
+TOTAL BOUNDS: [-667986.09603142 2066399.94461373  585819.13802963 2490048.78101377]
+
+SAMPLE ROWS:
+                     name                                           geometry
+0  North Slope Study Area  POLYGON ((585819.138 2066399.945, 498602.305 2...
+
+NUMERIC SUMMARY: NONE
+
+CATEGORICAL VALUES (FIRST FEW PER COLUMN):
+name: <ArrowStringArray>
+['North Slope Study Area']
+Length: 1, dtype: str
+

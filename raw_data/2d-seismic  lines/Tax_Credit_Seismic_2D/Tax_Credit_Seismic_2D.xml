@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?><metadata>
+    <idinfo>
+        <descript>
+            <abstract>1. This map is intended as a current snapshot of information that can be disclosed publicly regarding tax credit seismic surveys.2. Representation on this map does not guarantee public release and is subject to statutory requirements in effect at the time of    acquisition and application for tax credit.3. Release is subject to public notice and permission of private oil and gas mineral estate owner where applicable.  Some surveys    require clipping to mineral ownership boundaries; actual map extents of released datasets may differ from those shown here.  4. Year label &amp;quot;Released&amp;quot; surveys denote actual release year. Year label &amp;quot;Eligible&amp;quot; and &amp;quot;Issued&amp;quot; denote the year in which     the data is eligible for release and distribution under   AS 43.55.025(f)(2)(c), most tax credit seismic projects are held confidential     for 10 years from completion of initial seismic processing.  5. Map does not include surveys whose initial seismic processing was completed less than 10 years ago but prior to legislative adoption    of the disclosure clause of AS 43.55.025(f)(5). Seismic surveys acquired with credits under AS 43.55.023 are not subject to disclosure    under AS 43.55.025(f)(5), and cannot be represented here until their confidentiality period has expired.6. Additional qualifying surveys will be added to this map as new tax credit certificates are issued or as changes in confidentiality    status allows.</abstract>
+            <purpose>Dataset containing 2D seismic surveys in Alaska</purpose>
+        </descript>
+        <keywords>
+            <theme>
+                <themekt>None</themekt>
+                <themekey>Tax Credit</themekey>
+                <themekey>Div of Oil and Gas</themekey>
+                <themekey>Alaska</themekey>
+            </theme>
+        </keywords>
+        <accconst>None</accconst>
+        <useconst/>
+        <datacred/>
+    </idinfo>
+    <metainfo>
+        <metstdn>FGDC Content Standard for Digital Geospatial Metadata</metstdn>
+        <metstdv>FGDC-STD-001-1998</metstdv>
+        <mettc>local time</mettc>
+    </metainfo>
+</metadata>

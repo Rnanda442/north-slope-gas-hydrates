@@ -1,0 +1,574 @@
+Found 6 parquet files.
+
+====================================================================================================
+FILE: alaska_base_map.parquet
+Rows: 9
+Columns: 170
+Row groups: 1
+Size (MB): 0.11
+
+Column names:
+['featurecla', 'scalerank', 'LABELRANK', 'SOVEREIGNT', 'SOV_A3', 'ADM0_DIF', 'LEVEL', 'TYPE', 'TLC', 'ADMIN', 'ADM0_A3', 'GEOU_DIF', 'GEOUNIT', 'GU_A3', 'SU_DIF', 'SUBUNIT', 'SU_A3', 'BRK_DIFF', 'NAME', 'NAME_LONG', 'BRK_A3', 'BRK_NAME', 'BRK_GROUP', 'ABBREV', 'POSTAL', 'FORMAL_EN', 'FORMAL_FR', 'NAME_CIAWF', 'NOTE_ADM0', 'NOTE_BRK', 'NAME_SORT', 'NAME_ALT', 'MAPCOLOR7', 'MAPCOLOR8', 'MAPCOLOR9', 'MAPCOLOR13', 'POP_EST', 'POP_RANK', 'POP_YEAR', 'GDP_MD', 'GDP_YEAR', 'ECONOMY', 'INCOME_GRP', 'FIPS_10', 'ISO_A2', 'ISO_A2_EH', 'ISO_A3', 'ISO_A3_EH', 'ISO_N3', 'ISO_N3_EH', 'UN_A3', 'WB_A2', 'WB_A3', 'WOE_ID', 'WOE_ID_EH', 'WOE_NOTE', 'ADM0_ISO', 'ADM0_DIFF', 'ADM0_TLC', 'ADM0_A3_US', 'ADM0_A3_FR', 'ADM0_A3_RU', 'ADM0_A3_ES', 'ADM0_A3_CN', 'ADM0_A3_TW', 'ADM0_A3_IN', 'ADM0_A3_NP', 'ADM0_A3_PK', 'ADM0_A3_DE', 'ADM0_A3_GB', 'ADM0_A3_BR', 'ADM0_A3_IL', 'ADM0_A3_PS', 'ADM0_A3_SA', 'ADM0_A3_EG', 'ADM0_A3_MA', 'ADM0_A3_PT', 'ADM0_A3_AR', 'ADM0_A3_JP', 'ADM0_A3_KO', 'ADM0_A3_VN', 'ADM0_A3_TR', 'ADM0_A3_ID', 'ADM0_A3_PL', 'ADM0_A3_GR', 'ADM0_A3_IT', 'ADM0_A3_NL', 'ADM0_A3_SE', 'ADM0_A3_BD', 'ADM0_A3_UA', 'ADM0_A3_UN', 'ADM0_A3_WB', 'CONTINENT', 'REGION_UN', 'SUBREGION', 'REGION_WB', 'NAME_LEN', 'LONG_LEN', 'ABBREV_LEN', 'TINY', 'HOMEPART', 'MIN_ZOOM', 'MIN_LABEL', 'MAX_LABEL', 'LABEL_X', 'LABEL_Y', 'NE_ID', 'WIKIDATAID', 'NAME_AR', 'NAME_BN', 'NAME_DE', 'NAME_EN', 'NAME_ES', 'NAME_FA', 'NAME_FR', 'NAME_EL', 'NAME_HE', 'NAME_HI', 'NAME_HU', 'NAME_ID', 'NAME_IT', 'NAME_JA', 'NAME_KO', 'NAME_NL', 'NAME_PL', 'NAME_PT', 'NAME_RU', 'NAME_SV', 'NAME_TR', 'NAME_UK', 'NAME_UR', 'NAME_VI', 'NAME_ZH', 'NAME_ZHT', 'FCLASS_ISO', 'TLC_DIFF', 'FCLASS_TLC', 'FCLASS_US', 'FCLASS_FR', 'FCLASS_RU', 'FCLASS_ES', 'FCLASS_CN', 'FCLASS_TW', 'FCLASS_IN', 'FCLASS_NP', 'FCLASS_PK', 'FCLASS_DE', 'FCLASS_GB', 'FCLASS_BR', 'FCLASS_IL', 'FCLASS_PS', 'FCLASS_SA', 'FCLASS_EG', 'FCLASS_MA', 'FCLASS_PT', 'FCLASS_AR', 'FCLASS_JP', 'FCLASS_KO', 'FCLASS_VN', 'FCLASS_TR', 'FCLASS_ID', 'FCLASS_PL', 'FCLASS_GR', 'FCLASS_IT', 'FCLASS_NL', 'FCLASS_SE', 'FCLASS_BD', 'FCLASS_UA', 'geometry']
+
+Dtypes:
+featurecla       str
+scalerank      int32
+LABELRANK      int32
+SOVEREIGNT       str
+SOV_A3           str
+               ...  
+FCLASS_NL        str
+FCLASS_SE        str
+FCLASS_BD        str
+FCLASS_UA        str
+geometry      object
+Length: 169, dtype: object
+
+Null counts:
+featurecla    0
+scalerank     0
+LABELRANK     0
+SOVEREIGNT    0
+SOV_A3        0
+             ..
+FCLASS_NL     9
+FCLASS_SE     9
+FCLASS_BD     9
+FCLASS_UA     9
+geometry      0
+Length: 169, dtype: int64
+
+First 3 rows:
+        featurecla  scalerank  LABELRANK                SOVEREIGNT SOV_A3  \
+4  Admin-0 country          1          2  United States of America    US1   
+4  Admin-0 country          1          2  United States of America    US1   
+4  Admin-0 country          1          2  United States of America    US1   
+
+   ADM0_DIF  LEVEL     TYPE TLC                     ADMIN  ... FCLASS_TR  \
+4         1      2  Country   1  United States of America  ...       NaN   
+4         1      2  Country   1  United States of America  ...       NaN   
+4         1      2  Country   1  United States of America  ...       NaN   
+
+   FCLASS_ID FCLASS_PL FCLASS_GR  FCLASS_IT FCLASS_NL FCLASS_SE  FCLASS_BD  \
+4        NaN       NaN       NaN        NaN       NaN       NaN        NaN   
+4        NaN       NaN       NaN        NaN       NaN       NaN        NaN   
+4        NaN       NaN       NaN        NaN       NaN       NaN        NaN   
+
+  FCLASS_UA                                           geometry  
+4       NaN  b"\x01\x03\x00\x00\x00\x01\x00\x00\x00\x11\x00...  
+4       NaN  b"\x01\x03\x00\x00\x00\x01\x00\x00\x00\t\x00\x...  
+4       NaN  b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...  
+
+[3 rows x 169 columns]
+
+Numeric summary:
+            count          mean  std           min           25%  \
+scalerank     9.0  1.000000e+00  0.0  1.000000e+00  1.000000e+00   
+LABELRANK     9.0  2.000000e+00  0.0  2.000000e+00  2.000000e+00   
+ADM0_DIF      9.0  1.000000e+00  0.0  1.000000e+00  1.000000e+00   
+LEVEL         9.0  2.000000e+00  0.0  2.000000e+00  2.000000e+00   
+GEOU_DIF      9.0  0.000000e+00  0.0  0.000000e+00  0.000000e+00   
+SU_DIF        9.0  0.000000e+00  0.0  0.000000e+00  0.000000e+00   
+BRK_DIFF      9.0  0.000000e+00  0.0  0.000000e+00  0.000000e+00   
+MAPCOLOR7     9.0  4.000000e+00  0.0  4.000000e+00  4.000000e+00   
+MAPCOLOR8     9.0  5.000000e+00  0.0  5.000000e+00  5.000000e+00   
+MAPCOLOR9     9.0  1.000000e+00  0.0  1.000000e+00  1.000000e+00   
+MAPCOLOR13    9.0  1.000000e+00  0.0  1.000000e+00  1.000000e+00   
+POP_EST       9.0  3.282395e+08  0.0  3.282395e+08  3.282395e+08   
+POP_RANK      9.0  1.700000e+01  0.0  1.700000e+01  1.700000e+01   
+POP_YEAR      9.0  2.019000e+03  0.0  2.019000e+03  2.019000e+03   
+GDP_MD        9.0  2.143323e+07  0.0  2.143323e+07  2.143323e+07   
+GDP_YEAR      9.0  2.019000e+03  0.0  2.019000e+03  2.019000e+03   
+WOE_ID        9.0  2.342498e+07  0.0  2.342498e+07  2.342498e+07   
+WOE_ID_EH     9.0  2.342498e+07  0.0  2.342498e+07  2.342498e+07   
+ADM0_A3_UN    9.0 -9.900000e+01  0.0 -9.900000e+01 -9.900000e+01   
+ADM0_A3_WB    9.0 -9.900000e+01  0.0 -9.900000e+01 -9.900000e+01   
+NAME_LEN      9.0  2.400000e+01  0.0  2.400000e+01  2.400000e+01   
+LONG_LEN      9.0  1.300000e+01  0.0  1.300000e+01  1.300000e+01   
+ABBREV_LEN    9.0  6.000000e+00  0.0  6.000000e+00  6.000000e+00   
+TINY          9.0 -9.900000e+01  0.0 -9.900000e+01 -9.900000e+01   
+HOMEPART      9.0  1.000000e+00  0.0  1.000000e+00  1.000000e+00   
+MIN_ZOOM      9.0  0.000000e+00  0.0  0.000000e+00  0.000000e+00   
+MIN_LABEL     9.0  1.700000e+00  0.0  1.700000e+00  1.700000e+00   
+MAX_LABEL     9.0  5.700000e+00  0.0  5.700000e+00  5.700000e+00   
+LABEL_X       9.0 -9.748260e+01  0.0 -9.748260e+01 -9.748260e+01   
+LABEL_Y       9.0  3.953848e+01  0.0  3.953848e+01  3.953848e+01   
+NE_ID         9.0  1.159321e+09  0.0  1.159321e+09  1.159321e+09   
+
+                     50%           75%           max  
+scalerank   1.000000e+00  1.000000e+00  1.000000e+00  
+LABELRANK   2.000000e+00  2.000000e+00  2.000000e+00  
+ADM0_DIF    1.000000e+00  1.000000e+00  1.000000e+00  
+LEVEL       2.000000e+00  2.000000e+00  2.000000e+00  
+GEOU_DIF    0.000000e+00  0.000000e+00  0.000000e+00  
+SU_DIF      0.000000e+00  0.000000e+00  0.000000e+00  
+BRK_DIFF    0.000000e+00  0.000000e+00  0.000000e+00  
+MAPCOLOR7   4.000000e+00  4.000000e+00  4.000000e+00  
+MAPCOLOR8   5.000000e+00  5.000000e+00  5.000000e+00  
+MAPCOLOR9   1.000000e+00  1.000000e+00  1.000000e+00  
+MAPCOLOR13  1.000000e+00  1.000000e+00  1.000000e+00  
+POP_EST     3.282395e+08  3.282395e+08  3.282395e+08  
+POP_RANK    1.700000e+01  1.700000e+01  1.700000e+01  
+POP_YEAR    2.019000e+03  2.019000e+03  2.019000e+03  
+GDP_MD      2.143323e+07  2.143323e+07  2.143323e+07  
+GDP_YEAR    2.019000e+03  2.019000e+03  2.019000e+03  
+WOE_ID      2.342498e+07  2.342498e+07  2.342498e+07  
+WOE_ID_EH   2.342498e+07  2.342498e+07  2.342498e+07  
+ADM0_A3_UN -9.900000e+01 -9.900000e+01 -9.900000e+01  
+ADM0_A3_WB -9.900000e+01 -9.900000e+01 -9.900000e+01  
+NAME_LEN    2.400000e+01  2.400000e+01  2.400000e+01  
+LONG_LEN    1.300000e+01  1.300000e+01  1.300000e+01  
+ABBREV_LEN  6.000000e+00  6.000000e+00  6.000000e+00  
+TINY       -9.900000e+01 -9.900000e+01 -9.900000e+01  
+HOMEPART    1.000000e+00  1.000000e+00  1.000000e+00  
+MIN_ZOOM    0.000000e+00  0.000000e+00  0.000000e+00  
+MIN_LABEL   1.700000e+00  1.700000e+00  1.700000e+00  
+MAX_LABEL   5.700000e+00  5.700000e+00  5.700000e+00  
+LABEL_X    -9.748260e+01 -9.748260e+01 -9.748260e+01  
+LABEL_Y     3.953848e+01  3.953848e+01  3.953848e+01  
+NE_ID       1.159321e+09  1.159321e+09  1.159321e+09  
+
+Object/category summary:
+
+Top values for featurecla:
+featurecla
+Admin-0 country    9
+Name: count, dtype: int64
+
+Top values for SOVEREIGNT:
+SOVEREIGNT
+United States of America    9
+Name: count, dtype: int64
+
+Top values for SOV_A3:
+SOV_A3
+US1    9
+Name: count, dtype: int64
+
+Top values for TYPE:
+TYPE
+Country    9
+Name: count, dtype: int64
+
+Top values for TLC:
+TLC
+1    9
+Name: count, dtype: int64
+
+Top values for ADMIN:
+ADMIN
+United States of America    9
+Name: count, dtype: int64
+
+Top values for ADM0_A3:
+ADM0_A3
+USA    9
+Name: count, dtype: int64
+
+Top values for GEOUNIT:
+GEOUNIT
+United States of America    9
+Name: count, dtype: int64
+
+Top values for GU_A3:
+GU_A3
+USA    9
+Name: count, dtype: int64
+
+Top values for SUBUNIT:
+SUBUNIT
+United States    9
+Name: count, dtype: int64
+
+Geometry column detected.
+Non-null geometry count: 9
+====================================================================================================
+FILE: clean_2d_seismic.parquet
+Rows: 26
+Columns: 7
+Row groups: 1
+Size (MB): 5.17
+
+Column names:
+['survey_name', 'year_acquired', 'year_released', 'company', 'line_miles', 'geometry', 'type']
+
+Dtypes:
+survey_name          str
+year_acquired    float64
+year_released    float64
+company              str
+line_miles       float64
+geometry          object
+type                 str
+dtype: object
+
+Null counts:
+survey_name      0
+year_acquired    1
+year_released    5
+company          2
+line_miles       5
+geometry         0
+type             0
+dtype: int64
+
+First 3 rows:
+                                 survey_name  year_acquired  year_released  \
+0  Pike Bottom Hole Planning 2D Reprocessing            NaN         2018.0   
+1                                Stingray 2D         2011.0         2021.0   
+2                     Nenana Basin 2D (2005)         2005.0         2019.0   
+
+                                             company  line_miles  \
+0                                WesternGeco and CPA      153.75   
+1  Northern Exploration Services LLC & Fairfield ...        2.24   
+2              Weiman GeoScience & Geo Concepts Inc.      197.21   
+
+                                            geometry type  
+0  b'\x01\x05\x00\x00\x00)\x00\x00\x00\x01\x02\x0...   2D  
+1  b'\x01\x02\x00\x00\x00\x9e\x00\x00\x00\x05\xcb...   2D  
+2  b'\x01\x05\x00\x00\x00S\x00\x00\x00\x01\x02\x0...   2D  
+
+Numeric summary:
+               count         mean        std      min      25%     50%  \
+year_acquired   25.0  2011.120000   4.216238  2004.00  2007.00  2012.0   
+year_released   21.0  2020.952381   3.024503  2017.00  2018.00  2021.0   
+line_miles      21.0   102.882381  98.103400     0.43    16.51    96.7   
+
+                   75%      max  
+year_acquired  2014.00  2017.00  
+year_released  2024.00  2025.00  
+line_miles      165.64   375.05  
+
+Object/category summary:
+
+Top values for survey_name:
+survey_name
+Pike Bottom Hole Planning 2D Reprocessing    1
+Stingray 2D                                  1
+Nenana Basin 2D (2005)                       1
+White Hills 2D                               1
+Moquawkie 2D                                 1
+Shadura 2D (2D/3D Sold as a set)             1
+Toolik 2D (aka Foothills 2D)                 1
+Iniskin 2D                                   1
+Nenana Basin 2D 2016                         1
+Ikpikpuk 2D                                  1
+Name: count, dtype: int64
+
+Top values for company:
+company
+NEOS                                                   2
+Seismic Ventures                                       2
+CGG Veritas                                            2
+NaN                                                    2
+FairfieldNodal                                         2
+WesternGeco and CPA                                    1
+Northern Exploration Services LLC & Fairfield Nodal    1
+Weiman GeoScience & Geo Concepts Inc.                  1
+Paradigm                                               1
+Veritas Geoservices                                    1
+Name: count, dtype: int64
+
+Top values for type:
+type
+2D    26
+Name: count, dtype: int64
+
+Geometry column detected.
+Non-null geometry count: 26
+====================================================================================================
+FILE: clean_3d_seismic.parquet
+Rows: 36
+Columns: 8
+Row groups: 1
+Size (MB): 2.04
+
+Column names:
+['survey_name', 'year_acquired', 'year_released', 'company', 'square_miles', 'survey_type', 'geometry', 'type']
+
+Dtypes:
+survey_name          str
+year_acquired      int64
+year_released    float64
+company              str
+square_miles     float64
+survey_type          str
+geometry          object
+type                 str
+dtype: object
+
+Null counts:
+survey_name      0
+year_acquired    0
+year_released    5
+company          2
+square_miles     5
+survey_type      0
+geometry         0
+type             0
+dtype: int64
+
+First 3 rows:
+                                         survey_name  year_acquired  \
+0                      Aklaq, Smith Bay & Simpson 3D           2008   
+1                                        Big Bend 3D           2014   
+2  Big Island / North Island 3D (aka North Slope ...           2008   
+
+   year_released                company  square_miles survey_type  \
+0         2019.0            WesternGeco        602.04          3D   
+1         2024.0  Geotrace Technologies         83.71          3D   
+2         2019.0            CGG Veritas        199.39          3D   
+
+                                            geometry type  
+0  b'\x01\x03\x00\x00\x00\x01\x00\x00\x00M\x0f\x0...   3D  
+1  b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x86\t\x...   3D  
+2  b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\xf1\x06...   3D  
+
+Numeric summary:
+               count         mean         std      min       25%      50%  \
+year_acquired   36.0  2010.472222    3.909593  2004.00  2007.000  2011.50   
+year_released   31.0  2021.225806    3.252790  2017.00  2018.000  2023.00   
+square_miles    31.0   175.712258  169.885063    10.77    51.775   123.08   
+
+                    75%      max  
+year_acquired  2014.000  2017.00  
+year_released  2024.000  2026.00  
+square_miles    241.005   670.41  
+
+Object/category summary:
+
+Top values for survey_name:
+survey_name
+Aklaq, Smith Bay & Simpson 3D                                 1
+Big Bend 3D                                                   1
+Big Island / North Island 3D (aka North Slope Winter 2007)    1
+Cook Inlet Tyonek 3D (R2)                                     1
+Cosmo 3D                                                      1
+Deep Creek 3D                                                 1
+Granite Point Transition 3D                                   1
+Great Bear 2012 Seismic 3D (Alcor)                            1
+Great Bear 2013 Seismic 3D (Dalton)                           1
+Great Bear 2014 Seismic 3D                                    1
+Name: count, dtype: int64
+
+Top values for company:
+company
+CGG Veritas                                                                                                                     10
+WesternGeco                                                                                                                      7
+FairfieldNodal                                                                                                                   3
+Geokinetics                                                                                                                      2
+NaN                                                                                                                              2
+Veritas Geoservices                                                                                                              2
+Geotrace Technologies                                                                                                            1
+Global Geophysical Services                                                                                                      1
+Weems Geophysical Inc;eSeis, Inc.;Global Geophysical Services, Inc.;Flamingo Seismic Solutions, Inc.;Lumina Geophysical, LLC     1
+WesternGeco & Schlumberger                                                                                                       1
+Name: count, dtype: int64
+
+Top values for survey_type:
+survey_type
+3D           32
+2D and 3D     4
+Name: count, dtype: int64
+
+Top values for type:
+type
+3D    36
+Name: count, dtype: int64
+
+Geometry column detected.
+Non-null geometry count: 36
+====================================================================================================
+FILE: clean_well_locations.parquet
+Rows: 10250
+Columns: 4
+Row groups: 1
+Size (MB): 0.20
+
+Column names:
+['operator', 'field', 'geometry', 'type']
+
+Dtypes:
+operator       str
+field          str
+geometry    object
+type           str
+dtype: object
+
+Null counts:
+operator      0
+field         1
+geometry    356
+type          0
+dtype: int64
+
+First 3 rows:
+                          operator         field  \
+0                  Romig Park Inc.  *EXPLORATORY   
+1    Anchorage Oil and Development  *EXPLORATORY   
+2  Union Oil Company of California  *EXPLORATORY   
+
+                                            geometry  type  
+0  b'\x01\x01\x00\x00\x00\x80=\nW:W\nA\xc0\x86\xa...  well  
+1  b'\x01\x01\x00\x00\x00@EG\xf2Y\x9b\x0bA\xc0\x9...  well  
+2  b'\x01\x01\x00\x00\x00\x007\x1a\xc0I\x9b\nAx$\...  well  
+
+Numeric summary:
+No numeric columns found.
+
+Object/category summary:
+
+Top values for operator:
+operator
+ConocoPhillips Alaska, Inc.        2736
+Hilcorp North Slope, LLC           2121
+Hilcorp Alaska, LLC                1848
+BP Exploration (Alaska) Inc.       1505
+ARCO Alaska Inc.                    467
+Union Oil Company of California     212
+US Dept of Interior                 114
+Cook Inlet Energy, LLC.              61
+Chevron USA Inc.                     56
+Amoco Production Company             43
+Name: count, dtype: int64
+
+Top values for field:
+field
+PRUDHOE BAY            3786
+KUPARUK RIVER          2388
+*EXPLORATORY            907
+MILNE POINT             682
+COLVILLE RIVER          351
+MCARTHUR RIVER          246
+SWANSON RIVER           178
+ENDICOTT                163
+MIDDLE GROUND SHOAL     152
+GRANITE PT              123
+Name: count, dtype: int64
+
+Top values for type:
+type
+well    10250
+Name: count, dtype: int64
+
+Geometry column detected.
+Non-null geometry count: 9894
+====================================================================================================
+FILE: north_slope_assessment_units.parquet
+Rows: 6
+Columns: 6
+Row groups: 1
+Size (MB): 1.08
+
+Column names:
+['region', 'province', 'tps_name', 'au_name', 'geometry', 'type']
+
+Dtypes:
+region         str
+province       str
+tps_name       str
+au_name        str
+geometry    object
+type           str
+dtype: object
+
+Null counts:
+region      0
+province    0
+tps_name    0
+au_name     0
+geometry    0
+type        0
+dtype: int64
+
+First 3 rows:
+          region         province                 tps_name  \
+0  North America  Northern Alaska  Arctic Alaska Composite   
+1  North America  Northern Alaska  Arctic Alaska Composite   
+2  North America  Northern Alaska  Arctic Alaska Composite   
+
+                      au_name  \
+0             Brookian Topset   
+1  Brookian Foreset-Bottomset   
+2    Beaufortian Strata North   
+
+                                            geometry             type  
+0  b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\xedD\x0...  assessment_unit  
+1  b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\xdeG\x0...  assessment_unit  
+2  b'\x01\x03\x00\x00\x00\x01\x00\x00\x00=B\x00\x...  assessment_unit  
+
+Numeric summary:
+No numeric columns found.
+
+Object/category summary:
+
+Top values for region:
+region
+North America    6
+Name: count, dtype: int64
+
+Top values for province:
+province
+Northern Alaska    6
+Name: count, dtype: int64
+
+Top values for tps_name:
+tps_name
+Arctic Alaska Composite    6
+Name: count, dtype: int64
+
+Top values for au_name:
+au_name
+Brookian Topset               1
+Brookian Foreset-Bottomset    1
+Beaufortian Strata North      1
+Beaufortian Strata South      1
+Ellesmerian Strata North      1
+Ellesmerian Strata South      1
+Name: count, dtype: int64
+
+Top values for type:
+type
+assessment_unit    6
+Name: count, dtype: int64
+
+Geometry column detected.
+Non-null geometry count: 6
+====================================================================================================
+FILE: north_slope_extent.parquet
+Rows: 1
+Columns: 2
+Row groups: 1
+Size (MB): 0.01
+
+Column names:
+['name', 'geometry']
+
+Dtypes:
+name           str
+geometry    object
+dtype: object
+
+Null counts:
+name        0
+geometry    0
+dtype: int64
+
+First 3 rows:
+                     name                                           geometry
+0  North Slope Study Area  b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...
+
+Numeric summary:
+No numeric columns found.
+
+Object/category summary:
+
+Top values for name:
+name
+North Slope Study Area    1
+Name: count, dtype: int64
+
+Geometry column detected.
+Non-null geometry count: 1
+
+Done.
