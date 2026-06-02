@@ -46,6 +46,30 @@ jupyter server list
 
 Use the displayed base URL and append `proxy/8501/`.
 
+## Stable Hosted Atlas URL
+
+The unclassified regional atlas can also be deployed through Streamlit Community
+Cloud. This provides a stable `streamlit.app` HTTPS link that can be opened
+directly without keeping an OpenScienceLab terminal running.
+
+Deploy from:
+
+```text
+https://share.streamlit.io/
+```
+
+Choose:
+
+```text
+Repository: Rnanda442/north-slope-gas-hydrates
+Branch: main
+Main file path: streamlit_app.py
+```
+
+The hosted deployment is for the public-source regional atlas only. Do not
+upload classified, controlled, restricted, or credential-bearing material to
+Streamlit Community Cloud.
+
 ## Atlas Views
 
 - `Welcome`: project purpose, public-data boundary, and atlas entry points
