@@ -51,7 +51,8 @@ The regional-atlas release adds:
 - Separate interactive 3D structural explorer
 - Curated data library and filterable repository browser
 - Plain-language data dictionary with `PUBLIC-SOURCE ATLAS` boundary labels
-- Lightweight sampled 3D viewer with selectable layers and optional public wells
+- Lightweight geographic 3D surface viewer with selectable horizons, North Slope
+  context overlays, and optional extent-filtered public wells
 - Manuscript-backed research framework
 - Explicit future wireline-engine blueprint
 - OpenScienceLab launch script and setup instructions

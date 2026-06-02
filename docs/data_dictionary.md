@@ -42,6 +42,10 @@ credentials, and sensitive metadata must stay outside this hosted repository.
 - `9,894` records have usable point geometry.
 - `356` records currently lack usable geometry and must remain visible as a
   quality-control count rather than being silently treated as mappable.
-- The lightweight structural viewer samples the processed structural master table
-  for responsive exploration. It does not alter or discard the underlying source
-  surfaces.
+- The lightweight structural viewer downsamples the processed horizon grids into
+  geographic surface meshes for responsive exploration. It does not alter or
+  discard the underlying source surfaces.
+- Interval-thickness grids remain documented analytical products, but the default
+  3D viewer draws only structural horizons as planes.
+- The optional well overlay is filtered to the North Slope study-area extent so
+  statewide public inventory records do not distort the structural view.

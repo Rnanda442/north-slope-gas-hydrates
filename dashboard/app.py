@@ -21,6 +21,12 @@ STRUCTURAL_SCENES = {
 }
 MASTER_3D = PROJECT_ROOT / "03_data_final" / "master_layers" / "north_slope_master_3d_surfaces.parquet"
 MASTER_2D = PROJECT_ROOT / "03_data_final" / "master_layers" / "north_slope_master_2d_layers.parquet"
+STRUCTURAL_HORIZONS = ["NStopo", "NSLCU", "NSshublik", "NSbasement"]
+CONTEXT_OVERLAYS = [
+    "North Slope study-area boundary",
+    "Assessment-unit outlines",
+    "North Slope public wells",
+]
 
 SURFACE_CATALOG = {
     "NStopo": {
@@ -289,17 +295,28 @@ def read_scene(path: Path) -> str:
 def load_structural_surfaces() -> pd.DataFrame:
     return pd.read_parquet(
         MASTER_3D,
-        columns=["x_3338", "y_3338", "depth_m", "surface_name"],
+        columns=["x_3338", "y_3338", "lon", "lat", "depth_m", "surface_name"],
     )
 
 
 @st.cache_data
-def load_well_points() -> pd.DataFrame:
+def load_regional_context() -> pd.DataFrame:
     layers = pd.read_parquet(
         MASTER_2D,
-        columns=["x_3338", "y_3338", "depth_m", "layer_name"],
+        columns=["layer_name", "feature_id", "vertex_order", "lon", "lat", "depth_m", "au_name"],
     )
-    return layers[layers["layer_name"] == "wells"].copy()
+    return layers[layers["layer_name"].isin(["extent", "assessment_units", "wells"])].copy()
+
+
+@st.cache_data
+def load_north_slope_wells() -> pd.DataFrame:
+    context = load_regional_context()
+    extent = context[context["layer_name"] == "extent"]
+    wells = context[context["layer_name"] == "wells"].copy()
+    return wells[
+        wells["lon"].between(extent["lon"].min(), extent["lon"].max())
+        & wells["lat"].between(extent["lat"].min(), extent["lat"].max())
+    ]
 
 
 def sample_rows(df: pd.DataFrame, max_rows: int) -> pd.DataFrame:
@@ -309,50 +326,103 @@ def sample_rows(df: pd.DataFrame, max_rows: int) -> pd.DataFrame:
     return df.iloc[::step].head(max_rows)
 
 
-def build_lightweight_structural_figure(
+def grid_surface(surface: pd.DataFrame, max_cells: int) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    stride = max(1, round((len(surface) / max_cells) ** 0.5))
+    index = "y_3338"
+    columns = "x_3338"
+    lon = surface.pivot(index=index, columns=columns, values="lon").iloc[::stride, ::stride]
+    lat = surface.pivot(index=index, columns=columns, values="lat").iloc[::stride, ::stride]
+    depth = surface.pivot(index=index, columns=columns, values="depth_m").iloc[::stride, ::stride]
+    return lon, lat, depth
+
+
+def add_context_line(
+    figure: go.Figure,
+    rows: pd.DataFrame,
+    name: str,
+    color: str,
+    width: int,
+    showlegend: bool = True,
+) -> None:
+    figure.add_trace(
+        go.Scatter3d(
+            x=rows["lon"],
+            y=rows["lat"],
+            z=[0] * len(rows),
+            mode="lines",
+            name=name,
+            showlegend=showlegend,
+            line={"color": color, "width": width},
+            hovertemplate=f"<b>{name}</b><br>Longitude: %{{x:.2f}}<br>Latitude: %{{y:.2f}}<extra></extra>",
+        )
+    )
+
+
+def build_geographic_structural_figure(
     selected_surfaces: list[str],
-    points_per_surface: int,
-    include_wells: bool,
+    cells_per_surface: int,
+    selected_overlays: list[str],
 ) -> go.Figure:
     surfaces = load_structural_surfaces()
     figure = go.Figure()
 
     for surface_name in selected_surfaces:
         surface = surfaces[surfaces["surface_name"] == surface_name]
-        surface = sample_rows(surface, points_per_surface)
+        lon, lat, depth = grid_surface(surface, cells_per_surface)
         metadata = SURFACE_CATALOG[surface_name]
         figure.add_trace(
-            go.Scatter3d(
-                x=surface["x_3338"],
-                y=surface["y_3338"],
-                z=surface["depth_m"],
-                mode="markers",
+            go.Surface(
+                x=lon,
+                y=lat,
+                z=depth,
                 name=metadata["Label"],
-                marker={
-                    "size": 2.4,
-                    "color": metadata["Color"],
-                    "opacity": 0.55,
-                },
+                colorscale=[[0, metadata["Color"]], [1, metadata["Color"]]],
+                opacity=0.72,
+                showscale=False,
+                showlegend=True,
                 hovertemplate=(
                     f"<b>{metadata['Label']}</b><br>"
-                    "X: %{x:,.0f} m<br>"
-                    "Y: %{y:,.0f} m<br>"
+                    "Longitude: %{x:.2f}<br>"
+                    "Latitude: %{y:.2f}<br>"
                     "Depth: %{z:,.0f} m<extra></extra>"
                 ),
             )
         )
 
-    if include_wells:
-        wells = sample_rows(load_well_points(), 1800)
+    context = load_regional_context()
+    if "North Slope study-area boundary" in selected_overlays:
+        extent = context[context["layer_name"] == "extent"].sort_values("vertex_order")
+        add_context_line(figure, extent, "North Slope study-area boundary", "#111111", 8)
+
+    if "Assessment-unit outlines" in selected_overlays:
+        assessment_units = context[context["layer_name"] == "assessment_units"]
+        for index, (_, rows) in enumerate(assessment_units.groupby("feature_id")):
+            rows = rows.sort_values("vertex_order")
+            rows = sample_rows(rows, 400)
+            add_context_line(
+                figure,
+                rows,
+                "Assessment-unit outlines",
+                "#d9773d",
+                4,
+                showlegend=index == 0,
+            )
+
+    if "North Slope public wells" in selected_overlays:
+        wells = sample_rows(load_north_slope_wells(), 1800)
         figure.add_trace(
             go.Scatter3d(
-                x=wells["x_3338"],
-                y=wells["y_3338"],
+                x=wells["lon"],
+                y=wells["lat"],
                 z=wells["depth_m"],
                 mode="markers",
-                name="Public well locations",
+                name="North Slope public wells",
                 marker={"size": 2.8, "color": "#111111", "opacity": 0.65},
-                hovertemplate="Public well location<extra></extra>",
+                hovertemplate=(
+                    "<b>North Slope public well</b><br>"
+                    "Longitude: %{x:.2f}<br>"
+                    "Latitude: %{y:.2f}<extra></extra>"
+                ),
             )
         )
 
@@ -361,11 +431,13 @@ def build_lightweight_structural_figure(
         margin={"l": 0, "r": 0, "t": 40, "b": 0},
         legend={"orientation": "h", "y": 1.02, "x": 0},
         scene={
-            "xaxis_title": "Projected X (EPSG:3338)",
-            "yaxis_title": "Projected Y (EPSG:3338)",
+            "xaxis_title": "Longitude",
+            "yaxis_title": "Latitude",
             "zaxis_title": "Depth (m, positive downward)",
             "zaxis": {"autorange": "reversed"},
-            "aspectmode": "data",
+            "aspectmode": "manual",
+            "aspectratio": {"x": 1.8, "y": 1, "z": 0.55},
+            "camera": {"eye": {"x": 1.55, "y": -1.75, "z": 1.05}},
         },
     )
     return figure
@@ -382,7 +454,7 @@ def render_scene(path: Path, height: int = 830) -> None:
 def render_sidebar() -> str:
     with st.sidebar:
         st.markdown("## North Slope Atlas")
-        st.caption("Unclassified regional workspace")
+        st.caption("Public-source regional workspace")
         st.markdown("---")
         page = st.radio("Navigate", PAGES, label_visibility="collapsed")
         st.markdown("---")
@@ -491,35 +563,40 @@ def render_structural_explorer() -> None:
     st.markdown('<div class="atlas-kicker">Subsurface context</div>', unsafe_allow_html=True)
     st.title("Structural Explorer")
     st.write(
-        "Use the lightweight viewer to inspect selected structural layers without "
-        "loading the full 723,840-point stack. Add surfaces deliberately and keep "
-        "the point budget modest for smoother interaction."
+        "Compare regional structural horizons as lightweight surface planes. The "
+        "horizontal axes use longitude and latitude, while optional context overlays "
+        "connect the subsurface model to the North Slope study area."
     )
-    cols = st.columns([2, 1, 1])
+    cols = st.columns([2, 1])
     selected_surfaces = cols[0].multiselect(
-        "Visible structural layers",
-        list(SURFACE_CATALOG),
+        "Visible structural horizons",
+        STRUCTURAL_HORIZONS,
         default=["NStopo", "NSLCU", "NSshublik", "NSbasement"],
         format_func=lambda name: f"{name} - {SURFACE_CATALOG[name]['Label']}",
     )
-    points_per_surface = cols[1].select_slider(
-        "Points per layer",
-        options=[500, 1000, 2000, 3500, 5000],
-        value=2000,
+    cells_per_surface = cols[1].select_slider(
+        "Surface detail",
+        options=[1500, 3000, 6000, 12000],
+        value=3000,
+        format_func=lambda cells: f"Up to {cells:,} cells / horizon",
     )
-    include_wells = cols[2].checkbox("Show public wells", value=False)
+    selected_overlays = st.multiselect(
+        "Regional context overlays",
+        CONTEXT_OVERLAYS,
+        default=["North Slope study-area boundary", "Assessment-unit outlines"],
+    )
 
     if selected_surfaces:
-        total_points = points_per_surface * len(selected_surfaces)
         st.caption(
-            f"Rendering up to {total_points:,} structural points"
-            + (" plus sampled public wells." if include_wells else ".")
+            f"Rendering up to {cells_per_surface * len(selected_surfaces):,} surface cells. "
+            "Interval-thickness grids remain documented in the Data Library but are "
+            "not drawn as structural planes."
         )
         st.plotly_chart(
-            build_lightweight_structural_figure(
+            build_geographic_structural_figure(
                 selected_surfaces,
-                points_per_surface,
-                include_wells,
+                cells_per_surface,
+                selected_overlays,
             ),
             use_container_width=True,
         )
