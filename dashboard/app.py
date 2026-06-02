@@ -10,7 +10,9 @@ import streamlit.components.v1 as components
 
 from dashboard.well_log_engine import (
     RANGE_GUIDE,
+    PUBLIC_SCIENCE_REFERENCES,
     SYNTHETIC_LABEL,
+    SWEET_SPOT_GUIDE,
     VARIABLES,
     cross_well_range_figure,
     csv_bytes,
@@ -838,6 +840,15 @@ def render_range_guide() -> None:
     )
     st.error("High resistivity alone is not a hydrate label. Stability is necessary but not sufficient.")
     st.dataframe(pd.DataFrame(RANGE_GUIDE), use_container_width=True, hide_index=True)
+    st.markdown("#### Synthetic Sweet-Spot Planning Guide")
+    st.write(
+        "These saturation-proxy bands are presentation and expert-review lanes. "
+        "They are not universal thresholds and they do not replace locally calibrated "
+        "multi-log interpretation inside the authorized environment."
+    )
+    st.dataframe(pd.DataFrame(SWEET_SPOT_GUIDE), use_container_width=True, hide_index=True)
+    st.markdown("#### Public Science Anchors")
+    st.dataframe(pd.DataFrame(PUBLIC_SCIENCE_REFERENCES), use_container_width=True, hide_index=True)
 
 
 def render_interval_screen(intervals: pd.DataFrame) -> None:

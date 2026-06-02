@@ -166,6 +166,62 @@ RANGE_GUIDE = [
     },
 ]
 
+SWEET_SPOT_GUIDE = [
+    {
+        "Planning band": "Admissibility only",
+        "Synthetic saturation-proxy range": "Any",
+        "Use": "Confirm that the interval is inside a probabilistic GHSZ screen.",
+        "Scientific anchor": "GHSZ is necessary but not sufficient.",
+        "Required confirmation": "Reservoir quality, multi-log phase evidence, and local calibration.",
+    },
+    {
+        "Planning band": "Occupancy / expert review",
+        "Synthetic saturation-proxy range": "< 0.35",
+        "Use": "Preserve low-to-moderate occupancy, thin-bed averaging, and ambiguous responses for review.",
+        "Scientific anchor": "The manuscript warns that thin strong hydrate beds can average into modest apparent saturation.",
+        "Required confirmation": "Vertical-resolution review, NMR where available, sonic, Rt, and core depth match.",
+    },
+    {
+        "Planning band": "Candidate sweet-spot review lane",
+        "Synthetic saturation-proxy range": "0.35-0.60",
+        "Use": "Flag a moderate-saturation interval for production-oriented review when reservoir quality and QC remain favorable.",
+        "Scientific anchor": "Manuscript load-bearing transition about 0.35-0.45; retained permeability can matter more than maximum saturation.",
+        "Required confirmation": "Connected pore volume, permeability retention, pressure communication, core calibration, and geomechanics.",
+    },
+    {
+        "Planning band": "High-saturation hydrate-supportive lane",
+        "Synthetic saturation-proxy range": "0.60-0.80",
+        "Use": "Flag strong hydrate-supportive evidence while retaining a separate flow-risk review.",
+        "Scientific anchor": "Public Mount Elbert study: hydrate intervals averaged about 0.50-0.54 and reached about 0.75.",
+        "Required confirmation": "NMR-density preferred, sonic and Rt agreement, reservoir continuity, and producibility review.",
+    },
+    {
+        "Planning band": "Very-high-saturation resource lane",
+        "Synthetic saturation-proxy range": "> 0.80",
+        "Use": "Flag high resource density and detectability, not an automatic best production target.",
+        "Scientific anchor": "Public Hydrate-01 study: target reservoir sands reached approximately 0.90 saturation.",
+        "Required confirmation": "Permeability-collapse risk, pressure communication, mechanical response, and local core calibration.",
+    },
+]
+
+PUBLIC_SCIENCE_REFERENCES = [
+    {
+        "Reference": "Lee and Collett (2011), Mount Elbert",
+        "Public URL": "https://pubs.usgs.gov/publication/70036903",
+        "Dashboard use": "NMR, sonic, and electrical-resistivity saturation agreement; clay effects must be considered for resistivity interpretation.",
+    },
+    {
+        "Reference": "Haines et al. (2022), Hydrate-01",
+        "Public URL": "https://pubs.usgs.gov/publication/70249535",
+        "Dashboard use": "Sonic saturation estimates compare with resistivity and NMR; target sands reached approximately 90% pore-space hydrate occupancy.",
+    },
+    {
+        "Reference": "Zyrianova et al. (2024), Eileen trend",
+        "Public URL": "https://pubs.usgs.gov/publication/70252109",
+        "Dashboard use": "Fault-block segmentation, partial fill, and down-dip water contacts support good-sand/no-hydrate and compartment-aware outcomes.",
+    },
+]
+
 
 @dataclass(frozen=True)
 class RuntimeConfig:
@@ -368,10 +424,13 @@ def screen_intervals(logs: pd.DataFrame, interval_m: int = 40) -> pd.DataFrame:
             proxy_source = "NMR-density preferred" if nmr_available else "Archie supplementary cross-check"
             core_confidence = "placeholder: not calibrated" if not qc_review else "placeholder: QC-limited"
             producibility = "separate review"
+            sweet_spot_lane = "not promoted"
             if phase.startswith("hydrate") and proxy < 0.60 and median["density_porosity_vv"] >= 0.24:
                 producibility = "moderate-priority synthetic screen"
+                sweet_spot_lane = "candidate sweet-spot review lane"
             elif phase.startswith("hydrate"):
                 producibility = "flow-risk review: saturation is not producibility"
+                sweet_spot_lane = "high-saturation resource lane; flow-risk review"
             flags = []
             if not stable:
                 flags.append("outside working GHSZ screen")
@@ -394,6 +453,7 @@ def screen_intervals(logs: pd.DataFrame, interval_m: int = 40) -> pd.DataFrame:
                     "Proxy source": proxy_source,
                     "Core-calibration confidence": core_confidence,
                     "Producibility screen": producibility,
+                    "Synthetic sweet-spot review lane": sweet_spot_lane,
                     "Uncertainty flags": "; ".join(flags) if flags else "none in synthetic screen",
                 }
             )
@@ -496,4 +556,3 @@ def csv_bytes(frame: pd.DataFrame) -> bytes:
 
 def figure_html_bytes(figure: go.Figure) -> bytes:
     return figure.to_html(include_plotlyjs="cdn", full_html=True).encode("utf-8")
-

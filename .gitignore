@@ -2,3 +2,8 @@
 __pycache__/
 *.zip
 .venv-dashboard/
+data_runtime/
+outputs_runtime/
+models_runtime/
+logs_runtime/
+configs_local/

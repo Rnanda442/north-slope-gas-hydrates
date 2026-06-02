@@ -107,3 +107,13 @@ generated locally inside the authorized DOE environment. Every export is labeled
 The reusable calculation layer lives in `dashboard/well_log_engine.py`. Its
 `RuntimeConfig` boundary is the future transfer point for authorized LAS/CSV
 adapters. Do not point hosted Streamlit deployments at approved runtime files.
+
+For an authorized OpenScienceLab working layout, run:
+
+```bash
+bash setup_authorized_runtime.sh
+```
+
+The created `data_runtime/`, `outputs_runtime/`, `models_runtime/`,
+`logs_runtime/`, and `configs_local/` folders are intentionally ignored by Git.
+See `docs/opensciencelab_runtime_layout.md`.

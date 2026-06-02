@@ -1,0 +1,13 @@
+# PUBLIC-SOURCE PLANNING SCAFFOLD
+# Copy to configs_local/curve_aliases.yaml and edit locally for approved files.
+depth_m: [DEPTH, MD, TVD]
+gr_api: [GR]
+rt_ohm_m: [RT, ILD, RDEP]
+rhob_g_cc: [RHOB]
+dt_us_ft: [DT, DTC]
+dts_us_ft: [DTS]
+nmr_porosity_vv: [NMRPHI, TCMR]
+caliper_in: [CALI]
+temperature_c: [TEMP, T]
+pressure_mpa: [PRESSURE, P]
+

@@ -1,0 +1,10 @@
+# PUBLIC-SOURCE PLANNING SCAFFOLD
+# Copy to configs_local/runtime_config.yaml inside the authorized environment.
+input_mode: approved_local_runtime
+approved_csv_glob: data_runtime/approved_inputs/*.csv
+approved_las_glob: data_runtime/approved_inputs/*.las
+core_calibration_glob: data_runtime/core_calibration/*.csv
+output_root: outputs_runtime
+model_root: models_runtime
+log_root: logs_runtime
+
