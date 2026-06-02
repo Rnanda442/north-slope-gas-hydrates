@@ -44,12 +44,14 @@ The dashboard and future wireline module should preserve these rules:
 
 ## Dashboard Status
 
-The first dashboard release adds:
+The regional-atlas release adds:
 
-- Manuscript-backed overview
-- Embedded interactive Plotly scene viewer
-- Filterable repository data catalog
-- Explicit future wireline-module roadmap
+- Welcome scaffold and atlas navigation
+- Regional map for assessment units, seismic coverage, and public well locations
+- Separate interactive 3D structural explorer
+- Curated data library and filterable repository browser
+- Manuscript-backed research framework
+- Explicit future wireline-engine blueprint
 - OpenScienceLab launch script and setup instructions
 
 ## Next Engineering Stages
