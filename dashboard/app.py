@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections import Counter
 from pathlib import Path
 
+import pandas as pd
+import plotly.graph_objects as go
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -16,6 +18,51 @@ STRUCTURAL_SCENES = {
     "Master structural scene": EXPORT_DIR / "north_slope_master_analysis_scene.html",
     "Full-resolution structural scene": EXPORT_DIR
     / "north_slope_master_analysis_scene_full_no_simplify.html",
+}
+MASTER_3D = PROJECT_ROOT / "03_data_final" / "master_layers" / "north_slope_master_3d_surfaces.parquet"
+MASTER_2D = PROJECT_ROOT / "03_data_final" / "master_layers" / "north_slope_master_2d_layers.parquet"
+
+SURFACE_CATALOG = {
+    "NStopo": {
+        "Label": "Topographic reference",
+        "Description": "Near-surface reference horizon used to orient the structural stack.",
+        "Color": "#4daf4a",
+    },
+    "NSLCU": {
+        "Label": "Lower Cretaceous unconformity",
+        "Description": "Regional unconformity surface used as a subsurface structural reference.",
+        "Color": "#377eb8",
+    },
+    "NSshublik": {
+        "Label": "Shublik surface",
+        "Description": "Regional Shublik structural horizon used for deeper framework context.",
+        "Color": "#ff7f00",
+    },
+    "NSbasement": {
+        "Label": "Basement surface",
+        "Description": "Deep basement structural reference for regional basin geometry.",
+        "Color": "#984ea3",
+    },
+    "NStopo-LCU": {
+        "Label": "Topography to LCU interval",
+        "Description": "Thickness-style grid between the topographic reference and LCU.",
+        "Color": "#66c2a5",
+    },
+    "NSLCU-Shublik": {
+        "Label": "LCU to Shublik interval",
+        "Description": "Thickness-style grid between LCU and the Shublik surface.",
+        "Color": "#fc8d62",
+    },
+    "NSshublik-basement": {
+        "Label": "Shublik to basement interval",
+        "Description": "Thickness-style grid between the Shublik and basement surfaces.",
+        "Color": "#8da0cb",
+    },
+    "NStopo-basement": {
+        "Label": "Topography to basement interval",
+        "Description": "Full reference interval between topography and basement.",
+        "Color": "#e78ac3",
+    },
 }
 
 PAGES = [
@@ -34,6 +81,9 @@ LAYER_CATALOG = [
         "Records": "10,250",
         "Geometry": "Point",
         "Status": "Cleaned + enriched",
+        "Source category": "Public-source GIS",
+        "Boundary tag": "PUBLIC-SOURCE ATLAS",
+        "Description": "Well-bottom-hole inventory used for regional orientation and map filtering.",
         "Location": "03_data_final/core_layers/clean_well_locations.parquet",
     },
     {
@@ -42,6 +92,9 @@ LAYER_CATALOG = [
         "Records": "26 surveys",
         "Geometry": "Line / MultiLine",
         "Status": "Cleaned + enriched",
+        "Source category": "Public-source GIS",
+        "Boundary tag": "PUBLIC-SOURCE ATLAS",
+        "Description": "Regional 2D line inventory used to show available seismic context.",
         "Location": "03_data_final/core_layers/clean_2d_seismic.parquet",
     },
     {
@@ -50,6 +103,9 @@ LAYER_CATALOG = [
         "Records": "36 surveys",
         "Geometry": "Polygon / MultiPolygon",
         "Status": "Cleaned + enriched",
+        "Source category": "Public-source GIS",
+        "Boundary tag": "PUBLIC-SOURCE ATLAS",
+        "Description": "Polygon footprints showing areas with 3D seismic inventory coverage.",
         "Location": "03_data_final/core_layers/clean_3d_seismic.parquet",
     },
     {
@@ -58,6 +114,9 @@ LAYER_CATALOG = [
         "Records": "6 units",
         "Geometry": "Polygon / MultiPolygon",
         "Status": "Cleaned + enriched",
+        "Source category": "Public-source geology",
+        "Boundary tag": "PUBLIC-SOURCE ATLAS",
+        "Description": "Regional assessment units used as petroleum-system context.",
         "Location": "03_data_final/core_layers/north_slope_assessment_units.parquet",
     },
     {
@@ -66,6 +125,9 @@ LAYER_CATALOG = [
         "Records": "1 boundary",
         "Geometry": "Polygon",
         "Status": "Cleaned + enriched",
+        "Source category": "Project-derived boundary",
+        "Boundary tag": "PUBLIC-SOURCE ATLAS",
+        "Description": "Study-area outline for North Slope-focused visualization.",
         "Location": "03_data_final/core_layers/north_slope_extent.parquet",
     },
     {
@@ -74,6 +136,9 @@ LAYER_CATALOG = [
         "Records": "8 XYZ grids",
         "Geometry": "Grid points + rasters",
         "Status": "Processed",
+        "Source category": "Public-source structural grids",
+        "Boundary tag": "PUBLIC-SOURCE ATLAS",
+        "Description": "Raw XYZ structural references and interval grids used in the 3D explorer.",
         "Location": "raw_data/north_slope_depth_grids/",
     },
     {
@@ -82,6 +147,9 @@ LAYER_CATALOG = [
         "Records": "3 surfaces",
         "Geometry": "Point GeoJSON + Parquet",
         "Status": "Dashboard ready",
+        "Source category": "Project-derived GIS output",
+        "Boundary tag": "PUBLIC-SOURCE ATLAS",
+        "Description": "Processed surface points exported for GIS and lightweight inspection.",
         "Location": "03_data_final/gis_ready_surfaces/",
     },
 ]
@@ -217,6 +285,92 @@ def read_scene(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="replace")
 
 
+@st.cache_data
+def load_structural_surfaces() -> pd.DataFrame:
+    return pd.read_parquet(
+        MASTER_3D,
+        columns=["x_3338", "y_3338", "depth_m", "surface_name"],
+    )
+
+
+@st.cache_data
+def load_well_points() -> pd.DataFrame:
+    layers = pd.read_parquet(
+        MASTER_2D,
+        columns=["x_3338", "y_3338", "depth_m", "layer_name"],
+    )
+    return layers[layers["layer_name"] == "wells"].copy()
+
+
+def sample_rows(df: pd.DataFrame, max_rows: int) -> pd.DataFrame:
+    if len(df) <= max_rows:
+        return df
+    step = max(1, len(df) // max_rows)
+    return df.iloc[::step].head(max_rows)
+
+
+def build_lightweight_structural_figure(
+    selected_surfaces: list[str],
+    points_per_surface: int,
+    include_wells: bool,
+) -> go.Figure:
+    surfaces = load_structural_surfaces()
+    figure = go.Figure()
+
+    for surface_name in selected_surfaces:
+        surface = surfaces[surfaces["surface_name"] == surface_name]
+        surface = sample_rows(surface, points_per_surface)
+        metadata = SURFACE_CATALOG[surface_name]
+        figure.add_trace(
+            go.Scatter3d(
+                x=surface["x_3338"],
+                y=surface["y_3338"],
+                z=surface["depth_m"],
+                mode="markers",
+                name=metadata["Label"],
+                marker={
+                    "size": 2.4,
+                    "color": metadata["Color"],
+                    "opacity": 0.55,
+                },
+                hovertemplate=(
+                    f"<b>{metadata['Label']}</b><br>"
+                    "X: %{x:,.0f} m<br>"
+                    "Y: %{y:,.0f} m<br>"
+                    "Depth: %{z:,.0f} m<extra></extra>"
+                ),
+            )
+        )
+
+    if include_wells:
+        wells = sample_rows(load_well_points(), 1800)
+        figure.add_trace(
+            go.Scatter3d(
+                x=wells["x_3338"],
+                y=wells["y_3338"],
+                z=wells["depth_m"],
+                mode="markers",
+                name="Public well locations",
+                marker={"size": 2.8, "color": "#111111", "opacity": 0.65},
+                hovertemplate="Public well location<extra></extra>",
+            )
+        )
+
+    figure.update_layout(
+        height=760,
+        margin={"l": 0, "r": 0, "t": 40, "b": 0},
+        legend={"orientation": "h", "y": 1.02, "x": 0},
+        scene={
+            "xaxis_title": "Projected X (EPSG:3338)",
+            "yaxis_title": "Projected Y (EPSG:3338)",
+            "zaxis_title": "Depth (m, positive downward)",
+            "zaxis": {"autorange": "reversed"},
+            "aspectmode": "data",
+        },
+    )
+    return figure
+
+
 def render_scene(path: Path, height: int = 830) -> None:
     if not path.exists():
         st.warning(f"Scene has not been generated yet: {path.relative_to(PROJECT_ROOT)}")
@@ -337,22 +491,61 @@ def render_structural_explorer() -> None:
     st.markdown('<div class="atlas-kicker">Subsurface context</div>', unsafe_allow_html=True)
     st.title("Structural Explorer")
     st.write(
-        "The structural scenes use generated North Slope depth surfaces and the "
-        "public well inventory. They establish the regional subsurface framework "
-        "that later log interpretation can reference."
+        "Use the lightweight viewer to inspect selected structural layers without "
+        "loading the full 723,840-point stack. Add surfaces deliberately and keep "
+        "the point budget modest for smoother interaction."
     )
-    label = st.selectbox("Structural scene", list(STRUCTURAL_SCENES))
-    render_scene(STRUCTURAL_SCENES[label], height=870)
-    with st.expander("Included structural layers"):
-        st.markdown(
-            """
-            - `NStopo`: topographic reference surface
-            - `NSLCU`: Lower Cretaceous unconformity surface
-            - `NSshublik`: Shublik structural surface
-            - `NSbasement`: basement structural surface
-            - Interval grids connecting topography, LCU, Shublik, and basement
-            """
+    cols = st.columns([2, 1, 1])
+    selected_surfaces = cols[0].multiselect(
+        "Visible structural layers",
+        list(SURFACE_CATALOG),
+        default=["NStopo", "NSLCU", "NSshublik", "NSbasement"],
+        format_func=lambda name: f"{name} - {SURFACE_CATALOG[name]['Label']}",
+    )
+    points_per_surface = cols[1].select_slider(
+        "Points per layer",
+        options=[500, 1000, 2000, 3500, 5000],
+        value=2000,
+    )
+    include_wells = cols[2].checkbox("Show public wells", value=False)
+
+    if selected_surfaces:
+        total_points = points_per_surface * len(selected_surfaces)
+        st.caption(
+            f"Rendering up to {total_points:,} structural points"
+            + (" plus sampled public wells." if include_wells else ".")
         )
+        st.plotly_chart(
+            build_lightweight_structural_figure(
+                selected_surfaces,
+                points_per_surface,
+                include_wells,
+            ),
+            use_container_width=True,
+        )
+    else:
+        st.info("Select at least one structural layer to draw the 3D view.")
+
+    st.markdown("### Structural Layer Labels")
+    surface_rows = [
+        {
+            "Code": code,
+            "Plain-language label": metadata["Label"],
+            "Meaning": metadata["Description"],
+            "Boundary tag": "PUBLIC-SOURCE ATLAS",
+        }
+        for code, metadata in SURFACE_CATALOG.items()
+    ]
+    st.dataframe(surface_rows, use_container_width=True, hide_index=True)
+
+    with st.expander("Advanced fallback: original heavy HTML scenes"):
+        st.warning(
+            "These notebook exports are preserved for completeness. They can lag "
+            "because they embed much larger point collections."
+        )
+        label = st.selectbox("Original structural scene", list(STRUCTURAL_SCENES))
+        if st.button("Load original heavy scene"):
+            render_scene(STRUCTURAL_SCENES[label], height=870)
 
 
 def render_data_library(files: list[dict[str, object]]) -> None:
@@ -363,6 +556,10 @@ def render_data_library(files: list[dict[str, object]]) -> None:
         "products. The repository browser below provides the full file-level view."
     )
     st.dataframe(LAYER_CATALOG, use_container_width=True, hide_index=True)
+    st.caption(
+        "Boundary tags label the public atlas data products. Future approved "
+        "restricted inputs must remain outside this hosted repository."
+    )
 
     st.markdown("### Repository Browser")
     extensions = sorted({str(row["Type"]) for row in files})

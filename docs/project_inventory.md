@@ -50,6 +50,8 @@ The regional-atlas release adds:
 - Regional map for assessment units, seismic coverage, and public well locations
 - Separate interactive 3D structural explorer
 - Curated data library and filterable repository browser
+- Plain-language data dictionary with `PUBLIC-SOURCE ATLAS` boundary labels
+- Lightweight sampled 3D viewer with selectable layers and optional public wells
 - Manuscript-backed research framework
 - Explicit future wireline-engine blueprint
 - OpenScienceLab launch script and setup instructions

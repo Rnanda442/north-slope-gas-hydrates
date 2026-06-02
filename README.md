@@ -87,6 +87,7 @@ Streamlit Community Cloud.
 - `03_data_final/gis_ready_surfaces/`: depth-grid surfaces prepared for GIS use
 - `03_data_final/master_layers/`: consolidated 2D and 3D analysis tables
 - `05_exports/html/`: generated interactive Plotly scenes and notebook exports
+- `docs/data_dictionary.md`: plain-language layer labels and atlas boundary tags
 
 ## Data Boundary
 
