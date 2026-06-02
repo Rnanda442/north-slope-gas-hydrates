@@ -77,7 +77,9 @@ Streamlit Community Cloud.
 - `Structural Explorer`: generated North Slope 3D structural scenes
 - `Data Library`: curated layer metadata and a filterable repository inventory
 - `Research Framework`: manuscript-backed interpretation chain and decision rules
-- `Future Well-Log Engine`: runtime-only blueprint for approved well-log analysis
+- `Future Well-Log Engine`: synthetic planning scaffold for the later runtime-only
+  approved well-log analysis, including variable ranges, interpretation guidance,
+  interval screening, core-calibration placeholders, and presentation exports
 
 ## Current Data Layout
 
@@ -94,3 +96,14 @@ Streamlit Community Cloud.
 Do not commit classified, controlled, restricted, or credential-bearing material.
 The future well-log module must accept data at runtime from the approved
 environment rather than embedding DOE data in this repository.
+
+## Synthetic Well-Log Planning Scaffold
+
+The public dashboard includes synthetic records with neutral aliases such as
+`SYNTH-WELL-01`. These records preview the analysis outputs that should later be
+generated locally inside the authorized DOE environment. Every export is labeled
+`SYNTHETIC DEMONSTRATION DATA`.
+
+The reusable calculation layer lives in `dashboard/well_log_engine.py`. Its
+`RuntimeConfig` boundary is the future transfer point for authorized LAS/CSV
+adapters. Do not point hosted Streamlit deployments at approved runtime files.

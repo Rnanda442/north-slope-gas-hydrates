@@ -8,6 +8,22 @@ import plotly.graph_objects as go
 import streamlit as st
 import streamlit.components.v1 as components
 
+from dashboard.well_log_engine import (
+    RANGE_GUIDE,
+    SYNTHETIC_LABEL,
+    VARIABLES,
+    cross_well_range_figure,
+    csv_bytes,
+    figure_html_bytes,
+    load_runtime_data,
+    model_placeholder_figures,
+    nearby_log_calibration,
+    screen_intervals,
+    synthetic_core_placeholders,
+    variable_range_summary,
+    well_log_panel,
+)
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 EXPORT_DIR = PROJECT_ROOT / "05_exports" / "html"
@@ -690,12 +706,16 @@ def render_framework() -> None:
 
 
 def render_future_engine() -> None:
-    st.markdown('<div class="atlas-kicker">Planned runtime module</div>', unsafe_allow_html=True)
+    st.markdown('<div class="atlas-kicker">Synthetic planning scaffold</div>', unsafe_allow_html=True)
     st.title("Future Well-Log Engine")
     st.write(
-        "This page is a blueprint for the later runtime-only analysis module. It "
-        "does not contain restricted data and does not claim that the regional GIS "
-        "layers alone detect hydrate."
+        "This presentation-ready scaffold previews the outputs planned for the later "
+        "runtime-only analysis module. It contains synthetic example records only."
+    )
+    st.warning(
+        f"{SYNTHETIC_LABEL}. PUBLIC-SOURCE PLANNING SCAFFOLD. Do not upload approved "
+        "well logs, core data, identifiers, populated sensitive outputs, derived "
+        "sensitive results, or credentials to this hosted dashboard."
     )
 
     cols = st.columns(3)
@@ -713,7 +733,7 @@ def render_future_engine() -> None:
         ),
         (
             "Outputs",
-            "Occurrence screening, phase classification, saturation estimates, uncertainty, and separate producibility ranking.",
+            "Admissibility, reservoir quality, phase evidence, saturation proxy, core confidence, uncertainty, and separate producibility screening.",
         ),
     ]
     for col, (title, text) in zip(cols, blocks):
@@ -722,7 +742,46 @@ def render_future_engine() -> None:
             unsafe_allow_html=True,
         )
 
-    st.markdown("### Planned Analysis Sequence")
+    st.markdown("### Scientific Rules Kept Visible")
+    st.markdown(
+        """
+        1. GHSZ is necessary but not sufficient.
+        2. High Rt is evidence, not a hydrate label.
+        3. Good reservoir sand can contain no hydrate.
+        4. Geology and seismic context constrain confidence; they do not replace direct log evidence.
+        5. NMR-density saturation is preferred where NMR exists; Archie is a supplementary cross-check with uncertainty flags.
+        6. Hydrate occurrence, saturation, and producibility remain separate outputs.
+        7. Validation must split by well, not randomly by depth sample.
+        8. Maximum hydrate saturation is not automatically the best production target.
+        """
+    )
+
+    logs = load_runtime_data()
+    intervals = screen_intervals(logs)
+    core = synthetic_core_placeholders()
+    calibrated_core = nearby_log_calibration(logs, core)
+
+    tabs = st.tabs(
+        [
+            "Variable Range Explorer",
+            "Hydrate Interpretation Range Guide",
+            "Interval Screening Scaffold",
+            "Core Calibration Scaffold",
+            "Presentation Outputs",
+        ]
+    )
+    with tabs[0]:
+        render_variable_range_explorer(logs)
+    with tabs[1]:
+        render_range_guide()
+    with tabs[2]:
+        render_interval_screen(intervals)
+    with tabs[3]:
+        render_core_calibration(calibrated_core)
+    with tabs[4]:
+        render_presentation_outputs(logs, intervals, calibrated_core)
+
+    st.markdown("### Planned Runtime Analysis Sequence")
     sequence = [
         ("1", "Stability admissibility", "Screen pressure-temperature context without using it as a positive label."),
         ("2", "Reservoir screening", "Identify clean reservoir intervals and preserve good-sand/no-hydrate outcomes."),
@@ -733,10 +792,109 @@ def render_future_engine() -> None:
     for number, title, description in sequence:
         st.markdown(f"**{number}. {title}**  \n{description}")
 
-    st.warning(
-        "Next engine milestone: define a configurable LAS/CSV schema, units, "
-        "valid-range checks, and approved synthetic or public example logs."
+    st.info(
+        "Transfer point: the reusable calculation layer is isolated behind a runtime "
+        "configuration adapter. Authorized LAS/CSV loading should be added and run "
+        "locally inside the approved DOE environment."
     )
+
+
+def render_variable_range_explorer(logs: pd.DataFrame) -> None:
+    st.subheader("Variable Range Explorer")
+    st.caption(f"{SYNTHETIC_LABEL} | Summary statistics are descriptive planning outputs, not universal thresholds.")
+    wells = sorted(logs["well_alias"].unique())
+    cols = st.columns([1, 1, 2])
+    well = cols[0].selectbox("Synthetic location / well alias", wells)
+    variable = cols[1].selectbox("Variable", list(VARIABLES), format_func=lambda name: VARIABLES[name][0])
+    depth_min, depth_max = logs["depth_m"].min(), logs["depth_m"].max()
+    depth_range = cols[2].slider("Depth interval (m)", float(depth_min), float(depth_max), (float(depth_min), float(depth_max)), step=5.0)
+    subset = logs[(logs["well_alias"] == well) & logs["depth_m"].between(*depth_range)]
+    label, unit = VARIABLES[variable]
+    figure = go.Figure(go.Scatter(x=subset[variable], y=subset["depth_m"], mode="lines", name=label))
+    figure.update_layout(title=f"{SYNTHETIC_LABEL} | {well} | {label}", xaxis_title=f"{label} ({unit})", yaxis_title="Depth (m)", height=530)
+    figure.update_yaxes(autorange="reversed")
+    st.plotly_chart(figure, use_container_width=True)
+    summary = variable_range_summary(logs, [variable], well, depth_range)
+    st.dataframe(summary, use_container_width=True, hide_index=True)
+    st.download_button("Download variable-range table (CSV)", csv_bytes(summary), "synthetic_variable_range_table.csv", "text/csv", key="range_explorer_table")
+
+    st.markdown("#### Cross-Well Comparison")
+    cross_well = pd.concat(
+        [
+            variable_range_summary(logs, [variable], alias, depth_range).assign(**{"Well alias": alias})
+            for alias in wells
+        ],
+        ignore_index=True,
+    )
+    st.plotly_chart(cross_well_range_figure(cross_well, label), use_container_width=True)
+    st.dataframe(cross_well, use_container_width=True, hide_index=True)
+
+
+def render_range_guide() -> None:
+    st.subheader("Hydrate Interpretation Range Guide")
+    st.caption(
+        "Manuscript-backed working tendencies for planning. These ranges overlap competing "
+        "end members and must not be treated as universal thresholds."
+    )
+    st.error("High resistivity alone is not a hydrate label. Stability is necessary but not sufficient.")
+    st.dataframe(pd.DataFrame(RANGE_GUIDE), use_container_width=True, hide_index=True)
+
+
+def render_interval_screen(intervals: pd.DataFrame) -> None:
+    st.subheader("Interval Screening Scaffold")
+    st.caption(f"{SYNTHETIC_LABEL} | Separate staged outputs preserve good-sand/no-hydrate and expert-review outcomes.")
+    well = st.selectbox("Synthetic interval-screen well alias", sorted(intervals["Well alias"].unique()))
+    selected = intervals[intervals["Well alias"] == well]
+    st.dataframe(selected, use_container_width=True, hide_index=True)
+    st.download_button("Download interval-interpretation table (CSV)", csv_bytes(selected), "synthetic_interval_interpretation.csv", "text/csv", key="interval_screen_table")
+
+
+def render_core_calibration(calibrated_core: pd.DataFrame) -> None:
+    st.subheader("Core Calibration Scaffold")
+    st.caption(
+        f"{SYNTHETIC_LABEL} | Future approved pressure-core observations remain local. "
+        "The placeholder table shows depth-match uncertainty and nearby-log linkage."
+    )
+    st.dataframe(calibrated_core, use_container_width=True, hide_index=True)
+    st.download_button("Download core-to-log calibration table (CSV)", csv_bytes(calibrated_core), "synthetic_core_to_log_calibration.csv", "text/csv", key="core_calibration_table")
+
+
+def render_presentation_outputs(logs: pd.DataFrame, intervals: pd.DataFrame, calibrated_core: pd.DataFrame) -> None:
+    st.subheader("Presentation Outputs")
+    st.caption(f"{SYNTHETIC_LABEL} | Export-ready placeholders for the existing PowerPoint scaffold.")
+    well = st.selectbox("Presentation-output synthetic well", sorted(logs["well_alias"].unique()))
+    panel = well_log_panel(logs, well)
+    st.plotly_chart(panel, use_container_width=True)
+    st.download_button("Download well-log panel (HTML)", figure_html_bytes(panel), "synthetic_well_log_panel.html", "text/html", key="presentation_well_panel")
+
+    range_table = variable_range_summary(logs, well_alias=well)
+    st.dataframe(range_table, use_container_width=True, hide_index=True)
+    st.download_button("Download variable-range table (CSV)", csv_bytes(range_table), "synthetic_variable_range_table.csv", "text/csv", key="presentation_range_table")
+
+    interval_table = intervals[intervals["Well alias"] == well]
+    st.download_button("Download interval-interpretation table (CSV)", csv_bytes(interval_table), "synthetic_interval_interpretation.csv", "text/csv", key="presentation_interval_table")
+
+    cross_well = pd.concat(
+        [
+            variable_range_summary(logs, ["rt_ohm_m"], alias).assign(**{"Well alias": alias})
+            for alias in sorted(logs["well_alias"].unique())
+        ],
+        ignore_index=True,
+    )
+    cross_well_figure = cross_well_range_figure(cross_well, "Resistivity Rt")
+    st.plotly_chart(cross_well_figure, use_container_width=True)
+    st.download_button("Download cross-well comparison (HTML)", figure_html_bytes(cross_well_figure), "synthetic_cross_well_comparison.html", "text/html", key="presentation_cross_well")
+    st.download_button("Download core-to-log table (CSV)", csv_bytes(calibrated_core), "synthetic_core_to_log_calibration.csv", "text/csv", key="presentation_core_table")
+
+    uncertainty = intervals[["Data label", "Well alias", "Top depth (m)", "Base depth (m)", "Uncertainty flags"]]
+    st.download_button("Download uncertainty summary (CSV)", csv_bytes(uncertainty), "synthetic_uncertainty_summary.csv", "text/csv", key="presentation_uncertainty")
+
+    confusion, calibration = model_placeholder_figures()
+    cols = st.columns(2)
+    cols[0].plotly_chart(confusion, use_container_width=True)
+    cols[1].plotly_chart(calibration, use_container_width=True)
+    cols[0].download_button("Download placeholder confusion matrix (HTML)", figure_html_bytes(confusion), "synthetic_placeholder_confusion_matrix.html", "text/html", key="presentation_confusion")
+    cols[1].download_button("Download placeholder calibration panel (HTML)", figure_html_bytes(calibration), "synthetic_placeholder_calibration_panel.html", "text/html", key="presentation_calibration")
 
 
 def main() -> None:
