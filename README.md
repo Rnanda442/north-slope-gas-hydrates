@@ -15,10 +15,10 @@ cd ~/north-slope-gas-hydrates
 git pull
 ```
 
-Install the dashboard dependency once:
+Create the isolated dashboard environment once:
 
 ```bash
-python -m pip install -r requirements-dashboard.txt
+bash setup_dashboard.sh
 ```
 
 Launch the dashboard:
@@ -26,6 +26,10 @@ Launch the dashboard:
 ```bash
 bash run_dashboard.sh
 ```
+
+The setup script creates `.venv-dashboard` inside the project folder. This avoids
+writing into OpenScienceLab's shared `/opt/conda` installation, which may be
+read-only.
 
 The process listens on port `8501`. In a JupyterHub environment with
 `jupyter-server-proxy`, open:
