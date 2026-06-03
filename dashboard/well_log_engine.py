@@ -22,15 +22,42 @@ VARIABLES = {
     "dts_us_ft": ("DTS", "us/ft"),
     "vs_km_s": ("Vs", "km/s"),
     "vp_vs_ratio": ("Vp/Vs", "ratio"),
+    "shear_modulus_gpa": ("Shear modulus", "GPa"),
+    "bulk_modulus_gpa": ("Bulk modulus", "GPa"),
+    "poisson_ratio": ("Poisson ratio", "ratio"),
+    "youngs_modulus_gpa": ("Young's modulus", "GPa"),
     "lambda_rho": ("lambda-rho", "GPa g/cc"),
     "mu_rho": ("mu-rho", "GPa g/cc"),
+    "vshale": ("Shale volume proxy", "fraction"),
     "nmr_porosity_vv": ("NMR porosity", "v/v"),
     "nmr_density_separation_vv": ("NMR-density separation", "v/v"),
     "caliper_in": ("Caliper", "in"),
     "temperature_c": ("Temperature", "deg C"),
     "pressure_mpa": ("Pressure", "MPa"),
+    "vertical_stress_mpa": ("Vertical stress", "MPa"),
+    "effective_stress_mpa": ("Effective stress", "MPa"),
+    "permeability_retention_proxy": ("Permeability retention proxy", "fraction"),
+    "reservoir_quality_score": ("Reservoir quality score", "0-1"),
+    "hydrate_evidence_score": ("Hydrate evidence score", "0-1"),
     "archie_hydrate_proxy": ("Archie hydrate proxy", "fraction"),
     "nmr_density_hydrate_proxy": ("NMR-density hydrate proxy", "fraction"),
+}
+
+SCREENING_BANDS = {
+    "gr_api": (25, 65, "Cleaner reservoir-sand tendency; validate with porosity and facies."),
+    "rt_ohm_m": (10, 100, "Hydrate-supportive Rt tendency only when sonic/NMR/QC agree."),
+    "density_porosity_vv": (0.20, 0.35, "Reservoir capacity window; capacity is not occupancy."),
+    "vp_km_s": (2.5, 4.0, "Hydrate/ice/competent-sand stiffening tendency; compare Vs and lithology."),
+    "vs_km_s": (1.0, 2.5, "Rigidity-supportive tendency that helps separate hydrate from free gas."),
+    "mu_rho": (10, 55, "Rigidity increase; review ice-bearing sediment and competent lithology."),
+    "lambda_rho": (12, 55, "Compressibility-sensitive crossplot lane; not a standalone classifier."),
+    "nmr_density_separation_vv": (0.06, 0.22, "Mobile-fluid deficit proxy; depth-match and NMR QC required."),
+    "archie_hydrate_proxy": (0.35, 0.80, "Supplementary saturation lane; salinity and clay uncertainty remain."),
+    "nmr_density_hydrate_proxy": (0.35, 0.80, "Preferred saturation proxy where NMR exists; calibrate to core."),
+    "effective_stress_mpa": (3, 18, "Stress context for compaction and mechanical risk, not hydrate proof."),
+    "permeability_retention_proxy": (0.20, 0.75, "Production-review lane; high saturation may reduce flow."),
+    "reservoir_quality_score": (0.55, 1.0, "Good rock screen before phase classification."),
+    "hydrate_evidence_score": (0.55, 1.0, "Multi-log evidence score; requires admissibility and QC review."),
 }
 
 RANGE_GUIDE = [
@@ -222,6 +249,180 @@ PUBLIC_SCIENCE_REFERENCES = [
     },
 ]
 
+EQUATION_LIBRARY = [
+    {
+        "Equation group": "Lithology / reservoir quality",
+        "Equation": "Vsh = clip((GR - GR_clean) / (GR_shale - GR_clean), 0, 1)",
+        "Inputs": "GR plus local clean-sand and shale anchors",
+        "Feature produced": "Shale volume proxy",
+        "Why it matters": "Screens clean reservoir sand before any hydrate phase call.",
+        "Classification use": "Hydrate evidence is downgraded in shale-rich intervals unless core/facies evidence supports it.",
+        "Source anchor": "Manuscript Section 8; hydrate_property_ranges_full_suite; Nanushuk reservoir-quality source",
+    },
+    {
+        "Equation group": "Density porosity",
+        "Equation": "phi_D = (rho_ma - RHOB) / (rho_ma - rho_f)",
+        "Inputs": "RHOB, matrix density, fluid density",
+        "Feature produced": "Storage-capacity porosity",
+        "Why it matters": "Separates reservoir capacity from hydrate occupancy.",
+        "Classification use": "Good porosity raises reservoir-quality score but does not create a hydrate label.",
+        "Source anchor": "Manuscript Table 12.A6; hydrate_wireline_equation_map",
+    },
+    {
+        "Equation group": "Sonic velocity",
+        "Equation": "Vp = 304.8 / DT; Vs = 304.8 / DTS",
+        "Inputs": "DT and DTS in us/ft",
+        "Feature produced": "Compressional and shear velocity",
+        "Why it matters": "Hydrate tends to stiffen the frame; gas tends to soften sonic response.",
+        "Classification use": "Hydrate-supportive Rt requires elastic support to avoid gas/low-porosity false positives.",
+        "Source anchor": "Lee and Collett (2011); Haines et al. (2022); manuscript Section 7",
+    },
+    {
+        "Equation group": "Elastic moduli",
+        "Equation": "G = rho * Vs^2; K = rho * (Vp^2 - 4Vs^2/3)",
+        "Inputs": "RHOB, Vp, Vs",
+        "Feature produced": "Shear modulus and bulk modulus",
+        "Why it matters": "Quantifies rigidity and incompressibility from logs.",
+        "Classification use": "Higher shear modulus supports hydrate/ice/competent-rock review; low stiffness with high Rt flags gas or ambiguity.",
+        "Source anchor": "lambda_density_pt_overburden_ranges; manuscript Table 12.A7",
+    },
+    {
+        "Equation group": "Lambda-rho / mu-rho",
+        "Equation": "lambda-rho = rho * (Vp^2 - 2Vs^2); mu-rho = rho * Vs^2",
+        "Inputs": "RHOB, Vp, Vs",
+        "Feature produced": "Fluid-sensitive and rigidity-sensitive crossplot terms",
+        "Why it matters": "Separates gas-softened response from hydrate/ice/rigid-framework response better than Rt alone.",
+        "Classification use": "Used as a crossplot lane; overlap with shale, ice, and carbonates remains explicit.",
+        "Source anchor": "lambda_density_pt_overburden_ranges; hydrate_property_ranges_full_suite",
+    },
+    {
+        "Equation group": "Poisson / Young's modulus",
+        "Equation": "nu = (Vp^2 - 2Vs^2) / (2(Vp^2 - Vs^2)); E = 2G(1 + nu)",
+        "Inputs": "Vp, Vs, shear modulus",
+        "Feature produced": "Mechanical behavior features",
+        "Why it matters": "Adds geomechanical context for compaction and production-risk discussion.",
+        "Classification use": "Not a hydrate detector; supports rock-type and producibility interpretation.",
+        "Source anchor": "Geomechanical relationship with Wireline Logging AN; geomechanics/productivity notes",
+    },
+    {
+        "Equation group": "Pressure-temperature admissibility",
+        "Equation": "T(z) = T0 + GT*z; Pp(z) = rho_w*g*z",
+        "Inputs": "Depth, thermal gradient, water density",
+        "Feature produced": "Working GHSZ screen",
+        "Why it matters": "Hydrate can only exist where pressure-temperature conditions are admissible.",
+        "Classification use": "Outside/marginal stability prevents automatic hydrate promotion even if logs look interesting.",
+        "Source anchor": "USGS Hydrate-01 and Mount Elbert publications; manuscript Section 6",
+    },
+    {
+        "Equation group": "Overburden / effective stress",
+        "Equation": "sigma_v = integral(rho_b*g dz); sigma_eff = sigma_v - alpha*Pp",
+        "Inputs": "Depth, density/overburden gradient, pore pressure, Biot coefficient",
+        "Feature produced": "Vertical and effective stress",
+        "Why it matters": "Stress affects compaction, velocity, porosity, and mechanical risk.",
+        "Classification use": "Velocity/stiffness anomalies are reviewed against stress and rock type before hydrate labeling.",
+        "Source anchor": "north_slope_overburden_framework; geomechanics/productivity notes",
+    },
+    {
+        "Equation group": "Saturation proxy",
+        "Equation": "Sh_Archie = 1 - (a*Rw / (phi^m * Rt))^(1/n)",
+        "Inputs": "Rt, porosity, water resistivity, Archie parameters",
+        "Feature produced": "Electrical hydrate proxy",
+        "Why it matters": "Hydrate reduces connected brine pathways and can increase Rt.",
+        "Classification use": "Supplementary only; clay, salinity, gas, low porosity, and ice must be reviewed.",
+        "Source anchor": "Lee and Collett (2011); hydrate_wireline_equation_map",
+    },
+    {
+        "Equation group": "NMR-density saturation proxy",
+        "Equation": "Sh_NMRD = (phi_D - phi_NMR) / phi_D",
+        "Inputs": "Density porosity and NMR porosity",
+        "Feature produced": "Preferred hydrate proxy where NMR exists",
+        "Why it matters": "NMR-density separation can represent pore volume not seen as mobile water.",
+        "Classification use": "Preferred saturation proxy, but depth matching, shale effects, and tool QC remain visible.",
+        "Source anchor": "Lee and Collett (2011); Haines et al. (2022)",
+    },
+    {
+        "Equation group": "Permeability / producibility risk",
+        "Equation": "k_rel_proxy = (1 - Sh)^n",
+        "Inputs": "Hydrate saturation proxy and exponent n",
+        "Feature produced": "Permeability retention proxy",
+        "Why it matters": "High saturation may increase resource density while reducing flow capacity.",
+        "Classification use": "Separates hydrate occurrence/saturation from production sweet-spot ranking.",
+        "Source anchor": "Hydrate_Full_Expanded_Document; geomechanics/productivity notes",
+    },
+]
+
+CLASSIFICATION_WORKFLOW = [
+    {
+        "Stage": "1. QC gate",
+        "Question": "Are borehole conditions and curve coverage good enough?",
+        "Primary variables": "Caliper, missing DTS/NMR, curve depth alignment",
+        "Pass logic": "Bad-hole intervals remain review-only until density/sonic reliability is defensible.",
+    },
+    {
+        "Stage": "2. Stability gate",
+        "Question": "Can hydrate physically exist at this depth?",
+        "Primary variables": "Temperature, pressure, depth, local gradient",
+        "Pass logic": "Inside working GHSZ permits evaluation; it does not prove hydrate.",
+    },
+    {
+        "Stage": "3. Rock-quality gate",
+        "Question": "Is there enough clean, connected reservoir volume?",
+        "Primary variables": "GR/Vsh, density porosity, rock type, facies",
+        "Pass logic": "Clean porous sand is a candidate host; shale/coal/carbonate require separate handling.",
+    },
+    {
+        "Stage": "4. Phase-evidence gate",
+        "Question": "Do electrical, sonic, density, and NMR responses agree?",
+        "Primary variables": "Rt, Vp, Vs, lambda-rho, mu-rho, NMR-density proxy",
+        "Pass logic": "Hydrate is promoted only when high Rt is supported by stiffness and saturation evidence.",
+    },
+    {
+        "Stage": "5. Competing-explanation gate",
+        "Question": "Could the same signal be gas, ice, shale, coal, carbonate, or stress?",
+        "Primary variables": "Vp/Vs, mu-rho, Vsh, effective stress, permafrost/depth context",
+        "Pass logic": "Ambiguous intervals stay in expert review rather than being forced into hydrate/non-hydrate.",
+    },
+    {
+        "Stage": "6. Producibility ranking",
+        "Question": "If hydrate is present, is it likely to flow/respond well?",
+        "Primary variables": "Porosity, permeability proxy, saturation proxy, stress, continuity",
+        "Pass logic": "Moderate saturation with retained flow can outrank maximum saturation for production review.",
+    },
+]
+
+ROCKTYPE_CONTEXT_GUIDE = [
+    {
+        "Rock / interval type": "Clean sand",
+        "Why it helps": "Provides pore volume and likely permeability for hydrate occupancy.",
+        "False-positive risk": "Can be water-bearing with no charge or hydrate occupancy.",
+        "Dashboard response": "Eligible for reservoir-quality score and phase-evidence review.",
+    },
+    {
+        "Rock / interval type": "Shaly or bentonitic sand",
+        "Why it helps": "May host thin or mixed hydrate-bearing layers.",
+        "False-positive risk": "Clay conductivity, bound water, and radioactive minerals distort GR/Rt/porosity transforms.",
+        "Dashboard response": "Downgrade confidence and require NMR/core/facies support.",
+    },
+    {
+        "Rock / interval type": "Ice-bearing sediment / permafrost",
+        "Why it helps": "Can be stiff and resistive in hydrate stability settings.",
+        "False-positive risk": "Ice can overlap hydrate in Vs, mu-rho, and resistivity behavior.",
+        "Dashboard response": "Require depth/permafrost and P-T context before hydrate promotion.",
+    },
+    {
+        "Rock / interval type": "Free-gas sand",
+        "Why it helps": "Can share high resistivity with hydrate-bearing intervals.",
+        "False-positive risk": "Gas often lowers Vp and weakens lambda-rho compared with hydrate.",
+        "Dashboard response": "High Rt plus low Vp/elastic weakness routes to gas-supportive or expert-review lanes.",
+    },
+    {
+        "Rock / interval type": "Coal/lignite or carbonate/competent rock",
+        "Why it helps": "Important regional lithologies and mechanical end members.",
+        "False-positive risk": "Can create high/low density, high resistivity, or high stiffness unrelated to hydrate.",
+        "Dashboard response": "Treat as competing lithology until local log/core evidence resolves it.",
+    },
+]
+
 
 @dataclass(frozen=True)
 class RuntimeConfig:
@@ -303,8 +504,13 @@ def _well_frame(alias: str, offset: float, nmr_available: bool) -> pd.DataFrame:
     dt = 304.8 / vp
     dts = 304.8 / vs
     vp_vs = vp / vs
+    shear_modulus = rhob * vs**2
+    bulk_modulus = rhob * (vp**2 - (4.0 / 3.0) * vs**2)
+    poisson = (vp**2 - 2 * vs**2) / (2 * (vp**2 - vs**2))
+    youngs_modulus = 2 * shear_modulus * (1 + poisson)
     lambda_rho = rhob * (vp**2 - 2 * vs**2)
-    mu_rho = rhob * vs**2
+    mu_rho = shear_modulus
+    vshale = np.clip((gr - 30) / (105 - 30), 0, 1)
     nmr = porosity - np.where(hydrate, 0.12, np.where(ambiguous, 0.055, 0.012))
     nmr += rng.normal(0, 0.012, depth.size)
     if not nmr_available:
@@ -312,6 +518,36 @@ def _well_frame(alias: str, offset: float, nmr_available: bool) -> pd.DataFrame:
     separation = porosity - nmr
     archie = np.clip(1 - ((0.12 / ((porosity.clip(0.04) ** 2) * rt)) ** 0.5), 0, 1)
     nmr_proxy = np.clip(separation / porosity, 0, 1)
+    saturation_for_flow = np.where(np.isnan(nmr_proxy), archie, nmr_proxy)
+    permeability_retention = np.clip((1 - saturation_for_flow) ** 3, 0, 1)
+    vertical_stress = depth * 0.0226
+    effective_stress = vertical_stress - (0.85 * pressure)
+    reservoir_quality_score = np.clip(
+        0.45 * ((65 - gr) / 45)
+        + 0.40 * ((porosity - 0.12) / 0.22)
+        + 0.15 * (1 - vshale),
+        0,
+        1,
+    )
+    hydrate_evidence_score = np.clip(
+        0.30 * ((np.log10(rt.clip(0.1)) - np.log10(5)) / (np.log10(80) - np.log10(5)))
+        + 0.25 * ((vp - 2.4) / 1.4)
+        + 0.20 * ((vs - 1.0) / 1.2)
+        + 0.15 * ((mu_rho - 5) / 25)
+        + 0.10 * saturation_for_flow,
+        0,
+        1,
+    )
+    rock_type = np.select(
+        [
+            vshale >= 0.65,
+            (vshale < 0.35) & (porosity >= 0.22),
+            (vshale < 0.55) & (porosity >= 0.18),
+            (rhob < 1.85) | ((gr < 45) & (rt > 20) & (vp < 2.35)),
+        ],
+        ["shale-rich / non-reservoir", "clean reservoir sand", "shaly reservoir sand", "coal/gas-risk review"],
+        default="mixed lithology review",
+    )
     qc = np.where(caliper > 9.5, "REVIEW: borehole washout", "PASS")
     stability = np.where((depth >= 470) & (depth <= 1080), "stable working screen", "outside working screen")
     return pd.DataFrame(
@@ -328,18 +564,29 @@ def _well_frame(alias: str, offset: float, nmr_available: bool) -> pd.DataFrame:
             "dts_us_ft": dts,
             "vs_km_s": vs,
             "vp_vs_ratio": vp_vs,
+            "shear_modulus_gpa": shear_modulus,
+            "bulk_modulus_gpa": bulk_modulus,
+            "poisson_ratio": poisson,
+            "youngs_modulus_gpa": youngs_modulus,
             "lambda_rho": lambda_rho,
             "mu_rho": mu_rho,
+            "vshale": vshale,
+            "rock_type_screen": rock_type,
             "nmr_porosity_vv": nmr,
             "nmr_density_separation_vv": separation,
             "caliper_in": caliper,
             "borehole_qc": qc,
             "temperature_c": temperature,
             "pressure_mpa": pressure,
+            "vertical_stress_mpa": vertical_stress,
+            "effective_stress_mpa": effective_stress,
             "ghsz_context": stability,
             "core_calibration_placeholder": "synthetic placeholder only",
             "archie_hydrate_proxy": archie,
             "nmr_density_hydrate_proxy": nmr_proxy,
+            "permeability_retention_proxy": permeability_retention,
+            "reservoir_quality_score": reservoir_quality_score,
+            "hydrate_evidence_score": hydrate_evidence_score,
             "synthetic_phase_reference": phase,
             "data_boundary": SYNTHETIC_LABEL,
         }
@@ -400,12 +647,17 @@ def screen_intervals(logs: pd.DataFrame, interval_m: int = 40) -> pd.DataFrame:
         for top, interval in well.groupby("interval_top_m"):
             median = interval.median(numeric_only=True)
             stable = (interval["ghsz_context"] == "stable working screen").mean() >= 0.5
-            reservoir = median["gr_api"] < 65 and median["density_porosity_vv"] >= 0.20
+            reservoir = (
+                median["gr_api"] < 65
+                and median["density_porosity_vv"] >= 0.20
+                and median["reservoir_quality_score"] >= 0.45
+            )
             qc_review = (interval["borehole_qc"] != "PASS").any()
             nmr_available = interval["nmr_porosity_vv"].notna().mean() >= 0.5
-            elastic_support = median["vp_km_s"] >= 2.9 and median["mu_rho"] >= 6.0
+            elastic_support = median["vp_km_s"] >= 2.9 and median["mu_rho"] >= 6.0 and median["hydrate_evidence_score"] >= 0.50
             high_rt = median["rt_ohm_m"] >= 10
             gas_like = median["vp_km_s"] < 2.35 and high_rt
+            common_rock_type = interval["rock_type_screen"].mode().iloc[0]
             if reservoir and stable and high_rt and elastic_support and not qc_review:
                 phase = "hydrate-supportive multi-log response"
             elif reservoir and gas_like:
@@ -440,6 +692,12 @@ def screen_intervals(logs: pd.DataFrame, interval_m: int = 40) -> pd.DataFrame:
                 flags.append("NMR unavailable")
             if high_rt and not elastic_support:
                 flags.append("high Rt without full elastic support")
+            if common_rock_type not in {"clean reservoir sand", "shaly reservoir sand"}:
+                flags.append(f"competing lithology: {common_rock_type}")
+            if median["effective_stress_mpa"] > 14:
+                flags.append("higher effective-stress context")
+            if phase.startswith("hydrate") and median["permeability_retention_proxy"] < 0.20:
+                flags.append("low permeability-retention proxy")
             rows.append(
                 {
                     "Data label": SYNTHETIC_LABEL,
@@ -448,9 +706,14 @@ def screen_intervals(logs: pd.DataFrame, interval_m: int = 40) -> pd.DataFrame:
                     "Base depth (m)": int(top + interval_m),
                     "Stability admissibility": "admissible working screen" if stable else "outside / uncertain",
                     "Reservoir quality": "reservoir-grade screen" if reservoir else "non-reservoir / marginal",
+                    "Dominant rock-type screen": common_rock_type,
                     "Phase-classification evidence": phase,
+                    "Reservoir-quality score": round(float(median["reservoir_quality_score"]), 2),
+                    "Hydrate-evidence score": round(float(median["hydrate_evidence_score"]), 2),
                     "Hydrate-saturation proxy": round(float(proxy), 2) if pd.notna(proxy) else np.nan,
                     "Proxy source": proxy_source,
+                    "Effective stress (MPa)": round(float(median["effective_stress_mpa"]), 1),
+                    "Permeability-retention proxy": round(float(median["permeability_retention_proxy"]), 2),
                     "Core-calibration confidence": core_confidence,
                     "Producibility screen": producibility,
                     "Synthetic sweet-spot review lane": sweet_spot_lane,
@@ -503,13 +766,54 @@ def nearby_log_calibration(logs: pd.DataFrame, core: pd.DataFrame) -> pd.DataFra
 
 def well_log_panel(logs: pd.DataFrame, well_alias: str) -> go.Figure:
     well = logs[logs["well_alias"] == well_alias]
-    specs = [("gr_api", "GR"), ("rt_ohm_m", "Rt"), ("density_porosity_vv", "Density phi"), ("vp_km_s", "Vp"), ("nmr_density_hydrate_proxy", "NMR Sh proxy")]
+    specs = [
+        ("gr_api", "GR"),
+        ("rt_ohm_m", "Rt"),
+        ("density_porosity_vv", "Density phi"),
+        ("vp_km_s", "Vp"),
+        ("mu_rho", "mu-rho"),
+        ("nmr_density_hydrate_proxy", "NMR Sh proxy"),
+    ]
     figure = make_subplots(rows=1, cols=len(specs), shared_yaxes=True, horizontal_spacing=0.035)
     for index, (column, label) in enumerate(specs, start=1):
         figure.add_trace(go.Scatter(x=well[column], y=well["depth_m"], name=label, mode="lines"), row=1, col=index)
         figure.update_xaxes(title_text=label, row=1, col=index)
+    phase_styles = {
+        "hydrate sand": ("rgba(22, 125, 141, 0.16)", "hydrate-supportive"),
+        "gas sand": ("rgba(217, 119, 61, 0.14)", "gas-risk"),
+        "ambiguous / expert review": ("rgba(120, 120, 120, 0.12)", "expert review"),
+        "good sand, no hydrate": ("rgba(76, 175, 80, 0.10)", "good sand/no hydrate"),
+    }
+    for phase, (color, label) in phase_styles.items():
+        mask = well["synthetic_phase_reference"].eq(phase)
+        if not mask.any():
+            continue
+        block_ids = (mask.ne(mask.shift(fill_value=False))).cumsum()
+        for _, block in well[mask].groupby(block_ids[mask]):
+            top = float(block["depth_m"].min())
+            base = float(block["depth_m"].max())
+            figure.add_hrect(y0=top, y1=base, fillcolor=color, line_width=0, row="all", col="all")
+            figure.add_annotation(
+                xref="x domain",
+                yref="y",
+                x=0.02,
+                y=(top + base) / 2,
+                text=label,
+                showarrow=True,
+                arrowhead=2,
+                ax=52,
+                ay=0,
+                bgcolor="rgba(255,255,255,0.86)",
+                bordercolor="#123447",
+                borderwidth=1,
+                font={"size": 10},
+            )
     figure.update_yaxes(title_text="Depth (m)", autorange="reversed", row=1, col=1)
-    figure.update_layout(title=f"{SYNTHETIC_LABEL} | {well_alias} well-log panel", height=640, showlegend=False)
+    figure.update_layout(
+        title=f"{SYNTHETIC_LABEL} | {well_alias} well-log panel with interpretation callouts",
+        height=680,
+        showlegend=False,
+    )
     return figure
 
 

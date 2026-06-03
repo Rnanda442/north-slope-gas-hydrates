@@ -9,8 +9,12 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 from dashboard.well_log_engine import (
+    CLASSIFICATION_WORKFLOW,
+    EQUATION_LIBRARY,
     RANGE_GUIDE,
     PUBLIC_SCIENCE_REFERENCES,
+    ROCKTYPE_CONTEXT_GUIDE,
+    SCREENING_BANDS,
     SYNTHETIC_LABEL,
     SWEET_SPOT_GUIDE,
     VARIABLES,
@@ -731,7 +735,8 @@ def render_future_engine() -> None:
         (
             "Derived features",
             "Shale volume, porosity, saturation proxies, <code>Vp</code>, "
-            "<code>Vs</code>, <code>Vp/Vs</code>, lambda-rho, mu-rho, and QA flags.",
+            "<code>Vs</code>, <code>Vp/Vs</code>, elastic moduli, stress, "
+            "permeability-risk proxy, and QA flags.",
         ),
         (
             "Outputs",
@@ -766,6 +771,7 @@ def render_future_engine() -> None:
     tabs = st.tabs(
         [
             "Variable Range Explorer",
+            "Equation-to-Decision Map",
             "Hydrate Interpretation Range Guide",
             "Interval Screening Scaffold",
             "Core Calibration Scaffold",
@@ -775,12 +781,14 @@ def render_future_engine() -> None:
     with tabs[0]:
         render_variable_range_explorer(logs)
     with tabs[1]:
-        render_range_guide()
+        render_equation_decision_map()
     with tabs[2]:
-        render_interval_screen(intervals)
+        render_range_guide()
     with tabs[3]:
-        render_core_calibration(calibrated_core)
+        render_interval_screen(intervals)
     with tabs[4]:
+        render_core_calibration(calibrated_core)
+    with tabs[5]:
         render_presentation_outputs(logs, intervals, calibrated_core)
 
     st.markdown("### Planned Runtime Analysis Sequence")
@@ -815,6 +823,29 @@ def render_variable_range_explorer(logs: pd.DataFrame) -> None:
     figure = go.Figure(go.Scatter(x=subset[variable], y=subset["depth_m"], mode="lines", name=label))
     figure.update_layout(title=f"{SYNTHETIC_LABEL} | {well} | {label}", xaxis_title=f"{label} ({unit})", yaxis_title="Depth (m)", height=530)
     figure.update_yaxes(autorange="reversed")
+    if variable in SCREENING_BANDS:
+        x0, x1, note = SCREENING_BANDS[variable]
+        figure.add_vrect(
+            x0=x0,
+            x1=x1,
+            fillcolor="rgba(22, 125, 141, 0.15)",
+            line_width=0,
+            annotation_text="working review band",
+            annotation_position="top left",
+        )
+        figure.add_annotation(
+            x=x1,
+            y=float(subset["depth_m"].quantile(0.25)),
+            text=note,
+            showarrow=True,
+            arrowhead=2,
+            ax=70,
+            ay=-45,
+            bgcolor="rgba(255,255,255,0.92)",
+            bordercolor="#167d8d",
+            borderwidth=1,
+            font={"size": 11},
+        )
     st.plotly_chart(figure, use_container_width=True)
     summary = variable_range_summary(logs, [variable], well, depth_range)
     st.dataframe(summary, use_container_width=True, hide_index=True)
@@ -830,6 +861,31 @@ def render_variable_range_explorer(logs: pd.DataFrame) -> None:
     )
     st.plotly_chart(cross_well_range_figure(cross_well, label), use_container_width=True)
     st.dataframe(cross_well, use_container_width=True, hide_index=True)
+
+
+def render_equation_decision_map() -> None:
+    st.subheader("Equation-to-Decision Map")
+    st.caption(
+        "This is the scaffold direction for the real-data project: measured logs become derived "
+        "features, derived features feed staged physics gates, and only then does ML classify intervals."
+    )
+    st.info(
+        "The key design choice: every future model feature must keep its physical meaning attached. "
+        "That prevents the dashboard from saying 'hydrate' just because one curve looks interesting."
+    )
+    st.markdown("#### Derived Equation Library")
+    st.dataframe(pd.DataFrame(EQUATION_LIBRARY), use_container_width=True, hide_index=True)
+
+    st.markdown("#### Classification Workflow")
+    st.dataframe(pd.DataFrame(CLASSIFICATION_WORKFLOW), use_container_width=True, hide_index=True)
+
+    st.markdown("#### Rock-Type and Overburden Context")
+    st.write(
+        "Rock type and stress change the meaning of the same log value. A high-resistivity, "
+        "high-stiffness interval in clean sand means something different than the same response "
+        "in ice-bearing sediment, coal, carbonate, or a washed-out borehole."
+    )
+    st.dataframe(pd.DataFrame(ROCKTYPE_CONTEXT_GUIDE), use_container_width=True, hide_index=True)
 
 
 def render_range_guide() -> None:
