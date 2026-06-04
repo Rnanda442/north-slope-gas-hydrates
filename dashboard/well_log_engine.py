@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from io import StringIO
 from typing import Iterable
 
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+
+from dashboard.runtime.exports import csv_bytes, figure_html_bytes
+from dashboard.runtime.loaders import load_runtime_data as load_configured_runtime_data
+from dashboard.runtime.schemas import RuntimeConfig, default_curve_aliases
 
 
 SYNTHETIC_LABEL = "SYNTHETIC DEMONSTRATION DATA"
@@ -424,35 +426,8 @@ ROCKTYPE_CONTEXT_GUIDE = [
 ]
 
 
-@dataclass(frozen=True)
-class RuntimeConfig:
-    input_mode: str = "synthetic"
-    approved_csv_paths: tuple[str, ...] = ()
-    approved_las_paths: tuple[str, ...] = ()
-    curve_aliases: dict[str, tuple[str, ...]] | None = None
-
-
-def default_curve_aliases() -> dict[str, tuple[str, ...]]:
-    return {
-        "depth_m": ("DEPTH", "MD", "TVD"),
-        "gr_api": ("GR",),
-        "rt_ohm_m": ("RT", "ILD", "RDEP"),
-        "rhob_g_cc": ("RHOB",),
-        "dt_us_ft": ("DT", "DTC"),
-        "dts_us_ft": ("DTS",),
-        "nmr_porosity_vv": ("NMRPHI", "TCMR"),
-        "caliper_in": ("CALI",),
-    }
-
-
 def load_runtime_data(config: RuntimeConfig | None = None) -> pd.DataFrame:
-    config = config or RuntimeConfig(curve_aliases=default_curve_aliases())
-    if config.input_mode != "synthetic":
-        raise NotImplementedError(
-            "Approved LAS/CSV loading is intentionally a local-runtime adapter. "
-            "Point this configuration layer at authorized files inside the approved environment."
-        )
-    return generate_synthetic_logs()
+    return load_configured_runtime_data(config, generate_synthetic_logs)
 
 
 def _well_frame(alias: str, offset: float, nmr_available: bool) -> pd.DataFrame:
@@ -850,13 +825,3 @@ def model_placeholder_figures() -> tuple[go.Figure, go.Figure]:
         height=380,
     )
     return matrix, calibration
-
-
-def csv_bytes(frame: pd.DataFrame) -> bytes:
-    buffer = StringIO()
-    frame.to_csv(buffer, index=False)
-    return buffer.getvalue().encode("utf-8")
-
-
-def figure_html_bytes(figure: go.Figure) -> bytes:
-    return figure.to_html(include_plotlyjs="cdn", full_html=True).encode("utf-8")
