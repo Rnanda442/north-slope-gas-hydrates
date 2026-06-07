@@ -478,7 +478,17 @@ def render_sidebar() -> str:
         st.markdown("## North Slope Atlas")
         st.caption("Public-source regional workspace")
         st.markdown("---")
-        page = st.radio("Navigate", PAGES, label_visibility="collapsed")
+        requested_page = st.query_params.get("page", PAGES[0])
+        if requested_page not in PAGES:
+            requested_page = PAGES[0]
+        page = st.radio(
+            "Navigate",
+            PAGES,
+            index=PAGES.index(requested_page),
+            label_visibility="collapsed",
+        )
+        if st.query_params.get("page") != page:
+            st.query_params["page"] = page
         st.markdown("---")
         st.caption("Current milestone")
         st.markdown("**Regional atlas foundation**")
