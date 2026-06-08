@@ -64,10 +64,10 @@ runtime engine or dashboard.
   Slope PowerPoint or source-library folder. See
   `docs/source_recovery_status.md`.
 - The working tree was recovered on 2026-06-07 from a prior Codex session
-  archive. The archive's Git repository has history and points to
-  `https://github.com/Rnanda442/north-slope-gas-hydrates.git`; this official
-  folder currently has a separate, empty Git repository and needs its Git
-  history/remote reconciled deliberately.
+  archive.
+- This official folder is connected to
+  `https://github.com/Rnanda442/north-slope-gas-hydrates.git`; local `main` and
+  `origin/main` were synchronized on 2026-06-08.
 
 ## Website
 
@@ -175,3 +175,5 @@ blockers, and next activities in the architecture/activity map.
   responsive phone-width styling.
 - 2026-06-08: Recorded the hosted Streamlit URL and confirmed that its current
   sharing state requires sign-in.
+- 2026-06-08: Verified the official folder's Git remote and history are
+  synchronized, and improved the roadmap's phone-width workstream view.

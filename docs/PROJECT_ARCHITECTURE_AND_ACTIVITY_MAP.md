@@ -81,7 +81,7 @@ The public website must never load authorized runtime data.
 | Presentation | Not yet recovered | Blocked | Recover from the source laptop |
 | Excel design | Not yet recovered | Blocked | Recover workbook and screenshots |
 | Source library | Index recovered; full library incomplete | Partial | Recover and inventory public sources |
-| Git history | Official folder has separate empty repository | Unresolved | Reconnect safely to existing GitHub history |
+| Git history | Connected and synchronized with GitHub | Complete | Preserve the normal commit-and-push workflow |
 
 ## Workstream Activity Map
 
@@ -92,9 +92,9 @@ The public website must never load authorized runtime data.
 | W3 | Extract Excel requirements | Waiting | Document sheets, columns, units, formulas, chart tracks, flags, and expected outputs | W1, W2 | Approved requirements map exists |
 | W4 | Gap analysis | Waiting | Compare spreadsheet requirements with the current engine and runtime package | W3 | Missing and existing capabilities are listed |
 | W5 | Implement well-log scaffold | Waiting | Add required schemas, calculations, validation, plots, and exports | W4 | Requirements are implemented with tests |
-| W6 | Website integration and QA | Partial | Roadmap page and responsive mobile shell are implemented; well-log workflow QA remains | W5 for final workflow | Website behavior and labels are verified |
+| W6 | Website integration and QA | Partial | Roadmap page now includes phone-width workstream cards; public sharing and well-log workflow QA remain | W5 for final workflow | Website behavior and labels are verified |
 | W7 | Scientific alignment | Partial | Reconcile equations and interpretation rules across code, manuscript, and presentation | W1, W3, W5 | No material scientific contradictions remain |
-| W8 | Git and project stabilization | Ready | Reconnect official folder to established repository history without losing recovered work | Recovery work preserved | Clean history, remote, and documented workflow |
+| W8 | Git and project stabilization | Complete | Keep local `main` synchronized with `origin/main` and preserve focused commits | None | Clean history, remote, and documented workflow |
 | W9 | Authorized-data execution | Future | Configure approved runtime and run real-data validation only in the authorized environment | W5, authorization | Reproducible authorized outputs exist |
 
 Status vocabulary: `Ready`, `In progress`, `Waiting`, `Blocked`, `Partial`,
@@ -140,7 +140,6 @@ inspect the Streamlit workflow.
 | Connected Drive may be the wrong Google account | Some uploaded sources may remain hidden | Check the account used on the other laptop |
 | June 6 migration was a failed local test | Source library was not actually uploaded | Repeat migration only after verifying real paths and destination |
 | Streamlit deployment currently requires sign-in | The hosted website is not publicly inspectable or shareable | Change the app's Streamlit sharing setting to public |
-| Official Git folder lacks existing history | Future commits could diverge from GitHub | Reconcile repositories deliberately |
 | Public and restricted files could be mixed | Data-governance and publication risk | Classify every recovered item before copying |
 
 ## Near-Term Sequence
@@ -152,7 +151,7 @@ inspect the Streamlit workflow.
 5. Implement the missing scaffold behavior and tests.
 6. Run website visual QA.
 7. Align the manuscript and PowerPoint with the verified implementation.
-8. Stabilize Git history and document the normal working workflow.
+8. Keep the architecture tracker, tests, commits, and hosted deployment synchronized.
 
 ## Key Decisions
 
@@ -173,3 +172,4 @@ inspect the Streamlit workflow.
 | 2026-06-08 | Established architecture and activity tracking | This document became the authoritative next-work map |
 | 2026-06-08 | Added roadmap to Streamlit and responsive mobile styling | Architecture status is available inside the website and narrow screens stack key layouts |
 | 2026-06-08 | Identified the hosted Streamlit deployment | Saved the canonical URL and found that anonymous access is currently disabled |
+| 2026-06-08 | Verified Git synchronization and improved the mobile roadmap | Local `main` matches `origin/main`; narrow screens receive workstream cards and a clearer next-project move |

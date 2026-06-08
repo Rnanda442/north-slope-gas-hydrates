@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from html import escape
 from pathlib import Path
 
 import pandas as pd
@@ -282,6 +283,65 @@ def apply_styles() -> None:
         .roadmap-status strong {
             color: #123447;
         }
+        .roadmap-next {
+            background: linear-gradient(135deg, #edf7f8 0%, #ffffff 100%);
+            border: 1px solid #bcdcdf;
+            border-left: 5px solid #167d8d;
+            border-radius: 12px;
+            padding: 1rem 1.1rem;
+            margin: 0.8rem 0 1rem;
+        }
+        .roadmap-next strong {
+            color: #123447;
+        }
+        .roadmap-mobile {
+            display: none;
+        }
+        .roadmap-table {
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            width: 100%;
+        }
+        .roadmap-table th {
+            background: #edf7f8;
+            color: #123447;
+            text-align: left;
+        }
+        .roadmap-table th,
+        .roadmap-table td {
+            border: 1px solid #d9e7e8;
+            padding: 0.55rem;
+            vertical-align: top;
+        }
+        .roadmap-card {
+            background: #ffffff;
+            border: 1px solid #d9e7e8;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin-bottom: 0.7rem;
+        }
+        .roadmap-card-title {
+            color: #123447;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+        .roadmap-pill {
+            background: #edf7f8;
+            border-radius: 999px;
+            color: #166674;
+            display: inline-block;
+            font-size: 0.76rem;
+            font-weight: 700;
+            margin-bottom: 0.55rem;
+            padding: 0.2rem 0.55rem;
+        }
+        .roadmap-label {
+            color: #527078;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
         [data-testid="stDataFrame"] {
             overflow-x: auto;
         }
@@ -342,6 +402,12 @@ def apply_styles() -> None:
             .stDownloadButton button {
                 width: 100%;
             }
+            .roadmap-desktop {
+                display: none;
+            }
+            .roadmap-mobile {
+                display: block;
+            }
         }
         </style>
         """,
@@ -374,6 +440,25 @@ def architecture_content() -> str:
     if not ARCHITECTURE_PATH.exists():
         return ""
     return ARCHITECTURE_PATH.read_text(encoding="utf-8")
+
+
+def roadmap_cards(workstreams: pd.DataFrame) -> str:
+    cards = []
+    for row in workstreams.to_dict(orient="records"):
+        safe = {key: escape(str(value)) for key, value in row.items()}
+        cards.append(
+            f"""
+            <div class="roadmap-card">
+              <div class="roadmap-card-title">{safe["ID"]} · {safe["Workstream"]}</div>
+              <div class="roadmap-pill">{safe["Status"]}</div>
+              <div class="roadmap-label">Next activity</div>
+              <div>{safe["Immediate activity"]}</div>
+              <div class="roadmap-label" style="margin-top:0.65rem">Dependency</div>
+              <div>{safe["Dependency"]}</div>
+            </div>
+            """
+        )
+    return '<div class="roadmap-mobile">' + "".join(cards) + "</div>"
 
 
 def format_bytes(size: int) -> str:
@@ -694,13 +779,17 @@ def render_project_roadmap() -> None:
         statuses = workstreams["Status"].astype(str)
         cols = st.columns(4)
         cols[0].metric("Workstreams", len(workstreams))
-        cols[1].metric("In progress", int(statuses.str.startswith("In progress").sum()))
-        cols[2].metric("Ready", int(statuses.str.startswith("Ready").sum()))
+        active = int(
+            statuses.str.startswith("In progress").sum()
+            + statuses.str.startswith("Partial").sum()
+        )
+        cols[1].metric("Active", active)
         waiting = int(
             statuses.str.startswith("Waiting").sum()
             + statuses.str.startswith("Blocked").sum()
         )
-        cols[3].metric("Waiting / blocked", waiting)
+        cols[2].metric("Waiting / blocked", waiting)
+        cols[3].metric("Complete", int(statuses.str.startswith("Complete").sum()))
 
     st.markdown("### How the System Connects")
     st.markdown(
@@ -725,13 +814,34 @@ def render_project_roadmap() -> None:
     )
 
     st.markdown("### Current Priority")
+    st.markdown(
+        """
+        <div class="roadmap-next">
+          <strong>Next project move</strong><br>
+          Recover the Excel workbook, spreadsheet screenshots, PowerPoint, and
+          public source files from the source laptop. Then translate the Excel
+          design into a requirements map before changing the well-log engine.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.markdown(markdown_section(content, "Current Priority"))
 
     st.markdown("### Workstream Status")
     if workstreams.empty:
         st.info("No workstream table is currently defined.")
     else:
-        st.dataframe(workstreams, use_container_width=True, hide_index=True)
+        st.markdown(roadmap_cards(workstreams), unsafe_allow_html=True)
+        desktop_table = workstreams.to_html(
+            index=False,
+            border=0,
+            classes=["roadmap-table"],
+            escape=True,
+        )
+        st.markdown(
+            f'<div class="roadmap-desktop">{desktop_table}</div>',
+            unsafe_allow_html=True,
+        )
 
     st.markdown("### Component Status")
     if not components.empty:

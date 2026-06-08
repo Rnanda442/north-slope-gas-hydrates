@@ -1,4 +1,9 @@
-from dashboard.app import architecture_content, markdown_section, markdown_table
+from dashboard.app import (
+    architecture_content,
+    markdown_section,
+    markdown_table,
+    roadmap_cards,
+)
 from streamlit.testing.v1 import AppTest
 
 
@@ -35,8 +40,19 @@ def test_project_roadmap_page_renders() -> None:
     assert app.title[0].value == "Project Architecture & Activity Map"
     assert [(metric.label, metric.value) for metric in app.metric] == [
         ("Workstreams", "9"),
-        ("In progress", "1"),
-        ("Ready", "1"),
+        ("Active", "3"),
         ("Waiting / blocked", "4"),
+        ("Complete", "1"),
     ]
-    assert len(app.dataframe) == 3
+    assert len(app.dataframe) == 2
+
+
+def test_roadmap_cards_include_next_activity_and_dependency() -> None:
+    content = architecture_content()
+    workstreams = markdown_table(markdown_section(content, "Workstream Activity Map"))
+    cards = roadmap_cards(workstreams.head(1))
+
+    assert "roadmap-mobile" in cards
+    assert "W1 · Recover project artifacts" in cards
+    assert "Next activity" in cards
+    assert "Dependency" in cards
