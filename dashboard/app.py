@@ -33,6 +33,7 @@ from dashboard.well_log_engine import (
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 EXPORT_DIR = PROJECT_ROOT / "05_exports" / "html"
+ARCHITECTURE_PATH = PROJECT_ROOT / "docs" / "PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md"
 IGNORED_DIRS = {".git", ".ipynb_checkpoints", "__pycache__"}
 
 REGIONAL_SCENE = EXPORT_DIR / "north_slope_plotly_advanced.html"
@@ -95,6 +96,7 @@ SURFACE_CATALOG = {
 
 PAGES = [
     "Welcome",
+    "Project Roadmap",
     "Regional Atlas",
     "Structural Explorer",
     "Data Library",
@@ -270,10 +272,108 @@ def apply_styles() -> None:
             border-radius: 10px;
             padding: 0.8rem 1rem;
         }
+        .roadmap-status {
+            background: #ffffff;
+            border: 1px solid #d9e7e8;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin-bottom: 0.7rem;
+        }
+        .roadmap-status strong {
+            color: #123447;
+        }
+        [data-testid="stDataFrame"] {
+            overflow-x: auto;
+        }
+        [data-baseweb="tab-list"] {
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+        [data-baseweb="tab"] {
+            flex: 0 0 auto;
+        }
+        @media (max-width: 768px) {
+            .block-container {
+                padding: 1rem 0.8rem 4rem;
+                max-width: 100%;
+            }
+            .atlas-hero {
+                border-radius: 12px;
+                padding: 1.35rem 1.1rem;
+                margin-bottom: 0.8rem;
+            }
+            .atlas-hero h1 {
+                font-size: 1.85rem;
+                line-height: 1.12;
+            }
+            .atlas-hero p {
+                font-size: 0.96rem;
+            }
+            .atlas-card {
+                min-height: auto;
+                margin-bottom: 0.65rem;
+            }
+            h1 {
+                font-size: 1.85rem !important;
+            }
+            h2 {
+                font-size: 1.45rem !important;
+            }
+            h3 {
+                font-size: 1.2rem !important;
+            }
+            [data-testid="stHorizontalBlock"] {
+                flex-direction: column;
+                gap: 0.55rem;
+            }
+            [data-testid="stHorizontalBlock"] > div {
+                width: 100% !important;
+                flex: 1 1 100% !important;
+                min-width: 0 !important;
+            }
+            [data-testid="stMetric"] {
+                border-bottom: 1px solid #e3ecec;
+                padding-bottom: 0.45rem;
+            }
+            iframe {
+                max-width: 100%;
+            }
+            .stButton button,
+            .stDownloadButton button {
+                width: 100%;
+            }
+        }
         </style>
         """,
         unsafe_allow_html=True,
     )
+
+
+def markdown_section(text: str, heading: str) -> str:
+    marker = f"## {heading}"
+    if marker not in text:
+        return ""
+    section = text.split(marker, 1)[1]
+    return section.split("\n## ", 1)[0].strip()
+
+
+def markdown_table(section: str) -> pd.DataFrame:
+    lines = [line.strip() for line in section.splitlines() if line.strip().startswith("|")]
+    if len(lines) < 2:
+        return pd.DataFrame()
+    headers = [cell.strip() for cell in lines[0].strip("|").split("|")]
+    rows = []
+    for line in lines[2:]:
+        cells = [cell.strip().replace("`", "") for cell in line.strip("|").split("|")]
+        if len(cells) == len(headers):
+            rows.append(cells)
+    return pd.DataFrame(rows, columns=headers)
+
+
+def architecture_content() -> str:
+    if not ARCHITECTURE_PATH.exists():
+        return ""
+    return ARCHITECTURE_PATH.read_text(encoding="utf-8")
 
 
 def format_bytes(size: int) -> str:
@@ -569,6 +669,90 @@ def render_welcome(files: list[dict[str, object]]) -> None:
         </div>
         """,
         unsafe_allow_html=True,
+    )
+
+
+def render_project_roadmap() -> None:
+    content = architecture_content()
+    st.markdown('<div class="atlas-kicker">Living project plan</div>', unsafe_allow_html=True)
+    st.title("Project Architecture & Activity Map")
+    st.write(
+        "A phone-friendly view of the project structure, current workstreams, "
+        "dependencies, blockers, and next actions. This page reads the tracked "
+        "project document directly so the website and repository stay aligned."
+    )
+
+    if not content:
+        st.error("The architecture tracker is not available in this deployment.")
+        return
+
+    workstreams = markdown_table(markdown_section(content, "Workstream Activity Map"))
+    components = markdown_table(markdown_section(content, "Component Map"))
+    blockers = markdown_table(markdown_section(content, "Blockers and Risks"))
+
+    if not workstreams.empty:
+        statuses = workstreams["Status"].astype(str)
+        cols = st.columns(4)
+        cols[0].metric("Workstreams", len(workstreams))
+        cols[1].metric("In progress", int(statuses.str.startswith("In progress").sum()))
+        cols[2].metric("Ready", int(statuses.str.startswith("Ready").sum()))
+        waiting = int(
+            statuses.str.startswith("Waiting").sum()
+            + statuses.str.startswith("Blocked").sum()
+        )
+        cols[3].metric("Waiting / blocked", waiting)
+
+    st.markdown("### How the System Connects")
+    st.markdown(
+        """
+        <div class="roadmap-status">
+          <strong>Public path</strong><br>
+          Regional GIS &rarr; processed layers &rarr; Streamlit atlas &rarr;
+          public research communication
+        </div>
+        <div class="roadmap-status">
+          <strong>Scientific path</strong><br>
+          Sources and manuscript &rarr; equations and interpretation rules &rarr;
+          well-log requirements &rarr; tested classification workflow
+        </div>
+        <div class="roadmap-status">
+          <strong>Authorized path</strong><br>
+          Approved logs and core data &rarr; validation &rarr; feature engineering
+          &rarr; interval screening &rarr; uncertainty-aware results
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown("### Current Priority")
+    st.markdown(markdown_section(content, "Current Priority"))
+
+    st.markdown("### Workstream Status")
+    if workstreams.empty:
+        st.info("No workstream table is currently defined.")
+    else:
+        st.dataframe(workstreams, use_container_width=True, hide_index=True)
+
+    st.markdown("### Component Status")
+    if not components.empty:
+        st.dataframe(components, use_container_width=True, hide_index=True)
+
+    st.markdown("### Blockers and Risks")
+    if not blockers.empty:
+        st.dataframe(blockers, use_container_width=True, hide_index=True)
+
+    st.markdown("### Near-Term Sequence")
+    st.markdown(markdown_section(content, "Near-Term Sequence"))
+
+    with st.expander("Project boundaries and key decisions"):
+        st.markdown("#### Data Boundary")
+        st.markdown(markdown_section(content, "Data Boundary"))
+        st.markdown("#### Key Decisions")
+        st.markdown(markdown_section(content, "Key Decisions"))
+
+    st.caption(
+        "Source: docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md | "
+        "Update the tracked document after important milestones or priority changes."
     )
 
 
@@ -979,7 +1163,7 @@ def main() -> None:
         page_title="North Slope Gas Hydrate Atlas",
         page_icon=None,
         layout="wide",
-        initial_sidebar_state="expanded",
+        initial_sidebar_state="auto",
     )
     apply_styles()
     files = project_files()
@@ -987,6 +1171,8 @@ def main() -> None:
 
     if page == "Welcome":
         render_welcome(files)
+    elif page == "Project Roadmap":
+        render_project_roadmap()
     elif page == "Regional Atlas":
         render_regional_atlas()
     elif page == "Structural Explorer":

@@ -40,6 +40,8 @@ runtime engine or dashboard.
 ## Current State
 
 - The public Streamlit regional atlas is implemented.
+- The website includes a mobile-responsive `Project Roadmap` page sourced from
+  `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md`.
 - The synthetic well-log planning page and reusable calculation layer are
   implemented in `dashboard/well_log_engine.py`.
 - The authorized runtime skeleton is implemented in `dashboard/runtime/`.
@@ -163,3 +165,5 @@ blockers, and next activities in the architecture/activity map.
   migration was a failed local test rather than a real Drive upload.
 - 2026-06-08: Added the project architecture and activity map as the
   authoritative next-work tracker.
+- 2026-06-08: Published the architecture/activity map inside Streamlit and added
+  responsive phone-width styling.

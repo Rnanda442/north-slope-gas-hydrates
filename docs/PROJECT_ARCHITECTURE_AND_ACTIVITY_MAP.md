@@ -71,8 +71,8 @@ The public website must never load authorized runtime data.
 
 | Component | Main location | Current state | Next outcome |
 |---|---|---|---|
-| Public atlas | `dashboard/app.py` | Implemented | Visually inspect and refine |
-| Website entry point | `streamlit_app.py` | Implemented | Confirm reliable launch/deployment |
+| Public atlas | `dashboard/app.py` | Implemented | Continue visual QA as features change |
+| Website entry point | `streamlit_app.py` | Implemented | Mobile-responsive shell and roadmap page added |
 | Synthetic well-log engine | `dashboard/well_log_engine.py` | Working scaffold | Align with Excel design |
 | Authorized runtime | `dashboard/runtime/` | Skeleton implemented | Complete input mapping and readiness UI |
 | Well-log tests | `tests/` | 8 focused tests passing | Expand with spreadsheet-derived cases |
@@ -88,11 +88,11 @@ The public website must never load authorized runtime data.
 | ID | Workstream | Status | Immediate activity | Dependency | Completion signal |
 |---|---|---|---|---|---|
 | W1 | Recover project artifacts | In progress | Collect PowerPoint, Excel workbook, screenshots, manuscript variants, and source files from the source laptop | Access to other laptop | Recovery inventory is complete |
-| W2 | Organize source intake | Waiting on W1 | Classify recovered files as public, synthetic, or restricted and place them appropriately | W1 | Every recovered file has a location and classification |
-| W3 | Extract Excel requirements | Waiting on W1 | Document sheets, columns, units, formulas, chart tracks, flags, and expected outputs | W1, W2 | Approved requirements map exists |
-| W4 | Gap analysis | Waiting on W3 | Compare spreadsheet requirements with the current engine and runtime package | W3 | Missing and existing capabilities are listed |
-| W5 | Implement well-log scaffold | Waiting on W4 | Add required schemas, calculations, validation, plots, and exports | W4 | Requirements are implemented with tests |
-| W6 | Website integration and QA | Waiting on W5 | Update the well-log page and visually test key workflows | W5 | Website behavior and labels are verified |
+| W2 | Organize source intake | Waiting | Classify recovered files as public, synthetic, or restricted and place them appropriately | W1 | Every recovered file has a location and classification |
+| W3 | Extract Excel requirements | Waiting | Document sheets, columns, units, formulas, chart tracks, flags, and expected outputs | W1, W2 | Approved requirements map exists |
+| W4 | Gap analysis | Waiting | Compare spreadsheet requirements with the current engine and runtime package | W3 | Missing and existing capabilities are listed |
+| W5 | Implement well-log scaffold | Waiting | Add required schemas, calculations, validation, plots, and exports | W4 | Requirements are implemented with tests |
+| W6 | Website integration and QA | Partial | Roadmap page and responsive mobile shell are implemented; well-log workflow QA remains | W5 for final workflow | Website behavior and labels are verified |
 | W7 | Scientific alignment | Partial | Reconcile equations and interpretation rules across code, manuscript, and presentation | W1, W3, W5 | No material scientific contradictions remain |
 | W8 | Git and project stabilization | Ready | Reconnect official folder to established repository history without losing recovered work | Recovery work preserved | Clean history, remote, and documented workflow |
 | W9 | Authorized-data execution | Future | Configure approved runtime and run real-data validation only in the authorized environment | W5, authorization | Reproducible authorized outputs exist |
@@ -170,3 +170,4 @@ inspect the Streamlit workflow.
 | 2026-06-07 | Verified focused well-log/runtime tests | 8 tests passed |
 | 2026-06-07 | Investigated source migration and Google Drive | Confirmed the migration was a failed local test and identified the source-laptop paths |
 | 2026-06-08 | Established architecture and activity tracking | This document became the authoritative next-work map |
+| 2026-06-08 | Added roadmap to Streamlit and responsive mobile styling | Architecture status is available inside the website and narrow screens stack key layouts |
