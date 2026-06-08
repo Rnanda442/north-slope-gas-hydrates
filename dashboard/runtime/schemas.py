@@ -15,6 +15,8 @@ REQUIRED_LOG_COLUMNS = (
 )
 
 OPTIONAL_LOG_COLUMNS = (
+    "density_porosity_vv",
+    "neutron_porosity_vv",
     "dt_us_ft",
     "dts_us_ft",
     "nmr_porosity_vv",
@@ -36,6 +38,39 @@ OPTIONAL_CORE_COLUMNS = (
     "core_quality",
 )
 
+CHONG_ML_FEATURE_COLUMNS = (
+    "rhob_g_cc",
+    "density_porosity_vv",
+    "rt_ohm_m",
+    "gr_api",
+    "vp_km_s",
+    "vs_km_s",
+)
+
+TARGET_LABEL_CONTRACT = (
+    {
+        "Target": "Hydrate saturation regression",
+        "Preferred source": "NMR-density-derived hydrate saturation",
+        "Alternatives": "Core hydrate saturation with documented depth matching",
+        "Do not use as inputs": "Any saturation target, interpreted class, or target-derived column",
+        "Status before workbook": "Unconfirmed",
+    },
+    {
+        "Target": "Phase classification",
+        "Preferred source": "Expert-reviewed hydrate / gas / water / non-reservoir intervals",
+        "Alternatives": "Core-supported interval interpretation",
+        "Do not use as inputs": "Final phase labels or manual sweet-spot rankings",
+        "Status before workbook": "Unconfirmed",
+    },
+    {
+        "Target": "Sweet-spot ranking",
+        "Preferred source": "Separate decision target combining occurrence confidence and reservoir quality",
+        "Alternatives": "Expert-review priority with explicit reasons",
+        "Do not use as inputs": "Final ranking, producibility outcome, or post-review decision",
+        "Status before workbook": "Planning only",
+    },
+)
+
 
 @dataclass(frozen=True)
 class RuntimeConfig:
@@ -55,6 +90,8 @@ def default_curve_aliases() -> dict[str, tuple[str, ...]]:
         "gr_api": ("gr_api", "GR", "GAMMA", "GAMMA_RAY"),
         "rt_ohm_m": ("rt_ohm_m", "RT", "ILD", "RDEP", "RES_DEEP"),
         "rhob_g_cc": ("rhob_g_cc", "RHOB", "DEN", "DENSITY"),
+        "density_porosity_vv": ("density_porosity_vv", "DPHI", "PHID", "DEN_POR"),
+        "neutron_porosity_vv": ("neutron_porosity_vv", "NPHI", "TNPH", "NEUTRON_POR"),
         "dt_us_ft": ("dt_us_ft", "DT", "DTC", "AC"),
         "dts_us_ft": ("dts_us_ft", "DTS", "DTSM"),
         "nmr_porosity_vv": ("nmr_porosity_vv", "NMRPHI", "TCMR", "CMRP"),

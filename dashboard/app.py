@@ -9,6 +9,15 @@ import plotly.graph_objects as go
 import streamlit as st
 import streamlit.components.v1 as components
 
+from dashboard.runtime.feature_engineering import add_standard_features
+from dashboard.runtime.schemas import CHONG_ML_FEATURE_COLUMNS, TARGET_LABEL_CONTRACT
+from dashboard.runtime.validation import (
+    curve_coverage_frame,
+    grouped_well_split_frame,
+    output_readiness_frame,
+    readiness_frame,
+    validate_log_table,
+)
 from dashboard.well_log_engine import (
     CLASSIFICATION_WORKFLOW,
     EQUATION_LIBRARY,
@@ -1299,6 +1308,7 @@ def render_future_engine() -> None:
 
     tabs = st.tabs(
         [
+            "Runtime Readiness & ML Plan",
             "Variable Range Explorer",
             "Header & Track Blueprint",
             "Sweet-Spot Evidence Model",
@@ -1310,20 +1320,22 @@ def render_future_engine() -> None:
         ]
     )
     with tabs[0]:
-        render_variable_range_explorer(logs)
+        render_runtime_readiness(logs)
     with tabs[1]:
-        render_header_blueprint()
+        render_variable_range_explorer(logs)
     with tabs[2]:
-        render_sweet_spot_evidence_model(intervals)
+        render_header_blueprint()
     with tabs[3]:
-        render_equation_decision_map()
+        render_sweet_spot_evidence_model(intervals)
     with tabs[4]:
-        render_range_guide()
+        render_equation_decision_map()
     with tabs[5]:
-        render_interval_screen(intervals)
+        render_range_guide()
     with tabs[6]:
-        render_core_calibration(calibrated_core)
+        render_interval_screen(intervals)
     with tabs[7]:
+        render_core_calibration(calibrated_core)
+    with tabs[8]:
         render_presentation_outputs(logs, intervals, calibrated_core)
 
     st.markdown("### Planned Runtime Analysis Sequence")
@@ -1342,6 +1354,64 @@ def render_future_engine() -> None:
         "configuration adapter. Authorized LAS/CSV loading should be added and run "
         "locally inside the approved DOE environment."
     )
+
+
+def render_runtime_readiness(logs: pd.DataFrame) -> None:
+    st.subheader("Runtime Readiness & ML Plan")
+    st.caption(
+        f"{SYNTHETIC_LABEL} | Source-driven readiness demonstration based on the "
+        "June 8 project answers and Chong et al. (2022)."
+    )
+    features = add_standard_features(logs)
+    report = validate_log_table(logs)
+    coverage = curve_coverage_frame(logs)
+    outputs = output_readiness_frame(features)
+    splits = grouped_well_split_frame(logs)
+
+    ready_outputs = int((outputs["Status"] == "Ready").sum())
+    partial_outputs = int((outputs["Status"] == "Partial").sum())
+    blocked_outputs = int((outputs["Status"] == "Blocked").sum())
+    metrics = st.columns(4)
+    metrics[0].metric("Input status", report.status.title())
+    metrics[1].metric("Ready outputs", ready_outputs)
+    metrics[2].metric("Partial outputs", partial_outputs)
+    metrics[3].metric("Blocked outputs", blocked_outputs)
+
+    st.markdown("#### Curve Coverage and Routing")
+    st.dataframe(coverage, use_container_width=True, hide_index=True)
+
+    st.markdown("#### Output Readiness")
+    st.dataframe(outputs, use_container_width=True, hide_index=True)
+    st.info(
+        "NMR-density saturation is preferred when NMR exists. Missing NMR does "
+        "not block the full workflow: electrical saturation remains a flagged "
+        "cross-check, and the model can test other log combinations."
+    )
+
+    st.markdown("#### Complete-Well Evaluation Split")
+    st.dataframe(splits, use_container_width=True, hide_index=True)
+    st.error(
+        "Do not randomly split neighboring depth rows across train and test. "
+        "The final model must demonstrate performance on wells excluded from training."
+    )
+
+    st.markdown("#### Supervised Target Contract")
+    st.dataframe(pd.DataFrame(TARGET_LABEL_CONTRACT), use_container_width=True, hide_index=True)
+
+    st.markdown("#### Attached-Paper Feature Contract")
+    st.write(
+        "The source paper tests density, porosity, resistivity, gamma ray, Vp, "
+        "and Vs. The runtime keeps each feature physically interpretable and "
+        "records missing-curve routes instead of silently inventing measurements."
+    )
+    st.code("\n".join(CHONG_ML_FEATURE_COLUMNS), language="text")
+
+    issues = readiness_frame(report)
+    if issues.empty:
+        st.success("No blocking synthetic input issues were detected.")
+    else:
+        st.markdown("#### Input Issues")
+        st.dataframe(issues, use_container_width=True, hide_index=True)
 
 
 def render_variable_range_explorer(logs: pd.DataFrame) -> None:

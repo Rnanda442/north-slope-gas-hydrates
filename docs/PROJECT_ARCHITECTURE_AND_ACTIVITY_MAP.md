@@ -74,8 +74,8 @@ The public website must never load authorized runtime data.
 | Public atlas | `dashboard/app.py` | Implemented with focused sweet-spot page | Continue responsive visual QA as features change |
 | Website entry point | `streamlit_app.py` | Public deployment verified | Keep the hosted app synchronized with `main` |
 | Synthetic well-log engine | `dashboard/well_log_engine.py` | Working scaffold | Align with Excel design |
-| Authorized runtime | `dashboard/runtime/` | Skeleton implemented | Complete input mapping and readiness UI |
-| Well-log tests | `tests/` | 17 project tests passing | Expand with workbook-derived unit and alignment cases |
+| Authorized runtime | `dashboard/runtime/` | Source-driven readiness and grouped-well split scaffold implemented | Complete workbook-derived input mapping and model evaluation |
+| Well-log tests | `tests/` | 19 project tests passing | Expand with workbook-derived unit, label, and alignment cases |
 | GIS pipeline | notebooks and `03_data_final/` | Recovered | Validate only when GIS changes are needed |
 | Manuscript | `docs/project_blueprints/` | Two drafts recovered | Reconcile with equations and final workflow |
 | Presentation | PowerPoint scaffold recovered from Gmail | Partial | Reduce and align it to the requested approximately eight-slide visual story |
@@ -91,12 +91,12 @@ The public website must never load authorized runtime data.
 | W2 | Organize source intake | Waiting | Classify recovered files as public, synthetic, or restricted and place them appropriately | W1 | Every recovered file has a location and classification |
 | W3 | Extract Excel requirements | In progress | Confirm the screenshot-derived header map against workbook formulas, units, tool mnemonics, and alignment logic | Full workbook recovery | Approved requirements map is complete |
 | W4 | Gap analysis | Waiting | Compare spreadsheet requirements with the current engine and runtime package | W3 | Missing and existing capabilities are listed |
-| W5 | Implement well-log scaffold | In progress | Extend the synthetic evidence model while keeping thresholds demonstrative until workbook and approved-data calibration | W3, W4 | Requirements are implemented with tests |
-| W6 | Website integration and QA | Partial | Dedicated synthetic sweet-spot page is implemented; complete responsive visual QA and final well-log workflow QA | W5 for final workflow | Website behavior and labels are verified |
+| W5 | Implement well-log scaffold | In progress | Runtime Readiness, source-derived QC, target contracts, and grouped-well split planning are implemented; next add workbook-derived mapping and baseline evaluation | W3, W4 | Requirements are implemented with tests |
+| W6 | Website integration and QA | Partial | Sweet-spot and Runtime Readiness views are implemented; complete responsive visual QA and final workflow QA as workbook requirements arrive | W5 for final workflow | Website behavior and labels are verified |
 | W7 | Scientific alignment | Partial | Reconcile equations and interpretation rules across code, manuscript, and presentation | W1, W3, W5 | No material scientific contradictions remain |
 | W8 | Git and project stabilization | Complete | Keep local `main` synchronized with `origin/main` and preserve focused commits | None | Clean history, remote, and documented workflow |
 | W9 | Authorized-data execution | Future | Configure approved runtime and run real-data validation only in the authorized environment | W5, authorization | Reproducible authorized outputs exist |
-| W10 | Word and PowerPoint deliverables | In progress | Convert the recovered 12-slide scaffold into an approximately eight-slide visual story and align the detailed Word document | W3, W5, W7 | Both deliverables use the verified workflow, figures, terminology, and validation plan |
+| W10 | Word and PowerPoint deliverables | In progress | Apply the completed eight-slide content specification to the recovered deck and align the detailed Word document | W3, W5, W7 | Both deliverables use the verified workflow, figures, terminology, and validation plan |
 
 Status vocabulary: `Ready`, `In progress`, `Waiting`, `Blocked`, `Partial`,
 `Complete`, or `Future`.
@@ -156,8 +156,8 @@ eight-slide visual presentation.
 3. Confirm the supervised targets, uncertain labels, and complete-well split plan.
 4. Build the well-log requirements map.
 5. Perform the code-to-requirements gap analysis.
-6. Implement Runtime Readiness, model-evaluation scaffolding, and tests.
-7. Generate reusable figures and align the Word document and eight-slide PowerPoint.
+6. Extend the implemented Runtime Readiness and grouped-well split scaffolds with workbook-derived rules and baseline models.
+7. Apply the eight-slide specification, generate reusable figures, and align the Word document.
 8. Run website visual QA.
 9. Keep the architecture tracker, tests, commits, and hosted deployment synchronized.
 
@@ -188,3 +188,4 @@ eight-slide visual presentation.
 | 2026-06-08 | Added the focused North Slope Sweet Spots page | Combined ranked synthetic intervals, input variables, geomechanics, uncertainty, competing explanations, and sources in one decision workspace |
 | 2026-06-08 | Expanded and tiered sweet-spot source provenance | Distinguished ten primary public references from 28 indexed project artifacts and the four-document Drive synthesis subset |
 | 2026-06-08 | Integrated project-direction emails and the attached ML paper | Added the vision/goals/next-steps tracker, clarified deliverable priority and validation requirements, and recovered the PowerPoint scaffold from Gmail |
+| 2026-06-08 | Implemented source-driven runtime and deliverable changes | Added curve/output readiness, Chong feature contracts, caliper washout QC, grouped-well splits, target provenance, and an eight-slide deck specification |

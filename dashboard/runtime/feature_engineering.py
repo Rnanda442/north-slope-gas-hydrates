@@ -3,6 +3,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from dashboard.runtime.schemas import CHONG_ML_FEATURE_COLUMNS
+
 
 def add_standard_features(logs: pd.DataFrame) -> pd.DataFrame:
     features = logs.copy()
@@ -45,4 +47,22 @@ def add_standard_features(logs: pd.DataFrame) -> pd.DataFrame:
             "stable working screen",
             "outside working screen",
         )
+    if "caliper_in" in features:
+        caliper = pd.to_numeric(features["caliper_in"], errors="coerce")
+        if "well_alias" in features:
+            washout_threshold = caliper.groupby(features["well_alias"]).transform(
+                lambda values: values.quantile(0.95)
+            )
+        else:
+            washout_threshold = pd.Series(caliper.quantile(0.95), index=features.index)
+        features["caliper_washout_flag"] = caliper.ge(washout_threshold) & caliper.notna()
+
+    available_ml_features = [
+        column for column in CHONG_ML_FEATURE_COLUMNS if column in features.columns
+    ]
+    if available_ml_features:
+        features["chong_ml_available_feature_count"] = features[available_ml_features].notna().sum(axis=1)
+        features["chong_ml_complete_case_flag"] = features[available_ml_features].notna().all(axis=1)
+        if "caliper_washout_flag" in features:
+            features["chong_ml_complete_case_flag"] &= ~features["caliper_washout_flag"]
     return features

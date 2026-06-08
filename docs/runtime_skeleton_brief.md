@@ -32,11 +32,14 @@ identifiers must stay in `data_runtime/`, `outputs_runtime/`, `models_runtime/`,
 
 The skeleton lives in `dashboard/runtime/`.
 
-- `schemas.py`: runtime config, canonical column names, validation report types
+- `schemas.py`: runtime config, canonical column names, Chong et al. feature
+  contract, target-label provenance, and validation report types
 - `loaders.py`: CSV loader, curve alias standardization, LAS adapter placeholder
 - `validation.py`: readiness checks for required columns, depth order, ranges,
-  missingness, and well counts
-- `feature_engineering.py`: reusable manuscript-backed feature transforms
+  missingness, well counts, curve coverage, output readiness, and complete-well
+  split planning
+- `feature_engineering.py`: reusable manuscript-backed feature transforms plus
+  caliper upper-tail washout and source-feature completeness flags
 - `core_calibration.py`: nearest-depth core-to-log matching and offset flags
 - `modeling.py`: rule-based labels now, approved ML adapter interface later
 - `plotting.py`: generic well-log and core-log plotting helpers
@@ -57,14 +60,27 @@ behind the scenes.
 7. Keep GIS context as a constraint and visualization layer, not a replacement
    for direct log/core evidence.
 
+## Implemented Readiness View
+
+The `Runtime Readiness & ML Plan` tab inside the Future Well-Log Engine now
+shows:
+
+- required and optional curve coverage;
+- source-backed decision roles;
+- ready, partial, and blocked downstream outputs;
+- NMR-density versus electrical saturation routing;
+- caliper-based washout QC;
+- complete-well train/validation/test assignments;
+- target-label provenance and leakage exclusions;
+- the six-feature Chong et al. machine-learning contract.
+
 ## Next Upgrade
 
-The next useful app change is a "Runtime Readiness" tab inside the Future
-Well-Log Engine page. It should show:
+After workbook recovery:
 
-- selected input mode
-- required/missing curves
-- depth-order and duplicate-depth warnings
-- per-well missingness
-- core-log match offsets
-- which graph/model outputs are ready, partial, or blocked
+- apply exact units, mnemonics, and missing-value conventions;
+- add per-well core-log match readiness;
+- confirm the authoritative saturation and classification targets;
+- implement baseline and ANN evaluation using grouped wells;
+- generate approved-environment metrics and figures without exporting runtime
+  data to the public application.

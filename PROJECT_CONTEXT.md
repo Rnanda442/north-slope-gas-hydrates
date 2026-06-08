@@ -47,7 +47,7 @@ scientific calculations.
 - The authorized runtime skeleton is implemented in `dashboard/runtime/`.
 - Tests exist in `tests/test_well_log_engine.py` and
   `tests/test_runtime_skeleton.py`.
-- The full project test suite passed on 2026-06-08: 17 tests passed.
+- The full project test suite passed on 2026-06-08: 19 tests passed.
 - Public GIS layers, notebooks, structural surfaces, and Plotly exports are
   present.
 - Two working Word drafts are present in `docs/project_blueprints/`.
@@ -130,6 +130,8 @@ It must not load or expose authorized well-log or core data.
   strategy for keeping product changes aligned with the scientific goal
 - `docs/PROJECT_VISION_GOALS_AND_NEXT_STEPS.md`: email-derived project vision,
   deliverable priority, expected inputs, ML direction, and ordered next steps
+- `docs/EIGHT_SLIDE_PRESENTATION_SPEC.md`: source-backed visual structure for
+  reducing the recovered 12-slide scaffold to the requested eight-slide deck
 - `docs/WELL_LOG_REQUIREMENTS_MAP.md`: screenshot-derived header schema,
   scaffold requirements, track groups, and unresolved questions
 - `docs/SWEET_SPOT_SCIENCE_BASIS.md`: research-backed directional relationships,
@@ -210,3 +212,6 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-08: Integrated the project-direction emails and Chong et al. (2022)
   into a tracked vision/next-steps document and recovered the PowerPoint
   scaffold from Gmail.
+- 2026-06-08: Implemented source-driven Runtime Readiness, target contracts,
+  caliper washout QC, complete-well split planning, and an eight-slide
+  presentation specification.

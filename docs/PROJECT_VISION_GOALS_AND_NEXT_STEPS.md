@@ -125,16 +125,16 @@ Public source:
 
 ## Immediate Next Steps
 
-1. Inventory the recovered PowerPoint and reduce its current 12-slide scaffold
-   toward the requested approximately eight-slide visual story.
+1. Use `docs/EIGHT_SLIDE_PRESENTATION_SPEC.md` to revise the recovered
+   12-slide scaffold into the requested approximately eight-slide visual story.
 2. Recover the full Excel workbook and confirm headers, units, formulas, labels,
    and depth-alignment rules.
 3. Define the label contract: NMR-derived saturation, core saturation,
    interpreted hydrate intervals, lithology, and uncertain/expert-review labels.
-4. Build a synthetic Runtime Readiness page for curve coverage, units,
-   missingness, bad-hole checks, core-log alignment, and blocked outputs.
-5. Implement a reproducible model-evaluation skeleton with grouped
-   train/validation/test wells and baseline comparisons.
+4. Extend the implemented synthetic Runtime Readiness view with workbook-derived
+   units and core-log alignment rules after the workbook is recovered.
+5. Extend the implemented grouped-well split scaffold into reproducible
+   baseline and ANN evaluation code after target labels are confirmed.
 6. Generate reusable visual components for the PowerPoint and Word document:
    input-to-output workflow, grouped validation, interval log panel, confusion
    matrix, calibration, uncertainty, and sweet-spot ranking.

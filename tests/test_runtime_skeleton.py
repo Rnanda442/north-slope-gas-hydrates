@@ -1,13 +1,19 @@
 from __future__ import annotations
 
 import pandas as pd
+from streamlit.testing.v1 import AppTest
 
 from dashboard.runtime.core_calibration import match_core_to_nearest_logs
 from dashboard.runtime.feature_engineering import add_standard_features
 from dashboard.runtime.loaders import load_csv_logs, standardize_curve_columns
 from dashboard.runtime.modeling import rule_based_interval_labels
-from dashboard.runtime.schemas import RuntimeConfig
-from dashboard.runtime.validation import validate_log_table
+from dashboard.runtime.schemas import CHONG_ML_FEATURE_COLUMNS, RuntimeConfig, TARGET_LABEL_CONTRACT
+from dashboard.runtime.validation import (
+    curve_coverage_frame,
+    grouped_well_split_frame,
+    output_readiness_frame,
+    validate_log_table,
+)
 from dashboard.well_log_engine import generate_synthetic_logs, load_runtime_data
 
 
@@ -83,3 +89,40 @@ def test_feature_model_and_core_skeletons_connect() -> None:
     assert {"vp_km_s", "vs_km_s", "density_porosity_vv", "archie_hydrate_proxy"}.issubset(features.columns)
     assert labels["runtime_phase_label"].iloc[0] == "hydrate-supportive multi-log response"
     assert matches.loc[0, "match_status"] == "matched"
+
+
+def test_source_driven_readiness_and_grouped_split_contracts() -> None:
+    logs = generate_synthetic_logs()
+    features = add_standard_features(logs)
+    coverage = curve_coverage_frame(logs)
+    outputs = output_readiness_frame(features)
+    splits = grouped_well_split_frame(logs)
+
+    assert set(CHONG_ML_FEATURE_COLUMNS).issubset(features.columns)
+    assert "caliper_washout_flag" in features
+    assert features["caliper_washout_flag"].any()
+    assert {"train", "validation", "test"} == set(splits["Split"])
+    assert splits.groupby("Well alias")["Split"].nunique().max() == 1
+    assert coverage.loc[
+        coverage["Canonical column"] == "nmr_porosity_vv", "Decision role"
+    ].iloc[0] == "Preferred saturation target support"
+    assert outputs.loc[
+        outputs["Output"] == "Chong-style ML feature set", "Status"
+    ].iloc[0] == "Ready"
+    assert outputs.loc[
+        outputs["Output"] == "NMR-density saturation", "Status"
+    ].iloc[0] == "Partial"
+    assert len(TARGET_LABEL_CONTRACT) == 3
+
+
+def test_future_engine_renders_source_driven_runtime_readiness() -> None:
+    app = AppTest.from_file("streamlit_app.py", default_timeout=30)
+    app.query_params["page"] = "Future Well-Log Engine"
+    app.run(timeout=30)
+
+    assert not app.exception
+    assert app.title[0].value == "Future Well-Log Engine"
+    metric_labels = [metric.label for metric in app.metric]
+    assert "Input status" in metric_labels
+    assert "Ready outputs" in metric_labels
+    assert "Blocked outputs" in metric_labels
