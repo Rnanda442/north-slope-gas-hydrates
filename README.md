@@ -62,8 +62,7 @@ Current deployment:
 https://north-slope-gas-hydrates-vj67xkke9ksfzveon8ldt2.streamlit.app/
 ```
 
-The deployment currently requires Streamlit sign-in. Make the app public in
-Streamlit Community Cloud before treating this as an anonymous public link.
+The deployment is public and can be opened without Streamlit sign-in.
 
 Deploy from:
 

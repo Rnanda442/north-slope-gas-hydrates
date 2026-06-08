@@ -78,8 +78,8 @@ Main application: `dashboard/app.py`
 Hosted deployment:
 `https://north-slope-gas-hydrates-vj67xkke9ksfzveon8ldt2.streamlit.app/`
 
-As checked on 2026-06-08, the deployment exists but requires Streamlit sign-in;
-anonymous visitors cannot currently view it.
+As checked on 2026-06-08, the deployment is public and anonymous visitors can
+open it without Streamlit sign-in.
 
 Current public views:
 
@@ -173,7 +173,10 @@ blockers, and next activities in the architecture/activity map.
   authoritative next-work tracker.
 - 2026-06-08: Published the architecture/activity map inside Streamlit and added
   responsive phone-width styling.
-- 2026-06-08: Recorded the hosted Streamlit URL and confirmed that its current
-  sharing state requires sign-in.
+- 2026-06-08: Recorded the hosted Streamlit URL and found that its initial
+  sharing state required sign-in.
 - 2026-06-08: Verified the official folder's Git remote and history are
   synchronized, and improved the roadmap's phone-width workstream view.
+- 2026-06-08: Changed the hosted Streamlit deployment to public access and
+  verified that an anonymous request reaches the app without an access-denied
+  response.

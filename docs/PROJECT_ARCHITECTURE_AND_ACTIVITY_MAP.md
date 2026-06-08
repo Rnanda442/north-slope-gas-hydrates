@@ -72,7 +72,7 @@ The public website must never load authorized runtime data.
 | Component | Main location | Current state | Next outcome |
 |---|---|---|---|
 | Public atlas | `dashboard/app.py` | Implemented | Continue visual QA as features change |
-| Website entry point | `streamlit_app.py` | Implemented | Make the existing Streamlit deployment anonymously public |
+| Website entry point | `streamlit_app.py` | Public deployment verified | Keep the hosted app synchronized with `main` |
 | Synthetic well-log engine | `dashboard/well_log_engine.py` | Working scaffold | Align with Excel design |
 | Authorized runtime | `dashboard/runtime/` | Skeleton implemented | Complete input mapping and readiness UI |
 | Well-log tests | `tests/` | 8 focused tests passing | Expand with spreadsheet-derived cases |
@@ -92,7 +92,7 @@ The public website must never load authorized runtime data.
 | W3 | Extract Excel requirements | Waiting | Document sheets, columns, units, formulas, chart tracks, flags, and expected outputs | W1, W2 | Approved requirements map exists |
 | W4 | Gap analysis | Waiting | Compare spreadsheet requirements with the current engine and runtime package | W3 | Missing and existing capabilities are listed |
 | W5 | Implement well-log scaffold | Waiting | Add required schemas, calculations, validation, plots, and exports | W4 | Requirements are implemented with tests |
-| W6 | Website integration and QA | Partial | Roadmap page now includes phone-width workstream cards; public sharing and well-log workflow QA remain | W5 for final workflow | Website behavior and labels are verified |
+| W6 | Website integration and QA | Partial | Public sharing and phone-width roadmap cards are complete; well-log workflow QA remains | W5 for final workflow | Website behavior and labels are verified |
 | W7 | Scientific alignment | Partial | Reconcile equations and interpretation rules across code, manuscript, and presentation | W1, W3, W5 | No material scientific contradictions remain |
 | W8 | Git and project stabilization | Complete | Keep local `main` synchronized with `origin/main` and preserve focused commits | None | Clean history, remote, and documented workflow |
 | W9 | Authorized-data execution | Future | Configure approved runtime and run real-data validation only in the authorized environment | W5, authorization | Reproducible authorized outputs exist |
@@ -139,7 +139,6 @@ inspect the Streamlit workflow.
 | PowerPoint and Excel files are not in this folder | Requirements cannot be finalized | Recover from the source laptop |
 | Connected Drive may be the wrong Google account | Some uploaded sources may remain hidden | Check the account used on the other laptop |
 | June 6 migration was a failed local test | Source library was not actually uploaded | Repeat migration only after verifying real paths and destination |
-| Streamlit deployment currently requires sign-in | The hosted website is not publicly inspectable or shareable | Change the app's Streamlit sharing setting to public |
 | Public and restricted files could be mixed | Data-governance and publication risk | Classify every recovered item before copying |
 
 ## Near-Term Sequence
@@ -173,3 +172,4 @@ inspect the Streamlit workflow.
 | 2026-06-08 | Added roadmap to Streamlit and responsive mobile styling | Architecture status is available inside the website and narrow screens stack key layouts |
 | 2026-06-08 | Identified the hosted Streamlit deployment | Saved the canonical URL and found that anonymous access is currently disabled |
 | 2026-06-08 | Verified Git synchronization and improved the mobile roadmap | Local `main` matches `origin/main`; narrow screens receive workstream cards and a clearer next-project move |
+| 2026-06-08 | Made the hosted Streamlit deployment public | Anonymous requests reach the app without a Streamlit access-denied response |
