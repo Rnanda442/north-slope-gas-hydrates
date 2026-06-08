@@ -102,6 +102,11 @@ Status vocabulary: `Ready`, `In progress`, `Waiting`, `Blocked`, `Partial`,
 
 ## Current Priority
 
+Improvement decisions should follow
+`docs/PROJECT_IMPROVEMENT_STRATEGY.md`. The project will prioritize scientific
+traceability and runtime readiness over adding disconnected pages or opaque
+classification features.
+
 ### Priority 1: Recover Inputs
 
 On the source laptop, gather:
@@ -173,3 +178,4 @@ inspect the Streamlit workflow.
 | 2026-06-08 | Identified the hosted Streamlit deployment | Saved the canonical URL and found that anonymous access is currently disabled |
 | 2026-06-08 | Verified Git synchronization and improved the mobile roadmap | Local `main` matches `origin/main`; narrow screens receive workstream cards and a clearer next-project move |
 | 2026-06-08 | Made the hosted Streamlit deployment public | Anonymous requests reach the app without a Streamlit access-denied response |
+| 2026-06-08 | Defined the project improvement strategy | Established product pillars, a feature decision test, phased priorities, and ML guardrails |

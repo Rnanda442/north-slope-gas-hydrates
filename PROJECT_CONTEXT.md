@@ -122,6 +122,8 @@ It must not load or expose authorized well-log or core data.
   recovery checklist
 - `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md`: authoritative architecture,
   priorities, workstream status, blockers, and next-work sequence
+- `docs/PROJECT_IMPROVEMENT_STRATEGY.md`: principles and phased improvement
+  strategy for keeping product changes aligned with the scientific goal
 
 ## Source Intake
 
@@ -180,3 +182,6 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-08: Changed the hosted Streamlit deployment to public access and
   verified that an anonymous request reaches the app without an access-denied
   response.
+- 2026-06-08: Established a phased improvement strategy centered on guided
+  scientific communication, requirements traceability, runtime readiness, and
+  decision-quality outputs.
