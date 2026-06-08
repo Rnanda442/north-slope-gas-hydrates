@@ -14,7 +14,7 @@ from dashboard.well_log_engine import (
 
 
 def test_source_coverage_distinguishes_primary_references_from_project_artifacts() -> None:
-    assert len(PUBLIC_SCIENCE_REFERENCES) >= 9
+    assert len(PUBLIC_SCIENCE_REFERENCES) >= 10
     assert all(reference["Evidence tier"].startswith("Primary") for reference in PUBLIC_SCIENCE_REFERENCES)
     assert len({reference["Public URL"] for reference in PUBLIC_SCIENCE_REFERENCES}) == len(
         PUBLIC_SCIENCE_REFERENCES

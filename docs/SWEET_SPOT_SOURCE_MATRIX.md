@@ -25,6 +25,7 @@ they are a subset of the working evidence base, not the total source count.
 
 | Source | Main contribution | Sweet-spot domains |
 |---|---|---|
+| Chong et al. (2022) | ANN saturation prediction from selected well-log combinations across Alaska and Mackenzie Delta wells | ML inputs, QC, saturation targets, transfer validation |
 | USGS Alaska Gas Hydrate Assessment Team (2014) | Petroleum-system assessment; discrete accumulations bounded by faults and water contacts | Charge, structure, continuity, uncertainty |
 | Collett et al. (2019) | Updated North Slope assessment-unit and technically recoverable resource framing | Regional context, resource versus interval evidence |
 | Collett, Boswell, and Zyrianova (2022) | Synthesis of Mount Elbert, Ignik Sikumi, and Hydrate-01 drilling | Occurrence, logs, testing, producibility |

@@ -39,6 +39,7 @@ from dashboard.well_log_engine import (
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 EXPORT_DIR = PROJECT_ROOT / "05_exports" / "html"
 ARCHITECTURE_PATH = PROJECT_ROOT / "docs" / "PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md"
+VISION_PATH = PROJECT_ROOT / "docs" / "PROJECT_VISION_GOALS_AND_NEXT_STEPS.md"
 IGNORED_DIRS = {".git", ".ipynb_checkpoints", "__pycache__"}
 
 REGIONAL_SCENE = EXPORT_DIR / "north_slope_plotly_advanced.html"
@@ -447,6 +448,12 @@ def architecture_content() -> str:
     return ARCHITECTURE_PATH.read_text(encoding="utf-8")
 
 
+def vision_content() -> str:
+    if not VISION_PATH.exists():
+        return ""
+    return VISION_PATH.read_text(encoding="utf-8")
+
+
 def roadmap_cards(workstreams: pd.DataFrame) -> str:
     cards = []
     for row in workstreams.to_dict(orient="records"):
@@ -764,17 +771,36 @@ def render_welcome(files: list[dict[str, object]]) -> None:
 
 def render_project_roadmap() -> None:
     content = architecture_content()
+    vision = vision_content()
     st.markdown('<div class="atlas-kicker">Living project plan</div>', unsafe_allow_html=True)
-    st.title("Project Architecture & Activity Map")
+    st.title("Project Vision, Goals & Next Steps")
     st.write(
-        "A phone-friendly view of the project structure, current workstreams, "
-        "dependencies, blockers, and next actions. This page reads the tracked "
-        "project document directly so the website and repository stay aligned."
+        "The current scientific objective, deliverable priorities, ML direction, "
+        "workstreams, blockers, and ordered next actions. This page reads the "
+        "tracked project documents directly so the website and repository stay aligned."
     )
 
-    if not content:
-        st.error("The architecture tracker is not available in this deployment.")
+    if not content or not vision:
+        st.error("The vision or architecture tracker is not available in this deployment.")
         return
+
+    st.markdown("### Project Vision")
+    st.markdown(markdown_section(vision, "Project Vision"))
+    st.markdown("### Primary Goal")
+    st.markdown(markdown_section(vision, "Primary Goal"))
+
+    goal_cols = st.columns(3)
+    goal_cols[0].metric("Primary outputs", "Detection + saturation")
+    goal_cols[1].metric("Presentation target", "~8 visual slides")
+    goal_cols[2].metric("Validation unit", "Held-out wells")
+
+    with st.expander("Deliverables, inputs, and ML direction", expanded=True):
+        st.markdown("#### Deliverable Priority")
+        st.markdown(markdown_section(vision, "Deliverable Priority"))
+        st.markdown("#### Expected Approved Inputs")
+        st.markdown(markdown_section(vision, "Expected Approved Inputs"))
+        st.markdown("#### ML Direction")
+        st.markdown(markdown_section(vision, "ML Direction"))
 
     workstreams = markdown_table(markdown_section(content, "Workstream Activity Map"))
     components = markdown_table(markdown_section(content, "Component Map"))
@@ -823,9 +849,9 @@ def render_project_roadmap() -> None:
         """
         <div class="roadmap-next">
           <strong>Next project move</strong><br>
-          Recover the full Excel workbook, PowerPoint, and public source files
-          from the source laptop. Then confirm the header specification against
-          workbook formulas before calibrating the well-log engine.
+          Recover the full Excel workbook, confirm the target labels and units,
+          and convert the recovered presentation into the requested concise,
+          visual deliverable. Build grouped-well evaluation before model tuning.
         </div>
         """,
         unsafe_allow_html=True,
@@ -859,6 +885,12 @@ def render_project_roadmap() -> None:
     st.markdown("### Near-Term Sequence")
     st.markdown(markdown_section(content, "Near-Term Sequence"))
 
+    st.markdown("### Immediate Next Steps")
+    st.markdown(markdown_section(vision, "Immediate Next Steps"))
+
+    with st.expander("Decisions still needed"):
+        st.markdown(markdown_section(vision, "Decisions Still Needed"))
+
     with st.expander("Project boundaries and key decisions"):
         st.markdown("#### Data Boundary")
         st.markdown(markdown_section(content, "Data Boundary"))
@@ -866,7 +898,8 @@ def render_project_roadmap() -> None:
         st.markdown(markdown_section(content, "Key Decisions"))
 
     st.caption(
-        "Source: docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md | "
+        "Sources: docs/PROJECT_VISION_GOALS_AND_NEXT_STEPS.md and "
+        "docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md | "
         "Update the tracked document after important milestones or priority changes."
     )
 

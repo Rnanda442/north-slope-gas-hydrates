@@ -47,7 +47,7 @@ scientific calculations.
 - The authorized runtime skeleton is implemented in `dashboard/runtime/`.
 - Tests exist in `tests/test_well_log_engine.py` and
   `tests/test_runtime_skeleton.py`.
-- The full project test suite passed on 2026-06-08: 13 tests passed.
+- The full project test suite passed on 2026-06-08: 17 tests passed.
 - Public GIS layers, notebooks, structural surfaces, and Plotly exports are
   present.
 - Two working Word drafts are present in `docs/project_blueprints/`.
@@ -55,10 +55,10 @@ scientific calculations.
 - Six normalized Excel header screenshots were reviewed from the user's email.
   The images are not stored in Git or shown on the website; their public-safe
   schema derivative is maintained in `docs/WELL_LOG_REQUIREMENTS_MAP.md`.
-- The user's full Excel workbook and PowerPoint have not yet been recovered into
-  this official folder.
-- The missing PowerPoint was last confirmed in the source laptop's `Downloads`
-  folder as `Alaska_North_Slope_Wireline_ML_Presentation_Scaffold_outline.pptx`.
+- The user's full Excel workbook has not yet been recovered into this official
+  folder.
+- The open-source PowerPoint scaffold was recovered from Gmail into
+  `docs/project_blueprints/Alaska_North_Slope_Wireline_ML_Presentation_Scaffold_outline.pptx`.
 - The June 6 source migration targeted a local fake-Drive folder and did not
   upload the source library: 211 of 212 files were missing and 1 was blocked.
 - Several supporting research documents were found on the connected Google
@@ -128,6 +128,8 @@ It must not load or expose authorized well-log or core data.
   priorities, workstream status, blockers, and next-work sequence
 - `docs/PROJECT_IMPROVEMENT_STRATEGY.md`: principles and phased improvement
   strategy for keeping product changes aligned with the scientific goal
+- `docs/PROJECT_VISION_GOALS_AND_NEXT_STEPS.md`: email-derived project vision,
+  deliverable priority, expected inputs, ML direction, and ordered next steps
 - `docs/WELL_LOG_REQUIREMENTS_MAP.md`: screenshot-derived header schema,
   scaffold requirements, track groups, and unresolved questions
 - `docs/SWEET_SPOT_SCIENCE_BASIS.md`: research-backed directional relationships,
@@ -202,6 +204,9 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-08: Added a dedicated North Slope Sweet Spots page with synthetic
   interval ranking, all current input-variable roles, geomechanics, competing
   explanations, uncertainty, and research-backed decision logic.
-- 2026-06-08: Corrected the sweet-spot provenance model to distinguish nine
+- 2026-06-08: Corrected the sweet-spot provenance model to distinguish ten
   primary public references, 28 indexed artifacts, and the four-document Drive
   review subset.
+- 2026-06-08: Integrated the project-direction emails and Chong et al. (2022)
+  into a tracked vision/next-steps document and recovered the PowerPoint
+  scaffold from Gmail.

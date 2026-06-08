@@ -75,10 +75,10 @@ The public website must never load authorized runtime data.
 | Website entry point | `streamlit_app.py` | Public deployment verified | Keep the hosted app synchronized with `main` |
 | Synthetic well-log engine | `dashboard/well_log_engine.py` | Working scaffold | Align with Excel design |
 | Authorized runtime | `dashboard/runtime/` | Skeleton implemented | Complete input mapping and readiness UI |
-| Well-log tests | `tests/` | 16 project tests passing | Expand with workbook-derived unit and alignment cases |
+| Well-log tests | `tests/` | 17 project tests passing | Expand with workbook-derived unit and alignment cases |
 | GIS pipeline | notebooks and `03_data_final/` | Recovered | Validate only when GIS changes are needed |
 | Manuscript | `docs/project_blueprints/` | Two drafts recovered | Reconcile with equations and final workflow |
-| Presentation | Not yet recovered | Blocked | Recover from the source laptop |
+| Presentation | PowerPoint scaffold recovered from Gmail | Partial | Reduce and align it to the requested approximately eight-slide visual story |
 | Excel design | Header screenshots recovered; workbook missing | Partial | Confirm formulas, units, and mnemonics from the workbook |
 | Source library | Index recovered; full library incomplete | Partial | Recover and inventory public sources |
 | Git history | Connected and synchronized with GitHub | Complete | Preserve the normal commit-and-push workflow |
@@ -87,7 +87,7 @@ The public website must never load authorized runtime data.
 
 | ID | Workstream | Status | Immediate activity | Dependency | Completion signal |
 |---|---|---|---|---|---|
-| W1 | Recover project artifacts | In progress | Collect the PowerPoint, full Excel workbook, manuscript variants, and source files; header screenshots are recovered | Access to other laptop | Recovery inventory is complete |
+| W1 | Recover project artifacts | In progress | Collect the full Excel workbook, remaining manuscript variants, and source files; the header screenshots and PowerPoint are recovered | Access to other laptop | Recovery inventory is complete |
 | W2 | Organize source intake | Waiting | Classify recovered files as public, synthetic, or restricted and place them appropriately | W1 | Every recovered file has a location and classification |
 | W3 | Extract Excel requirements | In progress | Confirm the screenshot-derived header map against workbook formulas, units, tool mnemonics, and alignment logic | Full workbook recovery | Approved requirements map is complete |
 | W4 | Gap analysis | Waiting | Compare spreadsheet requirements with the current engine and runtime package | W3 | Missing and existing capabilities are listed |
@@ -96,6 +96,7 @@ The public website must never load authorized runtime data.
 | W7 | Scientific alignment | Partial | Reconcile equations and interpretation rules across code, manuscript, and presentation | W1, W3, W5 | No material scientific contradictions remain |
 | W8 | Git and project stabilization | Complete | Keep local `main` synchronized with `origin/main` and preserve focused commits | None | Clean history, remote, and documented workflow |
 | W9 | Authorized-data execution | Future | Configure approved runtime and run real-data validation only in the authorized environment | W5, authorization | Reproducible authorized outputs exist |
+| W10 | Word and PowerPoint deliverables | In progress | Convert the recovered 12-slide scaffold into an approximately eight-slide visual story and align the detailed Word document | W3, W5, W7 | Both deliverables use the verified workflow, figures, terminology, and validation plan |
 
 Status vocabulary: `Ready`, `In progress`, `Waiting`, `Blocked`, `Partial`,
 `Complete`, or `Future`.
@@ -107,11 +108,10 @@ Improvement decisions should follow
 traceability and runtime readiness over adding disconnected pages or opaque
 classification features.
 
-### Priority 1: Recover Inputs
+### Priority 1: Confirm Inputs and Targets
 
 On the source laptop, gather:
 
-- `Alaska_North_Slope_Wireline_ML_Presentation_Scaffold_outline.pptx`;
 - the full Excel workbook and any additional header/formula references;
 - manuscript and equation-map documents;
 - the public source library and its inventory.
@@ -132,30 +132,34 @@ After recovery, create `docs/WELL_LOG_REQUIREMENTS_MAP.md` containing:
 - expected export;
 - test case and acceptance criterion.
 
-### Priority 3: Implement and Verify
+### Priority 3: Implement, Validate, and Build Deliverables
 
 Use the requirements map to make focused code changes, add tests, and visually
-inspect the Streamlit workflow.
+inspect the Streamlit workflow. Build reusable figures for the Word document and
+reduce the recovered PowerPoint scaffold toward the requested approximately
+eight-slide visual presentation.
 
 ## Blockers and Risks
 
 | Item | Impact | Resolution |
 |---|---|---|
-| PowerPoint and Excel files are not in this folder | Requirements cannot be finalized | Recover from the source laptop |
+| Full Excel workbook is not in this folder | Requirements and labels cannot be finalized | Recover from the source laptop |
+| Training-target and split expectation are not confirmed | Model design could optimize the wrong objective or leak depth-neighbor information | Confirm target labels and use held-out wells for final evaluation |
 | Connected Drive may be the wrong Google account | Some uploaded sources may remain hidden | Check the account used on the other laptop |
 | June 6 migration was a failed local test | Source library was not actually uploaded | Repeat migration only after verifying real paths and destination |
 | Public and restricted files could be mixed | Data-governance and publication risk | Classify every recovered item before copying |
 
 ## Near-Term Sequence
 
-1. Recover the missing PowerPoint, Excel artifacts, and public sources.
+1. Recover the missing Excel artifacts and remaining public sources.
 2. Create a recovery inventory with data classification.
-3. Build the well-log requirements map.
-4. Perform the code-to-requirements gap analysis.
-5. Implement the missing scaffold behavior and tests.
-6. Run website visual QA.
-7. Align the manuscript and PowerPoint with the verified implementation.
-8. Keep the architecture tracker, tests, commits, and hosted deployment synchronized.
+3. Confirm the supervised targets, uncertain labels, and complete-well split plan.
+4. Build the well-log requirements map.
+5. Perform the code-to-requirements gap analysis.
+6. Implement Runtime Readiness, model-evaluation scaffolding, and tests.
+7. Generate reusable figures and align the Word document and eight-slide PowerPoint.
+8. Run website visual QA.
+9. Keep the architecture tracker, tests, commits, and hosted deployment synchronized.
 
 ## Key Decisions
 
@@ -182,4 +186,5 @@ inspect the Streamlit workflow.
 | 2026-06-08 | Reviewed normalized Excel header screenshots | Kept the images out of Git and the website; retained only a public-safe header/schema requirements map |
 | 2026-06-08 | Reviewed connected Drive research and strengthened the synthetic scaffold | Added a seven-domain explainable sweet-spot model and documented the boundary between scientific tendencies and synthetic thresholds |
 | 2026-06-08 | Added the focused North Slope Sweet Spots page | Combined ranked synthetic intervals, input variables, geomechanics, uncertainty, competing explanations, and sources in one decision workspace |
-| 2026-06-08 | Expanded and tiered sweet-spot source provenance | Distinguished nine primary public references from 28 indexed project artifacts and the four-document Drive synthesis subset |
+| 2026-06-08 | Expanded and tiered sweet-spot source provenance | Distinguished ten primary public references from 28 indexed project artifacts and the four-document Drive synthesis subset |
+| 2026-06-08 | Integrated project-direction emails and the attached ML paper | Added the vision/goals/next-steps tracker, clarified deliverable priority and validation requirements, and recovered the PowerPoint scaffold from Gmail |

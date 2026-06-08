@@ -8,6 +8,11 @@ Improve the North Slope Gas Hydrates project by making the scientific workflow
 more understandable, traceable, testable, and useful without weakening the
 public-versus-authorized data boundary.
 
+The primary internship deliverables are the detailed Word document and an
+approximately eight-slide visual PowerPoint. Streamlit is the working surface
+used to prototype reusable figures, explanations, and code behavior for those
+deliverables.
+
 The project should not become a collection of disconnected visualizations.
 Every major feature should support the evidence chain:
 
@@ -163,8 +168,10 @@ produces reproducible, uncertainty-aware outputs.
 
 ### Later: Carefully Introduce ML
 
-ML should begin only after the deterministic workflow, data validation, labels,
-and evaluation design are stable.
+ML scaffolding should be built now, but comparative model training should begin
+only after the deterministic workflow, data validation, labels, and evaluation
+design are stable. Advanced methods are allowed; complexity must earn its place
+against transparent baselines on held-out wells.
 
 Required guardrails:
 

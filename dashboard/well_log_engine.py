@@ -294,6 +294,12 @@ SWEET_SPOT_GUIDE = [
 
 PUBLIC_SCIENCE_REFERENCES = [
     {
+        "Evidence tier": "Primary - machine learning",
+        "Reference": "Chong et al. (2022), Alaska and Mackenzie Delta",
+        "Public URL": "https://doi.org/10.1007/s10596-022-10151-9",
+        "Dashboard use": "ANN saturation prediction from density, porosity, resistivity, gamma ray, Vp, and Vs; NMR-derived targets, washout QC, feature-combination testing, and cross-basin transfer.",
+    },
+    {
         "Evidence tier": "Primary - regional assessment",
         "Reference": "USGS Alaska Gas Hydrate Assessment Team (2014)",
         "Public URL": "https://pubs.usgs.gov/publication/ds69CC",

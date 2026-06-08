@@ -21,10 +21,10 @@ groups: public field reports, Alaska geology and reservoir references, wireline
 equations and ranges, geomechanics/productivity/ML synthesis, manuscript
 synthesis, and map/public-data support.
 
-Nine directly relevant primary public references are currently exposed on the
+Ten directly relevant primary public references are currently exposed on the
 website. They cover North Slope assessment, scientific drilling, permafrost
 occurrence, well-log interpretation, reservoir architecture, stratigraphic
-correlation, and reservoir quality.
+correlation, reservoir quality, and machine-learning saturation prediction.
 
 Connected Google Drive documents reviewed during one synthesis pass on
 2026-06-08:

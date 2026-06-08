@@ -3,6 +3,7 @@ from dashboard.app import (
     markdown_section,
     markdown_table,
     roadmap_cards,
+    vision_content,
 )
 from streamlit.testing.v1 import AppTest
 
@@ -13,6 +14,16 @@ def test_architecture_tracker_contains_required_sections() -> None:
     assert "## Workstream Activity Map" in content
     assert "## Current Priority" in content
     assert "## Near-Term Sequence" in content
+
+
+def test_vision_tracker_contains_email_derived_project_direction() -> None:
+    content = vision_content()
+
+    assert "## Project Vision" in content
+    assert "## Deliverable Priority" in content
+    assert "## ML Direction" in content
+    assert "## Immediate Next Steps" in content
+    assert "complete well" in content
 
 
 def test_markdown_table_parses_workstreams() -> None:
@@ -37,10 +48,15 @@ def test_project_roadmap_page_renders() -> None:
     app.run(timeout=30)
 
     assert not app.exception
-    assert app.title[0].value == "Project Architecture & Activity Map"
-    assert [(metric.label, metric.value) for metric in app.metric] == [
-        ("Workstreams", "9"),
-        ("Active", "5"),
+    assert app.title[0].value == "Project Vision, Goals & Next Steps"
+    assert [(metric.label, metric.value) for metric in app.metric[:3]] == [
+        ("Primary outputs", "Detection + saturation"),
+        ("Presentation target", "~8 visual slides"),
+        ("Validation unit", "Held-out wells"),
+    ]
+    assert [(metric.label, metric.value) for metric in app.metric[3:]] == [
+        ("Workstreams", "10"),
+        ("Active", "6"),
         ("Waiting / blocked", "2"),
         ("Complete", "1"),
     ]
