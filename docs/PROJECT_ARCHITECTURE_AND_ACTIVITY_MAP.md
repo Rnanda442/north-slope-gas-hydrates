@@ -71,7 +71,7 @@ The public website must never load authorized runtime data.
 
 | Component | Main location | Current state | Next outcome |
 |---|---|---|---|
-| Public atlas | `dashboard/app.py` | Implemented with focused sweet-spot page | Continue responsive visual QA as features change |
+| Public atlas | `dashboard/app.py` | Implemented; navigation and overview are visually overloaded | Execute the approved four-page visual redesign plan in staged change sets |
 | Website entry point | `streamlit_app.py` | Public deployment verified | Keep the hosted app synchronized with `main` |
 | Synthetic well-log engine | `dashboard/well_log_engine.py` | Working scaffold | Align with Excel design |
 | Authorized runtime | `dashboard/runtime/` | Source-driven readiness and grouped-well split scaffold implemented | Complete workbook-derived input mapping and model evaluation |
@@ -92,7 +92,7 @@ The public website must never load authorized runtime data.
 | W3 | Extract Excel requirements | In progress | Confirm the screenshot-derived header map against workbook formulas, units, tool mnemonics, and alignment logic | Full workbook recovery | Approved requirements map is complete |
 | W4 | Gap analysis | Waiting | Compare spreadsheet requirements with the current engine and runtime package | W3 | Missing and existing capabilities are listed |
 | W5 | Implement well-log scaffold | In progress | Runtime Readiness, source-derived QC, target contracts, and grouped-well split planning are implemented; next add workbook-derived mapping and baseline evaluation | W3, W4 | Requirements are implemented with tests |
-| W6 | Website integration and QA | Partial | Sweet-spot and Runtime Readiness views are implemented; complete responsive visual QA and final workflow QA as workbook requirements arrive | W5 for final workflow | Website behavior and labels are verified |
+| W6 | Website integration and QA | In progress | Follow `docs/WEBSITE_VISUAL_REDESIGN_PLAN.md`: reduce navigation to four pages, rebuild the overview visually, then consolidate Explore, Analyze, and Project Plan content | W5 for final workflow | Four-page navigation, low-text visual overview, and responsive consolidated workflows are verified |
 | W7 | Scientific alignment | Partial | Reconcile equations and interpretation rules across code, manuscript, and presentation | W1, W3, W5 | No material scientific contradictions remain |
 | W8 | Git and project stabilization | Complete | Keep local `main` synchronized with `origin/main` and preserve focused commits | None | Clean history, remote, and documented workflow |
 | W9 | Authorized-data execution | Future | Configure approved runtime and run real-data validation only in the authorized environment | W5, authorization | Reproducible authorized outputs exist |
@@ -157,9 +157,10 @@ eight-slide visual presentation.
 4. Build the well-log requirements map.
 5. Perform the code-to-requirements gap analysis.
 6. Extend the implemented Runtime Readiness and grouped-well split scaffolds with workbook-derived rules and baseline models.
-7. Apply the eight-slide specification, generate reusable figures, and align the Word document.
-8. Run website visual QA.
-9. Keep the architecture tracker, tests, commits, and hosted deployment synchronized.
+7. Execute the website visual redesign in staged change sets, beginning with navigation reduction and the overview.
+8. Apply the eight-slide specification, reuse website visuals, and align the Word document.
+9. Run complete website visual QA.
+10. Keep the architecture tracker, tests, commits, and hosted deployment synchronized.
 
 ## Key Decisions
 
@@ -189,3 +190,4 @@ eight-slide visual presentation.
 | 2026-06-08 | Expanded and tiered sweet-spot source provenance | Distinguished ten primary public references from 28 indexed project artifacts and the four-document Drive synthesis subset |
 | 2026-06-08 | Integrated project-direction emails and the attached ML paper | Added the vision/goals/next-steps tracker, clarified deliverable priority and validation requirements, and recovered the PowerPoint scaffold from Gmail |
 | 2026-06-08 | Implemented source-driven runtime and deliverable changes | Added curve/output readiness, Chong feature contracts, caliper washout QC, grouped-well splits, target provenance, and an eight-slide deck specification |
+| 2026-06-08 | Planned the website navigation and visual redesign | Defined a four-page information architecture, overview visual prompts, icon/color rules, staged change sets, and mobile acceptance criteria before implementation |

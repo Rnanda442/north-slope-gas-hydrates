@@ -132,6 +132,8 @@ It must not load or expose authorized well-log or core data.
   deliverable priority, expected inputs, ML direction, and ordered next steps
 - `docs/EIGHT_SLIDE_PRESENTATION_SPEC.md`: source-backed visual structure for
   reducing the recovered 12-slide scaffold to the requested eight-slide deck
+- `docs/WEBSITE_VISUAL_REDESIGN_PLAN.md`: approved pre-implementation plan for
+  reducing navigation, rebuilding the overview, and specifying each visual
 - `docs/WELL_LOG_REQUIREMENTS_MAP.md`: screenshot-derived header schema,
   scaffold requirements, track groups, and unresolved questions
 - `docs/SWEET_SPOT_SCIENCE_BASIS.md`: research-backed directional relationships,
@@ -215,3 +217,6 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-08: Implemented source-driven Runtime Readiness, target contracts,
   caliper washout QC, complete-well split planning, and an eight-slide
   presentation specification.
+- 2026-06-08: Defined the website redesign plan before implementation, including
+  four-page navigation, low-text overview visuals, generation prompts, and
+  staged acceptance criteria.
