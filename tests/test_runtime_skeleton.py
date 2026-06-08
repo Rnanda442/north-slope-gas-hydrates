@@ -7,11 +7,17 @@ from dashboard.runtime.core_calibration import match_core_to_nearest_logs
 from dashboard.runtime.feature_engineering import add_standard_features
 from dashboard.runtime.loaders import load_csv_logs, standardize_curve_columns
 from dashboard.runtime.modeling import rule_based_interval_labels
-from dashboard.runtime.schemas import CHONG_ML_FEATURE_COLUMNS, RuntimeConfig, TARGET_LABEL_CONTRACT
+from dashboard.runtime.schemas import (
+    CHONG_ML_FEATURE_COLUMNS,
+    PROJECT_COHORT_ASSUMPTIONS,
+    RuntimeConfig,
+    TARGET_LABEL_CONTRACT,
+)
 from dashboard.runtime.validation import (
     curve_coverage_frame,
     grouped_well_split_frame,
     output_readiness_frame,
+    project_cohort_plan_frame,
     validate_log_table,
 )
 from dashboard.well_log_engine import generate_synthetic_logs, load_runtime_data
@@ -126,3 +132,19 @@ def test_future_engine_renders_source_driven_runtime_readiness() -> None:
     assert "Input status" in metric_labels
     assert "Ready outputs" in metric_labels
     assert "Blocked outputs" in metric_labels
+
+
+def test_project_cohort_plan_uses_known_wells_for_development_and_rest_for_prediction() -> None:
+    plan = project_cohort_plan_frame()
+
+    assert plan["Approximate wells"].sum() == 71
+    assert plan.loc[
+        plan["Cohort"] == "Prediction / deployment", "Approximate wells"
+    ].iloc[0] == 57
+    assert plan.loc[
+        plan["Cohort"].str.startswith("Development"), "Approximate wells"
+    ].sum() == 14
+    assert PROJECT_COHORT_ASSUMPTIONS["Expected NMR"] == "No"
+    assert "classification and continuous hydrate saturation" in PROJECT_COHORT_ASSUMPTIONS[
+        "Primary outputs"
+    ].lower()

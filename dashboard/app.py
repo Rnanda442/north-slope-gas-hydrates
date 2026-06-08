@@ -10,11 +10,16 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 from dashboard.runtime.feature_engineering import add_standard_features
-from dashboard.runtime.schemas import CHONG_ML_FEATURE_COLUMNS, TARGET_LABEL_CONTRACT
+from dashboard.runtime.schemas import (
+    CHONG_ML_FEATURE_COLUMNS,
+    PROJECT_COHORT_ASSUMPTIONS,
+    TARGET_LABEL_CONTRACT,
+)
 from dashboard.runtime.validation import (
     curve_coverage_frame,
     grouped_well_split_frame,
     output_readiness_frame,
+    project_cohort_plan_frame,
     readiness_frame,
     validate_log_table,
 )
@@ -1395,8 +1400,35 @@ def render_runtime_readiness(logs: pd.DataFrame) -> None:
         "The final model must demonstrate performance on wells excluded from training."
     )
 
+    st.markdown("#### Planned 71-Well Cohort Design")
+    cohort_plan = project_cohort_plan_frame(
+        total_wells=PROJECT_COHORT_ASSUMPTIONS["Estimated total wells"],
+        known_fraction=PROJECT_COHORT_ASSUMPTIONS["Known development fraction"],
+    )
+    st.dataframe(cohort_plan, use_container_width=True, hide_index=True)
+    st.caption(
+        "Working estimate: 14 known wells support model development and 57 wells "
+        "form the prediction cohort. Final counts depend on label completeness and "
+        "whether all wells contain compatible curves."
+    )
+    st.warning(
+        "The 20% known-well cohort cannot be used entirely for fitting. Whole wells "
+        "inside that cohort must remain unseen for validation and a locked test."
+    )
+    st.caption(
+        "Normalization ranges, imputers, feature selection, and any learned variable "
+        "weights must be fitted on training wells only, then applied unchanged to "
+        "validation, locked-test, and prediction wells."
+    )
+
     st.markdown("#### Supervised Target Contract")
     st.dataframe(pd.DataFrame(TARGET_LABEL_CONTRACT), use_container_width=True, hide_index=True)
+    st.info(
+        "Current assumption: NMR is not expected. Saturation training must use a "
+        "supplied, core-calibrated, or documented interpreted saturation target. "
+        "The same normalized log families may support both outputs, but classification "
+        "and saturation remain separate models or model heads."
+    )
 
     st.markdown("#### Attached-Paper Feature Contract")
     st.write(

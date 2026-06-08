@@ -101,6 +101,38 @@ Required validation:
 - test missing-curve and out-of-distribution behavior;
 - prevent target-derived columns from entering model inputs.
 
+## Confirmed Working Assumptions
+
+The current project design is:
+
+- approximately 71 wells total;
+- approximately 20% of wells have known outcomes and form the development
+  cohort;
+- the model predicts classification and saturation for the remaining
+  approximately 80% of wells;
+- NMR is not expected;
+- both phase classification and continuous hydrate saturation are required;
+- normalized percentages and values from multiple log and physics variables
+  will provide the evidence, rather than one universal cutoff.
+
+Normalization, imputation, feature selection, and any learned variable weights
+must be fitted using training wells only. The fitted transformations are then
+applied unchanged to validation, locked-test, and prediction wells.
+
+The input-variable percentages cannot define their own ground truth. The known
+wells still require an independent phase label and saturation reference from
+the supplied interpretation, core calibration, or another documented method.
+
+For 71 wells, the planning count is approximately 14 known development wells
+and 57 prediction wells. The 14 known wells must still be divided by complete
+well into training, validation, and locked testing. A current planning split is
+10 train, 2 validation, and 2 locked test wells. Final counts depend on label
+quality, curve coverage, geology, and class balance.
+
+If reference outcomes exist for the 57 prediction wells, those labels should
+remain hidden until predictions are locked and then be used for blind
+evaluation.
+
 ## New Research Anchor
 
 Chong et al. (2022), *Application of machine learning to characterize gas
@@ -129,8 +161,9 @@ Public source:
    12-slide scaffold into the requested approximately eight-slide visual story.
 2. Recover the full Excel workbook and confirm headers, units, formulas, labels,
    and depth-alignment rules.
-3. Define the label contract: NMR-derived saturation, core saturation,
-   interpreted hydrate intervals, lithology, and uncertain/expert-review labels.
+3. Confirm the exact supplied or core-calibrated saturation field, phase-label
+   field, lithology field, and uncertain/expert-review convention for the known
+   wells.
 4. Extend the implemented synthetic Runtime Readiness view with workbook-derived
    units and core-log alignment rules after the workbook is recovered.
 5. Extend the implemented grouped-well split scaffold into reproducible
@@ -143,16 +176,14 @@ Public source:
 ## Decisions Still Needed
 
 - Confirm the official project title.
-- Confirm whether the mentor expects 20% training and 80% prediction, or the
-  conventional 80% training and 20% validation described in the research
-  paper. These are materially different workflows.
-- Confirm whether NMR exists in the approved dataset.
-- Confirm which saturation or interval interpretation is the authoritative
-  training target.
-- Confirm whether the final deliverable requires classification only,
-  continuous saturation prediction, or both.
-- Confirm the number of wells and which wells can be reserved as untouched
-  validation and test wells.
+- Confirm the exact number of wells; the current estimate is 71.
+- Confirm which supplied, core-calibrated, or interpreted saturation field is
+  authoritative for the known wells.
+- Confirm the exact phase classes supplied for the known wells.
+- Confirm whether outcomes for the 80% prediction cohort are available for
+  blind evaluation after predictions are locked.
+- Confirm how known wells are distributed across formations, locations, hydrate
+  classes, and missing-curve patterns before assigning the final split.
 
 ## Source Note
 

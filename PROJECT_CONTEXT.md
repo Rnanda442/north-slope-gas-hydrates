@@ -47,7 +47,7 @@ scientific calculations.
 - The authorized runtime skeleton is implemented in `dashboard/runtime/`.
 - Tests exist in `tests/test_well_log_engine.py` and
   `tests/test_runtime_skeleton.py`.
-- The full project test suite passed on 2026-06-08: 19 tests passed.
+- The full project test suite passed on 2026-06-08: 20 tests passed.
 - Public GIS layers, notebooks, structural surfaces, and Plotly exports are
   present.
 - Two working Word drafts are present in `docs/project_blueprints/`.
@@ -220,3 +220,6 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-08: Defined the website redesign plan before implementation, including
   four-page navigation, low-text overview visuals, generation prompts, and
   staged acceptance criteria.
+- 2026-06-08: Recorded the working ML assumptions: approximately 71 wells,
+  approximately 20% known wells for development, 80% prediction wells, no
+  expected NMR, and separate classification and saturation outputs.

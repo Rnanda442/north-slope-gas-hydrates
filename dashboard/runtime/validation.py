@@ -235,3 +235,45 @@ def grouped_well_split_frame(logs: pd.DataFrame) -> pd.DataFrame:
             }
         )
     return pd.DataFrame(rows)
+
+
+def project_cohort_plan_frame(total_wells: int = 71, known_fraction: float = 0.20) -> pd.DataFrame:
+    if total_wells < 5:
+        raise ValueError("At least five wells are required for a development and prediction plan.")
+    if not 0 < known_fraction < 1:
+        raise ValueError("Known-well fraction must be between 0 and 1.")
+
+    development_wells = max(3, round(total_wells * known_fraction))
+    prediction_wells = total_wells - development_wells
+    validation_wells = max(1, round(development_wells * 0.15))
+    test_wells = max(1, round(development_wells * 0.15))
+    training_wells = development_wells - validation_wells - test_wells
+
+    return pd.DataFrame(
+        [
+            {
+                "Cohort": "Development - train",
+                "Approximate wells": training_wells,
+                "Labels visible during development": "Yes",
+                "Purpose": "Fit classification and saturation models",
+            },
+            {
+                "Cohort": "Development - validation",
+                "Approximate wells": validation_wells,
+                "Labels visible during development": "Yes",
+                "Purpose": "Tune features, hyperparameters, thresholds, and abstention",
+            },
+            {
+                "Cohort": "Development - locked test",
+                "Approximate wells": test_wells,
+                "Labels visible during development": "Hidden until final model selection",
+                "Purpose": "Estimate performance before deployment",
+            },
+            {
+                "Cohort": "Prediction / deployment",
+                "Approximate wells": prediction_wells,
+                "Labels visible during development": "No",
+                "Purpose": "Predict classification and saturation for the remaining wells",
+            },
+        ]
+    )

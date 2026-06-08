@@ -74,13 +74,27 @@ shows:
 - target-label provenance and leakage exclusions;
 - the six-feature Chong et al. machine-learning contract.
 
+Current project assumptions:
+
+- approximately 71 wells;
+- approximately 14 known wells for development and 57 wells for prediction;
+- complete-well train, validation, and locked-test separation inside the known
+  cohort;
+- no expected NMR;
+- separate phase-classification and continuous-saturation outputs;
+- normalized multivariable log and physics features rather than one fixed
+  percentage rule.
+
+All fitted preprocessing, including normalization, imputation, feature
+selection, and learned weighting, must use training wells only.
+
 ## Next Upgrade
 
 After workbook recovery:
 
 - apply exact units, mnemonics, and missing-value conventions;
 - add per-well core-log match readiness;
-- confirm the authoritative saturation and classification targets;
+- confirm the authoritative non-NMR saturation and classification targets;
 - implement baseline and ANN evaluation using grouped wells;
 - generate approved-environment metrics and figures without exporting runtime
   data to the public application.

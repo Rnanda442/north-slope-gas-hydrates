@@ -144,7 +144,7 @@ eight-slide visual presentation.
 | Item | Impact | Resolution |
 |---|---|---|
 | Full Excel workbook is not in this folder | Requirements and labels cannot be finalized | Recover from the source laptop |
-| Training-target and split expectation are not confirmed | Model design could optimize the wrong objective or leak depth-neighbor information | Confirm target labels and use held-out wells for final evaluation |
+| Exact saturation and phase-label fields are not confirmed | Models cannot be trained defensibly until known-well targets are mapped | Confirm the authoritative non-NMR saturation field, phase labels, and uncertain-label convention |
 | Connected Drive may be the wrong Google account | Some uploaded sources may remain hidden | Check the account used on the other laptop |
 | June 6 migration was a failed local test | Source library was not actually uploaded | Repeat migration only after verifying real paths and destination |
 | Public and restricted files could be mixed | Data-governance and publication risk | Classify every recovered item before copying |
@@ -153,7 +153,7 @@ eight-slide visual presentation.
 
 1. Recover the missing Excel artifacts and remaining public sources.
 2. Create a recovery inventory with data classification.
-3. Confirm the supervised targets, uncertain labels, and complete-well split plan.
+3. Confirm the exact non-NMR saturation target and phase labels; refine the approximately 14-known / 57-prediction well plan after inventory.
 4. Build the well-log requirements map.
 5. Perform the code-to-requirements gap analysis.
 6. Extend the implemented Runtime Readiness and grouped-well split scaffolds with workbook-derived rules and baseline models.
@@ -191,3 +191,4 @@ eight-slide visual presentation.
 | 2026-06-08 | Integrated project-direction emails and the attached ML paper | Added the vision/goals/next-steps tracker, clarified deliverable priority and validation requirements, and recovered the PowerPoint scaffold from Gmail |
 | 2026-06-08 | Implemented source-driven runtime and deliverable changes | Added curve/output readiness, Chong feature contracts, caliper washout QC, grouped-well splits, target provenance, and an eight-slide deck specification |
 | 2026-06-08 | Planned the website navigation and visual redesign | Defined a four-page information architecture, overview visual prompts, icon/color rules, staged change sets, and mobile acceptance criteria before implementation |
+| 2026-06-08 | Confirmed the working ML cohort assumptions | Recorded approximately 71 wells, 20% known wells for development, 80% prediction wells, no expected NMR, and separate classification and saturation outputs |

@@ -46,7 +46,7 @@ silently become an input feature.
 | `Rho_b`, `RHOB`, `Density_gcpcc` | Bulk density | kg/m3 or g/cc depending on sheet | `rhob_g_cc` | Measured input | Unit-aware conversion is required; preserve original unit |
 | `Phi_porosity`, `DPHI`, `phi_den` | Density-derived porosity | Screenshot unit is inconsistent in one header | `density_porosity_vv` | Derived or supplied feature | Confirm whether supplied or calculated; porosity should be dimensionless fraction or percent |
 | `NPHI`, `phi_neut` | Neutron porosity | not shown | `neutron_porosity_vv` | Measured input | Record fraction-versus-percent convention |
-| `NMRPHI`, `phi_nmr` | NMR porosity | not shown | `nmr_porosity_vv` | Measured input | Existing runtime field can be reused after unit confirmation |
+| `NMRPHI`, `phi_nmr` | NMR porosity | not shown | `nmr_porosity_vv` | Optional measured input | NMR is not expected for the current project; retain support only as a future optional route |
 | `GR` | Gamma ray | API | `gr_api` | Measured input | Existing runtime field |
 | `caliper`, `CAL1` | Caliper | screenshot suggests inches for `CAL1`; not universal | `caliper_in` | Measured/QC input | Preserve source unit and convert if necessary |
 | `Differential Caliper` | Borehole deviation from expected gauge | mm shown | `differential_caliper` | QC feature | Define reference diameter and sign convention |
@@ -55,7 +55,7 @@ silently become an input feature.
 | `Vs`, `VS`, `VS1` | Shear-wave velocity | m/s | `vs_m_s` | Measured or supplied input | Do not confuse with `DTS`; support direct velocity and calculated velocity |
 | `Ratio Vp/Vs` | Compressional-to-shear velocity ratio | dimensionless | `vp_vs_ratio` | Derived feature | Calculate from canonical velocities when both are available |
 | `Impedance` | Acoustic impedance, labeled `Rho_b * Vp` | kg/m2*s as shown | `acoustic_impedance` | Derived feature | Confirm desired unit expression and density conversion before calculation |
-| `Sgh`, `S_h`, `Hydrate Saturation`, `NMR_SAT` | Gas-hydrate saturation target or interpretation | fraction not explicitly shown | `hydrate_saturation_vv` | Target / interpretation | Never use as a model input unless a separately documented experiment requires it |
+| `Sgh`, `S_h`, `Hydrate Saturation`, `NMR_SAT` | Gas-hydrate saturation target or interpretation | fraction not explicitly shown | `hydrate_saturation_vv` | Target / interpretation | Required regression target for known wells; confirm which non-NMR supplied or core-calibrated field is authoritative and never use it as an input |
 | `S_wr`, `Swr` | Irreducible-water saturation | fraction not explicitly shown | `irreducible_water_saturation_vv` | Target, calibration, or derived field | Confirm formula and whether it is measured, assumed, or calculated |
 | `depths_unitD`, `depths_unitC`, `Unit D`, `Unit C` | Unit-specific depth vectors | ft shown in refined sheets | `source_depth_*` | Alignment/QC | Preserve unit identifier and original sampling |
 | `Depth correspondence at ML data` | Resampled or matched depth | not consistently displayed | `aligned_depth` plus unit | Alignment/QC | Record interpolation or nearest-depth method and offset |
@@ -101,6 +101,7 @@ machine-learning sampling interval.
 | H8 | Display the four-level header meaning in the synthetic scaffold | Streamlit well-log engine | Users can see role, mnemonic, unit, and description |
 | H9 | Treat normalized screenshot values as non-scientific layout examples only | Tests/docs/public site | No screenshot values are ingested into calculations or training |
 | H10 | Add representative synthetic cases for unit conversion, aliases, alignment, and target leakage | Tests | Each requirement has at least one focused test |
+| H11 | Fit normalization and imputation on training wells only | Modeling pipeline | Validation, locked-test, and prediction wells never influence fitted preprocessing |
 
 ## Proposed Track Groups
 
@@ -133,6 +134,12 @@ Ground-truth or calibration tracks should be visually isolated from ML inputs.
 7. What interpolation or matching rule created `Depth correspondence at ML data`?
 8. Are hydrate saturation fields fractions from 0 to 1 or percentages from 0
    to 100?
+9. Which field provides the authoritative non-NMR saturation target for the
+   approximately 20% known-well cohort?
+10. Which exact phase classes and uncertain-label convention are supplied for
+    the known wells?
+11. Are outcomes for the approximately 80% prediction wells available later
+    for blind evaluation?
 
 These questions should be resolved from the workbook, formulas, or supporting
 documentation before changing scientific calculations.

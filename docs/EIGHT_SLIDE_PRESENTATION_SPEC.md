@@ -47,13 +47,13 @@ Input families:
 - neutron porosity where present;
 - resistivity;
 - compressional and shear sonic;
-- NMR where present;
+- NMR only as an optional future enhancement; it is not expected;
 - caliper and borehole QC;
 - core porosity, permeability, hydrate saturation, lithology, and quality.
 
 Target families:
 
-- continuous hydrate saturation;
+- continuous hydrate saturation from a supplied or core-calibrated known-well target;
 - hydrate / gas / water / non-reservoir class;
 - uncertain or expert-review state;
 - separate sweet-spot priority;
@@ -87,13 +87,16 @@ Model ladder:
 
 Chong et al. (2022) is the direct ANN comparison anchor. The paper reports
 approximately 80-90% predictive performance for selected two- or three-log
-combinations against NMR-derived saturation.
+combinations against NMR-derived saturation. This project does not expect NMR,
+so the target must come from supplied or core-calibrated known-well saturation.
 
 ### Slide 6
 
 Do not present random depth-row accuracy as field generalization. Neighboring
-depth samples are correlated. Reserve complete wells for validation and final
-testing.
+depth samples are correlated. Of approximately 71 wells, the current plan uses
+approximately 14 known wells for development and predicts the remaining 57.
+Reserve complete wells inside the 14-well development cohort for validation and
+locked testing before predicting the 57-well cohort.
 
 Report:
 
