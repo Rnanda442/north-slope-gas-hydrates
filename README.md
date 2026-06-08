@@ -1,5 +1,7 @@
 # North Slope Gas Hydrate Dashboard
 
+[Open the hosted Streamlit atlas](https://north-slope-gas-hydrates-vj67xkke9ksfzveon8ldt2.streamlit.app/)
+
 [Open the Project Architecture and Activity Map](docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md)
 
 This repository contains the unclassified Alaska North Slope geospatial workspace
@@ -53,6 +55,15 @@ Use the displayed base URL and append `proxy/8501/`.
 The unclassified regional atlas can also be deployed through Streamlit Community
 Cloud. This provides a stable `streamlit.app` HTTPS link that can be opened
 directly without keeping an OpenScienceLab terminal running.
+
+Current deployment:
+
+```text
+https://north-slope-gas-hydrates-vj67xkke9ksfzveon8ldt2.streamlit.app/
+```
+
+The deployment currently requires Streamlit sign-in. Make the app public in
+Streamlit Community Cloud before treating this as an anonymous public link.
 
 Deploy from:
 

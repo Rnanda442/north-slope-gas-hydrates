@@ -72,7 +72,7 @@ The public website must never load authorized runtime data.
 | Component | Main location | Current state | Next outcome |
 |---|---|---|---|
 | Public atlas | `dashboard/app.py` | Implemented | Continue visual QA as features change |
-| Website entry point | `streamlit_app.py` | Implemented | Mobile-responsive shell and roadmap page added |
+| Website entry point | `streamlit_app.py` | Implemented | Make the existing Streamlit deployment anonymously public |
 | Synthetic well-log engine | `dashboard/well_log_engine.py` | Working scaffold | Align with Excel design |
 | Authorized runtime | `dashboard/runtime/` | Skeleton implemented | Complete input mapping and readiness UI |
 | Well-log tests | `tests/` | 8 focused tests passing | Expand with spreadsheet-derived cases |
@@ -139,6 +139,7 @@ inspect the Streamlit workflow.
 | PowerPoint and Excel files are not in this folder | Requirements cannot be finalized | Recover from the source laptop |
 | Connected Drive may be the wrong Google account | Some uploaded sources may remain hidden | Check the account used on the other laptop |
 | June 6 migration was a failed local test | Source library was not actually uploaded | Repeat migration only after verifying real paths and destination |
+| Streamlit deployment currently requires sign-in | The hosted website is not publicly inspectable or shareable | Change the app's Streamlit sharing setting to public |
 | Official Git folder lacks existing history | Future commits could diverge from GitHub | Reconcile repositories deliberately |
 | Public and restricted files could be mixed | Data-governance and publication risk | Classify every recovered item before copying |
 
@@ -171,3 +172,4 @@ inspect the Streamlit workflow.
 | 2026-06-07 | Investigated source migration and Google Drive | Confirmed the migration was a failed local test and identified the source-laptop paths |
 | 2026-06-08 | Established architecture and activity tracking | This document became the authoritative next-work map |
 | 2026-06-08 | Added roadmap to Streamlit and responsive mobile styling | Architecture status is available inside the website and narrow screens stack key layouts |
+| 2026-06-08 | Identified the hosted Streamlit deployment | Saved the canonical URL and found that anonymous access is currently disabled |

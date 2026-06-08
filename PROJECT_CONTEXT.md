@@ -75,6 +75,12 @@ Primary entry point: `streamlit_app.py`
 
 Main application: `dashboard/app.py`
 
+Hosted deployment:
+`https://north-slope-gas-hydrates-vj67xkke9ksfzveon8ldt2.streamlit.app/`
+
+As checked on 2026-06-08, the deployment exists but requires Streamlit sign-in;
+anonymous visitors cannot currently view it.
+
 Current public views:
 
 - Welcome
@@ -167,3 +173,5 @@ blockers, and next activities in the architecture/activity map.
   authoritative next-work tracker.
 - 2026-06-08: Published the architecture/activity map inside Streamlit and added
   responsive phone-width styling.
+- 2026-06-08: Recorded the hosted Streamlit URL and confirmed that its current
+  sharing state requires sign-in.
