@@ -13,14 +13,14 @@ measurements, scientific calibration values, or model-training records.
 
 ## Source References
 
-| Reference | Original attachment | Visible sheet or area | Classification |
-|---|---|---|---|
-| `header-reference-01.png` | `Screenshot 2026-06-05 131426.png` | ML inputs and ground-truth continuation | Header/layout reference; normalized values not used |
-| `header-reference-02.png` | `Screenshot 2026-06-05 131418.png` | Main ML input header block | Header/layout reference; normalized values not used |
-| `header-reference-03.png` | `Screenshot 2026-06-08 111117.png` | `MTE_refined` and `IGS_refined` alignment tables | Header/layout reference; normalized values not used |
-| `header-reference-04.png` | `Screenshot 2026-06-08 111124.png` | `IGS_refined` depth and hydrate saturation | Header/layout reference; normalized values not used |
-| `header-reference-05.png` | `Screenshot 2026-06-08 111108.png` | `IGS` compact source table | Header/layout reference; normalized values not used |
-| `header-reference-06.png` | `Screenshot 2026-06-08 111056.png` | `MTE` source and alignment table | Header/layout reference; normalized values not used |
+The header specification was derived from six normalized screenshots attached
+to the user's self-sent Gmail message `IMages of well headers no source leakage`
+on 2026-06-08.
+
+The screenshots are intentionally not stored in Git or displayed on the public
+website. This document is the durable public-safe derivative: it records only
+header names, units, schema roles, formatting concepts, and unresolved
+questions.
 
 ## Header Architecture
 

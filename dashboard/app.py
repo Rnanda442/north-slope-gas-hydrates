@@ -19,6 +19,7 @@ from dashboard.well_log_engine import (
     SCREENING_BANDS,
     SYNTHETIC_LABEL,
     SWEET_SPOT_GUIDE,
+    SWEET_SPOT_EVIDENCE_MODEL,
     VARIABLES,
     cross_well_range_figure,
     csv_bytes,
@@ -819,9 +820,9 @@ def render_project_roadmap() -> None:
         """
         <div class="roadmap-next">
           <strong>Next project move</strong><br>
-          Recover the Excel workbook, spreadsheet screenshots, PowerPoint, and
-          public source files from the source laptop. Then translate the Excel
-          design into a requirements map before changing the well-log engine.
+          Recover the full Excel workbook, PowerPoint, and public source files
+          from the source laptop. Then confirm the header specification against
+          workbook formulas before calibrating the well-log engine.
         </div>
         """,
         unsafe_allow_html=True,
@@ -1077,6 +1078,7 @@ def render_future_engine() -> None:
         [
             "Variable Range Explorer",
             "Header & Track Blueprint",
+            "Sweet-Spot Evidence Model",
             "Equation-to-Decision Map",
             "Hydrate Interpretation Range Guide",
             "Interval Screening Scaffold",
@@ -1089,14 +1091,16 @@ def render_future_engine() -> None:
     with tabs[1]:
         render_header_blueprint()
     with tabs[2]:
-        render_equation_decision_map()
+        render_sweet_spot_evidence_model(intervals)
     with tabs[3]:
-        render_range_guide()
+        render_equation_decision_map()
     with tabs[4]:
-        render_interval_screen(intervals)
+        render_range_guide()
     with tabs[5]:
-        render_core_calibration(calibrated_core)
+        render_interval_screen(intervals)
     with tabs[6]:
+        render_core_calibration(calibrated_core)
+    with tabs[7]:
         render_presentation_outputs(logs, intervals, calibrated_core)
 
     st.markdown("### Planned Runtime Analysis Sequence")
@@ -1174,8 +1178,8 @@ def render_variable_range_explorer(logs: pd.DataFrame) -> None:
 def render_header_blueprint() -> None:
     st.subheader("Header & Track Blueprint")
     st.caption(
-        "Derived from normalized Excel header screenshots. Header names and layout "
-        "guide the scaffold; screenshot values are not used."
+        "Derived from a normalized header-only reference. Names, units, roles, and "
+        "layout guide the scaffold; no reference values are used."
     )
     st.warning(
         "Measured inputs, derived features, QC/alignment fields, and targets remain "
@@ -1196,6 +1200,53 @@ def render_header_blueprint() -> None:
         calculations. In particular, depth appears in feet and meters, while bulk
         density appears in both `g/cc` and `kg/m3` conventions.
         """
+    )
+
+
+def render_sweet_spot_evidence_model(intervals: pd.DataFrame) -> None:
+    st.subheader("Synthetic Sweet-Spot Evidence Model")
+    st.caption(
+        "Research-backed directional logic applied to synthetic data. The working "
+        "thresholds are demonstrative and require local calibration before scientific use."
+    )
+    st.error(
+        "A sweet spot is not the row with the largest hydrate-saturation proxy. "
+        "It is an interval where hydrate evidence, reservoir quality, retained flow "
+        "capacity, QC, and uncertainty remain jointly defensible."
+    )
+    st.dataframe(
+        pd.DataFrame(SWEET_SPOT_EVIDENCE_MODEL),
+        use_container_width=True,
+        hide_index=True,
+    )
+
+    candidates = intervals[
+        intervals["Synthetic sweet-spot review lane"].str.contains(
+            "candidate sweet-spot",
+            na=False,
+        )
+    ]
+    st.markdown("#### Explainable Synthetic Candidates")
+    if candidates.empty:
+        st.info("No synthetic intervals currently satisfy the complete review lane.")
+        return
+    st.dataframe(
+        candidates[
+            [
+                "Well alias",
+                "Top depth (m)",
+                "Base depth (m)",
+                "Phase-classification evidence",
+                "Hydrate-saturation proxy",
+                "Permeability-retention proxy",
+                "Evidence domains passed",
+                "Blocking domains",
+                "Interpretation summary",
+                "Uncertainty flags",
+            ]
+        ],
+        use_container_width=True,
+        hide_index=True,
     )
 
 

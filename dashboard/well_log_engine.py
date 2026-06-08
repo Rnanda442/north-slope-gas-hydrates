@@ -310,6 +310,51 @@ PUBLIC_SCIENCE_REFERENCES = [
     },
 ]
 
+SWEET_SPOT_EVIDENCE_MODEL = [
+    {
+        "Evidence domain": "Thermodynamic admissibility",
+        "What supports advancement": "Pressure-temperature context is inside the working GHSZ screen.",
+        "What it cannot prove": "Stability does not prove methane charge or hydrate presence.",
+        "Synthetic implementation": "Admissibility gate only; never adds a positive hydrate label by itself.",
+        "Research basis": "Connected Drive synthesis: new query with all stuff; manuscript Sections 3 and 6.",
+    },
+    {
+        "Evidence domain": "Reservoir quality",
+        "What supports advancement": "Sand-prone, porous, connected reservoir with favorable borehole QC.",
+        "What it cannot prove": "Good sand can remain water-bearing when gas supply or migration is absent.",
+        "Synthetic implementation": "GR, density porosity, reservoir-quality score, and rock-type screen.",
+        "Research basis": "PDF notes reorganized; Mount Elbert and Eileen-trend synthesis.",
+    },
+    {
+        "Evidence domain": "Electrical evidence",
+        "What supports advancement": "Resistivity rises relative to the local reservoir baseline.",
+        "What it cannot prove": "Gas, low porosity, ice, carbonate, and other effects can also raise resistivity.",
+        "Synthetic implementation": "High Rt must be supported by elastic and reservoir evidence.",
+        "Research basis": "Geomechanical relationship with Wireline Logging AN; Archie workflow.",
+    },
+    {
+        "Evidence domain": "Elastic phase evidence",
+        "What supports advancement": "Vp and Vs stiffen together; rigidity-sensitive features support the response.",
+        "What it cannot prove": "Compaction, stress, ice, and competent lithology may mimic stiffness.",
+        "Synthetic implementation": "Vp, mu-rho, hydrate-evidence score, rock type, and effective-stress review.",
+        "Research basis": "Drive notes: hydrate raises Vp and Vs; free gas lowers Vp while Vs is less affected.",
+    },
+    {
+        "Evidence domain": "Pore-fluid and saturation evidence",
+        "What supports advancement": "NMR-density separation or a calibrated electrical saturation estimate agrees with other logs.",
+        "What it cannot prove": "Uncalibrated Archie parameters and shale effects can bias saturation.",
+        "Synthetic implementation": "NMR-density preferred; Archie retained as a flagged supplementary cross-check.",
+        "Research basis": "Mount Elbert/Hydrate-01 synthesis and connected Drive notes.",
+    },
+    {
+        "Evidence domain": "Producibility",
+        "What supports advancement": "Hydrate evidence coexists with retained porosity, permeability, continuity, and pressure communication.",
+        "What it cannot prove": "High hydrate saturation alone does not guarantee useful flow.",
+        "Synthetic implementation": "Moderate occupancy with permeability retention can outrank maximum saturation.",
+        "Research basis": "Drive synthesis: Unit D versus Unit C; reservoir and flow-potential notes.",
+    },
+]
+
 EQUATION_LIBRARY = [
     {
         "Equation group": "Lithology / reservoir quality",
@@ -732,6 +777,31 @@ def screen_intervals(logs: pd.DataFrame, interval_m: int = 40) -> pd.DataFrame:
                 flags.append("higher effective-stress context")
             if phase.startswith("hydrate") and median["permeability_retention_proxy"] < 0.20:
                 flags.append("low permeability-retention proxy")
+            evidence_domains = {
+                "stability": stable,
+                "reservoir": reservoir,
+                "electrical": high_rt,
+                "elastic": elastic_support,
+                "saturation": pd.notna(proxy) and proxy >= 0.35,
+                "flow": median["permeability_retention_proxy"] >= 0.20,
+                "qc": not qc_review,
+            }
+            passed_domains = [name for name, passed in evidence_domains.items() if passed]
+            blocked_domains = [name for name, passed in evidence_domains.items() if not passed]
+            if phase.startswith("hydrate") and sweet_spot_lane.startswith("candidate"):
+                interpretation_summary = (
+                    "Concordant synthetic hydrate evidence with retained reservoir and flow capacity."
+                )
+            elif phase.startswith("hydrate"):
+                interpretation_summary = (
+                    "Hydrate-supportive synthetic evidence; resource strength and flow quality diverge."
+                )
+            elif phase == "good sand, no hydrate":
+                interpretation_summary = (
+                    "Reservoir capacity is present without sufficient hydrate-supportive evidence."
+                )
+            else:
+                interpretation_summary = "Evidence remains incomplete or supports a competing explanation."
             rows.append(
                 {
                     "Data label": SYNTHETIC_LABEL,
@@ -751,6 +821,9 @@ def screen_intervals(logs: pd.DataFrame, interval_m: int = 40) -> pd.DataFrame:
                     "Core-calibration confidence": core_confidence,
                     "Producibility screen": producibility,
                     "Synthetic sweet-spot review lane": sweet_spot_lane,
+                    "Evidence domains passed": f"{len(passed_domains)}/7: {', '.join(passed_domains)}",
+                    "Blocking domains": ", ".join(blocked_domains) if blocked_domains else "none",
+                    "Interpretation summary": interpretation_summary,
                     "Uncertainty flags": "; ".join(flags) if flags else "none in synthetic screen",
                 }
             )

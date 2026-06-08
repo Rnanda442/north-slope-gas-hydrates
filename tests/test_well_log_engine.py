@@ -73,8 +73,16 @@ def test_interval_screen_preserves_separate_outcomes() -> None:
     assert "Core-calibration confidence" in intervals
     assert "Producibility screen" in intervals
     assert "Synthetic sweet-spot review lane" in intervals
+    assert "Evidence domains passed" in intervals
+    assert "Blocking domains" in intervals
+    assert "Interpretation summary" in intervals
     assert "Uncertainty flags" in intervals
     assert intervals["Synthetic sweet-spot review lane"].str.contains("sweet-spot").any()
+    candidates = intervals[
+        intervals["Synthetic sweet-spot review lane"].str.contains("candidate sweet-spot")
+    ]
+    assert not candidates.empty
+    assert candidates["Evidence domains passed"].str.startswith("7/7").all()
 
 
 def test_interval_screen_uses_archie_only_as_supplement_when_nmr_is_missing() -> None:

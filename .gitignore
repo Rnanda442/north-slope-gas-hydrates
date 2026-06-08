@@ -7,3 +7,7 @@ outputs_runtime/
 models_runtime/
 logs_runtime/
 configs_local/
+# Local spreadsheet screenshots are intake references, not public website assets.
+references/well-log-spreadsheet/*.png
+references/well-log-spreadsheet/*.jpg
+references/well-log-spreadsheet/*.jpeg

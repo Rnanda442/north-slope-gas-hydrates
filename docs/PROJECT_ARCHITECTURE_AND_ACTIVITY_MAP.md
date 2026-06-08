@@ -91,7 +91,7 @@ The public website must never load authorized runtime data.
 | W2 | Organize source intake | Waiting | Classify recovered files as public, synthetic, or restricted and place them appropriately | W1 | Every recovered file has a location and classification |
 | W3 | Extract Excel requirements | In progress | Confirm the screenshot-derived header map against workbook formulas, units, tool mnemonics, and alignment logic | Full workbook recovery | Approved requirements map is complete |
 | W4 | Gap analysis | Waiting | Compare spreadsheet requirements with the current engine and runtime package | W3 | Missing and existing capabilities are listed |
-| W5 | Implement well-log scaffold | Waiting | Add required schemas, calculations, validation, plots, and exports | W4 | Requirements are implemented with tests |
+| W5 | Implement well-log scaffold | In progress | Extend the synthetic evidence model while keeping thresholds demonstrative until workbook and approved-data calibration | W3, W4 | Requirements are implemented with tests |
 | W6 | Website integration and QA | Partial | Public sharing and phone-width roadmap cards are complete; well-log workflow QA remains | W5 for final workflow | Website behavior and labels are verified |
 | W7 | Scientific alignment | Partial | Reconcile equations and interpretation rules across code, manuscript, and presentation | W1, W3, W5 | No material scientific contradictions remain |
 | W8 | Git and project stabilization | Complete | Keep local `main` synchronized with `origin/main` and preserve focused commits | None | Clean history, remote, and documented workflow |
@@ -112,7 +112,7 @@ classification features.
 On the source laptop, gather:
 
 - `Alaska_North_Slope_Wireline_ML_Presentation_Scaffold_outline.pptx`;
-- the Excel workbook and spreadsheet screenshots;
+- the full Excel workbook and any additional header/formula references;
 - manuscript and equation-map documents;
 - the public source library and its inventory.
 
@@ -179,4 +179,5 @@ inspect the Streamlit workflow.
 | 2026-06-08 | Verified Git synchronization and improved the mobile roadmap | Local `main` matches `origin/main`; narrow screens receive workstream cards and a clearer next-project move |
 | 2026-06-08 | Made the hosted Streamlit deployment public | Anonymous requests reach the app without a Streamlit access-denied response |
 | 2026-06-08 | Defined the project improvement strategy | Established product pillars, a feature decision test, phased priorities, and ML guardrails |
-| 2026-06-08 | Recovered normalized Excel header screenshots | Stored six public-safe layout references and created the initial header/schema requirements map |
+| 2026-06-08 | Reviewed normalized Excel header screenshots | Kept the images out of Git and the website; retained only a public-safe header/schema requirements map |
+| 2026-06-08 | Reviewed connected Drive research and strengthened the synthetic scaffold | Added a seven-domain explainable sweet-spot model and documented the boundary between scientific tendencies and synthetic thresholds |

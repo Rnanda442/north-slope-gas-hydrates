@@ -52,9 +52,9 @@ scientific calculations.
   present.
 - Two working Word drafts are present in `docs/project_blueprints/`.
 - The public source-library index is present in `docs/source_library_index/`.
-- Six normalized Excel header screenshots are stored in
-  `references/well-log-spreadsheet/` and mapped in
-  `docs/WELL_LOG_REQUIREMENTS_MAP.md`.
+- Six normalized Excel header screenshots were reviewed from the user's email.
+  The images are not stored in Git or shown on the website; their public-safe
+  schema derivative is maintained in `docs/WELL_LOG_REQUIREMENTS_MAP.md`.
 - The user's full Excel workbook and PowerPoint have not yet been recovered into
   this official folder.
 - The missing PowerPoint was last confirmed in the source laptop's `Downloads`
@@ -128,6 +128,8 @@ It must not load or expose authorized well-log or core data.
   strategy for keeping product changes aligned with the scientific goal
 - `docs/WELL_LOG_REQUIREMENTS_MAP.md`: screenshot-derived header schema,
   scaffold requirements, track groups, and unresolved questions
+- `docs/SWEET_SPOT_SCIENCE_BASIS.md`: research-backed directional relationships,
+  synthetic implementation logic, and calibration requirements
 
 ## Source Intake
 
@@ -189,5 +191,7 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-08: Established a phased improvement strategy centered on guided
   scientific communication, requirements traceability, runtime readiness, and
   decision-quality outputs.
-- 2026-06-08: Recovered six normalized Excel header screenshots and created the
+- 2026-06-08: Reviewed six normalized Excel header screenshots and created the
   initial well-log requirements map without using the displayed values.
+- 2026-06-08: Removed the screenshot binaries from Git, reviewed connected Drive
+  research, and added an explainable synthetic sweet-spot evidence model.
