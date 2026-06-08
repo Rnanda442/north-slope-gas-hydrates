@@ -40,8 +40,8 @@ def test_project_roadmap_page_renders() -> None:
     assert app.title[0].value == "Project Architecture & Activity Map"
     assert [(metric.label, metric.value) for metric in app.metric] == [
         ("Workstreams", "9"),
-        ("Active", "3"),
-        ("Waiting / blocked", "4"),
+        ("Active", "4"),
+        ("Waiting / blocked", "3"),
         ("Complete", "1"),
     ]
     assert len(app.dataframe) == 2

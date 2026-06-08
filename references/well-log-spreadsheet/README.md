@@ -15,3 +15,16 @@ For each item, add a short note containing:
 - desired website/runtime behavior
 - data classification: public, synthetic, or restricted
 - questions that still need an answer
+
+## Recovered Header References
+
+The six `header-reference-*.png` files were recovered from the self-sent email
+`IMages of well headers no source leakage` on 2026-06-08.
+
+The user stated that the displayed numbers were normalized. These images are
+therefore retained only as public-safe header, layout, naming, and formatting
+references. Their values must not be used for scientific analysis, calibration,
+or model training.
+
+See `docs/WELL_LOG_REQUIREMENTS_MAP.md` for the extracted header map,
+requirements, and unresolved unit/mnemonic questions.

@@ -3,11 +3,21 @@ from __future__ import annotations
 import pandas as pd
 
 from dashboard.well_log_engine import (
+    HEADER_SCHEMA_BLUEPRINT,
     SYNTHETIC_LABEL,
     generate_synthetic_logs,
     screen_intervals,
     variable_range_summary,
 )
+
+
+def test_header_blueprint_separates_targets_from_inputs() -> None:
+    blueprint = pd.DataFrame(HEADER_SCHEMA_BLUEPRINT)
+
+    targets = blueprint[blueprint["Role"] == "Target / interpretation"]
+    assert not targets.empty
+    assert targets["Visible headers"].str.contains("Sgh").any()
+    assert targets["Unit handling"].str.contains("exclude from ML inputs").all()
 
 
 def test_synthetic_generation_has_runtime_schema_and_neutral_aliases() -> None:

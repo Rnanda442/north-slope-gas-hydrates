@@ -75,11 +75,11 @@ The public website must never load authorized runtime data.
 | Website entry point | `streamlit_app.py` | Public deployment verified | Keep the hosted app synchronized with `main` |
 | Synthetic well-log engine | `dashboard/well_log_engine.py` | Working scaffold | Align with Excel design |
 | Authorized runtime | `dashboard/runtime/` | Skeleton implemented | Complete input mapping and readiness UI |
-| Well-log tests | `tests/` | 8 focused tests passing | Expand with spreadsheet-derived cases |
+| Well-log tests | `tests/` | 13 project tests passing | Expand with workbook-derived unit and alignment cases |
 | GIS pipeline | notebooks and `03_data_final/` | Recovered | Validate only when GIS changes are needed |
 | Manuscript | `docs/project_blueprints/` | Two drafts recovered | Reconcile with equations and final workflow |
 | Presentation | Not yet recovered | Blocked | Recover from the source laptop |
-| Excel design | Not yet recovered | Blocked | Recover workbook and screenshots |
+| Excel design | Header screenshots recovered; workbook missing | Partial | Confirm formulas, units, and mnemonics from the workbook |
 | Source library | Index recovered; full library incomplete | Partial | Recover and inventory public sources |
 | Git history | Connected and synchronized with GitHub | Complete | Preserve the normal commit-and-push workflow |
 
@@ -87,9 +87,9 @@ The public website must never load authorized runtime data.
 
 | ID | Workstream | Status | Immediate activity | Dependency | Completion signal |
 |---|---|---|---|---|---|
-| W1 | Recover project artifacts | In progress | Collect PowerPoint, Excel workbook, screenshots, manuscript variants, and source files from the source laptop | Access to other laptop | Recovery inventory is complete |
+| W1 | Recover project artifacts | In progress | Collect the PowerPoint, full Excel workbook, manuscript variants, and source files; header screenshots are recovered | Access to other laptop | Recovery inventory is complete |
 | W2 | Organize source intake | Waiting | Classify recovered files as public, synthetic, or restricted and place them appropriately | W1 | Every recovered file has a location and classification |
-| W3 | Extract Excel requirements | Waiting | Document sheets, columns, units, formulas, chart tracks, flags, and expected outputs | W1, W2 | Approved requirements map exists |
+| W3 | Extract Excel requirements | In progress | Confirm the screenshot-derived header map against workbook formulas, units, tool mnemonics, and alignment logic | Full workbook recovery | Approved requirements map is complete |
 | W4 | Gap analysis | Waiting | Compare spreadsheet requirements with the current engine and runtime package | W3 | Missing and existing capabilities are listed |
 | W5 | Implement well-log scaffold | Waiting | Add required schemas, calculations, validation, plots, and exports | W4 | Requirements are implemented with tests |
 | W6 | Website integration and QA | Partial | Public sharing and phone-width roadmap cards are complete; well-log workflow QA remains | W5 for final workflow | Website behavior and labels are verified |
@@ -179,3 +179,4 @@ inspect the Streamlit workflow.
 | 2026-06-08 | Verified Git synchronization and improved the mobile roadmap | Local `main` matches `origin/main`; narrow screens receive workstream cards and a clearer next-project move |
 | 2026-06-08 | Made the hosted Streamlit deployment public | Anonymous requests reach the app without a Streamlit access-denied response |
 | 2026-06-08 | Defined the project improvement strategy | Established product pillars, a feature decision test, phased priorities, and ML guardrails |
+| 2026-06-08 | Recovered normalized Excel header screenshots | Stored six public-safe layout references and created the initial header/schema requirements map |

@@ -32,10 +32,10 @@ regional geology and stability context
 
 ## Current Focus
 
-Reconcile the existing synthetic well-log scaffold with the user's Excel sheets
-and screenshots. Convert the spreadsheet layout, calculations, variables,
-graphs, and interpretation logic into explicit requirements before changing the
-runtime engine or dashboard.
+Use the recovered normalized Excel header screenshots to define the canonical
+well-log schema, unit conversions, curve roles, track groups, and target-leakage
+guardrails. Continue recovering the workbook and formulas before changing
+scientific calculations.
 
 ## Current State
 
@@ -47,14 +47,16 @@ runtime engine or dashboard.
 - The authorized runtime skeleton is implemented in `dashboard/runtime/`.
 - Tests exist in `tests/test_well_log_engine.py` and
   `tests/test_runtime_skeleton.py`.
-- The focused well-log and runtime test suite passed on 2026-06-07: 8 tests
-  passed.
+- The full project test suite passed on 2026-06-08: 13 tests passed.
 - Public GIS layers, notebooks, structural surfaces, and Plotly exports are
   present.
 - Two working Word drafts are present in `docs/project_blueprints/`.
 - The public source-library index is present in `docs/source_library_index/`.
-- The user's Excel workbook, PowerPoint, and Excel screenshots have not yet
-  been identified in this official folder.
+- Six normalized Excel header screenshots are stored in
+  `references/well-log-spreadsheet/` and mapped in
+  `docs/WELL_LOG_REQUIREMENTS_MAP.md`.
+- The user's full Excel workbook and PowerPoint have not yet been recovered into
+  this official folder.
 - The missing PowerPoint was last confirmed in the source laptop's `Downloads`
   folder as `Alaska_North_Slope_Wireline_ML_Presentation_Scaffold_outline.pptx`.
 - The June 6 source migration targeted a local fake-Drive folder and did not
@@ -124,6 +126,8 @@ It must not load or expose authorized well-log or core data.
   priorities, workstream status, blockers, and next-work sequence
 - `docs/PROJECT_IMPROVEMENT_STRATEGY.md`: principles and phased improvement
   strategy for keeping product changes aligned with the scientific goal
+- `docs/WELL_LOG_REQUIREMENTS_MAP.md`: screenshot-derived header schema,
+  scaffold requirements, track groups, and unresolved questions
 
 ## Source Intake
 
@@ -185,3 +189,5 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-08: Established a phased improvement strategy centered on guided
   scientific communication, requirements traceability, runtime readiness, and
   decision-quality outputs.
+- 2026-06-08: Recovered six normalized Excel header screenshots and created the
+  initial well-log requirements map without using the displayed values.

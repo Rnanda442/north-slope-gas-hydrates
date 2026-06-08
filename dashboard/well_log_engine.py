@@ -14,6 +14,65 @@ from dashboard.runtime.schemas import RuntimeConfig, default_curve_aliases
 
 SYNTHETIC_LABEL = "SYNTHETIC DEMONSTRATION DATA"
 
+HEADER_SCHEMA_BLUEPRINT = [
+    {
+        "Track group": "Depth and alignment",
+        "Visible headers": "DEPTH, DEPT, Depth_ft, Depth, ft",
+        "Canonical field": "depth_m",
+        "Role": "Index / measured",
+        "Unit handling": "Accept ft or m; convert explicitly to m",
+    },
+    {
+        "Track group": "Borehole QC",
+        "Visible headers": "caliper, CAL1, Differential Caliper",
+        "Canonical field": "caliper_in, differential_caliper",
+        "Role": "Measured / QC",
+        "Unit handling": "Preserve source unit and reference diameter",
+    },
+    {
+        "Track group": "Lithology",
+        "Visible headers": "GR",
+        "Canonical field": "gr_api",
+        "Role": "Measured input",
+        "Unit handling": "API",
+    },
+    {
+        "Track group": "Porosity",
+        "Visible headers": "Rho_b, RHOB, Density_gcpcc, DPHI, NPHI, NMRPHI",
+        "Canonical field": "rhob_g_cc and porosity channels",
+        "Role": "Measured / derived",
+        "Unit handling": "Convert density; confirm fraction versus percent",
+    },
+    {
+        "Track group": "Electrical response",
+        "Visible headers": "RES, A090, AF90, Deep formation resistivity",
+        "Canonical field": "rt_ohm_m",
+        "Role": "Measured input",
+        "Unit handling": "Ohm.m; confirm tool mnemonic",
+    },
+    {
+        "Track group": "Elastic response",
+        "Visible headers": "Vp, VP, VELP, Vs, VS, VS1",
+        "Canonical field": "vp_m_s, vs_m_s",
+        "Role": "Measured or supplied",
+        "Unit handling": "m/s; keep supplied-versus-calculated provenance",
+    },
+    {
+        "Track group": "Elastic response",
+        "Visible headers": "Ratio Vp/Vs, Impedance",
+        "Canonical field": "vp_vs_ratio, acoustic_impedance",
+        "Role": "Derived feature",
+        "Unit handling": "Calculate from canonical density and velocity",
+    },
+    {
+        "Track group": "Interpretation / calibration",
+        "Visible headers": "Sgh, S_h, Hydrate Saturation, NMR_SAT, S_wr, Swr",
+        "Canonical field": "hydrate_saturation_vv, irreducible_water_saturation_vv",
+        "Role": "Target / interpretation",
+        "Unit handling": "Confirm fraction versus percent; exclude from ML inputs",
+    },
+]
+
 VARIABLES = {
     "gr_api": ("GR", "API"),
     "rt_ohm_m": ("Resistivity Rt", "ohm m"),

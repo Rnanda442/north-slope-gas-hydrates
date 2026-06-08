@@ -12,6 +12,7 @@ import streamlit.components.v1 as components
 from dashboard.well_log_engine import (
     CLASSIFICATION_WORKFLOW,
     EQUATION_LIBRARY,
+    HEADER_SCHEMA_BLUEPRINT,
     RANGE_GUIDE,
     PUBLIC_SCIENCE_REFERENCES,
     ROCKTYPE_CONTEXT_GUIDE,
@@ -1075,6 +1076,7 @@ def render_future_engine() -> None:
     tabs = st.tabs(
         [
             "Variable Range Explorer",
+            "Header & Track Blueprint",
             "Equation-to-Decision Map",
             "Hydrate Interpretation Range Guide",
             "Interval Screening Scaffold",
@@ -1085,14 +1087,16 @@ def render_future_engine() -> None:
     with tabs[0]:
         render_variable_range_explorer(logs)
     with tabs[1]:
-        render_equation_decision_map()
+        render_header_blueprint()
     with tabs[2]:
-        render_range_guide()
+        render_equation_decision_map()
     with tabs[3]:
-        render_interval_screen(intervals)
+        render_range_guide()
     with tabs[4]:
-        render_core_calibration(calibrated_core)
+        render_interval_screen(intervals)
     with tabs[5]:
+        render_core_calibration(calibrated_core)
+    with tabs[6]:
         render_presentation_outputs(logs, intervals, calibrated_core)
 
     st.markdown("### Planned Runtime Analysis Sequence")
@@ -1165,6 +1169,34 @@ def render_variable_range_explorer(logs: pd.DataFrame) -> None:
     )
     st.plotly_chart(cross_well_range_figure(cross_well, label), use_container_width=True)
     st.dataframe(cross_well, use_container_width=True, hide_index=True)
+
+
+def render_header_blueprint() -> None:
+    st.subheader("Header & Track Blueprint")
+    st.caption(
+        "Derived from normalized Excel header screenshots. Header names and layout "
+        "guide the scaffold; screenshot values are not used."
+    )
+    st.warning(
+        "Measured inputs, derived features, QC/alignment fields, and targets remain "
+        "separate. Hydrate saturation and water-saturation fields are not ML inputs."
+    )
+    st.dataframe(
+        pd.DataFrame(HEADER_SCHEMA_BLUEPRINT),
+        use_container_width=True,
+        hide_index=True,
+    )
+    st.markdown(
+        """
+        **Planned track order:** depth and alignment; borehole QC; lithology;
+        porosity; electrical response; elastic response; interpretation and
+        calibration; uncertainty and readiness.
+
+        Unit-aware loading is required before these headers can drive scientific
+        calculations. In particular, depth appears in feet and meters, while bulk
+        density appears in both `g/cc` and `kg/m3` conventions.
+        """
+    )
 
 
 def render_equation_decision_map() -> None:
