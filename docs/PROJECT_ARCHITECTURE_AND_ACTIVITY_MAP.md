@@ -75,7 +75,7 @@ The public website must never load authorized runtime data.
 | Website entry point | `streamlit_app.py` | Public deployment verified | Keep the hosted app synchronized with `main` |
 | Synthetic well-log engine | `dashboard/well_log_engine.py` | Working scaffold | Align with Excel design |
 | Authorized runtime | `dashboard/runtime/` | Skeleton implemented | Complete input mapping and readiness UI |
-| Well-log tests | `tests/` | 13 project tests passing | Expand with workbook-derived unit and alignment cases |
+| Well-log tests | `tests/` | 16 project tests passing | Expand with workbook-derived unit and alignment cases |
 | GIS pipeline | notebooks and `03_data_final/` | Recovered | Validate only when GIS changes are needed |
 | Manuscript | `docs/project_blueprints/` | Two drafts recovered | Reconcile with equations and final workflow |
 | Presentation | Not yet recovered | Blocked | Recover from the source laptop |
@@ -182,3 +182,4 @@ inspect the Streamlit workflow.
 | 2026-06-08 | Reviewed normalized Excel header screenshots | Kept the images out of Git and the website; retained only a public-safe header/schema requirements map |
 | 2026-06-08 | Reviewed connected Drive research and strengthened the synthetic scaffold | Added a seven-domain explainable sweet-spot model and documented the boundary between scientific tendencies and synthetic thresholds |
 | 2026-06-08 | Added the focused North Slope Sweet Spots page | Combined ranked synthetic intervals, input variables, geomechanics, uncertainty, competing explanations, and sources in one decision workspace |
+| 2026-06-08 | Expanded and tiered sweet-spot source provenance | Distinguished nine primary public references from 28 indexed project artifacts and the four-document Drive synthesis subset |

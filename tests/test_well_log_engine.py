@@ -4,11 +4,23 @@ import pandas as pd
 
 from dashboard.well_log_engine import (
     HEADER_SCHEMA_BLUEPRINT,
+    PUBLIC_SCIENCE_REFERENCES,
+    SOURCE_LIBRARY_COVERAGE,
     SYNTHETIC_LABEL,
     generate_synthetic_logs,
     screen_intervals,
     variable_range_summary,
 )
+
+
+def test_source_coverage_distinguishes_primary_references_from_project_artifacts() -> None:
+    assert len(PUBLIC_SCIENCE_REFERENCES) >= 9
+    assert all(reference["Evidence tier"].startswith("Primary") for reference in PUBLIC_SCIENCE_REFERENCES)
+    assert len({reference["Public URL"] for reference in PUBLIC_SCIENCE_REFERENCES}) == len(
+        PUBLIC_SCIENCE_REFERENCES
+    )
+    assert sum(group["Indexed artifacts"] for group in SOURCE_LIBRARY_COVERAGE) == 28
+    assert len(SOURCE_LIBRARY_COVERAGE) == 6
 
 
 def test_header_blueprint_separates_targets_from_inputs() -> None:

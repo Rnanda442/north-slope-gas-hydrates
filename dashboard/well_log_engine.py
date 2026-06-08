@@ -294,19 +294,97 @@ SWEET_SPOT_GUIDE = [
 
 PUBLIC_SCIENCE_REFERENCES = [
     {
+        "Evidence tier": "Primary - regional assessment",
+        "Reference": "USGS Alaska Gas Hydrate Assessment Team (2014)",
+        "Public URL": "https://pubs.usgs.gov/publication/ds69CC",
+        "Dashboard use": "North Slope petroleum-system framing, discrete fault-bounded accumulations, downdip water contacts, and regional resource context.",
+    },
+    {
+        "Evidence tier": "Primary - regional assessment",
+        "Reference": "Collett et al. (2019), 2018 North Slope assessment",
+        "Public URL": "https://pubs.usgs.gov/publication/fs20193037",
+        "Dashboard use": "Updated assessment-unit framing and the distinction between mapped resource potential and interval-scale evidence.",
+    },
+    {
+        "Evidence tier": "Primary - field synthesis",
+        "Reference": "Collett, Boswell, and Zyrianova (2022)",
+        "Public URL": "https://pubs.usgs.gov/publication/70227446",
+        "Dashboard use": "Scientific-drilling synthesis across Mount Elbert, Ignik Sikumi, and Hydrate-01 for North Slope occurrence and production context.",
+    },
+    {
+        "Evidence tier": "Primary - occurrence study",
+        "Reference": "Collett et al. (2011), permafrost-associated occurrences",
+        "Public URL": "https://pubs.usgs.gov/publication/70036041",
+        "Dashboard use": "Regional occurrence, field evidence, and the limits that remain between hydrate identification and technically useful production.",
+    },
+    {
+        "Evidence tier": "Primary - well-log study",
         "Reference": "Lee and Collett (2011), Mount Elbert",
         "Public URL": "https://pubs.usgs.gov/publication/70036903",
         "Dashboard use": "NMR, sonic, and electrical-resistivity saturation agreement; clay effects must be considered for resistivity interpretation.",
     },
     {
+        "Evidence tier": "Primary - well-log study",
         "Reference": "Haines et al. (2022), Hydrate-01",
         "Public URL": "https://pubs.usgs.gov/publication/70249535",
         "Dashboard use": "Sonic saturation estimates compare with resistivity and NMR; target sands reached approximately 90% pore-space hydrate occupancy.",
     },
     {
+        "Evidence tier": "Primary - reservoir architecture",
         "Reference": "Zyrianova et al. (2024), Eileen trend",
         "Public URL": "https://pubs.usgs.gov/publication/70252109",
         "Dashboard use": "Fault-block segmentation, partial fill, and down-dip water contacts support good-sand/no-hydrate and compartment-aware outcomes.",
+    },
+    {
+        "Evidence tier": "Primary - stratigraphic correlation",
+        "Reference": "Lewis and Collett (2013), Brookian well-log correlations",
+        "Public URL": "https://pubs.usgs.gov/sir/2013/5050/",
+        "Dashboard use": "North-central North Slope well-log correlation and stratigraphic controls on mapped gas-hydrate occurrence.",
+    },
+    {
+        "Evidence tier": "Primary - reservoir quality",
+        "Reference": "Helmold and LePain (2023), Nanushuk Formation",
+        "Public URL": "https://dggs.alaska.gov/pubs/id/31492",
+        "Dashboard use": "Depositional texture and maximum burial depth as local and regional controls on porosity and permeability.",
+    },
+]
+
+SOURCE_LIBRARY_COVERAGE = [
+    {
+        "Source group": "Public field reports",
+        "Indexed artifacts": 5,
+        "Evidence role": "Field observations, methods, occurrence, and assessment context",
+        "Treatment": "Verify and cite primary publications directly",
+    },
+    {
+        "Source group": "Alaska geology and reservoir",
+        "Indexed artifacts": 4,
+        "Evidence role": "Stratigraphy, burial, reservoir quality, overburden, and tectonic context",
+        "Treatment": "Use primary geology sources where available; label project syntheses",
+    },
+    {
+        "Source group": "Wireline equations and ranges",
+        "Indexed artifacts": 6,
+        "Evidence role": "Measurement mapping, derived properties, screening ranges, and ambiguity checks",
+        "Treatment": "Implementation references; trace equations back to primary sources",
+    },
+    {
+        "Source group": "Geomechanics, productivity, and ML",
+        "Indexed artifacts": 4,
+        "Evidence role": "Feature engineering, recoverability logic, failure modes, and validation design",
+        "Treatment": "Project synthesis; not independent confirmation",
+    },
+    {
+        "Source group": "Manuscript synthesis",
+        "Indexed artifacts": 4,
+        "Evidence role": "Integrated project logic, methods direction, and manuscript traceability",
+        "Treatment": "Project synthesis; reconcile with verified primary sources",
+    },
+    {
+        "Source group": "Maps and public-data notes",
+        "Indexed artifacts": 5,
+        "Evidence role": "Regional GIS, well-location support, surveys, and recovery inventory",
+        "Treatment": "Context and provenance; not interval-scale hydrate proof",
     },
 ]
 

@@ -14,9 +14,20 @@ This is not a calibrated North Slope classification model. It separates:
 - questions that require the full workbook, approved data, and local
   calibration.
 
-## Research Reviewed
+## Source Architecture
 
-Connected Google Drive documents reviewed on 2026-06-08:
+The repository source-library index contains 28 candidate artifacts across six
+groups: public field reports, Alaska geology and reservoir references, wireline
+equations and ranges, geomechanics/productivity/ML synthesis, manuscript
+synthesis, and map/public-data support.
+
+Nine directly relevant primary public references are currently exposed on the
+website. They cover North Slope assessment, scientific drilling, permafrost
+occurrence, well-log interpretation, reservoir architecture, stratigraphic
+correlation, and reservoir quality.
+
+Connected Google Drive documents reviewed during one synthesis pass on
+2026-06-08:
 
 - `Geomechanical relationship with Wireline Logging AN`
 - `new query with all stuff`
@@ -30,9 +41,13 @@ Repository sources also used:
 - the public science references already listed in
   `dashboard/well_log_engine.py`.
 
-The Drive documents are research synthesis and working notes. They guide the
-project's logic but do not replace verification against primary publications
-before final scientific claims or calibrated thresholds are published.
+Those four Drive documents are a review subset, not the project's total source
+base. They and the project manuscripts guide the logic but do not replace
+verification against primary publications before final scientific claims or
+calibrated thresholds are published.
+
+See `docs/SWEET_SPOT_SOURCE_MATRIX.md` for the evidence tiers, primary-source
+roles, indexed-library coverage, and treatment rules.
 
 ## Supported Directional Relationships
 

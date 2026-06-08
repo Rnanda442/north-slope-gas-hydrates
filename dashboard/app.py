@@ -17,6 +17,7 @@ from dashboard.well_log_engine import (
     PUBLIC_SCIENCE_REFERENCES,
     ROCKTYPE_CONTEXT_GUIDE,
     SCREENING_BANDS,
+    SOURCE_LIBRARY_COVERAGE,
     SYNTHETIC_LABEL,
     SWEET_SPOT_GUIDE,
     SWEET_SPOT_EVIDENCE_MODEL,
@@ -1022,20 +1023,38 @@ def render_sweet_spot_page() -> None:
             "without reservoir and pore-fluid agreement remains a lithology/stress review."
         )
     with tabs[3]:
+        source_metrics = st.columns(3)
+        source_metrics[0].metric("Primary public references", len(PUBLIC_SCIENCE_REFERENCES))
+        source_metrics[1].metric(
+            "Indexed project artifacts",
+            sum(row["Indexed artifacts"] for row in SOURCE_LIBRARY_COVERAGE),
+        )
+        source_metrics[2].metric("Source groups", len(SOURCE_LIBRARY_COVERAGE))
+        st.caption(
+            "The four connected-Drive documents were one synthesis subset. "
+            "They are not the project's total source base."
+        )
         st.dataframe(
             pd.DataFrame(SWEET_SPOT_EVIDENCE_MODEL),
             use_container_width=True,
             hide_index=True,
         )
+        st.subheader("Source Library Coverage")
+        st.dataframe(
+            pd.DataFrame(SOURCE_LIBRARY_COVERAGE),
+            use_container_width=True,
+            hide_index=True,
+        )
+        st.subheader("Verified Primary Public References")
         st.dataframe(
             pd.DataFrame(PUBLIC_SCIENCE_REFERENCES),
             use_container_width=True,
             hide_index=True,
         )
         st.caption(
-            "Working logic also draws from the connected Drive research synthesis and "
-            "the project manuscripts. Final thresholds require primary-source review "
-            "and authorized-data calibration."
+            "Project manuscripts, equation maps, and Drive synthesis documents organize "
+            "the workflow but are not counted as independent confirmation. Final "
+            "thresholds require source-by-source verification and authorized-data calibration."
         )
 
 

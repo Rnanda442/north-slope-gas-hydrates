@@ -30,4 +30,8 @@ def test_sweet_spot_page_renders() -> None:
         "Hydrate-supportive",
         "Good sand, no hydrate",
     ]
+    metric_labels = [metric.label for metric in app.metric]
+    assert "Primary public references" in metric_labels
+    assert "Indexed project artifacts" in metric_labels
+    assert "Source groups" in metric_labels
     assert len(app.dataframe) >= 1

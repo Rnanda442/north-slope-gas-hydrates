@@ -132,6 +132,8 @@ It must not load or expose authorized well-log or core data.
   scaffold requirements, track groups, and unresolved questions
 - `docs/SWEET_SPOT_SCIENCE_BASIS.md`: research-backed directional relationships,
   synthetic implementation logic, and calibration requirements
+- `docs/SWEET_SPOT_SOURCE_MATRIX.md`: primary evidence, source tiers, indexed
+  library coverage, and provenance rules for the sweet-spot scaffold
 
 ## Source Intake
 
@@ -200,3 +202,6 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-08: Added a dedicated North Slope Sweet Spots page with synthetic
   interval ranking, all current input-variable roles, geomechanics, competing
   explanations, uncertainty, and research-backed decision logic.
+- 2026-06-08: Corrected the sweet-spot provenance model to distinguish nine
+  primary public references, 28 indexed artifacts, and the four-document Drive
+  review subset.
