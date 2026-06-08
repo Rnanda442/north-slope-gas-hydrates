@@ -28,6 +28,7 @@ from dashboard.well_log_engine import (
     model_placeholder_figures,
     nearby_log_calibration,
     screen_intervals,
+    sweet_spot_review_table,
     synthetic_core_placeholders,
     variable_range_summary,
     well_log_panel,
@@ -100,6 +101,7 @@ SURFACE_CATALOG = {
 PAGES = [
     "Welcome",
     "Project Roadmap",
+    "North Slope Sweet Spots",
     "Regional Atlas",
     "Structural Explorer",
     "Data Library",
@@ -868,6 +870,175 @@ def render_project_roadmap() -> None:
     )
 
 
+def render_sweet_spot_page() -> None:
+    st.markdown('<div class="atlas-kicker">Synthetic decision workspace</div>', unsafe_allow_html=True)
+    st.title("North Slope Gas-Hydrate Sweet Spots")
+    st.write(
+        "A focused, research-aligned review of synthetic intervals using the full "
+        "well-log, reservoir, pressure-temperature, and geomechanical scaffold. "
+        "This page demonstrates how future approved data will be evaluated."
+    )
+    st.warning(
+        f"{SYNTHETIC_LABEL}. Review priorities are workflow-triage aids, not hydrate "
+        "probabilities, reserves, or calibrated North Slope thresholds."
+    )
+
+    logs = load_runtime_data()
+    intervals = screen_intervals(logs)
+    ranked = sweet_spot_review_table(intervals)
+    candidates = intervals[
+        intervals["Synthetic sweet-spot review lane"].str.contains(
+            "candidate sweet-spot",
+            na=False,
+        )
+    ]
+
+    metric_cols = st.columns(4)
+    metric_cols[0].metric("Synthetic intervals", len(intervals))
+    metric_cols[1].metric("Review-lane candidates", len(candidates))
+    metric_cols[2].metric(
+        "Hydrate-supportive",
+        int(intervals["Phase-classification evidence"].str.startswith("hydrate").sum()),
+    )
+    metric_cols[3].metric(
+        "Good sand, no hydrate",
+        int((intervals["Phase-classification evidence"] == "good sand, no hydrate").sum()),
+    )
+
+    st.markdown("### Ranked Review Queue")
+    st.caption(
+        "Priority balances reservoir quality, multi-log hydrate evidence, retained "
+        "flow capacity, moderate-occupancy preference, QC, stability, and stress context."
+    )
+    st.dataframe(ranked, use_container_width=True, hide_index=True)
+
+    interval_labels = {
+        f'{row["Well alias"]} | {row["Top depth (m)"]}-{row["Base depth (m)"]} m': index
+        for index, row in intervals.iterrows()
+    }
+    selected_label = st.selectbox(
+        "Inspect a synthetic interval",
+        list(interval_labels),
+        index=0,
+    )
+    selected = intervals.loc[interval_labels[selected_label]]
+
+    st.markdown("### Selected Interval Decision")
+    decision_cols = st.columns(4)
+    decision_cols[0].metric("Review priority", f'{selected["Synthetic review priority"]:.2f}')
+    decision_cols[1].metric("Reservoir quality", f'{selected["Reservoir-quality score"]:.2f}')
+    decision_cols[2].metric("Hydrate evidence", f'{selected["Hydrate-evidence score"]:.2f}')
+    decision_cols[3].metric(
+        "Flow retention",
+        f'{selected["Permeability-retention proxy"]:.2f}',
+    )
+    st.info(str(selected["Interpretation summary"]))
+    st.write(
+        f'**Review lane:** {selected["Synthetic sweet-spot review lane"]}  \n'
+        f'**Passed evidence:** {selected["Evidence domains passed"]}  \n'
+        f'**Blocking domains:** {selected["Blocking domains"]}  \n'
+        f'**Uncertainty:** {selected["Uncertainty flags"]}'
+    )
+
+    evidence_values = {
+        "Reservoir": selected["Reservoir-quality score"],
+        "Hydrate evidence": selected["Hydrate-evidence score"],
+        "Saturation proxy": selected["Hydrate-saturation proxy"],
+        "Flow retention": selected["Permeability-retention proxy"],
+        "QC": 0 if "borehole QC review" in selected["Uncertainty flags"] else 1,
+        "Stability": 0 if selected["Stability admissibility"] == "outside / uncertain" else 1,
+    }
+    evidence_figure = go.Figure(
+        go.Bar(
+            x=list(evidence_values.values()),
+            y=list(evidence_values),
+            orientation="h",
+            marker_color=["#167d8d", "#d9773d", "#4c78a8", "#59a14f", "#8f6bb3", "#76b7b2"],
+            text=[f"{value:.2f}" for value in evidence_values.values()],
+            textposition="auto",
+        )
+    )
+    evidence_figure.update_layout(
+        title="Evidence Profile",
+        xaxis={"range": [0, 1], "title": "Synthetic normalized support"},
+        yaxis={"autorange": "reversed"},
+        height=390,
+        margin={"l": 0, "r": 0, "t": 45, "b": 0},
+    )
+    st.plotly_chart(evidence_figure, use_container_width=True)
+
+    tabs = st.tabs(
+        [
+            "Input Variables",
+            "Geomechanics",
+            "Competing Explanations",
+            "Science and Sources",
+        ]
+    )
+    with tabs[0]:
+        input_rows = [
+            ("GR", selected["GR median (API)"], "API", "Lithology and clean-sand screen"),
+            ("Rt", selected["Rt median (ohm m)"], "ohm m", "Electrical hydrate evidence; non-unique"),
+            ("RHOB", selected["RHOB median (g/cc)"], "g/cc", "Density and porosity constraint"),
+            ("Density porosity", selected["Density porosity median"], "v/v", "Reservoir capacity"),
+            ("NMR porosity", selected["NMR porosity median"], "v/v", "Mobile-fluid response where available"),
+            ("Vp", selected["Vp median (km/s)"], "km/s", "Compressional stiffness and gas discrimination"),
+            ("Vs", selected["Vs median (km/s)"], "km/s", "Rigidity and hydrate-versus-gas support"),
+            ("Vp/Vs", selected["Vp/Vs median"], "ratio", "Elastic phase context"),
+            ("Hydrate saturation proxy", selected["Hydrate-saturation proxy"], "fraction", selected["Proxy source"]),
+        ]
+        st.dataframe(
+            pd.DataFrame(input_rows, columns=["Variable", "Interval median", "Unit", "Decision role"]),
+            use_container_width=True,
+            hide_index=True,
+        )
+    with tabs[1]:
+        geomechanics = pd.DataFrame(
+            [
+                ("Shear modulus", selected["Shear modulus (GPa)"], "GPa", "Rigidity"),
+                ("Bulk modulus", selected["Bulk modulus (GPa)"], "GPa", "Compressibility"),
+                ("Young's modulus", selected["Young's modulus (GPa)"], "GPa", "Stiffness"),
+                ("Poisson ratio", selected["Poisson ratio"], "ratio", "Elastic behavior"),
+                ("Lambda-rho", selected["Lambda-rho"], "GPa g/cc", "Fluid/compressibility context"),
+                ("Mu-rho", selected["Mu-rho"], "GPa g/cc", "Rigidity context"),
+                ("Vertical stress", selected["Vertical stress (MPa)"], "MPa", "Overburden"),
+                ("Effective stress", selected["Effective stress (MPa)"], "MPa", "Compaction and flow risk"),
+            ],
+            columns=["Property", "Synthetic interval median", "Unit", "Interpretation role"],
+        )
+        st.dataframe(geomechanics, use_container_width=True, hide_index=True)
+        st.caption(
+            "High stiffness can support hydrate interpretation, but burial, effective "
+            "stress, ice, cementation, and competent lithology can mimic the response."
+        )
+    with tabs[2]:
+        st.dataframe(
+            pd.DataFrame(ROCKTYPE_CONTEXT_GUIDE),
+            use_container_width=True,
+            hide_index=True,
+        )
+        st.error(
+            "High resistivity plus low Vp remains gas-supportive. High stiffness "
+            "without reservoir and pore-fluid agreement remains a lithology/stress review."
+        )
+    with tabs[3]:
+        st.dataframe(
+            pd.DataFrame(SWEET_SPOT_EVIDENCE_MODEL),
+            use_container_width=True,
+            hide_index=True,
+        )
+        st.dataframe(
+            pd.DataFrame(PUBLIC_SCIENCE_REFERENCES),
+            use_container_width=True,
+            hide_index=True,
+        )
+        st.caption(
+            "Working logic also draws from the connected Drive research synthesis and "
+            "the project manuscripts. Final thresholds require primary-source review "
+            "and authorized-data calibration."
+        )
+
+
 def render_regional_atlas() -> None:
     st.markdown('<div class="atlas-kicker">Regional context</div>', unsafe_allow_html=True)
     st.title("Regional Atlas")
@@ -1366,6 +1537,8 @@ def main() -> None:
         render_welcome(files)
     elif page == "Project Roadmap":
         render_project_roadmap()
+    elif page == "North Slope Sweet Spots":
+        render_sweet_spot_page()
     elif page == "Regional Atlas":
         render_regional_atlas()
     elif page == "Structural Explorer":

@@ -87,6 +87,9 @@ Streamlit Community Cloud.
 - `Welcome`: project purpose, public-data boundary, and atlas entry points
 - `Project Roadmap`: mobile-friendly architecture, workstream status, blockers,
   and next actions read from the tracked project activity map
+- `North Slope Sweet Spots`: focused synthetic interval ranking, input-variable
+  review, geomechanics, uncertainty, competing explanations, and source-backed
+  decision logic
 - `Regional Atlas`: assessment units, seismic coverage, and public well inventory
 - `Structural Explorer`: generated North Slope 3D structural scenes
 - `Data Library`: curated layer metadata and a filterable repository inventory

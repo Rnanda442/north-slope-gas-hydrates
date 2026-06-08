@@ -802,6 +802,23 @@ def screen_intervals(logs: pd.DataFrame, interval_m: int = 40) -> pd.DataFrame:
                 )
             else:
                 interpretation_summary = "Evidence remains incomplete or supports a competing explanation."
+            saturation_balance = (
+                max(0.0, 1.0 - abs(float(proxy) - 0.50) / 0.50)
+                if pd.notna(proxy)
+                else 0.0
+            )
+            stress_context_score = float(
+                np.clip(1.0 - max(float(median["effective_stress_mpa"]) - 14.0, 0.0) / 10.0, 0, 1)
+            )
+            review_priority = (
+                0.25 * float(median["reservoir_quality_score"])
+                + 0.30 * float(median["hydrate_evidence_score"])
+                + 0.20 * float(median["permeability_retention_proxy"])
+                + 0.10 * saturation_balance
+                + 0.05 * float(not qc_review)
+                + 0.05 * float(stable)
+                + 0.05 * stress_context_score
+            )
             rows.append(
                 {
                     "Data label": SYNTHETIC_LABEL,
@@ -816,8 +833,28 @@ def screen_intervals(logs: pd.DataFrame, interval_m: int = 40) -> pd.DataFrame:
                     "Hydrate-evidence score": round(float(median["hydrate_evidence_score"]), 2),
                     "Hydrate-saturation proxy": round(float(proxy), 2) if pd.notna(proxy) else np.nan,
                     "Proxy source": proxy_source,
+                    "GR median (API)": round(float(median["gr_api"]), 1),
+                    "Rt median (ohm m)": round(float(median["rt_ohm_m"]), 1),
+                    "RHOB median (g/cc)": round(float(median["rhob_g_cc"]), 3),
+                    "Density porosity median": round(float(median["density_porosity_vv"]), 3),
+                    "NMR porosity median": (
+                        round(float(median["nmr_porosity_vv"]), 3)
+                        if pd.notna(median["nmr_porosity_vv"])
+                        else np.nan
+                    ),
+                    "Vp median (km/s)": round(float(median["vp_km_s"]), 2),
+                    "Vs median (km/s)": round(float(median["vs_km_s"]), 2),
+                    "Vp/Vs median": round(float(median["vp_vs_ratio"]), 2),
+                    "Shear modulus (GPa)": round(float(median["shear_modulus_gpa"]), 2),
+                    "Bulk modulus (GPa)": round(float(median["bulk_modulus_gpa"]), 2),
+                    "Young's modulus (GPa)": round(float(median["youngs_modulus_gpa"]), 2),
+                    "Poisson ratio": round(float(median["poisson_ratio"]), 3),
+                    "Lambda-rho": round(float(median["lambda_rho"]), 2),
+                    "Mu-rho": round(float(median["mu_rho"]), 2),
+                    "Vertical stress (MPa)": round(float(median["vertical_stress_mpa"]), 1),
                     "Effective stress (MPa)": round(float(median["effective_stress_mpa"]), 1),
                     "Permeability-retention proxy": round(float(median["permeability_retention_proxy"]), 2),
+                    "Synthetic review priority": round(float(review_priority), 2),
                     "Core-calibration confidence": core_confidence,
                     "Producibility screen": producibility,
                     "Synthetic sweet-spot review lane": sweet_spot_lane,
@@ -828,6 +865,30 @@ def screen_intervals(logs: pd.DataFrame, interval_m: int = 40) -> pd.DataFrame:
                 }
             )
     return pd.DataFrame(rows)
+
+
+def sweet_spot_review_table(intervals: pd.DataFrame) -> pd.DataFrame:
+    columns = [
+        "Well alias",
+        "Top depth (m)",
+        "Base depth (m)",
+        "Synthetic review priority",
+        "Synthetic sweet-spot review lane",
+        "Phase-classification evidence",
+        "Reservoir-quality score",
+        "Hydrate-evidence score",
+        "Hydrate-saturation proxy",
+        "Permeability-retention proxy",
+        "Effective stress (MPa)",
+        "Evidence domains passed",
+        "Blocking domains",
+        "Uncertainty flags",
+    ]
+    ranked = intervals[columns].copy()
+    return ranked.sort_values(
+        ["Synthetic review priority", "Evidence domains passed"],
+        ascending=[False, False],
+    ).reset_index(drop=True)
 
 
 def synthetic_core_placeholders() -> pd.DataFrame:

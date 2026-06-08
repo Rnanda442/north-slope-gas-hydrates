@@ -86,6 +86,8 @@ open it without Streamlit sign-in.
 Current public views:
 
 - Welcome
+- Project Roadmap
+- North Slope Sweet Spots
 - Regional Atlas
 - Structural Explorer
 - Data Library
@@ -195,3 +197,6 @@ blockers, and next activities in the architecture/activity map.
   initial well-log requirements map without using the displayed values.
 - 2026-06-08: Removed the screenshot binaries from Git, reviewed connected Drive
   research, and added an explainable synthetic sweet-spot evidence model.
+- 2026-06-08: Added a dedicated North Slope Sweet Spots page with synthetic
+  interval ranking, all current input-variable roles, geomechanics, competing
+  explanations, uncertainty, and research-backed decision logic.

@@ -71,7 +71,7 @@ The public website must never load authorized runtime data.
 
 | Component | Main location | Current state | Next outcome |
 |---|---|---|---|
-| Public atlas | `dashboard/app.py` | Implemented | Continue visual QA as features change |
+| Public atlas | `dashboard/app.py` | Implemented with focused sweet-spot page | Continue responsive visual QA as features change |
 | Website entry point | `streamlit_app.py` | Public deployment verified | Keep the hosted app synchronized with `main` |
 | Synthetic well-log engine | `dashboard/well_log_engine.py` | Working scaffold | Align with Excel design |
 | Authorized runtime | `dashboard/runtime/` | Skeleton implemented | Complete input mapping and readiness UI |
@@ -92,7 +92,7 @@ The public website must never load authorized runtime data.
 | W3 | Extract Excel requirements | In progress | Confirm the screenshot-derived header map against workbook formulas, units, tool mnemonics, and alignment logic | Full workbook recovery | Approved requirements map is complete |
 | W4 | Gap analysis | Waiting | Compare spreadsheet requirements with the current engine and runtime package | W3 | Missing and existing capabilities are listed |
 | W5 | Implement well-log scaffold | In progress | Extend the synthetic evidence model while keeping thresholds demonstrative until workbook and approved-data calibration | W3, W4 | Requirements are implemented with tests |
-| W6 | Website integration and QA | Partial | Public sharing and phone-width roadmap cards are complete; well-log workflow QA remains | W5 for final workflow | Website behavior and labels are verified |
+| W6 | Website integration and QA | Partial | Dedicated synthetic sweet-spot page is implemented; complete responsive visual QA and final well-log workflow QA | W5 for final workflow | Website behavior and labels are verified |
 | W7 | Scientific alignment | Partial | Reconcile equations and interpretation rules across code, manuscript, and presentation | W1, W3, W5 | No material scientific contradictions remain |
 | W8 | Git and project stabilization | Complete | Keep local `main` synchronized with `origin/main` and preserve focused commits | None | Clean history, remote, and documented workflow |
 | W9 | Authorized-data execution | Future | Configure approved runtime and run real-data validation only in the authorized environment | W5, authorization | Reproducible authorized outputs exist |
@@ -181,3 +181,4 @@ inspect the Streamlit workflow.
 | 2026-06-08 | Defined the project improvement strategy | Established product pillars, a feature decision test, phased priorities, and ML guardrails |
 | 2026-06-08 | Reviewed normalized Excel header screenshots | Kept the images out of Git and the website; retained only a public-safe header/schema requirements map |
 | 2026-06-08 | Reviewed connected Drive research and strengthened the synthetic scaffold | Added a seven-domain explainable sweet-spot model and documented the boundary between scientific tendencies and synthetic thresholds |
+| 2026-06-08 | Added the focused North Slope Sweet Spots page | Combined ranked synthetic intervals, input variables, geomechanics, uncertainty, competing explanations, and sources in one decision workspace |
