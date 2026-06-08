@@ -1,5 +1,7 @@
 # North Slope Gas Hydrate Dashboard
 
+[Open the Project Architecture and Activity Map](docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md)
+
 This repository contains the unclassified Alaska North Slope geospatial workspace
 and a URL-accessible Streamlit regional atlas. The application organizes the
 existing public-source GIS assets, exported Plotly scenes, and manuscript-backed
