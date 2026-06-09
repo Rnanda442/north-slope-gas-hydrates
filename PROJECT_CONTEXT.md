@@ -237,3 +237,7 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-09: Upgraded the nine-slide deck with embedded project visuals from
   the website/scaffold, including a 3D regional context image, synthetic
   well-log panel, ML validation placeholder, and sweet-spot ranking graphic.
+- 2026-06-09: Strengthened the live Google Slides deck and reproducible PPTX
+  with Chong et al. ANN architecture context, classification/regression
+  branches, target-leakage guardrails, complete-well validation, and the current
+  Streamlit Structural Explorer 3D map asset plus live-app link.

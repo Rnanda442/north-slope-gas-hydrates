@@ -24,6 +24,10 @@ wireline machine-learning project.
     instructions.
   - Current version embeds generated website/scaffold visuals from
     `presentation_assets/`.
+  - The ML-methodology slides now explain the Chong et al. ANN source paper,
+    the project-specific classification/regression split, target-leakage
+    guardrails, and complete-well validation. The map slide uses the current
+    Streamlit Structural Explorer asset and links to the live app.
 - `build_research_overview_deliverables.py`
   - Reproducible builder for the new Word and PowerPoint deliverables.
 

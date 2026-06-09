@@ -96,7 +96,7 @@ The public website must never load authorized runtime data.
 | W7 | Scientific alignment | Partial | Reconcile equations and interpretation rules across code, manuscript, and presentation | W1, W3, W5 | No material scientific contradictions remain |
 | W8 | Git and project stabilization | Complete | Keep local `main` synchronized with `origin/main` and preserve focused commits | None | Clean history, remote, and documented workflow |
 | W9 | Authorized-data execution | Future | Configure approved runtime and run real-data validation only in the authorized environment | W5, authorization | Reproducible authorized outputs exist |
-| W10 | Word and PowerPoint deliverables | In progress | Research-overview Word and nine-slide PowerPoint were revised from the user's emailed instructions and upgraded with project visual assets; next replace the about-me placeholder and later approved-data figures when available | W3, W5, W7 | Both deliverables use the verified workflow, figures, terminology, and validation plan |
+| W10 | Word and PowerPoint deliverables | In progress | Research-overview Word and nine-slide PowerPoint were revised from the user's emailed instructions, upgraded with project visual assets, and further strengthened with Chong et al. ANN architecture context, model-branch logic, leakage guardrails, and the current Streamlit 3D map link; next replace the about-me placeholder and later approved-data figures when available | W3, W5, W7 | Both deliverables use the verified workflow, figures, terminology, and validation plan |
 
 Status vocabulary: `Ready`, `In progress`, `Waiting`, `Blocked`, `Partial`,
 `Complete`, or `Future`.
@@ -195,3 +195,4 @@ eight-slide visual presentation.
 | 2026-06-09 | Updated NMR availability and regenerated deliverables | Recorded that NMR and all screenshot-listed fields are available; created a crisp research-overview Word document and eight-slide PowerPoint |
 | 2026-06-09 | Revised deliverables from emailed instructions | Word now fills abstract/introduction and leaves later sections as outline placeholders with process sketches; PowerPoint now uses the requested nine-slide structure |
 | 2026-06-09 | Embedded website visuals into the PowerPoint | Added generated 3D regional context, synthetic well-log panel, ML validation placeholder, and sweet-spot ranking images to the nine-slide deck |
+| 2026-06-09 | Strengthened the ML architecture and map slides | Updated the live Google Slides deck and reproducible PPTX with Chong et al. ANN source-paper context, classification/regression branches, target-leakage guardrails, complete-well validation, and a refreshed Streamlit Structural Explorer 3D map image with a live-app link |

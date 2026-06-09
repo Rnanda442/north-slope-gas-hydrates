@@ -144,7 +144,7 @@ def test_project_cohort_plan_uses_known_wells_for_development_and_rest_for_predi
     assert plan.loc[
         plan["Cohort"].str.startswith("Development"), "Approximate wells"
     ].sum() == 14
-    assert PROJECT_COHORT_ASSUMPTIONS["Expected NMR"] == "No"
+    assert PROJECT_COHORT_ASSUMPTIONS["Expected NMR"] == "Yes"
     assert "classification and continuous hydrate saturation" in PROJECT_COHORT_ASSUMPTIONS[
         "Primary outputs"
     ].lower()

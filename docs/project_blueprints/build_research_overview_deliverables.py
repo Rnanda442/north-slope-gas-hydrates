@@ -30,12 +30,14 @@ from dashboard.well_log_engine import (
     sweet_spot_review_table,
     well_log_panel,
 )
+from dashboard.app import build_geographic_structural_figure
 OUT_DIR = REPO_ROOT / "docs" / "project_blueprints"
 DOCX_OUT = OUT_DIR / "North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.docx"
 PPTX_OUT = OUT_DIR / "North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx"
 ASSET_DIR = OUT_DIR / "presentation_assets"
 MASTER_3D = REPO_ROOT / "03_data_final" / "master_layers" / "north_slope_master_3d_surfaces.parquet"
 MASTER_2D = REPO_ROOT / "03_data_final" / "master_layers" / "north_slope_master_2d_layers.parquet"
+STREAMLIT_URL = "https://north-slope-gas-hydrates-vj67xkke9ksfzveon8ldt2.streamlit.app/"
 
 NAVY = "123447"
 TEAL = "167D8D"
@@ -85,57 +87,33 @@ def project_asset_path(name: str) -> Path:
 
 
 def build_regional_3d_asset() -> Path:
-    surfaces = pd.read_parquet(
-        MASTER_3D,
-        columns=["lon", "lat", "depth_m", "surface_name"],
+    figure = build_geographic_structural_figure(
+        ["NStopo", "NSLCU", "NSshublik", "NSbasement"],
+        1800,
+        [
+            "North Slope study-area boundary",
+            "Assessment-unit outlines",
+            "North Slope public wells",
+        ],
     )
-    wells = pd.read_parquet(
-        MASTER_2D,
-        columns=["layer_name", "lon", "lat", "depth_m"],
-    )
-    wells = wells[wells["layer_name"] == "wells"].dropna(subset=["lon", "lat"]).head(450)
-
-    figure = go.Figure()
-    colors = {"NStopo": "#3F8E54", "NSLCU": "#2878B5", "NSshublik": "#D9773D", "NSbasement": "#7353A4"}
-    for surface_name in ["NStopo", "NSLCU", "NSshublik", "NSbasement"]:
-        subset = surfaces[surfaces["surface_name"] == surface_name].dropna()
-        if subset.empty:
-            continue
-        subset = subset.iloc[:: max(1, len(subset) // 1800)]
-        figure.add_trace(
-            go.Scatter3d(
-                x=subset["lon"],
-                y=subset["lat"],
-                z=-subset["depth_m"],
-                mode="markers",
-                marker={"size": 2.2, "color": colors[surface_name], "opacity": 0.62},
-                name=surface_name,
-            )
-        )
-    figure.add_trace(
-        go.Scatter3d(
-            x=wells["lon"],
-            y=wells["lat"],
-            z=[120] * len(wells),
-            mode="markers",
-            marker={"size": 2.8, "color": "#0B1F2A", "opacity": 0.85},
-            name="public wells",
-        )
-    )
+    figure.update_traces(selector={"type": "surface"}, opacity=0.66)
     figure.update_layout(
-        title="Public North Slope structural context and well inventory",
+        title="Current Streamlit structural explorer view: public wells, boundaries, and horizons",
         paper_bgcolor="white",
         plot_bgcolor="white",
-        margin={"l": 0, "r": 0, "t": 52, "b": 0},
-        legend={"orientation": "h", "y": 0.02, "x": 0.02},
+        margin={"l": 0, "r": 0, "t": 58, "b": 0},
+        legend={"orientation": "h", "y": 1.02, "x": 0.0},
         scene={
             "xaxis_title": "Longitude",
             "yaxis_title": "Latitude",
-            "zaxis_title": "Relative depth",
+            "zaxis_title": "Depth (m)",
+            "zaxis": {"autorange": "reversed"},
+            "aspectmode": "manual",
+            "aspectratio": {"x": 1.8, "y": 1, "z": 0.55},
             "camera": {"eye": {"x": 1.55, "y": -1.7, "z": 0.85}},
         },
     )
-    return export_plotly(figure, project_asset_path("regional_3d_context.png"), 1280, 760)
+    return export_plotly(figure, project_asset_path("streamlit_3d_context_v2.png"), 1400, 820)
 
 
 def build_well_log_asset(logs: pd.DataFrame) -> Path:
@@ -453,6 +431,23 @@ def add_textbox(slide, x, y, w, h, text, size=18, bold=False, color=INK, align=P
     return box
 
 
+def add_link_textbox(slide, x, y, w, h, text, url, size=11.5):
+    box = slide.shapes.add_textbox(PptInches(x), PptInches(y), PptInches(w), PptInches(h))
+    frame = box.text_frame
+    frame.clear()
+    frame.margin_left = PptInches(0.06)
+    frame.margin_right = PptInches(0.06)
+    p = frame.paragraphs[0]
+    run = p.add_run()
+    run.text = text
+    run.font.name = "Aptos"
+    run.font.size = PptPt(size)
+    run.font.bold = True
+    run.font.color.rgb = ppt_color(TEAL)
+    run.hyperlink.address = url
+    return box
+
+
 def add_title(slide, title, subtitle=None):
     add_textbox(slide, 0.55, 0.24, 12.1, 0.45, title, size=24, bold=True, color=NAVY)
     if subtitle:
@@ -560,22 +555,30 @@ def build_pptx() -> None:
     add_footer(slide, "Sources: recovered header screenshots; project Q&A update; Lee and Collett 2011; Haines et al. 2022")
 
     slide = prs.slides.add_slide(blank)
-    add_title(slide, "ML Methodology: Architecture", "Workflow adapted from gas-hydrate ML literature and approved-data constraints")
-    add_flow(slide, ["raw logs", "QC", "features", "labels", "models", "validation"], x=0.85, y=1.25, box_w=1.55)
-    add_label(slide, 0.95, 2.7, 3.1, 1.35, "Data processing", "Remove outliers, select depth intervals, align logs and core, and standardize units.", SAND)
-    add_label(slide, 4.35, 2.7, 3.1, 1.35, "Modeling", "Compare rules, linear baselines, tree models, and Keras/ANN saturation models.")
-    add_label(slide, 7.75, 2.7, 3.1, 1.35, "Validation", "Use complete-well holdouts and compare predictions against core and interpreted measurements.")
-    add_image(slide, assets["metrics"], 2.0, 4.45, 9.45, 1.65)
-    add_footer(slide, "Source anchor: Chong et al. 2022; project runtime requirements map.")
+    add_title(slide, "ML Methodology: Architecture", "ANN paper logic adapted into a leakage-controlled well-log workflow")
+    add_label(slide, 0.75, 1.18, 2.35, 0.9, "Chong et al. anchor", "5 permafrost wells\n>10,000 depth points\nNMR-derived Sh target", SAND)
+    add_label(slide, 3.45, 1.18, 2.35, 0.9, "Input log families", "density, porosity, Rt, GR,\nVp and Vs candidates", ICE)
+    add_label(slide, 6.15, 1.18, 2.35, 0.9, "Project target control", "NMR/core saturation is a label,\nnot an input when target-derived", ICE)
+    add_label(slide, 8.85, 1.18, 2.35, 0.9, "Validation upgrade", "complete-well holdout\ninstead of random depth rows", SAND)
+    add_flow(slide, ["approved logs", "QC", "feature sets", "model ladder", "held-out wells", "outputs"], x=0.75, y=2.48, box_w=1.55)
+    add_label(slide, 0.75, 3.75, 2.95, 1.15, "1. QC and alignment", "Caliper washout, depth matching, missing-curve routing, unit standardization, multivariate outlier review.", SAND)
+    add_label(slide, 3.95, 3.75, 2.95, 1.15, "2. Physics features", "Separate measured logs, derived elastic/geomechanical features, and target-derived saturation fields.")
+    add_label(slide, 7.15, 3.75, 2.95, 1.15, "3. Model ladder", "Rules and linear baselines first; tree/GBM for feature behavior; ANN/Keras for nonlinear saturation response.")
+    add_label(slide, 10.35, 3.75, 2.2, 1.15, "4. Outputs", "Occurrence class\nSh regression\nuncertainty flags", ICE)
+    add_image(slide, assets["metrics"], 2.25, 5.33, 8.8, 1.18)
+    add_footer(slide, "Source anchor: Chong et al. 2022, DOI: 10.1007/s10596-022-10151-9; project runtime requirements map.")
 
     slide = prs.slides.add_slide(blank)
-    add_title(slide, "ML Methodology: Why These Parameters", "Classification and regression need different evidence")
-    add_image(slide, assets["sweet_spot"], 6.45, 1.15, 5.95, 3.0)
-    add_label(slide, 0.8, 1.28, 5.0, 1.0, "Classification", "Predict hydrate occurrence or phase class using lithology, resistivity, elastic, NMR, and QC context.", SAND)
-    add_label(slide, 0.8, 2.62, 5.0, 1.0, "Regression", "Predict continuous hydrate saturation from calibrated logs, NMR-derived or core-calibrated targets, and physics features.")
-    add_label(slide, 0.8, 3.96, 5.0, 1.0, "Linear vs nonlinear", "Linear baselines show traceable relationships; nonlinear models test interactions among reservoir, electrical, elastic, and NMR evidence.")
-    add_label(slide, 6.65, 4.62, 5.55, 0.92, "Website ranking logic", "The sweet-spot ranking is an explainable scaffold, not a final result until approved data are run.", ICE)
-    add_footer(slide)
+    add_title(slide, "ML Methodology: Why This Architecture Fits Well Logs", "Depth-indexed curves need both explainable baselines and nonlinear models")
+    add_image(slide, assets["sweet_spot"], 7.0, 1.18, 5.35, 2.65)
+    add_label(slide, 0.75, 1.25, 2.75, 1.0, "Classification branch", "Detect hydrate-supportive intervals or phase classes from multi-log agreement, lithology, and QC context.", SAND)
+    add_label(slide, 3.75, 1.25, 2.75, 1.0, "Regression branch", "Estimate continuous hydrate saturation only from allowed predictors and calibrated targets.")
+    add_label(slide, 0.75, 2.68, 2.75, 1.0, "Linear baseline", "Shows defensible directionality and exposes whether a simple relation is already sufficient.")
+    add_label(slide, 3.75, 2.68, 2.75, 1.0, "Tree/GBM test", "Handles missingness and ranks feature importance without forcing a single curve relationship.", ICE)
+    add_label(slide, 0.75, 4.1, 2.75, 1.0, "ANN/Keras test", "Best fit for nonlinear interactions among Rt, porosity, density, Vp, Vs, GR, and NMR-supported targets.", ICE)
+    add_label(slide, 3.75, 4.1, 2.75, 1.0, "Guardrail", "Do not train on Sgh, phase labels, rankings, or NMR-derived target columns as inputs.", SAND)
+    add_label(slide, 7.05, 4.35, 5.3, 1.0, "Decision logic", "Use the ANN only if it improves held-out-well performance beyond explainable baselines and stays geologically reasonable.")
+    add_footer(slide, "Sources: Chong et al. 2022; USGS/NETL hydrate well-log studies; project target-leakage rules.")
 
     slide = prs.slides.add_slide(blank)
     add_title(slide, "Geomechanical Feature Sketch", "Rock-physics parameters help evaluate hydrate-consistent stiffness")
@@ -592,11 +595,12 @@ def build_pptx() -> None:
     add_footer(slide, "Source anchor: project geomechanics screenshots and local equation-map documents.")
 
     slide = prs.slides.add_slide(blank)
-    add_title(slide, "3D Map and Well Context", "Regional context constrains interpretation but does not replace log evidence")
+    add_title(slide, "3D Map and Well Context", "Current Streamlit structural explorer view with a live-map link")
     add_image(slide, assets["regional_3d"], 0.75, 1.05, 7.35, 4.7)
     add_label(slide, 8.45, 1.35, 3.75, 1.2, "Map use", "Show well positions, structural context, data coverage, and candidate intervals.", SAND)
-    add_label(slide, 8.45, 3.05, 3.75, 1.2, "Boundary", "Public deck can show synthetic/public context; approved well identifiers and results stay in the authorized runtime.")
-    add_label(slide, 8.45, 4.75, 3.75, 0.8, "OpenScienceLab step", "Ready to replace this with approved-environment map output when you push/run there.", ICE)
+    add_label(slide, 8.45, 3.0, 3.75, 1.05, "Live interaction", "Google Slides stores a static image; use the linked Streamlit app for rotation, zoom, and layer toggles.")
+    add_link_textbox(slide, 8.55, 4.2, 3.55, 0.3, "Open live Streamlit 3D explorer", STREAMLIT_URL)
+    add_label(slide, 8.45, 4.82, 3.75, 0.82, "Data boundary", "Public map uses regional/public layers; approved well results stay runtime-only.", ICE)
     add_footer(slide, "Source anchor: project GIS atlas and future approved-runtime outputs.")
 
     slide = prs.slides.add_slide(blank)

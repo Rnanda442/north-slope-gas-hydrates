@@ -51,7 +51,7 @@ TARGET_LABEL_CONTRACT = (
     {
         "Target": "Hydrate saturation regression",
         "Preferred source": "Supplied or core-calibrated hydrate saturation from known wells",
-        "Alternatives": "Documented multi-method interpreted saturation; NMR only if unexpectedly available",
+        "Alternatives": "Documented multi-method interpreted saturation; NMR-density saturation where available",
         "Do not use as inputs": "Any saturation target, interpreted class, or target-derived column",
         "Status before workbook": "Required; exact source unconfirmed",
     },
@@ -75,7 +75,7 @@ PROJECT_COHORT_ASSUMPTIONS = {
     "Estimated total wells": 71,
     "Known development fraction": 0.20,
     "Prediction fraction": 0.80,
-    "Expected NMR": "No",
+    "Expected NMR": "Yes",
     "Primary outputs": "Phase classification and continuous hydrate saturation",
     "Feature strategy": "Normalized multivariable logs and physics-derived features; transformations fit on training wells only and weights learned or calibrated, not assumed",
 }
