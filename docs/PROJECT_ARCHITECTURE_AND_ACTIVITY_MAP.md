@@ -1,6 +1,6 @@
 # Project Architecture and Activity Map
 
-Last updated: 2026-06-08
+Last updated: 2026-06-09
 
 ## Purpose
 
@@ -77,8 +77,8 @@ The public website must never load authorized runtime data.
 | Authorized runtime | `dashboard/runtime/` | Source-driven readiness and grouped-well split scaffold implemented | Complete workbook-derived input mapping and model evaluation |
 | Well-log tests | `tests/` | 19 project tests passing | Expand with workbook-derived unit, label, and alignment cases |
 | GIS pipeline | notebooks and `03_data_final/` | Recovered | Validate only when GIS changes are needed |
-| Manuscript | `docs/project_blueprints/` | Two drafts recovered | Reconcile with equations and final workflow |
-| Presentation | PowerPoint scaffold recovered from Gmail | Partial | Reduce and align it to the requested approximately eight-slide visual story |
+| Manuscript | `docs/project_blueprints/` | Two drafts recovered; new crisp research-overview Word deliverable generated | Reconcile with equations and final workflow after approved labels are confirmed |
+| Presentation | PowerPoint scaffold recovered from Gmail; new eight-slide research-overview deck generated | Partial | Align final deck with approved-data results and figures when available |
 | Excel design | Header screenshots recovered; workbook missing | Partial | Confirm formulas, units, and mnemonics from the workbook |
 | Source library | Index recovered; full library incomplete | Partial | Recover and inventory public sources |
 | Git history | Connected and synchronized with GitHub | Complete | Preserve the normal commit-and-push workflow |
@@ -96,7 +96,7 @@ The public website must never load authorized runtime data.
 | W7 | Scientific alignment | Partial | Reconcile equations and interpretation rules across code, manuscript, and presentation | W1, W3, W5 | No material scientific contradictions remain |
 | W8 | Git and project stabilization | Complete | Keep local `main` synchronized with `origin/main` and preserve focused commits | None | Clean history, remote, and documented workflow |
 | W9 | Authorized-data execution | Future | Configure approved runtime and run real-data validation only in the authorized environment | W5, authorization | Reproducible authorized outputs exist |
-| W10 | Word and PowerPoint deliverables | In progress | Apply the completed eight-slide content specification to the recovered deck and align the detailed Word document | W3, W5, W7 | Both deliverables use the verified workflow, figures, terminology, and validation plan |
+| W10 | Word and PowerPoint deliverables | In progress | Research-overview Word and nine-slide PowerPoint were revised from the user's emailed instructions and upgraded with project visual assets; next replace the about-me placeholder and later approved-data figures when available | W3, W5, W7 | Both deliverables use the verified workflow, figures, terminology, and validation plan |
 
 Status vocabulary: `Ready`, `In progress`, `Waiting`, `Blocked`, `Partial`,
 `Complete`, or `Future`.
@@ -144,7 +144,7 @@ eight-slide visual presentation.
 | Item | Impact | Resolution |
 |---|---|---|
 | Full Excel workbook is not in this folder | Requirements and labels cannot be finalized | Recover from the source laptop |
-| Exact saturation and phase-label fields are not confirmed | Models cannot be trained defensibly until known-well targets are mapped | Confirm the authoritative non-NMR saturation field, phase labels, and uncertain-label convention |
+| Exact saturation and phase-label fields are not confirmed | Models cannot be trained defensibly until known-well targets are mapped | Confirm the authoritative saturation field, NMR-derived or otherwise supplied saturation targets, phase labels, and uncertain-label convention |
 | Connected Drive may be the wrong Google account | Some uploaded sources may remain hidden | Check the account used on the other laptop |
 | June 6 migration was a failed local test | Source library was not actually uploaded | Repeat migration only after verifying real paths and destination |
 | Public and restricted files could be mixed | Data-governance and publication risk | Classify every recovered item before copying |
@@ -153,7 +153,7 @@ eight-slide visual presentation.
 
 1. Recover the missing Excel artifacts and remaining public sources.
 2. Create a recovery inventory with data classification.
-3. Confirm the exact non-NMR saturation target and phase labels; refine the approximately 14-known / 57-prediction well plan after inventory.
+3. Confirm the exact saturation target, NMR target role, and phase labels; refine the approximately 14-known / 57-prediction well plan after inventory.
 4. Build the well-log requirements map.
 5. Perform the code-to-requirements gap analysis.
 6. Extend the implemented Runtime Readiness and grouped-well split scaffolds with workbook-derived rules and baseline models.
@@ -191,4 +191,7 @@ eight-slide visual presentation.
 | 2026-06-08 | Integrated project-direction emails and the attached ML paper | Added the vision/goals/next-steps tracker, clarified deliverable priority and validation requirements, and recovered the PowerPoint scaffold from Gmail |
 | 2026-06-08 | Implemented source-driven runtime and deliverable changes | Added curve/output readiness, Chong feature contracts, caliper washout QC, grouped-well splits, target provenance, and an eight-slide deck specification |
 | 2026-06-08 | Planned the website navigation and visual redesign | Defined a four-page information architecture, overview visual prompts, icon/color rules, staged change sets, and mobile acceptance criteria before implementation |
-| 2026-06-08 | Confirmed the working ML cohort assumptions | Recorded approximately 71 wells, 20% known wells for development, 80% prediction wells, no expected NMR, and separate classification and saturation outputs |
+| 2026-06-08 | Confirmed the working ML cohort assumptions | Recorded approximately 71 wells, 20% known wells for development, 80% prediction wells, and separate classification and saturation outputs |
+| 2026-06-09 | Updated NMR availability and regenerated deliverables | Recorded that NMR and all screenshot-listed fields are available; created a crisp research-overview Word document and eight-slide PowerPoint |
+| 2026-06-09 | Revised deliverables from emailed instructions | Word now fills abstract/introduction and leaves later sections as outline placeholders with process sketches; PowerPoint now uses the requested nine-slide structure |
+| 2026-06-09 | Embedded website visuals into the PowerPoint | Added generated 3D regional context, synthetic well-log panel, ML validation placeholder, and sweet-spot ranking images to the nine-slide deck |

@@ -1,5 +1,7 @@
 # DOE Runtime Skeleton Brief
 
+Last updated: 2026-06-09
+
 ## Goal
 
 Build the public Streamlit atlas so it is ready to accept approved DOE well-log
@@ -80,7 +82,8 @@ Current project assumptions:
 - approximately 14 known wells for development and 57 wells for prediction;
 - complete-well train, validation, and locked-test separation inside the known
   cohort;
-- no expected NMR;
+- NMR and all screenshot-listed fields are expected to be available, with
+  missing-curve routing still required where coverage varies;
 - separate phase-classification and continuous-saturation outputs;
 - normalized multivariable log and physics features rather than one fixed
   percentage rule.
@@ -94,7 +97,8 @@ After workbook recovery:
 
 - apply exact units, mnemonics, and missing-value conventions;
 - add per-well core-log match readiness;
-- confirm the authoritative non-NMR saturation and classification targets;
+- confirm the authoritative saturation and classification targets, including
+  whether saturation is supplied, NMR-derived, core-calibrated, or interpreted;
 - implement baseline and ANN evaluation using grouped wells;
 - generate approved-environment metrics and figures without exporting runtime
   data to the public application.

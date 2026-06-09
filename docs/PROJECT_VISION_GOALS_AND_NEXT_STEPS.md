@@ -1,6 +1,6 @@
 # Project Vision, Goals, and Next Steps
 
-Last updated: 2026-06-08
+Last updated: 2026-06-09
 
 ## Project Vision
 
@@ -70,7 +70,8 @@ Current planning assumptions from the June 8 project answers:
 - CSV and Excel well-log exports rather than seismic inputs;
 - depth and location fields;
 - gamma ray, density, neutron/porosity, resistivity, and sonic measurements;
-- possible shear sonic and NMR, with missing-curve routing required;
+- shear sonic and NMR, with missing-curve routing still required where coverage
+  varies by well or interval;
 - core porosity, permeability, hydrate saturation, lithology descriptions, and
   pressure-core quality;
 - normalized or otherwise controlled values for external planning examples.
@@ -110,7 +111,8 @@ The current project design is:
   cohort;
 - the model predicts classification and saturation for the remaining
   approximately 80% of wells;
-- NMR is not expected;
+- NMR and all screenshot-listed fields are available for the future approved-data
+  workflow;
 - both phase classification and continuous hydrate saturation are required;
 - normalized percentages and values from multiple log and physics variables
   will provide the evidence, rather than one universal cutoff.
@@ -157,13 +159,14 @@ Public source:
 
 ## Immediate Next Steps
 
-1. Use `docs/EIGHT_SLIDE_PRESENTATION_SPEC.md` to revise the recovered
-   12-slide scaffold into the requested approximately eight-slide visual story.
+1. Use the new research-overview Word document and eight-slide PowerPoint as the
+   current concise deliverable baseline, then refine them with final figures and
+   approved-data results when available.
 2. Recover the full Excel workbook and confirm headers, units, formulas, labels,
    and depth-alignment rules.
-3. Confirm the exact supplied or core-calibrated saturation field, phase-label
-   field, lithology field, and uncertain/expert-review convention for the known
-   wells.
+3. Confirm the exact supplied, NMR-derived, interpreted, or core-calibrated
+   saturation field, phase-label field, lithology field, and uncertain/expert-review
+   convention for the known wells.
 4. Extend the implemented synthetic Runtime Readiness view with workbook-derived
    units and core-log alignment rules after the workbook is recovered.
 5. Extend the implemented grouped-well split scaffold into reproducible
@@ -177,8 +180,8 @@ Public source:
 
 - Confirm the official project title.
 - Confirm the exact number of wells; the current estimate is 71.
-- Confirm which supplied, core-calibrated, or interpreted saturation field is
-  authoritative for the known wells.
+- Confirm which supplied, NMR-derived, core-calibrated, or interpreted saturation
+  field is authoritative for the known wells.
 - Confirm the exact phase classes supplied for the known wells.
 - Confirm whether outcomes for the 80% prediction cohort are available for
   blind evaluation after predictions are locked.

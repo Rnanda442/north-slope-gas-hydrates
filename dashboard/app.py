@@ -1424,10 +1424,11 @@ def render_runtime_readiness(logs: pd.DataFrame) -> None:
     st.markdown("#### Supervised Target Contract")
     st.dataframe(pd.DataFrame(TARGET_LABEL_CONTRACT), use_container_width=True, hide_index=True)
     st.info(
-        "Current assumption: NMR is not expected. Saturation training must use a "
-        "supplied, core-calibrated, or documented interpreted saturation target. "
-        "The same normalized log families may support both outputs, but classification "
-        "and saturation remain separate models or model heads."
+        "Current assumption: NMR and the screenshot-listed fields are available. "
+        "Saturation training must still identify the authoritative target as supplied, "
+        "NMR-derived, core-calibrated, or documented interpreted saturation. The same "
+        "normalized log families may support both outputs, but classification and "
+        "saturation remain separate models or model heads."
     )
 
     st.markdown("#### Attached-Paper Feature Contract")

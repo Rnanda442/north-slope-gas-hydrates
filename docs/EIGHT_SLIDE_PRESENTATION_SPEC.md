@@ -1,6 +1,6 @@
 # Eight-Slide North Slope ML Presentation Specification
 
-Last updated: 2026-06-08
+Last updated: 2026-06-09
 
 ## Purpose
 
@@ -47,7 +47,7 @@ Input families:
 - neutron porosity where present;
 - resistivity;
 - compressional and shear sonic;
-- NMR only as an optional future enhancement; it is not expected;
+- NMR as an available input and potential saturation-calibration source;
 - caliper and borehole QC;
 - core porosity, permeability, hydrate saturation, lithology, and quality.
 
@@ -87,8 +87,9 @@ Model ladder:
 
 Chong et al. (2022) is the direct ANN comparison anchor. The paper reports
 approximately 80-90% predictive performance for selected two- or three-log
-combinations against NMR-derived saturation. This project does not expect NMR,
-so the target must come from supplied or core-calibrated known-well saturation.
+combinations against NMR-derived saturation. This project now expects NMR
+availability, so the workflow must explicitly separate NMR input curves from any
+NMR-derived supervised saturation target.
 
 ### Slide 6
 
@@ -127,7 +128,8 @@ Current:
 - synthetic well-log scaffold;
 - runtime schemas and readiness logic;
 - source-traced feature and decision model;
-- recovered Word and PowerPoint blueprints.
+- recovered Word and PowerPoint blueprints;
+- new concise research-overview Word document and eight-slide PowerPoint.
 
 Activate after approved data:
 

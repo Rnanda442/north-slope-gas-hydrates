@@ -1,6 +1,6 @@
 # Well-Log Requirements Map
 
-Last updated: 2026-06-08
+Last updated: 2026-06-09
 
 ## Purpose
 
@@ -46,7 +46,7 @@ silently become an input feature.
 | `Rho_b`, `RHOB`, `Density_gcpcc` | Bulk density | kg/m3 or g/cc depending on sheet | `rhob_g_cc` | Measured input | Unit-aware conversion is required; preserve original unit |
 | `Phi_porosity`, `DPHI`, `phi_den` | Density-derived porosity | Screenshot unit is inconsistent in one header | `density_porosity_vv` | Derived or supplied feature | Confirm whether supplied or calculated; porosity should be dimensionless fraction or percent |
 | `NPHI`, `phi_neut` | Neutron porosity | not shown | `neutron_porosity_vv` | Measured input | Record fraction-versus-percent convention |
-| `NMRPHI`, `phi_nmr` | NMR porosity | not shown | `nmr_porosity_vv` | Optional measured input | NMR is not expected for the current project; retain support only as a future optional route |
+| `NMRPHI`, `phi_nmr` | NMR porosity | not shown | `nmr_porosity_vv` | Measured input where available | User confirmed NMR is available; preserve whether the field is an input curve or target-derived value |
 | `GR` | Gamma ray | API | `gr_api` | Measured input | Existing runtime field |
 | `caliper`, `CAL1` | Caliper | screenshot suggests inches for `CAL1`; not universal | `caliper_in` | Measured/QC input | Preserve source unit and convert if necessary |
 | `Differential Caliper` | Borehole deviation from expected gauge | mm shown | `differential_caliper` | QC feature | Define reference diameter and sign convention |
@@ -55,7 +55,7 @@ silently become an input feature.
 | `Vs`, `VS`, `VS1` | Shear-wave velocity | m/s | `vs_m_s` | Measured or supplied input | Do not confuse with `DTS`; support direct velocity and calculated velocity |
 | `Ratio Vp/Vs` | Compressional-to-shear velocity ratio | dimensionless | `vp_vs_ratio` | Derived feature | Calculate from canonical velocities when both are available |
 | `Impedance` | Acoustic impedance, labeled `Rho_b * Vp` | kg/m2*s as shown | `acoustic_impedance` | Derived feature | Confirm desired unit expression and density conversion before calculation |
-| `Sgh`, `S_h`, `Hydrate Saturation`, `NMR_SAT` | Gas-hydrate saturation target or interpretation | fraction not explicitly shown | `hydrate_saturation_vv` | Target / interpretation | Required regression target for known wells; confirm which non-NMR supplied or core-calibrated field is authoritative and never use it as an input |
+| `Sgh`, `S_h`, `Hydrate Saturation`, `NMR_SAT` | Gas-hydrate saturation target or interpretation | fraction not explicitly shown | `hydrate_saturation_vv` | Target / interpretation | Required regression target for known wells; confirm whether the authoritative target is supplied, NMR-derived, core-calibrated, or interpreted, and never use it as an input |
 | `S_wr`, `Swr` | Irreducible-water saturation | fraction not explicitly shown | `irreducible_water_saturation_vv` | Target, calibration, or derived field | Confirm formula and whether it is measured, assumed, or calculated |
 | `depths_unitD`, `depths_unitC`, `Unit D`, `Unit C` | Unit-specific depth vectors | ft shown in refined sheets | `source_depth_*` | Alignment/QC | Preserve unit identifier and original sampling |
 | `Depth correspondence at ML data` | Resampled or matched depth | not consistently displayed | `aligned_depth` plus unit | Alignment/QC | Record interpolation or nearest-depth method and offset |
@@ -134,8 +134,9 @@ Ground-truth or calibration tracks should be visually isolated from ML inputs.
 7. What interpolation or matching rule created `Depth correspondence at ML data`?
 8. Are hydrate saturation fields fractions from 0 to 1 or percentages from 0
    to 100?
-9. Which field provides the authoritative non-NMR saturation target for the
-   approximately 20% known-well cohort?
+9. Which field provides the authoritative saturation target, and is it supplied,
+   NMR-derived, core-calibrated, or interpreted, for the approximately 20%
+   known-well cohort?
 10. Which exact phase classes and uncertain-label convention are supplied for
     the known wells?
 11. Are outcomes for the approximately 80% prediction wells available later

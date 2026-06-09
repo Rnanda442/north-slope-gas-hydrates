@@ -1,6 +1,6 @@
 # North Slope Gas Hydrates Project Context
 
-Last updated: 2026-06-08
+Last updated: 2026-06-09
 
 ## Purpose
 
@@ -50,11 +50,14 @@ scientific calculations.
 - The full project test suite passed on 2026-06-08: 20 tests passed.
 - Public GIS layers, notebooks, structural surfaces, and Plotly exports are
   present.
-- Two working Word drafts are present in `docs/project_blueprints/`.
+- Two working Word drafts and a new research-overview Word/PPT deliverable pair
+  are present in `docs/project_blueprints/`.
 - The public source-library index is present in `docs/source_library_index/`.
 - Six normalized Excel header screenshots were reviewed from the user's email.
   The images are not stored in Git or shown on the website; their public-safe
   schema derivative is maintained in `docs/WELL_LOG_REQUIREMENTS_MAP.md`.
+- The user confirmed that NMR and all fields listed in the recovered screenshots
+  are available for the future approved-data workflow.
 - The user's full Excel workbook has not yet been recovered into this official
   folder.
 - The open-source PowerPoint scaffold was recovered from Gmail into
@@ -220,6 +223,17 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-08: Defined the website redesign plan before implementation, including
   four-page navigation, low-text overview visuals, generation prompts, and
   staged acceptance criteria.
-- 2026-06-08: Recorded the working ML assumptions: approximately 71 wells,
-  approximately 20% known wells for development, 80% prediction wells, no
-  expected NMR, and separate classification and saturation outputs.
+- 2026-06-08: Recorded the initial working ML cohort assumptions:
+  approximately 71 wells, approximately 20% known wells for development, 80%
+  prediction wells, and separate classification and saturation outputs.
+- 2026-06-09: Updated the deliverable assumptions after the user confirmed NMR
+  and all screenshot-listed fields are available, and created a new
+  research-overview Word document plus eight-slide PowerPoint.
+- 2026-06-09: Revised the Word/PPT deliverables from the user's emailed
+  instructions: filled only the abstract and introduction, converted the Word
+  file to a section-outline format with process sketches, and changed the deck
+  to a nine-slide structure with about-me, parameter, ML, map/results, and
+  conclusion slides.
+- 2026-06-09: Upgraded the nine-slide deck with embedded project visuals from
+  the website/scaffold, including a 3D regional context image, synthetic
+  well-log panel, ML validation placeholder, and sweet-spot ranking graphic.
