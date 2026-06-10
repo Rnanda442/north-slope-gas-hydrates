@@ -75,10 +75,10 @@ The public website must never load authorized runtime data.
 | Website entry point | `streamlit_app.py` | Public deployment verified | Keep the hosted app synchronized with `main` |
 | Synthetic well-log engine | `dashboard/well_log_engine.py` | Working scaffold | Align with Excel design |
 | Authorized runtime | `dashboard/runtime/` | Source-driven readiness and grouped-well split scaffold implemented | Complete workbook-derived input mapping and model evaluation |
-| Well-log tests | `tests/` | 19 project tests passing | Expand with workbook-derived unit, label, and alignment cases |
+| Well-log tests | `tests/` | 23 project tests passing | Expand with workbook-derived unit, label, and alignment cases |
 | GIS pipeline | notebooks and `03_data_final/` | Recovered | Validate only when GIS changes are needed |
 | Manuscript | `docs/project_blueprints/` | Two drafts recovered; new crisp research-overview Word deliverable generated | Reconcile with equations and final workflow after approved labels are confirmed |
-| Presentation | PowerPoint scaffold recovered from Gmail; new eight-slide research-overview deck generated | Partial | Align final deck with approved-data results and figures when available |
+| Presentation | Latest Drive PowerPoint exported, rebuilt into a 12-slide visual-first ML parameter architecture deck, and imported back to Drive | In progress | Align the deck with approved-data results and figures when available |
 | Excel design | Header screenshots recovered; workbook missing | Partial | Confirm formulas, units, and mnemonics from the workbook |
 | Source library | Index recovered; full library incomplete | Partial | Recover and inventory public sources |
 | Git history | Connected and synchronized with GitHub | Complete | Preserve the normal commit-and-push workflow |
@@ -96,7 +96,7 @@ The public website must never load authorized runtime data.
 | W7 | Scientific alignment | Partial | Reconcile equations and interpretation rules across code, manuscript, and presentation | W1, W3, W5 | No material scientific contradictions remain |
 | W8 | Git and project stabilization | Complete | Keep local `main` synchronized with `origin/main` and preserve focused commits | None | Clean history, remote, and documented workflow |
 | W9 | Authorized-data execution | Future | Configure approved runtime and run real-data validation only in the authorized environment | W5, authorization | Reproducible authorized outputs exist |
-| W10 | Word and PowerPoint deliverables | In progress | User-approved revamp now prioritizes Word/PPT over website polish: build a packed parameter signal slide, parameter masking/effect trees, and a two-level ML architecture before rebuilding the PowerPoint; then align the Word document | W3, W5, W7 | Both deliverables use the verified workflow, figures, terminology, and validation plan |
+| W10 | Word and PowerPoint deliverables | In progress | Rebuilt the PowerPoint from the latest Drive deck export with a packed parameter signal slide, parameter masking/effect trees, and a two-level ML architecture, then imported it back to Drive; next align the Word document | W3, W5, W7 | Both deliverables use the verified workflow, figures, terminology, and validation plan |
 
 Status vocabulary: `Ready`, `In progress`, `Waiting`, `Blocked`, `Partial`,
 `Complete`, or `Future`.
@@ -158,7 +158,7 @@ eight-slide visual presentation.
 5. Perform the code-to-requirements gap analysis.
 6. Extend the implemented Runtime Readiness and grouped-well split scaffolds with workbook-derived rules and baseline models.
 7. Build the parameter signal/masking matrix and two-level ML architecture plan.
-8. Rebuild the PowerPoint from the approved visual plan, then align the Word document.
+8. Align the Word document with the same parameter/masking and ML architecture.
 9. Polish and deploy the implemented four-page Processing-style website redesign.
 10. Run complete website visual QA.
 11. Keep the architecture tracker, tests, commits, and hosted deployment synchronized.
@@ -205,3 +205,4 @@ eight-slide visual presentation.
 | 2026-06-10 | Reintegrated the DOE-sent updated deliverables | Recovered the user's Gmail-sent Word document and PowerPoint to the DOE account, used them as the base tracked deliverables, and patched in the latest website visuals, source anchors, and public/runtime boundary |
 | 2026-06-10 | Added ML visual architecture sketches | Created a source-backed ML visual plan and added Processing-style header-to-model knowledge graph and hydrate decision-tree sketches to the active Analyze Hydrates workflow |
 | 2026-06-10 | Recorded the user-approved deck revamp direction | Shifted priority back to Word/PPT, added a parameter signal and masking-tree plan, and created a machine-readable parameter/effect matrix for the upcoming PowerPoint rebuild |
+| 2026-06-10 | Rebuilt the latest Drive PowerPoint as a visual ML architecture deck | Generated a 12-slide public-safe PPTX with parameter signal bars, conceptual importance weights, masking/effect trees, MLOps-style architecture maps, parallel classification/regression branches, and overburden/sweet-spot review visuals; imported it to Drive as `REVAMPED June 10 North Slope Gas Hydrate ML Parameter Architecture Slides` |

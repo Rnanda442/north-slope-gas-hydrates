@@ -52,6 +52,9 @@ scientific calculations.
   present.
 - Two working Word drafts and a new research-overview Word/PPT deliverable pair
   are present in `docs/project_blueprints/`.
+- The latest Drive PowerPoint was exported and rebuilt into a visual-first
+  12-slide ML parameter architecture deck with signal bars, masking trees,
+  parallel model branches, and overburden/sweet-spot review visuals.
 - The public source-library index is present in `docs/source_library_index/`.
 - Three Excel header references were reviewed from the user's email. The images
   are not stored in Git or shown on the website; their public-safe schema
@@ -269,3 +272,5 @@ blockers, and next activities in the architecture/activity map.
   Word/PPT deliverables, create parameter signal/masking trees before deck
   rebuild, use a hybrid dark/clean visual style, and treat classification and
   saturation regression as parallel branches.
+- 2026-06-10: Rebuilt the latest Drive PowerPoint into a public-safe 12-slide
+  visual ML architecture deck for Drive review.
