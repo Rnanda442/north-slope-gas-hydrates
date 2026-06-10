@@ -1,6 +1,6 @@
 # North Slope Gas Hydrates Project Context
 
-Last updated: 2026-06-09
+Last updated: 2026-06-10
 
 ## Purpose
 
@@ -40,8 +40,8 @@ scientific calculations.
 ## Current State
 
 - The public Streamlit regional atlas is implemented.
-- The website includes a mobile-responsive `Project Roadmap` page sourced from
-  `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md`.
+- The website now uses a four-page, visual-first Streamlit structure with
+  Processing-style public/synthetic canvas sketches.
 - The synthetic well-log planning page and reusable calculation layer are
   implemented in `dashboard/well_log_engine.py`.
 - The authorized runtime skeleton is implemented in `dashboard/runtime/`.
@@ -53,9 +53,12 @@ scientific calculations.
 - Two working Word drafts and a new research-overview Word/PPT deliverable pair
   are present in `docs/project_blueprints/`.
 - The public source-library index is present in `docs/source_library_index/`.
-- Six normalized Excel header screenshots were reviewed from the user's email.
-  The images are not stored in Git or shown on the website; their public-safe
-  schema derivative is maintained in `docs/WELL_LOG_REQUIREMENTS_MAP.md`.
+- Three Excel header references were reviewed from the user's email. The images
+  are not stored in Git or shown on the website; their public-safe schema
+  derivative is maintained in `docs/WELL_LOG_REQUIREMENTS_MAP.md`.
+- No real well-log rows, core rows, or calibrated target values were supplied
+  from those Excel references. Website and test rows are header-derived
+  synthetic examples generated only to exercise layout, validation, and visuals.
 - The user confirmed that NMR and all fields listed in the recovered screenshots
   are available for the future approved-data workflow.
 - The user's full Excel workbook has not yet been recovered into this official
@@ -88,14 +91,13 @@ open it without Streamlit sign-in.
 
 Current public views:
 
-- Welcome
-- Project Roadmap
-- North Slope Sweet Spots
-- Log Scaffold
-- Regional Atlas
-- Structural Explorer
-- Data Library
-- Research Framework
+- Overview
+- Explore North Slope
+- Analyze Hydrates
+- Project Plan
+
+Legacy query links for the prior eight-page structure route into the four
+current pages.
 
 The hosted website must remain a public-source atlas and synthetic demonstration.
 It must not load or expose authorized well-log or core data.
@@ -204,8 +206,8 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-08: Established a phased improvement strategy centered on guided
   scientific communication, requirements traceability, runtime readiness, and
   decision-quality outputs.
-- 2026-06-08: Reviewed six normalized Excel header screenshots and created the
-  initial well-log requirements map without using the displayed values.
+- 2026-06-08: Reviewed three Excel header references and created the initial
+  well-log requirements map without using any values as real sample data.
 - 2026-06-08: Removed the screenshot binaries from Git, reviewed connected Drive
   research, and added an explainable synthetic sweet-spot evidence model.
 - 2026-06-08: Added a dedicated North Slope Sweet Spots page with synthetic
@@ -244,3 +246,12 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-09: Re-exposed the website well-log scaffold as a first-class
   `Log Scaffold` page, kept the old `Future Well-Log Engine` query alias, and
   added a visible welcome-page link.
+- 2026-06-10: Implemented the Processing-style website redesign with four
+  top-level pages, visual-first canvas sketches, route aliases for old page
+  links, and browser QA at desktop and 390-pixel mobile widths.
+- 2026-06-10: Clarified that the Excel material provides header/schema
+  information only; synthetic website/test rows are generated from those headers
+  and source logic, not from user-supplied sample data.
+- 2026-06-10: Rebuilt the research-overview Word document and nine-slide
+  PowerPoint with the four-page website workflow, source anchors, subsurface
+  evidence stack, and header-derived synthetic-data provenance.

@@ -9,6 +9,7 @@ import plotly.graph_objects as go
 import streamlit as st
 import streamlit.components.v1 as components
 
+from dashboard.processing_visuals import render_processing_sketch
 from dashboard.runtime.feature_engineering import add_standard_features
 from dashboard.runtime.schemas import (
     CHONG_ML_FEATURE_COLUMNS,
@@ -47,6 +48,22 @@ from dashboard.well_log_engine import (
     synthetic_core_placeholders,
     variable_range_summary,
     well_log_panel,
+)
+from dashboard.visual_story_data import (
+    BLOCKERS,
+    BUILT_NEXT,
+    COHORT_SPLIT,
+    DELIVERABLES,
+    EVIDENCE_DOMAINS,
+    EVIDENCE_STACK,
+    HEADER_DERIVED_SYNTHETIC_NOTE,
+    LAYER_SUMMARY,
+    MISSION_OUTCOMES,
+    PIPELINE_STAGES,
+    SOURCE_ANCHORS,
+    STRUCTURE_LAYERS,
+    SYNTHETIC_TRACKS,
+    TARGET_BOUNDARY,
 )
 
 
@@ -115,20 +132,24 @@ SURFACE_CATALOG = {
 }
 
 PAGES = [
-    "Welcome",
-    "Project Roadmap",
-    "North Slope Sweet Spots",
-    "Log Scaffold",
-    "Regional Atlas",
-    "Structural Explorer",
-    "Data Library",
-    "Research Framework",
+    "Overview",
+    "Explore North Slope",
+    "Analyze Hydrates",
+    "Project Plan",
 ]
 
 PAGE_ALIASES = {
-    "Future Well-Log Engine": "Log Scaffold",
-    "Well-Log Engine": "Log Scaffold",
-    "Well Log Scaffold": "Log Scaffold",
+    "Welcome": "Overview",
+    "Project Roadmap": "Project Plan",
+    "North Slope Sweet Spots": "Analyze Hydrates",
+    "Log Scaffold": "Analyze Hydrates",
+    "Future Well-Log Engine": "Analyze Hydrates",
+    "Well-Log Engine": "Analyze Hydrates",
+    "Well Log Scaffold": "Analyze Hydrates",
+    "Regional Atlas": "Explore North Slope",
+    "Structural Explorer": "Explore North Slope",
+    "Data Library": "Explore North Slope",
+    "Research Framework": "Project Plan",
 }
 
 LAYER_CATALOG = [
@@ -256,7 +277,7 @@ def apply_styles() -> None:
         }
         .atlas-hero {
             background: linear-gradient(125deg, #123447 0%, #176477 70%, #167d8d 100%);
-            border-radius: 18px;
+            border-radius: 8px;
             color: white;
             padding: 2.4rem 2.7rem;
             margin-bottom: 1.1rem;
@@ -275,7 +296,7 @@ def apply_styles() -> None:
         .atlas-card {
             background: white;
             border: 1px solid #d9e7e8;
-            border-radius: 14px;
+            border-radius: 8px;
             min-height: 162px;
             padding: 1.1rem 1.2rem;
         }
@@ -289,6 +310,32 @@ def apply_styles() -> None:
             border-radius: 8px;
             margin: 0.42rem 0;
             padding: 0.66rem 0.85rem;
+        }
+        .path-card {
+            background: #ffffff;
+            border: 1px solid #d9e7e8;
+            border-radius: 8px;
+            min-height: 118px;
+            padding: 1rem;
+        }
+        .path-card h4 {
+            color: #123447;
+            margin: 0 0 0.35rem;
+        }
+        .path-card p {
+            color: #49636b;
+            margin: 0;
+        }
+        .boundary-badge {
+            background: #f4efe6;
+            border: 1px solid #e4d8c4;
+            border-radius: 8px;
+            color: #5d4b2a;
+            display: inline-block;
+            font-size: 0.86rem;
+            font-weight: 700;
+            margin: 0.35rem 0 0.75rem;
+            padding: 0.36rem 0.62rem;
         }
         .atlas-step strong {
             color: #123447;
@@ -794,6 +841,94 @@ def render_welcome(files: list[dict[str, object]]) -> None:
         """,
         unsafe_allow_html=True,
     )
+
+
+def render_outcome_cards() -> None:
+    cols = st.columns(3)
+    for col, outcome in zip(cols, MISSION_OUTCOMES):
+        col.markdown(
+            f"""
+            <div class="path-card">
+              <h4 style="border-left:4px solid {outcome['color']};padding-left:0.55rem">
+                {escape(outcome['label'])}
+              </h4>
+              <p>{escape(outcome['detail'])}</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+
+def render_path_cards() -> None:
+    cards = [
+        ("Explore the North Slope", "Map layers, wells, seismic, and structure.", "Explore North Slope"),
+        ("Review Hydrate Decisions", "Logs, evidence, readiness, and uncertainty.", "Analyze Hydrates"),
+        ("See What Happens Next", "Built pieces, blockers, and deliverables.", "Project Plan"),
+    ]
+    cols = st.columns(3)
+    for col, (title, text, page) in zip(cols, cards):
+        col.markdown(
+            f"""
+            <a href="?page={page.replace(' ', '%20')}" style="text-decoration:none">
+              <div class="path-card">
+                <h4>{escape(title)}</h4>
+                <p>{escape(text)}</p>
+              </div>
+            </a>
+            """,
+            unsafe_allow_html=True,
+        )
+
+
+def render_source_anchors() -> None:
+    st.markdown("#### Evidence Anchors")
+    for anchor in SOURCE_ANCHORS:
+        st.markdown(f"**{anchor['claim']}**")
+        st.caption(anchor["source"])
+        st.write(anchor["use"])
+    st.caption(
+        "Project synthesis documents organize the workflow; public claims should trace back to verified primary sources."
+    )
+
+
+def render_overview(files: list[dict[str, object]]) -> None:
+    render_processing_sketch(
+        "system_flow",
+        {"tracks": SYNTHETIC_TRACKS},
+        "Constraining North Slope Gas Hydrates",
+        "Regional context, synthetic well evidence, and interval decisions in one public-safe view.",
+        height=430,
+    )
+    st.markdown(
+        '<span class="boundary-badge">Public-source site. Approved logs stay runtime-only.</span>',
+        unsafe_allow_html=True,
+    )
+    render_outcome_cards()
+    render_processing_sketch(
+        "pipeline",
+        {"stages": PIPELINE_STAGES, "heading": "Data to Decision"},
+        "Data-to-Decision Pipeline",
+        "Files move through QC, physics, whole-well ML validation, expert review, and deliverables.",
+        height=340,
+    )
+    render_processing_sketch(
+        "evidence_stack",
+        {"stack": EVIDENCE_STACK, "tracks": SYNTHETIC_TRACKS},
+        "Subsurface Evidence Stack",
+        "Regional context narrows confidence; logs, core, and labels determine interval decisions.",
+        height=430,
+    )
+    render_path_cards()
+    with st.expander("Repository context and data boundary"):
+        render_metric_row(files)
+        st.markdown(
+            """
+            The hosted website is a public-source atlas and synthetic planning
+            scaffold. Restricted logs, core data, named identifiers, trained
+            models, populated runtime configs, and derived sensitive outputs
+            belong only in the authorized runtime environment.
+            """
+        )
 
 
 def render_project_roadmap() -> None:
@@ -1378,8 +1513,8 @@ def render_future_engine() -> None:
 def render_runtime_readiness(logs: pd.DataFrame) -> None:
     st.subheader("Runtime Readiness & ML Plan")
     st.caption(
-        f"{SYNTHETIC_LABEL} | Source-driven readiness demonstration based on the "
-        "June 8 project answers and Chong et al. (2022)."
+        f"{SYNTHETIC_LABEL} | Header-derived synthetic records generated from "
+        "Excel schema references, project answers, and Chong et al. (2022)."
     )
     features = add_standard_features(logs)
     report = validate_log_table(logs)
@@ -1518,8 +1653,9 @@ def render_variable_range_explorer(logs: pd.DataFrame) -> None:
 def render_header_blueprint() -> None:
     st.subheader("Header & Track Blueprint")
     st.caption(
-        "Derived from a normalized header-only reference. Names, units, roles, and "
-        "layout guide the scaffold; no reference values are used."
+        "Derived from three Excel header/schema references. Names, units, roles, "
+        "and layout guide the scaffold; no user-supplied data rows or reference "
+        "values are used."
     )
     st.warning(
         "Measured inputs, derived features, QC/alignment fields, and targets remain "
@@ -1691,6 +1827,253 @@ def render_presentation_outputs(logs: pd.DataFrame, intervals: pd.DataFrame, cal
     cols[1].download_button("Download placeholder calibration panel (HTML)", figure_html_bytes(calibration), "synthetic_placeholder_calibration_panel.html", "text/html", key="presentation_calibration")
 
 
+def render_project_plan() -> None:
+    content = architecture_content()
+    vision = vision_content()
+    st.markdown('<div class="atlas-kicker">Project execution</div>', unsafe_allow_html=True)
+    st.title("Project Plan")
+    st.write("Built public pieces are ready; approved-data steps activate only inside the runtime boundary.")
+    render_processing_sketch(
+        "built_next",
+        BUILT_NEXT,
+        "Built Now / Activate Next",
+        "A visual split between current public/synthetic assets and approved-data-dependent work.",
+        height=390,
+    )
+    col1, col2 = st.columns(2)
+    with col1:
+        render_processing_sketch(
+            "blocks",
+            {"heading": "Blockers", "rows": BLOCKERS},
+            "Current Blockers",
+            "Open dependencies affect workbook mapping, labels, and source provenance.",
+            height=280,
+        )
+    with col2:
+        render_processing_sketch(
+            "blocks",
+            {"heading": "Deliverables", "rows": DELIVERABLES},
+            "Deliverable Path",
+            "Website visuals feed Word and PowerPoint; approved outputs remain runtime-only.",
+            height=280,
+        )
+
+    if not content or not vision:
+        st.error("The vision or architecture tracker is not available in this deployment.")
+        return
+
+    st.markdown("### Next Three Actions")
+    next_actions = [
+        "Recover the full Excel workbook and remaining public sources.",
+        "Confirm saturation targets, NMR role, phase labels, and whole-well splits.",
+        "Implement workbook-derived rules and replace placeholders with validated results.",
+    ]
+    for action in next_actions:
+        st.markdown(f'<div class="atlas-step">{escape(action)}</div>', unsafe_allow_html=True)
+
+    workstreams = markdown_table(markdown_section(content, "Workstream Activity Map"))
+    blockers = markdown_table(markdown_section(content, "Blockers and Risks"))
+    if not workstreams.empty:
+        statuses = workstreams["Status"].astype(str)
+        cols = st.columns(4)
+        cols[0].metric("Workstreams", len(workstreams))
+        cols[1].metric(
+            "Active",
+            int(statuses.str.startswith("In progress").sum() + statuses.str.startswith("Partial").sum()),
+        )
+        cols[2].metric(
+            "Waiting / blocked",
+            int(statuses.str.startswith("Waiting").sum() + statuses.str.startswith("Blocked").sum()),
+        )
+        cols[3].metric("Complete", int(statuses.str.startswith("Complete").sum()))
+
+    with st.expander("Detailed tracker"):
+        st.markdown("#### Project Vision")
+        st.markdown(markdown_section(vision, "Project Vision"))
+        st.markdown("#### Current Priority")
+        st.markdown(markdown_section(content, "Current Priority"))
+        if not workstreams.empty:
+            st.markdown("#### Workstream Status")
+            st.markdown('<div class="roadmap-desktop">', unsafe_allow_html=True)
+            st.dataframe(workstreams, use_container_width=True, hide_index=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown(roadmap_cards(workstreams), unsafe_allow_html=True)
+        if not blockers.empty:
+            st.markdown("#### Blockers and Risks")
+            st.dataframe(blockers, use_container_width=True, hide_index=True)
+        st.markdown("#### Near-Term Sequence")
+        st.markdown(markdown_section(content, "Near-Term Sequence"))
+
+
+def render_explore_north_slope(files: list[dict[str, object]]) -> None:
+    st.markdown('<div class="atlas-kicker">Public regional context</div>', unsafe_allow_html=True)
+    st.title("Explore North Slope")
+    st.write("Public GIS and structural layers constrain interpretation; they do not classify hydrate by themselves.")
+    tabs = st.tabs(["Regional Map", "3D Structure", "Data & Sources"])
+    with tabs[0]:
+        render_processing_sketch(
+            "layer_map",
+            {"layers": LAYER_SUMMARY},
+            "Regional Layer Overview",
+            "Assessment units, seismic coverage, public wells, and missing geometry stay visible before the full map.",
+            height=360,
+        )
+        with st.expander("Full interactive regional map", expanded=True):
+            render_regional_atlas()
+    with tabs[1]:
+        render_processing_sketch(
+            "structure_stack",
+            {"layers": STRUCTURE_LAYERS},
+            "Structural Stack Preview",
+            "A lightweight public-horizon sketch leads into the precise Plotly structural explorer.",
+            height=360,
+        )
+        with st.expander("Full 3D structural explorer", expanded=True):
+            render_structural_explorer()
+    with tabs[2]:
+        render_processing_sketch(
+            "blocks",
+            {
+                "heading": "Source Boundary",
+                "rows": [
+                    {"label": "Public GIS", "status": "hosted"},
+                    {"label": "Synthetic logs", "status": "demo only"},
+                    {"label": "Approved logs", "status": "runtime only", "severity": "waiting"},
+                    {"label": "Core data", "status": "runtime only", "severity": "waiting"},
+                    {"label": "Sensitive outputs", "status": "do not publish", "severity": "waiting"},
+                    {"label": "Figures", "status": "public/synthetic export"},
+                ],
+            },
+            "Public / Runtime Boundary",
+            "Source categories are separated before users reach file tables.",
+            height=300,
+        )
+        with st.expander("Layer catalog and repository browser", expanded=True):
+            render_data_library(files)
+
+
+def render_interval_review(logs: pd.DataFrame, intervals: pd.DataFrame) -> None:
+    ranked = sweet_spot_review_table(intervals)
+    candidates = intervals[
+        intervals["Synthetic sweet-spot review lane"].str.contains("candidate sweet-spot", na=False)
+    ]
+    cols = st.columns(4)
+    cols[0].metric("Synthetic intervals", len(intervals))
+    cols[1].metric("Review-lane candidates", len(candidates))
+    cols[2].metric(
+        "Hydrate-supportive",
+        int(intervals["Phase-classification evidence"].str.startswith("hydrate").sum()),
+    )
+    cols[3].metric(
+        "Good sand, no hydrate",
+        int((intervals["Phase-classification evidence"] == "good sand, no hydrate").sum()),
+    )
+    interval_labels = {
+        f'{row["Well alias"]} | {row["Top depth (m)"]}-{row["Base depth (m)"]} m': index
+        for index, row in intervals.iterrows()
+    }
+    selected_label = st.selectbox("Synthetic interval", list(interval_labels), index=0)
+    selected = intervals.loc[interval_labels[selected_label]]
+    st.info(str(selected["Interpretation summary"]))
+    evidence_values = {
+        "Reservoir": selected["Reservoir-quality score"],
+        "Hydrate evidence": selected["Hydrate-evidence score"],
+        "Saturation proxy": selected["Hydrate-saturation proxy"],
+        "Flow retention": selected["Permeability-retention proxy"],
+        "QC": 0 if "borehole QC review" in selected["Uncertainty flags"] else 1,
+        "Stability": 0 if selected["Stability admissibility"] == "outside / uncertain" else 1,
+    }
+    figure = go.Figure(
+        go.Bar(
+            x=list(evidence_values.values()),
+            y=list(evidence_values),
+            orientation="h",
+            marker_color=["#167d8d", "#d9773d", "#4c78a8", "#59a14f", "#8f6bb3", "#76b7b2"],
+            text=[f"{value:.2f}" for value in evidence_values.values()],
+            textposition="auto",
+        )
+    )
+    figure.update_layout(
+        title="Selected Interval Evidence",
+        xaxis={"range": [0, 1], "title": "Synthetic normalized support"},
+        yaxis={"autorange": "reversed"},
+        height=340,
+        margin={"l": 0, "r": 0, "t": 45, "b": 0},
+    )
+    st.plotly_chart(figure, use_container_width=True)
+    with st.expander("Ranked review queue and interval details"):
+        st.dataframe(ranked, use_container_width=True, hide_index=True)
+        input_rows = [
+            ("GR", selected["GR median (API)"], "API", "Lithology and clean-sand screen"),
+            ("Rt", selected["Rt median (ohm m)"], "ohm m", "Electrical hydrate evidence; non-unique"),
+            ("RHOB", selected["RHOB median (g/cc)"], "g/cc", "Density and porosity constraint"),
+            ("NMR porosity", selected["NMR porosity median"], "v/v", "Mobile-fluid response where available"),
+            ("Vp/Vs", selected["Vp/Vs median"], "ratio", "Elastic phase context"),
+            ("Hydrate saturation proxy", selected["Hydrate-saturation proxy"], "fraction", selected["Proxy source"]),
+        ]
+        st.dataframe(
+            pd.DataFrame(input_rows, columns=["Variable", "Interval median", "Unit", "Decision role"]),
+            use_container_width=True,
+            hide_index=True,
+        )
+
+
+def render_analyze_hydrates() -> None:
+    st.markdown('<div class="atlas-kicker">Synthetic decision workspace</div>', unsafe_allow_html=True)
+    st.title("Analyze Hydrates")
+    st.write("Synthetic logs show the workflow shape; approved well and core data stay outside the public site.")
+    logs = load_runtime_data()
+    intervals = screen_intervals(logs)
+    core = synthetic_core_placeholders()
+    calibrated_core = nearby_log_calibration(logs, core)
+    render_processing_sketch(
+        "well_evidence",
+        {"tracks": SYNTHETIC_TRACKS, "domains": EVIDENCE_DOMAINS},
+        "Well-Log Evidence Board",
+        "Depth tracks, highlighted intervals, evidence domains, and QC are visible before the tables.",
+        height=430,
+    )
+    st.warning(
+        f"{SYNTHETIC_LABEL}. {HEADER_DERIVED_SYNTHETIC_NOTE} Do not upload approved logs, core data, identifiers, or derived sensitive outputs."
+    )
+    tabs = st.tabs(["Interval Review", "Runtime Readiness", "Methods & Evidence"])
+    with tabs[0]:
+        render_interval_review(logs, intervals)
+    with tabs[1]:
+        col1, col2 = st.columns(2)
+        with col1:
+            render_processing_sketch(
+                "target_boundary",
+                {"items": TARGET_BOUNDARY},
+                "Target Leakage Guardrail",
+                "Measured inputs, derived features, and target fields stay separated.",
+                height=280,
+            )
+        with col2:
+            render_processing_sketch(
+                "cohort_split",
+                {"split": COHORT_SPLIT},
+                "Whole-Well Split Plan",
+                "Validation is by well, not neighboring depth rows.",
+                height=280,
+            )
+        render_runtime_readiness(logs)
+    with tabs[2]:
+        render_source_anchors()
+        with st.expander("Header and track blueprint", expanded=True):
+            render_header_blueprint()
+        with st.expander("Sweet-spot evidence model"):
+            render_sweet_spot_evidence_model(intervals)
+        with st.expander("Equation-to-decision map"):
+            render_equation_decision_map()
+        with st.expander("Range guide and public science anchors"):
+            render_range_guide()
+        with st.expander("Interval, core, and presentation exports"):
+            render_interval_screen(intervals)
+            render_core_calibration(calibrated_core)
+            render_presentation_outputs(logs, intervals, calibrated_core)
+
+
 def main() -> None:
     st.set_page_config(
         page_title="North Slope Gas Hydrate Atlas",
@@ -1702,22 +2085,14 @@ def main() -> None:
     files = project_files()
     page = render_sidebar()
 
-    if page == "Welcome":
-        render_welcome(files)
-    elif page == "Project Roadmap":
-        render_project_roadmap()
-    elif page == "North Slope Sweet Spots":
-        render_sweet_spot_page()
-    elif page == "Log Scaffold":
-        render_future_engine()
-    elif page == "Regional Atlas":
-        render_regional_atlas()
-    elif page == "Structural Explorer":
-        render_structural_explorer()
-    elif page == "Data Library":
-        render_data_library(files)
-    elif page == "Research Framework":
-        render_framework()
+    if page == "Overview":
+        render_overview(files)
+    elif page == "Explore North Slope":
+        render_explore_north_slope(files)
+    elif page == "Analyze Hydrates":
+        render_analyze_hydrates()
+    elif page == "Project Plan":
+        render_project_plan()
     else:
         render_framework()
 

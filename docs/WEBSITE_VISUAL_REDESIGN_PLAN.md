@@ -2,6 +2,12 @@
 
 Last updated: 2026-06-08
 
+Implementation note: the four-page navigation, visual-first Overview,
+Explore North Slope, Analyze Hydrates, and Project Plan pages were implemented
+on 2026-06-10. Remaining polish is source-captioning, static export packaging,
+and replacing header-derived synthetic examples when approved runtime data are
+available.
+
 ## Objective
 
 Reduce navigation complexity and replace long explanatory sections with a
@@ -388,3 +394,18 @@ Color must encode the same meaning everywhere.
 - Every overview visual has a PowerPoint/Word reuse path.
 - Existing scientific rules, data boundary, downloads, and source provenance
   remain accessible after consolidation.
+
+## Source Caption Updates Needed
+
+Each visual should carry a compact source/provenance caption:
+
+- System hero: project vision plus public/runtime data-boundary rule.
+- Data-to-decision pipeline: project vision and Chong et al. (2022) for the
+  log/ML feature families.
+- Subsurface evidence stack: USGS/Collett assessment sources for regional
+  context; Lee and Collett (2011), Haines et al. (2022), and Chong et al.
+  (2022) for log/core/saturation evidence.
+- Well-log evidence board: header-derived synthetic records only; no
+  user-supplied sample rows.
+- Target-leakage guardrail: `docs/WELL_LOG_REQUIREMENTS_MAP.md` and the project
+  vision requirement that target columns never become inputs.

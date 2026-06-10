@@ -10,7 +10,7 @@ if str(REPO_ROOT) not in sys.path:
 
 import pandas as pd
 import plotly.graph_objects as go
-from PIL import Image, ImageChops
+from PIL import Image, ImageChops, ImageDraw, ImageFont
 from plotly.subplots import make_subplots
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -31,6 +31,7 @@ from dashboard.well_log_engine import (
     well_log_panel,
 )
 from dashboard.app import build_geographic_structural_figure
+from dashboard.visual_story_data import HEADER_DERIVED_SYNTHETIC_NOTE, SOURCE_ANCHORS
 OUT_DIR = REPO_ROOT / "docs" / "project_blueprints"
 DOCX_OUT = OUT_DIR / "North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.docx"
 PPTX_OUT = OUT_DIR / "North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx"
@@ -172,6 +173,113 @@ def build_sweet_spot_asset(logs: pd.DataFrame) -> Path:
     return export_plotly(figure, project_asset_path("sweet_spot_ranking.png"), 1280, 640)
 
 
+def build_website_flow_asset() -> Path:
+    labels = ["Overview", "Explore North Slope", "Analyze Hydrates", "Project Plan"]
+    subtitles = [
+        "project goal + evidence flow",
+        "public maps and structure",
+        "header-derived synthetic log workflow",
+        "built now / activate with data",
+    ]
+    colors = ["#123447", "#167d8d", "#d8a24a", "#8ea7ff"]
+    figure = go.Figure()
+    for index, (label, subtitle, color) in enumerate(zip(labels, subtitles, colors)):
+        x0 = 0.06 + index * 0.235
+        x1 = x0 + 0.18
+        figure.add_shape(
+            type="rect",
+            xref="paper",
+            yref="paper",
+            x0=x0,
+            x1=x1,
+            y0=0.34,
+            y1=0.74,
+            fillcolor=color,
+            line={"color": color, "width": 2},
+        )
+        figure.add_annotation(
+            x=(x0 + x1) / 2,
+            y=0.58,
+            xref="paper",
+            yref="paper",
+            text=f"<b>{label}</b><br><span style='font-size:12px'>{subtitle}</span>",
+            showarrow=False,
+            font={"color": "white", "size": 16},
+            align="center",
+        )
+        if index < len(labels) - 1:
+            figure.add_annotation(
+                x=x1 + 0.03,
+                y=0.54,
+                xref="paper",
+                yref="paper",
+                text="->",
+                showarrow=False,
+                font={"color": "#167d8d", "size": 24},
+            )
+    figure.add_annotation(
+        x=0.5,
+        y=0.16,
+        xref="paper",
+        yref="paper",
+        text="Public website = visual prototype surface. Approved well/core rows remain runtime-only.",
+        showarrow=False,
+        font={"color": "#5E6A71", "size": 15},
+    )
+    figure.update_layout(
+        title="Implemented Streamlit website structure",
+        width=1280,
+        height=520,
+        margin={"l": 30, "r": 30, "t": 75, "b": 35},
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        xaxis={"visible": False},
+        yaxis={"visible": False},
+    )
+    return export_plotly(figure, project_asset_path("website_four_page_flow.png"), 1280, 520)
+
+
+def build_evidence_stack_asset() -> Path:
+    path = project_asset_path("subsurface_evidence_stack.png")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    rows = [
+        ("Regional context", "USGS/Collett assessments; public GIS layers", "#67d0df"),
+        ("Stability + reservoir", "P-T admissibility plus sand quality and continuity", "#25b99a"),
+        ("Logs + core", "GR, Rt, density, Vp, Vs, NMR, core labels", "#d8a24a"),
+        ("Decision", "phase, saturation, uncertainty, sweet-spot rank", "#8ea7ff"),
+    ]
+    image = Image.new("RGB", (1280, 620), "white")
+    draw = ImageDraw.Draw(image)
+    try:
+        title_font = ImageFont.truetype("arial.ttf", 34)
+        label_font = ImageFont.truetype("arialbd.ttf", 24)
+        detail_font = ImageFont.truetype("arial.ttf", 22)
+        note_font = ImageFont.truetype("arial.ttf", 21)
+    except OSError:
+        title_font = label_font = detail_font = note_font = ImageFont.load_default()
+
+    draw.text((55, 36), "Source-backed subsurface evidence stack", fill=f"#{NAVY}", font=title_font)
+    y = 115
+    for label, detail, color in rows:
+        rgb = tuple(int(color.lstrip("#")[i : i + 2], 16) for i in (0, 2, 4))
+        fill = tuple(int(255 * 0.78 + channel * 0.22) for channel in rgb)
+        draw.rounded_rectangle((95, y, 1185, y + 82), radius=12, fill=fill, outline=rgb, width=3)
+        draw.text((130, y + 27), label, fill=f"#{NAVY}", font=label_font)
+        draw.text((450, y + 29), detail, fill=f"#{INK}", font=detail_font)
+        if y < 430:
+            draw.line((640, y + 88, 640, y + 112), fill=f"#{TEAL}", width=4)
+            draw.polygon([(640, y + 120), (628, y + 104), (652, y + 104)], fill=f"#{TEAL}")
+        y += 112
+    draw.text(
+        (250, 565),
+        "Maps constrain confidence; logs/core/labels determine interval decisions.",
+        fill=f"#{MUTED}",
+        font=note_font,
+    )
+    image.save(path)
+    return path
+
+
 def build_visual_assets() -> dict[str, Path]:
     ASSET_DIR.mkdir(parents=True, exist_ok=True)
     logs = generate_synthetic_logs()
@@ -180,6 +288,8 @@ def build_visual_assets() -> dict[str, Path]:
         "well_log": build_well_log_asset(logs),
         "metrics": build_ml_metrics_asset(),
         "sweet_spot": build_sweet_spot_asset(logs),
+        "website_flow": build_website_flow_asset(),
+        "evidence_stack": build_evidence_stack_asset(),
     }
 
 
@@ -297,7 +407,7 @@ def build_docx() -> None:
     run.font.size = Pt(20)
     run.font.color.rgb = RGBColor.from_string(NAVY)
 
-    subtitle = doc.add_paragraph("Research-paper outline with filled abstract and introduction")
+    subtitle = doc.add_paragraph("Research-paper outline updated with website visuals and header-derived synthetic-data provenance")
     subtitle.paragraph_format.space_after = Pt(8)
     for run in subtitle.runs:
         run.font.name = "Aptos"
@@ -308,6 +418,7 @@ def build_docx() -> None:
         doc,
         "Boundary: this public-source planning document contains no restricted well logs, approved-runtime data, named restricted well identifiers, populated model results, credentials, or sensitive derived outputs.",
     )
+    add_note(doc, HEADER_DERIVED_SYNTHETIC_NOTE)
 
     doc.add_heading("Abstract", level=1)
     add_body(
@@ -330,7 +441,7 @@ def build_docx() -> None:
     )
     add_body(
         doc,
-        "The project will use all available screenshot-listed fields and NMR where present. The expected input families include depth, location, gamma ray, density, density porosity, neutron porosity, NMR porosity, resistivity, caliper, Vp, Vs, Vp/Vs, acoustic impedance, interpreted hydrate saturation fields such as Sgh or S_h, NMR-derived saturation where supplied, core porosity, permeability, lithology, and quality flags. These variables are scientifically useful only when their roles are controlled. Measured curves, derived features, quality-control fields, alignment fields, and supervised targets must be separated so that the model does not accidentally learn from the answer column it is supposed to predict."
+        "The current public scaffold is based on three Excel header/schema references, not real sample rows. Those headers indicate the expected input families: depth, location, gamma ray, density, density porosity, neutron porosity, NMR porosity, resistivity, caliper, Vp, Vs, Vp/Vs, acoustic impedance, interpreted hydrate saturation fields such as Sgh or S_h, NMR-derived saturation where supplied, core porosity, permeability, lithology, and quality flags. Synthetic rows may be generated from those headers to test layout, validation, and visual behavior, but the generated values are not scientific measurements. These variables are scientifically useful only when their roles are controlled. Measured curves, derived features, quality-control fields, alignment fields, and supervised targets must be separated so that the model does not accidentally learn from the answer column it is supposed to predict."
     )
     add_process_sketch(
         doc,
@@ -346,6 +457,16 @@ def build_docx() -> None:
         "Approved-data processing sketch",
         ["raw logs", "QC", "features", "labels", "ML models", "validated outputs"],
         fill=ICE,
+    )
+    add_process_sketch(
+        doc,
+        "Website visual workflow now implemented",
+        ["Overview", "Explore", "Analyze", "Project Plan"],
+        fill=ICE,
+    )
+    add_body(
+        doc,
+        "The Streamlit website has been reduced to four visual-first pages. It is a prototype and figure-generation surface for the Word document and PowerPoint. It should continue to show only public GIS layers and header-derived synthetic examples until approved data are loaded inside the authorized runtime environment."
     )
     add_body(
         doc,
@@ -396,6 +517,9 @@ def build_docx() -> None:
         "Discussion",
         "This section will interpret the predicted hydrate intervals, compare model behavior against geologic expectations, discuss false positives and ambiguous intervals, and explain how reservoir quality and uncertainty affect sweet-spot ranking.",
     )
+    doc.add_heading("Current Evidence Anchors", level=1)
+    for anchor in SOURCE_ANCHORS:
+        add_body(doc, f"{anchor['claim']}: {anchor['source']} - {anchor['use']}")
     add_placeholder_section(
         doc,
         "Conclusion",
@@ -531,16 +655,15 @@ def build_pptx() -> None:
 
     slide = prs.slides.add_slide(blank)
     add_title(slide, "Introduction: What and Why Gas Hydrates", "A potential natural-gas resource that requires reservoir-scale characterization")
-    add_label(slide, 0.8, 1.28, 3.45, 1.25, "Gas hydrate", "Methane is held inside crystalline water cages in sediment pore space.", SAND)
-    add_label(slide, 0.8, 2.9, 3.45, 1.25, "North Slope value", "USGS assessed a mean of about 53.8 TCF of technically recoverable gas in North Slope hydrate accumulations.")
-    add_label(slide, 0.8, 4.52, 3.45, 1.25, "Characterization goal", "Translate resource potential into interval-scale occurrence, saturation, uncertainty, and sweet-spot evidence.")
-    add_flow(slide, ["stability", "reservoir", "gas charge", "logs/core", "saturation"], x=4.9, y=1.35, box_w=1.34)
-    add_label(slide, 4.9, 3.05, 6.85, 1.4, "Core message", "Stability is necessary but not proof. The project asks whether well logs, NMR, and core evidence jointly support hydrate occurrence and saturation.")
-    add_label(slide, 4.9, 4.92, 6.85, 0.9, "Energy-security framing", "The presentation stays focused on natural-gas resource characterization, not environmental-impact discussion.", SAND)
+    add_label(slide, 0.8, 1.15, 3.45, 1.05, "Gas hydrate", "Methane is held inside crystalline water cages in sediment pore space.", SAND)
+    add_label(slide, 0.8, 2.45, 3.45, 1.05, "North Slope value", "USGS assessed a mean of about 53.8 TCF of technically recoverable gas in North Slope hydrate accumulations.")
+    add_label(slide, 0.8, 3.75, 3.45, 1.05, "Characterization goal", "Translate resource potential into interval-scale occurrence, saturation, uncertainty, and sweet-spot evidence.")
+    add_image(slide, assets["evidence_stack"], 4.75, 1.15, 7.25, 3.35)
+    add_label(slide, 4.95, 4.72, 6.85, 0.9, "Core message", "Stability and maps constrain confidence. Logs, NMR/core labels, and uncertainty determine interval decisions.", SAND)
     add_footer(slide)
 
     slide = prs.slides.add_slide(blank)
-    add_title(slide, "Parameters: Well-Log Scaffold", "Measured curves, derived physics, QC fields, and targets stay separated")
+    add_title(slide, "Parameters: Header-Derived Well-Log Scaffold", "Only Excel header/schema references are available; generated rows are synthetic")
     add_image(slide, assets["well_log"], 5.25, 1.08, 7.45, 4.65)
     for i, (label, body) in enumerate([
         ("Lithology", "GR, core lithology, clean-sand screening"),
@@ -551,8 +674,8 @@ def build_pptx() -> None:
         ("QC", "Caliper, outliers, depth match, missing curves"),
     ]):
         add_label(slide, 0.65, 1.12 + i * 0.78, 4.25, 0.62, label, body, SAND if label == "Targets" else ICE)
-    add_label(slide, 5.45, 5.88, 6.9, 0.65, "Embedded website scaffold", "Synthetic well-log panel with interpretation callouts from the Future Well-Log Engine.")
-    add_footer(slide, "Sources: recovered header screenshots; project Q&A update; Lee and Collett 2011; Haines et al. 2022")
+    add_label(slide, 5.45, 5.88, 6.9, 0.65, "Data provenance", "Header-derived synthetic records only. Values test layout and QA; they are not user-supplied sample data.")
+    add_footer(slide, "Sources: three Excel header references; project Q&A update; Lee and Collett 2011; Haines et al. 2022")
 
     slide = prs.slides.add_slide(blank)
     add_title(slide, "ML Methodology: Architecture", "ANN paper logic adapted into a leakage-controlled well-log workflow")
@@ -569,16 +692,12 @@ def build_pptx() -> None:
     add_footer(slide, "Source anchor: Chong et al. 2022, DOI: 10.1007/s10596-022-10151-9; project runtime requirements map.")
 
     slide = prs.slides.add_slide(blank)
-    add_title(slide, "ML Methodology: Why This Architecture Fits Well Logs", "Depth-indexed curves need both explainable baselines and nonlinear models")
-    add_image(slide, assets["sweet_spot"], 7.0, 1.18, 5.35, 2.65)
-    add_label(slide, 0.75, 1.25, 2.75, 1.0, "Classification branch", "Detect hydrate-supportive intervals or phase classes from multi-log agreement, lithology, and QC context.", SAND)
-    add_label(slide, 3.75, 1.25, 2.75, 1.0, "Regression branch", "Estimate continuous hydrate saturation only from allowed predictors and calibrated targets.")
-    add_label(slide, 0.75, 2.68, 2.75, 1.0, "Linear baseline", "Shows defensible directionality and exposes whether a simple relation is already sufficient.")
-    add_label(slide, 3.75, 2.68, 2.75, 1.0, "Tree/GBM test", "Handles missingness and ranks feature importance without forcing a single curve relationship.", ICE)
-    add_label(slide, 0.75, 4.1, 2.75, 1.0, "ANN/Keras test", "Best fit for nonlinear interactions among Rt, porosity, density, Vp, Vs, GR, and NMR-supported targets.", ICE)
-    add_label(slide, 3.75, 4.1, 2.75, 1.0, "Guardrail", "Do not train on Sgh, phase labels, rankings, or NMR-derived target columns as inputs.", SAND)
-    add_label(slide, 7.05, 4.35, 5.3, 1.0, "Decision logic", "Use the ANN only if it improves held-out-well performance beyond explainable baselines and stays geologically reasonable.")
-    add_footer(slide, "Sources: Chong et al. 2022; USGS/NETL hydrate well-log studies; project target-leakage rules.")
+    add_title(slide, "Website Integration: Four-Page Visual Workflow", "Streamlit is a public-source prototype and figure-generation surface")
+    add_image(slide, assets["website_flow"], 0.95, 1.12, 11.25, 3.25)
+    add_label(slide, 0.95, 4.82, 3.45, 0.95, "Overview", "Project goal, data-to-decision pipeline, and evidence stack.", SAND)
+    add_label(slide, 4.72, 4.82, 3.45, 0.95, "Analyze Hydrates", "Header-derived synthetic log board, target guardrail, runtime readiness.", ICE)
+    add_label(slide, 8.48, 4.82, 3.45, 0.95, "Project Plan", "Built now versus approved-data activation, blockers, deliverables.", ICE)
+    add_footer(slide, "Public website remains synthetic/public-source only; legacy eight-page links route into the four current pages.")
 
     slide = prs.slides.add_slide(blank)
     add_title(slide, "Geomechanical Feature Sketch", "Rock-physics parameters help evaluate hydrate-consistent stiffness")

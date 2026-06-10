@@ -111,8 +111,9 @@ The current project design is:
   cohort;
 - the model predicts classification and saturation for the remaining
   approximately 80% of wells;
-- NMR and all screenshot-listed fields are available for the future approved-data
-  workflow;
+- NMR and all screenshot-listed fields are expected for the future approved-data
+  workflow based on the header references; actual data rows are not yet in this
+  repository;
 - both phase classification and continuous hydrate saturation are required;
 - normalized percentages and values from multiple log and physics variables
   will provide the evidence, rather than one universal cutoff.
@@ -167,8 +168,9 @@ Public source:
 3. Confirm the exact supplied, NMR-derived, interpreted, or core-calibrated
    saturation field, phase-label field, lithology field, and uncertain/expert-review
    convention for the known wells.
-4. Extend the implemented synthetic Runtime Readiness view with workbook-derived
-   units and core-log alignment rules after the workbook is recovered.
+4. Extend the implemented synthetic Runtime Readiness view with header-derived
+   units and core-log alignment rules, then replace assumptions only after the
+   workbook and formulas are recovered.
 5. Extend the implemented grouped-well split scaffold into reproducible
    baseline and ANN evaluation code after target labels are confirmed.
 6. Generate reusable visual components for the PowerPoint and Word document:

@@ -19,11 +19,11 @@ def test_sweet_spot_review_table_is_ranked_and_explainable() -> None:
 
 def test_sweet_spot_page_renders() -> None:
     app = AppTest.from_file("streamlit_app.py", default_timeout=30)
-    app.query_params["page"] = "North Slope Sweet Spots"
+    app.query_params["page"] = "Analyze Hydrates"
     app.run(timeout=30)
 
     assert not app.exception
-    assert app.title[0].value == "North Slope Gas-Hydrate Sweet Spots"
+    assert app.title[0].value == "Analyze Hydrates"
     assert [metric.label for metric in app.metric[:4]] == [
         "Synthetic intervals",
         "Review-lane candidates",
@@ -31,7 +31,16 @@ def test_sweet_spot_page_renders() -> None:
         "Good sand, no hydrate",
     ]
     metric_labels = [metric.label for metric in app.metric]
-    assert "Primary public references" in metric_labels
-    assert "Indexed project artifacts" in metric_labels
-    assert "Source groups" in metric_labels
+    assert "Input status" in metric_labels
+    assert "Ready outputs" in metric_labels
+    assert "Blocked outputs" in metric_labels
     assert len(app.dataframe) >= 1
+
+
+def test_legacy_sweet_spots_query_routes_to_analyze_hydrates() -> None:
+    app = AppTest.from_file("streamlit_app.py", default_timeout=30)
+    app.query_params["page"] = "North Slope Sweet Spots"
+    app.run(timeout=30)
+
+    assert not app.exception
+    assert app.title[0].value == "Analyze Hydrates"

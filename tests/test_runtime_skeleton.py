@@ -123,11 +123,11 @@ def test_source_driven_readiness_and_grouped_split_contracts() -> None:
 
 def test_log_scaffold_renders_source_driven_runtime_readiness() -> None:
     app = AppTest.from_file("streamlit_app.py", default_timeout=30)
-    app.query_params["page"] = "Log Scaffold"
+    app.query_params["page"] = "Analyze Hydrates"
     app.run(timeout=30)
 
     assert not app.exception
-    assert app.title[0].value == "Log Scaffold"
+    assert app.title[0].value == "Analyze Hydrates"
     metric_labels = [metric.label for metric in app.metric]
     assert "Input status" in metric_labels
     assert "Ready outputs" in metric_labels
@@ -140,8 +140,9 @@ def test_legacy_future_engine_query_routes_to_log_scaffold() -> None:
     app.run(timeout=30)
 
     assert not app.exception
-    assert app.title[0].value == "Log Scaffold"
-    assert app.caption[0].value == "Formerly listed as Future Well-Log Engine."
+    assert app.title[0].value == "Analyze Hydrates"
+    assert "SYNTHETIC DEMONSTRATION DATA" in app.warning[0].value
+    assert "Header-derived synthetic records only" in app.warning[0].value
 
 
 def test_project_cohort_plan_uses_known_wells_for_development_and_rest_for_prediction() -> None:

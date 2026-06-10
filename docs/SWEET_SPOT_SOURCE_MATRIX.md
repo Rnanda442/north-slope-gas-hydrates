@@ -66,3 +66,11 @@ Every scientific relationship shown publicly should be traceable to at least one
 verified primary source. Working thresholds, ranges, and scores must remain
 marked synthetic until calibrated against the recovered workbook and authorized
 well-log and core data.
+
+## Header-Derived Synthetic Data Rule
+
+The current synthetic well-log rows are generated records used to exercise the
+workflow and visuals. They are not samples from the user's Excel files. The
+Excel material currently provides header/schema references only, so public
+sample values must remain visibly synthetic until approved runtime data are
+loaded in the authorized environment.

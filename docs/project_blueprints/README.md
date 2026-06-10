@@ -13,21 +13,24 @@ wireline machine-learning project.
   - Focuses on measured variables, derived equations, staged classification,
     machine-learning design, expected outputs, and results/discussion structure.
 - `North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.docx`
-  - Research-paper-style overview generated and revised on 2026-06-09.
+  - Research-paper-style overview regenerated on 2026-06-10.
   - Frames gas hydrates as an energy-resource characterization and energy-security
-    project, with NMR and all screenshot-listed fields treated as available.
+    project, with the current public scaffold clearly marked as header-derived
+    synthetic records from three Excel header/schema references.
   - Current version fills the abstract and introduction, then keeps Parameters,
     Methodology, Machine-Learning Framework, Error and Validation, Discussion,
     and Conclusion as outline sections for future approved-data results.
 - `North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`
-  - Nine-slide visual companion deck revised on 2026-06-09 from emailed
-    instructions.
+  - Nine-slide visual companion deck regenerated on 2026-06-10 from emailed
+    instructions and the implemented four-page website redesign.
   - Current version embeds generated website/scaffold visuals from
     `presentation_assets/`.
   - The ML-methodology slides now explain the Chong et al. ANN source paper,
     the project-specific classification/regression split, target-leakage
-    guardrails, and complete-well validation. The map slide uses the current
-    Streamlit Structural Explorer asset and links to the live app.
+    guardrails, complete-well validation, header-derived synthetic-data
+    provenance, the source-backed evidence stack, and the current four-page
+    Streamlit website workflow. The map slide uses the current Streamlit
+    Structural Explorer asset and links to the live app.
 - `build_research_overview_deliverables.py`
   - Reproducible builder for the new Word and PowerPoint deliverables.
 

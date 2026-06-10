@@ -4,23 +4,26 @@ Last updated: 2026-06-09
 
 ## Purpose
 
-Translate the recovered Excel header screenshots into explicit requirements for
-the synthetic well-log scaffold and future authorized runtime.
+Translate the recovered Excel header references into explicit requirements for
+the header-derived synthetic well-log scaffold and future authorized runtime.
 
-The screenshots are layout and schema references only. Their numerical values
-were normalized by the user and must not be treated as original well
-measurements, scientific calibration values, or model-training records.
+Only header/schema information is available from the user's Excel references.
+No real well-log rows, core rows, or calibrated target values were supplied.
+Any sample rows used by the website or tests must be generated synthetic
+records built from the visible headers, units, schema roles, and scientific
+source logic.
 
 ## Source References
 
-The header specification was derived from six normalized screenshots attached
-to the user's self-sent Gmail message `IMages of well headers no source leakage`
-on 2026-06-08.
+The header specification was derived from three Excel header references supplied
+as normalized screenshots in the user's self-sent Gmail message
+`IMages of well headers no source leakage` on 2026-06-08.
 
 The screenshots are intentionally not stored in Git or displayed on the public
 website. This document is the durable public-safe derivative: it records only
 header names, units, schema roles, formatting concepts, and unresolved
-questions.
+questions. Synthetic example records may be generated from this schema, but
+they are not user-supplied sample data.
 
 ## Header Architecture
 
@@ -99,8 +102,8 @@ machine-learning sampling interval.
 | H6 | Preserve source resistivity mnemonics while mapping confirmed deep-resistivity channels | Loaders/config | Unconfirmed `A090`/`AF90` mappings remain review items |
 | H7 | Report source sampling, aligned depth, matching method, and offset | Alignment/core calibration | Refined outputs retain traceable source-to-ML depth correspondence |
 | H8 | Display the four-level header meaning in the synthetic scaffold | Streamlit well-log engine | Users can see role, mnemonic, unit, and description |
-| H9 | Treat normalized screenshot values as non-scientific layout examples only | Tests/docs/public site | No screenshot values are ingested into calculations or training |
-| H10 | Add representative synthetic cases for unit conversion, aliases, alignment, and target leakage | Tests | Each requirement has at least one focused test |
+| H9 | Treat the Excel references as header/schema sources only | Tests/docs/public site | No screenshot values or implied real samples are ingested into calculations or training |
+| H10 | Add representative header-derived synthetic cases for unit conversion, aliases, alignment, and target leakage | Tests | Each requirement has at least one focused synthetic test |
 | H11 | Fit normalization and imputation on training wells only | Modeling pipeline | Validation, locked-test, and prediction wells never influence fitted preprocessing |
 
 ## Proposed Track Groups
@@ -143,4 +146,5 @@ Ground-truth or calibration tracks should be visually isolated from ML inputs.
     for blind evaluation?
 
 These questions should be resolved from the workbook, formulas, or supporting
-documentation before changing scientific calculations.
+documentation before changing scientific calculations. Until then, generated
+sample rows are only schema-exercising synthetic records.

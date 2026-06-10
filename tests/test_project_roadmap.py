@@ -44,23 +44,27 @@ def test_markdown_table_parses_workstreams() -> None:
 
 def test_project_roadmap_page_renders() -> None:
     app = AppTest.from_file("streamlit_app.py", default_timeout=30)
-    app.query_params["page"] = "Project Roadmap"
+    app.query_params["page"] = "Project Plan"
     app.run(timeout=30)
 
     assert not app.exception
-    assert app.title[0].value == "Project Vision, Goals & Next Steps"
-    assert [(metric.label, metric.value) for metric in app.metric[:3]] == [
-        ("Primary outputs", "Detection + saturation"),
-        ("Presentation target", "~8 visual slides"),
-        ("Validation unit", "Held-out wells"),
-    ]
-    assert [(metric.label, metric.value) for metric in app.metric[3:]] == [
+    assert app.title[0].value == "Project Plan"
+    assert [(metric.label, metric.value) for metric in app.metric[:4]] == [
         ("Workstreams", "10"),
         ("Active", "6"),
         ("Waiting / blocked", "2"),
         ("Complete", "1"),
     ]
     assert len(app.dataframe) == 2
+
+
+def test_legacy_project_roadmap_query_routes_to_project_plan() -> None:
+    app = AppTest.from_file("streamlit_app.py", default_timeout=30)
+    app.query_params["page"] = "Project Roadmap"
+    app.run(timeout=30)
+
+    assert not app.exception
+    assert app.title[0].value == "Project Plan"
 
 
 def test_roadmap_cards_include_next_activity_and_dependency() -> None:
