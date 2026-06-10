@@ -13,7 +13,8 @@ wireline machine-learning project.
   - Focuses on measured variables, derived equations, staged classification,
     machine-learning design, expected outputs, and results/discussion structure.
 - `North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.docx`
-  - Research-paper-style overview regenerated on 2026-06-10.
+  - Research-paper-style overview reintegrated on 2026-06-10 from the updated
+    Gmail-sent DOE copy.
   - Frames gas hydrates as an energy-resource characterization and energy-security
     project, with the current public scaffold clearly marked as header-derived
     synthetic records from three Excel header/schema references.
@@ -21,8 +22,8 @@ wireline machine-learning project.
     Methodology, Machine-Learning Framework, Error and Validation, Discussion,
     and Conclusion as outline sections for future approved-data results.
 - `North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`
-  - Nine-slide visual companion deck regenerated on 2026-06-10 from emailed
-    instructions and the implemented four-page website redesign.
+  - Nine-slide visual companion deck reintegrated on 2026-06-10 from the updated
+    Gmail-sent DOE copy and the implemented four-page website redesign.
   - Current version embeds generated website/scaffold visuals from
     `presentation_assets/`.
   - The ML-methodology slides now explain the Chong et al. ANN source paper,
@@ -31,6 +32,11 @@ wireline machine-learning project.
     provenance, the source-backed evidence stack, and the current four-page
     Streamlit website workflow. The map slide uses the current Streamlit
     Structural Explorer asset and links to the live app.
+- `DOE_sent_UPDATED_North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.docx`
+  and `DOE_sent_UPDATED_North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview_Slides.pptx`
+  - Source copies recovered from the user's Gmail sent message to the DOE account
+    on 2026-06-10.
+  - Kept as provenance inputs for the tracked integrated DOCX/PPTX above.
 - `build_research_overview_deliverables.py`
   - Reproducible builder for the new Word and PowerPoint deliverables.
 

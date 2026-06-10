@@ -255,3 +255,6 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-10: Rebuilt the research-overview Word document and nine-slide
   PowerPoint with the four-page website workflow, source anchors, subsurface
   evidence stack, and header-derived synthetic-data provenance.
+- 2026-06-10: Recovered the user's updated Gmail-sent DOE Word document and
+  PowerPoint, then reintegrated the tracked deliverables from those copies with
+  the latest website visuals and header-derived synthetic-data boundary.
