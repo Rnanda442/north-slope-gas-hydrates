@@ -373,6 +373,83 @@ def render_processing_sketch(
         text("target leakage barrier", w * 0.68 + 12, h * 0.23, 11, colors.red, "left");
       }}
 
+      function drawMLArchitecture(t, w, h) {{
+        const lanes = payload.lanes || [];
+        const compact = w < 760;
+        text("ML Knowledge Graph", w / 2, 32, 22);
+        text("headers -> equations -> model heads -> review outputs", w / 2, 60, 12, colors.muted);
+        const left = compact ? 26 : 44;
+        const top = compact ? 88 : 95;
+        const colW = compact ? (w - 52) : (w - 88) / Math.max(1, lanes.length);
+        const rowH = compact ? 90 : 230;
+        lanes.forEach((lane, i) => {{
+          const x = compact ? left : left + i * colW;
+          const y = compact ? top + i * rowH : top;
+          const boxW = compact ? colW : colW - 18;
+          const boxH = compact ? 74 : 218;
+          roundRect(x, y, boxW, boxH, 8, "rgba(242,245,246,0.07)", lane.color);
+          text(lane.label, x + boxW / 2, y + 20, compact ? 11 : 12, lane.color, "center", 800);
+          (lane.nodes || []).forEach((node, j) => {{
+            const nx = x + boxW / 2;
+            const ny = y + 48 + j * (compact ? 0 : 48);
+            const nodeY = compact ? y + 48 : ny;
+            if (compact && j > 0) return;
+            roundRect(nx - boxW * 0.38, nodeY - 13, boxW * 0.76, 26, 7, "rgba(11,37,51,0.76)", lane.color);
+            const label = compact ? (lane.nodes || []).join(" | ") : node;
+            text(label, nx, nodeY, compact ? 9 : 10, colors.white);
+          }});
+          if (i > 0) {{
+            if (compact) arrow(w / 2, y - 12, w / 2, y - 2, colors.muted);
+            else arrow(x - 18, y + boxH / 2, x - 2, y + boxH / 2, colors.muted);
+          }}
+        }});
+        const bx = compact ? w - 58 : w * 0.51;
+        const by = compact ? h - 78 : h - 70;
+        ctx.strokeStyle = colors.red;
+        ctx.lineWidth = 3;
+        ctx.setLineDash([8, 6]);
+        ctx.beginPath();
+        if (compact) {{
+          ctx.moveTo(42, by);
+          ctx.lineTo(w - 42, by);
+        }} else {{
+          ctx.moveTo(bx, 84);
+          ctx.lineTo(bx, h - 88);
+        }}
+        ctx.stroke();
+        ctx.setLineDash([]);
+        text(payload.barrier || "target labels cannot become features", compact ? w / 2 : bx + 12, compact ? by + 24 : 86, compact ? 10 : 11, colors.red, compact ? "center" : "left");
+      }}
+
+      function drawDecisionTree(t, w, h) {{
+        const nodes = payload.nodes || payload || [];
+        text("Hydrate Interpretation Decision Tree", w / 2, 32, 22);
+        text("each gate preserves uncertainty instead of forcing a hydrate label", w / 2, 60, 12, colors.muted);
+        const compact = w < 700;
+        const x = compact ? w * 0.5 : w * 0.36;
+        const startY = 92;
+        const gap = compact ? 58 : 64;
+        nodes.forEach((node, i) => {{
+          const y = startY + i * gap;
+          roundRect(x - 126, y - 20, 252, 40, 8, "rgba(242,245,246,0.08)", node.color);
+          text(node.label, x, y, compact ? 11 : 12, colors.white, "center", 800);
+          if (i < nodes.length - 1) arrow(x, y + 22, x, y + gap - 22, colors.teal);
+          const nx = compact ? x : w * 0.74;
+          const ny = compact ? y + 25 : y;
+          if (!compact) {{
+            arrow(x + 130, y, nx - 104, ny, colors.red);
+            roundRect(nx - 100, ny - 16, 200, 32, 8, "rgba(214,106,106,0.12)", colors.red);
+            text(node.no || "review", nx, ny, 10, colors.white);
+          }}
+        }});
+        if (compact) {{
+          text("No branches become review, exclude, or uncertainty lanes.", w / 2, h - 28, 11, colors.muted);
+        }} else {{
+          text("No branch", w * 0.74, 82, 11, colors.red, "center", 800);
+          text("Yes branch continues downward", x, h - 30, 11, colors.teal);
+        }}
+      }}
+
       function drawCohort(t, w, h) {{
         text("Whole-Well Validation", w / 2, 34, 22);
         const split = payload.split || [];
@@ -429,6 +506,8 @@ def render_processing_sketch(
         else if (sketch === "structure_stack") drawStructure(t, w, h);
         else if (sketch === "well_evidence") drawWellEvidence(t, w, h);
         else if (sketch === "target_boundary") drawBoundary(t, w, h);
+        else if (sketch === "ml_architecture") drawMLArchitecture(t, w, h);
+        else if (sketch === "decision_tree") drawDecisionTree(t, w, h);
         else if (sketch === "cohort_split") drawCohort(t, w, h);
         else if (sketch === "built_next") drawBuiltNext(t, w, h);
         else if (sketch === "blocks") drawBlocks(t, w, h);

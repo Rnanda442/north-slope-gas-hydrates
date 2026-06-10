@@ -2,6 +2,7 @@
 __pycache__/
 *.zip
 .venv-dashboard/
+.codex_runtime/
 data_runtime/
 outputs_runtime/
 models_runtime/

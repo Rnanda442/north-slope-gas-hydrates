@@ -139,6 +139,8 @@ It must not load or expose authorized well-log or core data.
   reducing the recovered 12-slide scaffold to the requested eight-slide deck
 - `docs/WEBSITE_VISUAL_REDESIGN_PLAN.md`: approved pre-implementation plan for
   reducing navigation, rebuilding the overview, and specifying each visual
+- `docs/ML_VISUAL_ARCHITECTURE_PLAN.md`: source-backed plan for ML knowledge
+  graph, hydrate decision tree, target-leakage barrier, and validation visuals
 - `docs/WELL_LOG_REQUIREMENTS_MAP.md`: screenshot-derived header schema,
   scaffold requirements, track groups, and unresolved questions
 - `docs/SWEET_SPOT_SCIENCE_BASIS.md`: research-backed directional relationships,
@@ -258,3 +260,6 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-10: Recovered the user's updated Gmail-sent DOE Word document and
   PowerPoint, then reintegrated the tracked deliverables from those copies with
   the latest website visuals and header-derived synthetic-data boundary.
+- 2026-06-10: Added ML visual architecture planning and implemented Processing-style
+  website sketches for a header-to-model knowledge graph and staged hydrate
+  interpretation decision tree.

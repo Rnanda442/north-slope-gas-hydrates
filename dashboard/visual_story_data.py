@@ -121,6 +121,72 @@ TARGET_BOUNDARY = [
 ]
 
 
+ML_ARCHITECTURE = {
+    "lanes": [
+        {
+            "label": "Excel header roles",
+            "nodes": ["measured logs", "QC + alignment", "targets"],
+            "color": "#67d0df",
+        },
+        {
+            "label": "Canonical runtime fields",
+            "nodes": ["GR, Rt, RHOB", "NMR, Vp, Vs", "depth match"],
+            "color": "#25b99a",
+        },
+        {
+            "label": "Equation features",
+            "nodes": ["porosity + Vsh", "Vp/Vs, AI", "lambda-rho, mu-rho"],
+            "color": "#d8a24a",
+        },
+        {
+            "label": "Model heads",
+            "nodes": ["phase class", "Sgh regression", "uncertainty"],
+            "color": "#8ea7ff",
+        },
+        {
+            "label": "Review outputs",
+            "nodes": ["hydrate?", "how much?", "how reliable?"],
+            "color": "#f2f5f6",
+        },
+    ],
+    "barrier": "Sgh, NMR_SAT, phase labels, and rankings are labels only",
+}
+
+
+HYDRATE_DECISION_TREE = [
+    {
+        "label": "QC pass?",
+        "yes": "stable?",
+        "no": "review / exclude",
+        "color": "#d8a24a",
+    },
+    {
+        "label": "GHSZ stable?",
+        "yes": "reservoir?",
+        "no": "unlikely hydrate",
+        "color": "#67d0df",
+    },
+    {
+        "label": "Clean reservoir?",
+        "yes": "multi-log evidence?",
+        "no": "non-reservoir or shale",
+        "color": "#25b99a",
+    },
+    {
+        "label": "Rt + NMR + Vp/Vs agree?",
+        "yes": "classify + regress Sgh",
+        "no": "gas / ice / lithology / uncertainty",
+        "color": "#8ea7ff",
+    },
+    {
+        "label": "Core or interpreted target?",
+        "yes": "calibrate confidence",
+        "no": "flag prediction-only",
+        "color": "#f2f5f6",
+    },
+]
+
+
 COHORT_SPLIT = [
     {"label": "Known wells", "count": 14, "color": "#67d0df"},
     {"label": "Train", "count": 8, "color": "#25b99a"},

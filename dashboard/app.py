@@ -57,7 +57,9 @@ from dashboard.visual_story_data import (
     EVIDENCE_DOMAINS,
     EVIDENCE_STACK,
     HEADER_DERIVED_SYNTHETIC_NOTE,
+    HYDRATE_DECISION_TREE,
     LAYER_SUMMARY,
+    ML_ARCHITECTURE,
     MISSION_OUTCOMES,
     PIPELINE_STAGES,
     SOURCE_ANCHORS,
@@ -1463,6 +1465,7 @@ def render_future_engine() -> None:
     tabs = st.tabs(
         [
             "Runtime Readiness & ML Plan",
+            "ML Visual Architecture",
             "Variable Range Explorer",
             "Header & Track Blueprint",
             "Sweet-Spot Evidence Model",
@@ -1476,20 +1479,22 @@ def render_future_engine() -> None:
     with tabs[0]:
         render_runtime_readiness(logs)
     with tabs[1]:
-        render_variable_range_explorer(logs)
+        render_ml_visual_architecture()
     with tabs[2]:
-        render_header_blueprint()
+        render_variable_range_explorer(logs)
     with tabs[3]:
-        render_sweet_spot_evidence_model(intervals)
+        render_header_blueprint()
     with tabs[4]:
-        render_equation_decision_map()
+        render_sweet_spot_evidence_model(intervals)
     with tabs[5]:
-        render_range_guide()
+        render_equation_decision_map()
     with tabs[6]:
-        render_interval_screen(intervals)
+        render_range_guide()
     with tabs[7]:
-        render_core_calibration(calibrated_core)
+        render_interval_screen(intervals)
     with tabs[8]:
+        render_core_calibration(calibrated_core)
+    with tabs[9]:
         render_presentation_outputs(logs, intervals, calibrated_core)
 
     st.markdown("### Planned Runtime Analysis Sequence")
@@ -1594,6 +1599,72 @@ def render_runtime_readiness(logs: pd.DataFrame) -> None:
     else:
         st.markdown("#### Input Issues")
         st.dataframe(issues, use_container_width=True, hide_index=True)
+
+
+def render_ml_visual_architecture() -> None:
+    st.subheader("ML Visual Architecture")
+    st.caption(
+        "A source-backed visual map from the Excel header roles through equations, "
+        "model branches, and decision outputs."
+    )
+    render_processing_sketch(
+        "ml_architecture",
+        ML_ARCHITECTURE,
+        "Header-to-Model Knowledge Graph",
+        "Concrete headers and equations stay attached to every model output.",
+        height=430,
+    )
+    st.warning(
+        "Target fields such as hydrate saturation, NMR-derived saturation, phase "
+        "labels, and sweet-spot rankings are labels or review outputs. They cannot "
+        "be fitted as input features."
+    )
+    render_processing_sketch(
+        "decision_tree",
+        {"nodes": HYDRATE_DECISION_TREE},
+        "Hydrate Interpretation Decision Tree",
+        "The model should preserve no-hydrate, gas, bad-hole, and uncertainty branches.",
+        height=430,
+    )
+    cols = st.columns(2)
+    with cols[0]:
+        st.markdown("#### Visual Contract")
+        st.dataframe(
+            pd.DataFrame(
+                [
+                    {
+                        "Visual": "Knowledge graph",
+                        "Source basis": "Excel header roles; Chong feature set; equation library",
+                        "Reader takeaway": "Inputs, features, labels, and outputs are separate.",
+                    },
+                    {
+                        "Visual": "Decision tree",
+                        "Source basis": "Sweet-spot science basis; interpretation rules",
+                        "Reader takeaway": "Hydrate is assigned only after staged evidence survives.",
+                    },
+                    {
+                        "Visual": "Whole-well split",
+                        "Source basis": "Runtime validation plan",
+                        "Reader takeaway": "Models are tested on unseen wells, not adjacent rows.",
+                    },
+                ]
+            ),
+            use_container_width=True,
+            hide_index=True,
+        )
+    with cols[1]:
+        st.markdown("#### Concrete Feature Families")
+        st.dataframe(
+            pd.DataFrame(
+                [
+                    {"Family": "Measured", "Fields": "GR, Rt, RHOB, NMR, Vp, Vs, caliper", "Use": "Model inputs after QC"},
+                    {"Family": "Derived", "Fields": "Vsh, density porosity, Vp/Vs, acoustic impedance, lambda-rho, mu-rho", "Use": "Physics-backed features"},
+                    {"Family": "Targets", "Fields": "Sgh, S_h, NMR_SAT, phase class, sweet-spot rank", "Use": "Supervision or review only"},
+                ]
+            ),
+            use_container_width=True,
+            hide_index=True,
+        )
 
 
 def render_variable_range_explorer(logs: pd.DataFrame) -> None:
@@ -2059,6 +2130,7 @@ def render_analyze_hydrates() -> None:
             )
         render_runtime_readiness(logs)
     with tabs[2]:
+        render_ml_visual_architecture()
         render_source_anchors()
         with st.expander("Header and track blueprint", expanded=True):
             render_header_blueprint()
