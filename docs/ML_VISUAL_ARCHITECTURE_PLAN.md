@@ -20,19 +20,36 @@ outputs.
 
 | Visual | Best surface | Source basis | Reader takeaway |
 |---|---|---|---|
-| Header-to-model knowledge graph | Website, PowerPoint architecture slide | Excel header roles, Chong feature set, runtime equations | Measured logs, derived physics, targets, model heads, and outputs are separate layers |
+| Parameter signal grid | PowerPoint parameter slide, Word methods figure | Excel headers, equations, source-backed hydrate responses | Each parameter has a physical meaning, a hydrate-supportive side, and masking conditions |
+| Header-to-model architecture map | PowerPoint architecture slide | Excel header roles, Chong feature set, runtime equations, user-approved hybrid reference style | Measured logs, derived physics, targets, model heads, and outputs are separate layers |
 | Hydrate interpretation decision tree | Website, methods slide, Word methodology section | Sweet-spot science basis and scientific rules | Hydrate classification happens after QC, stability, reservoir, and multi-log evidence gates |
 | Target-leakage barrier | Website, ML slide | Header map target contract | `Sgh`, `S_h`, `NMR_SAT`, phase labels, and rankings are labels or outputs, not inputs |
 | Whole-well validation split | Website, validation slide | Runtime validation plan | Future model performance must be tested on unseen wells, not random neighboring depth rows |
 | Feature-family matrix | Website table, appendix, methods doc | Header map and runtime schemas | Each curve family has a scientific role, model role, and unresolved workbook question |
 
+## User-Approved Revamp Decisions
+
+- Use a hybrid style: dark MLOps architecture visuals plus cleaner scientific
+  parameter visuals.
+- Build one packed parameter slide with icons and horizontal signal lines.
+- Use a two-level architecture: readable overview first, then detailed decision
+  map.
+- Treat classification and saturation regression as parallel branches from
+  shared physics-backed features.
+- Build the plan first, then rebuild the PowerPoint.
+
+The governing planning artifact is now
+`docs/ML_PARAMETER_TREE_AND_DECK_REVAMP_PLAN.md`, and the machine-readable
+parameter/effect matrix is
+`docs/project_blueprints/ml_parameter_effect_tree.csv`.
+
 ## Knowledge Graph Contract
 
-Analytical question: How do the Excel headers and equations become machine
-learning outputs without hiding scientific meaning?
+Analytical question: How do the Excel headers, equations, and masking
+conditions become machine-learning outputs without hiding scientific meaning?
 
-Takeaway: The model architecture is a layered graph, not a single black-box
-arrow.
+Takeaway: The model architecture is a physical-evidence map, not a generic
+nodes-and-edges pipeline.
 
 Nodes:
 
@@ -47,6 +64,10 @@ Nodes:
 Required visual rule: Draw a visible leakage barrier between target columns and
 feature columns. Target labels may calibrate or supervise; they cannot become
 training inputs.
+
+Required masking rule: Every major parameter visual must show at least one
+non-hydrate condition that can produce a similar response, such as gas, ice,
+carbonate, shale, bad-hole response, or overburden compaction.
 
 ## Decision Tree Contract
 

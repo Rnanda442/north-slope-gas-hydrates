@@ -141,6 +141,8 @@ It must not load or expose authorized well-log or core data.
   reducing navigation, rebuilding the overview, and specifying each visual
 - `docs/ML_VISUAL_ARCHITECTURE_PLAN.md`: source-backed plan for ML knowledge
   graph, hydrate decision tree, target-leakage barrier, and validation visuals
+- `docs/ML_PARAMETER_TREE_AND_DECK_REVAMP_PLAN.md`: user-approved revamp plan
+  for parameter signal visuals, masking trees, ML architecture, and deck order
 - `docs/WELL_LOG_REQUIREMENTS_MAP.md`: screenshot-derived header schema,
   scaffold requirements, track groups, and unresolved questions
 - `docs/SWEET_SPOT_SCIENCE_BASIS.md`: research-backed directional relationships,
@@ -263,3 +265,7 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-10: Added ML visual architecture planning and implemented Processing-style
   website sketches for a header-to-model knowledge graph and staged hydrate
   interpretation decision tree.
+- 2026-06-10: Incorporated the user's new revamp instructions: prioritize the
+  Word/PPT deliverables, create parameter signal/masking trees before deck
+  rebuild, use a hybrid dark/clean visual style, and treat classification and
+  saturation regression as parallel branches.
