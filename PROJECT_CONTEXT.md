@@ -91,11 +91,11 @@ Current public views:
 - Welcome
 - Project Roadmap
 - North Slope Sweet Spots
+- Log Scaffold
 - Regional Atlas
 - Structural Explorer
 - Data Library
 - Research Framework
-- Future Well-Log Engine
 
 The hosted website must remain a public-source atlas and synthetic demonstration.
 It must not load or expose authorized well-log or core data.
@@ -241,3 +241,6 @@ blockers, and next activities in the architecture/activity map.
   with Chong et al. ANN architecture context, classification/regression
   branches, target-leakage guardrails, complete-well validation, and the current
   Streamlit Structural Explorer 3D map asset plus live-app link.
+- 2026-06-09: Re-exposed the website well-log scaffold as a first-class
+  `Log Scaffold` page, kept the old `Future Well-Log Engine` query alias, and
+  added a visible welcome-page link.

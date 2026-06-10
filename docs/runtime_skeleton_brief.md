@@ -64,7 +64,7 @@ behind the scenes.
 
 ## Implemented Readiness View
 
-The `Runtime Readiness & ML Plan` tab inside the Future Well-Log Engine now
+The `Runtime Readiness & ML Plan` tab inside the website `Log Scaffold` page now
 shows:
 
 - required and optional curve coverage;

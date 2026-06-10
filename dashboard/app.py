@@ -118,12 +118,18 @@ PAGES = [
     "Welcome",
     "Project Roadmap",
     "North Slope Sweet Spots",
+    "Log Scaffold",
     "Regional Atlas",
     "Structural Explorer",
     "Data Library",
     "Research Framework",
-    "Future Well-Log Engine",
 ]
+
+PAGE_ALIASES = {
+    "Future Well-Log Engine": "Log Scaffold",
+    "Well-Log Engine": "Log Scaffold",
+    "Well Log Scaffold": "Log Scaffold",
+}
 
 LAYER_CATALOG = [
     {
@@ -690,6 +696,7 @@ def render_sidebar() -> str:
         st.caption("Public-source regional workspace")
         st.markdown("---")
         requested_page = st.query_params.get("page", PAGES[0])
+        requested_page = PAGE_ALIASES.get(requested_page, requested_page)
         if requested_page not in PAGES:
             requested_page = PAGES[0]
         page = st.radio(
@@ -740,7 +747,7 @@ def render_welcome(files: list[dict[str, object]]) -> None:
     render_metric_row(files)
 
     st.markdown("### Start Here")
-    cols = st.columns(3)
+    cols = st.columns(4)
     cards = [
         (
             "Explore the regional context",
@@ -757,12 +764,18 @@ def render_welcome(files: list[dict[str, object]]) -> None:
             "Use the Research Framework to keep maps, measurements, future ML, "
             "and producibility logic tied to one scientific chain.",
         ),
+        (
+            "Open the log scaffold",
+            "Use the Log Scaffold to inspect synthetic well-log tracks, runtime "
+            "readiness, target controls, and presentation exports.",
+        ),
     ]
     for col, (title, text) in zip(cols, cards):
         col.markdown(
             f'<div class="atlas-card"><h4>{title}</h4><p>{text}</p></div>',
             unsafe_allow_html=True,
         )
+    st.markdown("[Open Log Scaffold](?page=Log%20Scaffold)")
 
     st.markdown("### What This Atlas Is For")
     st.write(
@@ -1256,7 +1269,8 @@ def render_framework() -> None:
 
 def render_future_engine() -> None:
     st.markdown('<div class="atlas-kicker">Synthetic planning scaffold</div>', unsafe_allow_html=True)
-    st.title("Future Well-Log Engine")
+    st.title("Log Scaffold")
+    st.caption("Formerly listed as Future Well-Log Engine.")
     st.write(
         "This presentation-ready scaffold previews the outputs planned for the later "
         "runtime-only analysis module. It contains synthetic example records only."
@@ -1694,6 +1708,8 @@ def main() -> None:
         render_project_roadmap()
     elif page == "North Slope Sweet Spots":
         render_sweet_spot_page()
+    elif page == "Log Scaffold":
+        render_future_engine()
     elif page == "Regional Atlas":
         render_regional_atlas()
     elif page == "Structural Explorer":
@@ -1703,7 +1719,7 @@ def main() -> None:
     elif page == "Research Framework":
         render_framework()
     else:
-        render_future_engine()
+        render_framework()
 
     st.divider()
     st.caption(

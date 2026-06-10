@@ -94,9 +94,11 @@ Streamlit Community Cloud.
 - `Structural Explorer`: generated North Slope 3D structural scenes
 - `Data Library`: curated layer metadata and a filterable repository inventory
 - `Research Framework`: manuscript-backed interpretation chain and decision rules
-- `Future Well-Log Engine`: synthetic planning scaffold for the later runtime-only
-  approved well-log analysis, including variable ranges, interpretation guidance,
-  interval screening, core-calibration placeholders, and presentation exports
+- `Log Scaffold`: synthetic planning scaffold for the later runtime-only
+  approved well-log analysis, including variable ranges, runtime readiness,
+  target controls, interval screening, core-calibration placeholders, and
+  presentation exports. The old `Future Well-Log Engine` URL parameter still
+  routes here.
 
 ## Current Data Layout
 
