@@ -16,7 +16,7 @@ or reusable code-rendered visuals help explain the research workflow.
 
 | Deliverable | Current local file | Current role |
 |---|---|---|
-| PowerPoint | `docs/project_blueprints/North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx` | Current nine-slide raster-panel deck |
+| PowerPoint | `docs/project_blueprints/CURRENT_GMAIL_VISUAL_REVISION_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-11.pptx` | Current nine-slide Gmail visual revision deck |
 | Word document | `docs/project_blueprints/North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.docx` | Current research overview document |
 | Slide builder | `docs/project_blueprints/build_ml_revamp_powerpoint.py` | Rebuilds the deck from generated slide panels |
 | Slide visual builder | `docs/project_blueprints/build_processing_slide_assets.py` | Builds Processing-style raster visuals |
@@ -24,6 +24,11 @@ or reusable code-rendered visuals help explain the research workflow.
 
 Current Drive slide deck reference:
 `https://docs.google.com/presentation/d/1irTOw1wSGSMkQmUrHp33XPKykfgHNjbQANKyDkbv3H4/edit`
+
+Current Gmail slide source:
+Gmail message `19eba86da8752830`, subject `New pressy`, sent 2026-06-12
+01:30 CDT. The attached file was copied into this repo as
+`docs/project_blueprints/CURRENT_GMAIL_VISUAL_REVISION_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-11.pptx`.
 
 ## Files In This Base
 

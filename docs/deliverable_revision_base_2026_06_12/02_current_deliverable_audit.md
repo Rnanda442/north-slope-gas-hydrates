@@ -5,19 +5,29 @@ Created: 2026-06-12
 ## PowerPoint Audit
 
 Local file:
-`docs/project_blueprints/North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`
+`docs/project_blueprints/CURRENT_GMAIL_VISUAL_REVISION_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-11.pptx`
+
+Source:
+
+- Gmail message `19eba86da8752830`
+- Subject: `New pressy`
+- Sent: 2026-06-12 01:30 CDT
+- Original local copy: `C:\Users\gargi\Downloads\GMAIL VISUAL REVISION 9-SLIDE North Slope Gas Hydrate Slides 2026-06-11.pptx`
 
 Current structure:
 
 - 9 slides.
-- Each slide is a full-slide raster panel.
-- The inspected deck has 1 image shape per slide and 0 native text shapes.
+- Verified locally as a valid PPTX.
+- Treat this Gmail deck as the latest user-approved slide starting point.
+- The older tracked `North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`
+  remains useful as provenance and builder output, but it is not the first deck
+  to revise.
 
 Implementation implication:
 
 - Do not plan normal PowerPoint text-box edits as the primary workflow.
 - Slide changes should be made in the code-rendered panel assets, then rebuilt
-  into the PPTX.
+  into the PPTX unless the user specifically requests quick native edits.
 - The main slide asset generator is
   `docs/project_blueprints/build_processing_slide_assets.py`.
 - The deck assembly builder is

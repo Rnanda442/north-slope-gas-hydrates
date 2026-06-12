@@ -88,6 +88,14 @@ The deck should be visual and source-backed. The current deck is raster-panel
 based, so edits should go through the builders and generated panels rather than
 manual native slide text-box edits.
 
+Current slide authority:
+
+- `docs/project_blueprints/CURRENT_GMAIL_VISUAL_REVISION_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-11.pptx`
+- Source: Gmail message `19eba86da8752830`, subject `New pressy`, sent
+  2026-06-12 01:30 CDT.
+- Use this deck first for slide review and revision. Older tracked decks and
+  builder outputs are context unless the user requests a scripted rebuild.
+
 Required slide roles:
 
 | Slide | Role |
@@ -186,8 +194,9 @@ Edit these directly:
 2. Should the deck stay exactly nine slides?
 3. Should slide 1 include personal/about-me visuals in the repo, or only in
    Drive/local copies?
-4. Should the current PPTX be tracked in Git, or should Git track only builders,
-   source manifests, and public-safe exported panels?
+4. Resolved 2026-06-12: the Gmail visual revision PPTX is tracked in Git as the
+   current slide authority. Builders, source manifests, and public-safe exported
+   panels remain tracked as provenance/rebuild support.
 5. Is the work order correct: Word first, slides second, website third?
 6. Should the website remain mostly app/runtime skeleton for now?
 7. Are the primary outputs correct: occurrence, saturation, uncertainty, and

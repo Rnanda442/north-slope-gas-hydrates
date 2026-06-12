@@ -30,7 +30,7 @@ wireline machine-learning project.
   - Imported to the connected Google Drive account on 2026-06-11 as
     [ENRICHED ML PIPELINE North Slope Gas Hydrate Research Overview 2026-06-11](https://docs.google.com/document/d/1V3kZuu4euP6IhHwfnwscAh7RxDAqWMNu2tEf7wC_pW4).
 - `North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`
-  - Final 9-slide visual companion deck rebuilt on 2026-06-11 from the latest
+  - Prior tracked 9-slide visual companion deck rebuilt on 2026-06-11 from the latest
     Drive review feedback and imported to Drive as
     `FINAL CLASSIFICATION-METHODS ML VISUAL REVISION North Slope Gas Hydrate
     Slides 2026-06-11`.
@@ -49,6 +49,16 @@ wireline machine-learning project.
   - The deck remains public-safe: it uses public sources, equation/header
     references, and conceptual/sample visuals only, not real approved well rows
     or trained model outputs.
+- `CURRENT_GMAIL_VISUAL_REVISION_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-11.pptx`
+  - Current slide authority as of the user's 2026-06-12 clarification.
+  - Copied from `C:\Users\gargi\Downloads\GMAIL VISUAL REVISION 9-SLIDE North
+    Slope Gas Hydrate Slides 2026-06-11.pptx`.
+  - Email source: Gmail message `19eba86da8752830`, subject `New pressy`, sent
+    2026-06-12 01:30 CDT.
+  - Verified locally as a valid 9-slide PPTX.
+  - Use this deck as the starting point for slide review and edits. Treat the
+    older tracked PPTX and builder outputs as context/provenance unless the user
+    explicitly chooses to rebuild from the script.
 - `build_ml_revamp_powerpoint.py`
   - Reproducible builder for the current 9-slide visual-first ML parameter
     architecture PowerPoint.

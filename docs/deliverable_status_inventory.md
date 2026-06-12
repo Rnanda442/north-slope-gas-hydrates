@@ -82,10 +82,20 @@ Supporting docs:
 
 ## Slides
 
-Tracked slide deliverable:
+Current slide authority:
+
+- `docs/project_blueprints/CURRENT_GMAIL_VISUAL_REVISION_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-11.pptx`
+  - Current slide starting point, per user clarification on 2026-06-12.
+  - Copied from the Gmail-sourced local deck:
+    `C:\Users\gargi\Downloads\GMAIL VISUAL REVISION 9-SLIDE North Slope Gas Hydrate Slides 2026-06-11.pptx`.
+  - Email source: Gmail message `19eba86da8752830`, subject `New pressy`, sent
+    2026-06-12 01:30 CDT.
+  - Verified as a valid 9-slide PPTX.
+
+Prior tracked slide deliverable:
 
 - `docs/project_blueprints/North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`
-  - Current tracked PowerPoint deliverable path.
+  - Older tracked PowerPoint deliverable path.
   - The live working Drive deck has been repeatedly imported as native Google
     Slides during the June 2026 revision passes.
 
@@ -109,9 +119,10 @@ Local-only slide assets intentionally ignored:
 
 Slide status:
 
-- The deck is tracked, but the current local PPTX may include personal slide-1
-  content and should not be recommitted until the user decides whether that
-  material belongs in Git or stays Drive/local only.
+- The Gmail visual revision deck is now tracked and should be opened first for
+  slide review.
+- The prior deck and script-generated panels remain useful as provenance and
+  rebuild tools, but they are not the latest user-approved slide starting point.
 - The next slide pass should follow
   `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md` and
   `docs/deliverable_revision_base_2026_06_12/`.
