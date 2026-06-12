@@ -157,9 +157,9 @@ Screenshot review notes:
 - The `MTE_refined` and `IGS_refined` screenshots show `Sgh` / hydrate saturation tied to depth correspondence.
 - Working interpretation for now: the target family is hydrate saturation, but the exact column name depends on sheet/well/source context. Preserve original headers and document equivalences rather than renaming them away.
 - The screenshots are enough to document the header/schema families and sheet/tab
-  names. They are not enough to prove workbook identity, so public deliverables
-  should refer to the current real files as `Dataset 1`, `Dataset 2`, and
-  `Dataset 3`.
+  names. They are not the actual datasets. Do not spend project energy naming
+  datasets in public deliverables; the useful evidence is the header structure,
+  equations, official project wording, and target-field roles.
 - The visible sheet/tab names include `MTE`, `IGS`, `MTE_refined`, and
   `IGS_refined`. Treat these as evidence of raw/refined table structure until
   the user can safely describe the full workbook organization.
@@ -219,7 +219,14 @@ Use these screenshots as official DOE project-origin language. Rewrite for clari
 
 ## Main Scientific Gap
 
-Before major Word/PPT/site edits, build a parameter logic and source matrix.
+Before major Word/PPT/site edits, identify the real source-backed science logic
+for each parameter from the header screenshots and equations. This should become
+a high-level Word section first, then a more detailed parameter/source matrix.
+
+The project should not begin by making fake data. The project should begin by
+explaining why each logged property matters, what can distort it, and how a
+machine-learning pipeline should use it without making unsupported hydrate
+claims.
 
 That matrix should answer for each parameter:
 
@@ -228,6 +235,7 @@ That matrix should answer for each parameter:
 - What is the expected public/source-backed range?
 - What change might support hydrate?
 - What false positives could create the same response?
+- What external factors can change the reading without proving hydrate?
 - What does it become in the ML feature table?
 - Is it measured, derived, QC-only, context, or label/target?
 - Which source supports the statement?
@@ -246,6 +254,20 @@ Priority parameters:
 - Vp/Vs;
 - impedance;
 - hydrate saturation / `Sgh` target family.
+
+External factors to explicitly discuss:
+
+- overburden and effective stress;
+- pressure-temperature stability;
+- lithology and shale content;
+- clean sand versus shale/carbonate/coal/ice/cement effects;
+- gas versus hydrate ambiguity;
+- salinity and formation water assumptions;
+- borehole washout and caliper quality;
+- compaction and porosity loss with depth;
+- core-to-log depth mismatch;
+- missing NMR or missing shear sonic;
+- tool/mnemonic differences across sheets.
 
 ## Equations To Preserve
 
@@ -351,11 +373,16 @@ Before each commit:
 
 Recommended next build:
 
-1. Create `docs/PARAMETER_LOGIC_AND_SOURCE_MATRIX.md`.
-2. Fill it with the parameter table, equation table, target-role table, and source links.
-3. Use that matrix to rewrite the Word document.
-4. Use the revised Word logic to revise the 9-slide Gmail deck.
-5. Use the revised Word/slide logic to update the website skeleton.
+1. Review the header screenshots, equation screenshots, DOE project overview
+   screenshots, citation packet, and source-library index.
+2. Create a high-level Word-ready parameter science section: what each
+   screenshot parameter measures, why it matters for gas hydrate, and what
+   external factors can mimic or distort the signal.
+3. Then create `docs/PARAMETER_LOGIC_AND_SOURCE_MATRIX.md` as the detailed
+   working table behind the Word/slides/website.
+4. Use that logic to rewrite the Word document.
+5. Use the revised Word logic to revise the 9-slide Gmail deck.
+6. Use the revised Word/slide logic to update the website skeleton.
 
 ## Questions For User
 
@@ -383,8 +410,8 @@ Remaining questions before the next major build.
 - Headers: preserve the screenshot/origin headers in the scaffold and deliverables.
 - DOE project overview screenshots: official wording/evidence.
 - Next build: yes, create the parameter logic/source matrix before Word/PPT.
-- Current real files: refer to them publicly as `Dataset 1`, `Dataset 2`, and
-  `Dataset 3`.
+- Dataset naming: not important right now because we only have headers, not the
+  datasets. Do not foreground dataset names.
 - Occurrence and saturation: yes, the DOE overview explicitly specifies both.
 - Sweet spot: wait to define fully until the parameter logic and external-factor
   reasoning are built.
