@@ -18,11 +18,11 @@ in priority. Do not record every small edit.
 
 Create a scientifically defensible North Slope gas-hydrate research system with:
 
-- a public regional GIS and research website;
-- a synthetic well-log demonstration;
-- an authorized runtime for real well-log and core inputs;
-- reproducible classification, uncertainty, plots, and exports;
-- aligned manuscript and presentation deliverables.
+- a public regional GIS and research website; this webiste needs to be private if we are gonna put classified data on it. the main goal is the slides and document the website is kinda of anothe rmiddle man to store skelton structurs that i can bring into the doe virtual desktop into anaconda to like put the datasets in and then run thhe system. i can run jupyter notebook on anaconda so geting thhe vs code stuff is fine probably. i also have access to antigravity its like a agentic ai helper.
+- a synthetic well-log demonstration; that is more the end product of our logical reasoning to each paramters ranges and changes that describe gas hydrates. thhat was the visual i dea i came up with for one of the slides to describe how hydrates are being identified in the nort slpe of alska does that make snese?
+- an authorized runtime for real well-log and core inputs; im not sure what means like run time whhat do you mean?
+- reproducible classification, uncertainty, plots, and exports;  yes! thats whhat the website is for to put a bunch of skeletons in there.
+- aligned manuscript and presentation deliverables. for sure
 
 ## System Architecture
 

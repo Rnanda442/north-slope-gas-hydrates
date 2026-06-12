@@ -154,34 +154,39 @@ and runtime skeleton:
   truth.
 - GIS/map context is screening context; logs and core decide interval evidence.
 
+these scientific proofs are not held down by evidence and are not proofs, we need actual proof of this. and ranges and numbers and reasoning.
+
 ## ML Commitments
 
 - Use complete-well or compartment holdouts, not random depth-row validation as
-  the final standard.
+  the final standard. yes 
 - Fit normalization, imputation, feature selection, and calibration on training
-  wells only.
+  wells only. it should be for all the data but your not getting acess to the data cus its clasified, what we are dooing is building what i need to bring bakc into the doe virtual desktop and im giving you the bare minimum for the builds and the paper and stuff, the results and everything will be done later by me personally cuz i cant share the data, but in the meantime i have the equations, the headers to the ecells seets where thedata we are getting is stored and ive normalized them except for the depth. Like the screenshots contain thhe project overview too so that should help withh readjustments hhere.
 - Keep target-derived fields out of predictors.
-- Use baselines for comparison before advanced models.
-- Do not report project model metrics until approved-data validation exists.
-- Use Chong et al. (2022) as the direct gas-hydrate/well-log ML anchor.
-- Use Singh et al. (2021) and Chong et al. (2024) as comparative ML method
+im not sure what means i think we the excells we will get will have the target areas but we also need to know from the equations and hhow gas hydrates are constrained the areas where hydrates are valid. all those variables count for now in the training i think and the targeet variables in the test is what we are testing for yes.
+- Use baselines for comparison before advanced models. i meann i dont think we are running any models here itself unless we create 71 csvs of fake data to test on. tat would be crazy.
+- Do not report project model metrics until approved-data validation exists. im not sure what this means
+- Use Chong et al. (2022) as the direct gas-hydrate/well-log ML anchor. yes this paper is essential for making the diagrams and visuals and explaining the pipeline ml structure 
+- Use Singh et al. (2021) and Chong et al. (2024) as comparative ML method yes thhis one too
   support, not North Slope field truth.
+
+
 
 ## Data Boundary
 
 Public repository and public Drive deliverables may include:
 
-- Public GIS context.
+- Public GIS context. yea on open science lab my virtual desktop storing all that data
 - Public USGS/DOE/NETL source references.
 - Synthetic examples.
-- Empty runtime schemas/adapters.
+- Empty runtime schemas/adapters. 
 - Source-backed diagrams and planning documents.
 
 Public repository and public Drive deliverables must not include:
 
-- Approved or restricted LAS/CSV/core rows.
-- Named restricted well identifiers.
-- Populated runtime configs.
+- Approved or restricted LAS/CSV/core rows. yea im just giving header data at the moment i dont plan to give any actual information out. so i wanna be able to either make a fake group of data sets with duplicate header formats and reasonable numbers to test. i think the main thing will be explaining the exact ranges for eachh paramter and whhy. and not just ranges but changes and what they represetnt in the north slope first. this should be done first. 
+- Named restricted well identifiers. yea itll just be like dataset 1 dataset2 dataset 3 i have the real names and we will mapp them to the 3d structural explorer when we can but not right now.
+- Populated runtime configs. not sure hwaat the rest means
 - Trained models.
 - Runtime logs or derived sensitive outputs.
 - Personal visual assets unless the user explicitly approves public tracking.
@@ -190,35 +195,35 @@ Public repository and public Drive deliverables must not include:
 
 Edit these directly:
 
-1. Is the one-sentence project goal correct?
-2. Should the deck stay exactly nine slides?
+1. Is the one-sentence project goal correct? the project overview screenshots is the exact overview of the project.
+2. Should the deck stay exactly nine slides? yes the deck has to stay nine slides 
 3. Should slide 1 include personal/about-me visuals in the repo, or only in
-   Drive/local copies?
-4. Resolved 2026-06-12: the Gmail visual revision PPTX is tracked in Git as the
+   Drive/local copies? the about me has to be there thhe new sldie deck we have you havnt seenn it yer but it starts with "gmail" its in google slides and just pushed into the repo is good structure jjust bad specifics and format and syntax that we will fix.
+4. Resolved 2026-06-12: the Gmail visual revision PPTX is tracked in Git as the 
    current slide authority. Builders, source manifests, and public-safe exported
-   panels remain tracked as provenance/rebuild support.
-5. Is the work order correct: Word first, slides second, website third?
-6. Should the website remain mostly app/runtime skeleton for now?
+   panels remain tracked as provenance/rebuild support. yep
+5. Is the work order correct: Word first, slides second, website third? yep
+6. Should the website remain mostly app/runtime skeleton for now? yea everythhig should be skeletons thhat i can bring into doe anaconda environment from emailing it from my personal account to my doe account and opening it in anaconda and then like uploading the real data for it to run. 
 7. Are the primary outputs correct: occurrence, saturation, uncertainty, and
-   review/sweet-spot screening?
-8. Are any sources, equations, or ML claims missing before the next build?
+   review/sweet-spot screening? yes 
+8. Are any sources, equations, or ML claims missing before the next build? not sure but l diragram and pipeline needs to be fixed. 
 
 ## What Is Still Not Ready
 
 - Full Excel workbook and formulas are not yet recovered in this official
-  folder.
-- Authoritative hydrate-saturation target is not confirmed.
-- Phase labels and uncertain-label conventions are not confirmed.
+  folder.  i sent an email with the screenshot and they should stored i nthe giithub push for access for both the laptop(this one) and PC
+- Authoritative hydrate-saturation target is not confirmed. yea we need to use the equations and the sources for hydrates to first constrain  hydrates quanitatively. based on real sccience, and try to account for all the ecternal facters that could affect the parameters, and then we need to check hhow our logics line up withh the data since we do have gas hydrate saturaturation and the target variables for the datasets. 
+- Phase labels and uncertain-label conventions are not confirmed.  yea they are not we need to build them with our paramter logiccs too
 - Known-label, validation, locked-test, and prediction well lists are not
-  confirmed.
-- Approved-data model metrics do not exist yet.
-- Public-safe policy for slide-1 personal visual assets needs user decision.
+  confirmed. no i only have access to 3/71 datasets right now so i cant really give you that stuff. i do hhave the welll names for the 3 data sets and i would be able to give you that. 
+- Approved-data model metrics do not exist yet.  yea we need to build those
+- Public-safe policy for slide-1 personal visual assets needs user decision. i made te first slide for the newest slide version so slide one is ready. the rest of te slides are not.
 
 ## Acceptance Criteria Before Next Major Edit
 
 Proceed to Word/PPT changes only when:
 
-- This direction file has been reviewed or accepted.
+- This direction file has been reviewed or accepted. 
 - Source roles are clear.
 - Data-boundary rules are accepted.
 - The slide count and slide roles are accepted.
