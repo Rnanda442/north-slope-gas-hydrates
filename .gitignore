@@ -12,3 +12,9 @@ configs_local/
 references/well-log-spreadsheet/*.png
 references/well-log-spreadsheet/*.jpg
 references/well-log-spreadsheet/*.jpeg
+# Local-only personal and Gmail-derived presentation references.
+docs/project_blueprints/presentation_assets/rohan_profile_photo.jpg
+docs/project_blueprints/presentation_assets/processing_revisions_2026_06_11/slide_01_about_me.png
+docs/project_blueprints/presentation_assets/processing_revisions_2026_06_11/processing_panel_contact_sheet.jpg
+references/presentation-revision-2026-06-11/gmail-2026-06-11/
+references/presentation-revision-2026-06-11/drive-thumbnails-2026-06-12/

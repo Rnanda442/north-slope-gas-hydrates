@@ -18,27 +18,45 @@ wireline machine-learning project.
   - Frames gas hydrates as an energy-resource characterization and energy-security
     project, with the current public scaffold clearly marked as header-derived
     synthetic records from three Excel header/schema references.
-  - Current version fills the abstract and introduction, then keeps Parameters,
-    Methodology, Machine-Learning Framework, Error and Validation, Discussion,
-    and Conclusion as outline sections for future approved-data results.
+  - Current version fills the abstract and introduction, then expands Parameters,
+    Methodology, Machine-Learning Framework, Error and Validation, and Discussion
+    with the same parameter signal, masking, target-leakage, normalization,
+    complete-well validation, and overburden-context logic used in the rebuilt
+    ML architecture deck. The 2026-06-11 local refresh also adds the recovered
+    ML-source specifics: Chong et al.'s five-well ANN saturation workflow,
+    approved-data feature-table controls, train-only preprocessing, model
+    ladder, calibration, residual review, and data-quality/drift checks.
+    Results-bearing claims remain placeholders until approved-data execution.
+  - Imported to the connected Google Drive account on 2026-06-11 as
+    [ENRICHED ML PIPELINE North Slope Gas Hydrate Research Overview 2026-06-11](https://docs.google.com/document/d/1V3kZuu4euP6IhHwfnwscAh7RxDAqWMNu2tEf7wC_pW4).
 - `North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`
-  - Twelve-slide visual companion deck rebuilt on 2026-06-10 from the latest
-    Drive PowerPoint export.
-  - Current version reduces text and emphasizes parameter signal bars,
-    conceptual importance weights, parameter masking/effect trees, a dark
-    MLOps-style ML architecture, classification and saturation-regression
-    branches, overburden-map context, and predicted sweet-spot review outputs.
+  - Final 9-slide visual companion deck rebuilt on 2026-06-11 from the latest
+    Drive review feedback and imported to Drive as
+    `FINAL CLASSIFICATION-METHODS ML VISUAL REVISION North Slope Gas Hydrate
+    Slides 2026-06-11`.
+  - Current version restores the older nine-slide topic sequence, restores the
+    profile photo, keeps parameter measurement/caveat/model-role logic on
+    one-slide surfaces, connects named ML feature equations to the visual model
+    workflow, explains model-family rationale and error modes using the
+    Classification Methods Draft, Chong et al. (2022), and the broader ML
+    research-paper draft, and ends with the public-safe output/next-work
+    summary.
+  - The 2026-06-11 local refresh keeps exactly 9 slides and enriches the
+    parameter, ML architecture, model-rationale, and results/discussion slides
+    using the recovered Gmail ML sources in `references/ml-sources/2026-06-11/`.
+  - Imported to the connected Google Drive account on 2026-06-11 as
+    [ENRICHED 9-SLIDE ML PIPELINE North Slope Gas Hydrate Slides 2026-06-11](https://docs.google.com/presentation/d/1jazq9ZLc6G9DlM2n6QZq9rKsjDcBuw-3KrTZb4-kzJ0).
   - The deck remains public-safe: it uses public sources, equation/header
     references, and conceptual/sample visuals only, not real approved well rows
     or trained model outputs.
 - `build_ml_revamp_powerpoint.py`
-  - Reproducible builder for the current visual-first ML parameter architecture
-    PowerPoint.
+  - Reproducible builder for the current 9-slide visual-first ML parameter
+    architecture PowerPoint.
   - Uses the latest Drive export as a local base when present, but can rebuild
     the tracked deck from a blank 16:9 presentation using
     `ml_parameter_effect_tree.csv`.
 - `ml_parameter_effect_tree.csv`
-  - Machine-readable public-safe parameter/effect/masking matrix and conceptual
+  - Machine-readable public-safe parameter/effect/caveat matrix and conceptual
     importance weighting for the rebuilt deck.
 - `DOE_sent_UPDATED_North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.docx`
   and `DOE_sent_UPDATED_North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview_Slides.pptx`
@@ -46,7 +64,11 @@ wireline machine-learning project.
     on 2026-06-10.
   - Kept as provenance inputs for the tracked integrated DOCX/PPTX above.
 - `build_research_overview_deliverables.py`
-  - Reproducible builder for the new Word and PowerPoint deliverables.
+  - Reproducible builder for the current Word deliverable.
+  - The default script entry point now regenerates the DOCX only so it does not
+    overwrite the visual-first ML deck. The legacy PPTX helper remains in the
+    file for reference, but the current deck should be rebuilt with
+    `build_ml_revamp_powerpoint.py`.
 
 ## Direction
 

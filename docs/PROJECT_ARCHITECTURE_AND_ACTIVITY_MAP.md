@@ -1,6 +1,6 @@
 # Project Architecture and Activity Map
 
-Last updated: 2026-06-10
+Last updated: 2026-06-12
 
 ## Purpose
 
@@ -77,8 +77,8 @@ The public website must never load authorized runtime data.
 | Authorized runtime | `dashboard/runtime/` | Source-driven readiness and grouped-well split scaffold implemented | Complete workbook-derived input mapping and model evaluation |
 | Well-log tests | `tests/` | 23 project tests passing | Expand with workbook-derived unit, label, and alignment cases |
 | GIS pipeline | notebooks and `03_data_final/` | Recovered | Validate only when GIS changes are needed |
-| Manuscript | `docs/project_blueprints/` | Two drafts recovered; new crisp research-overview Word deliverable generated | Reconcile with equations and final workflow after approved labels are confirmed |
-| Presentation | Latest Drive PowerPoint exported, rebuilt into a 12-slide visual-first ML parameter architecture deck, and imported back to Drive | In progress | Align the deck with approved-data results and figures when available |
+| Manuscript | `docs/project_blueprints/` | Two drafts recovered; research-overview Word deliverable aligned with the ML parameter, masking, target-leakage, normalization, overburden-context, and complete-well validation logic | Reconcile with equations and final workflow after approved labels are confirmed |
+| Presentation | Current baseline is the public-safe Gmail visual-feedback 9-slide revision rebuilt from `docs/project_blueprints/build_ml_revamp_powerpoint.py` and imported to Drive as `GMAIL VISUAL REVISION 9-SLIDE North Slope Gas Hydrate Slides 2026-06-11`; slide 2 now uses the approved SEM-first, source-backed gas-hydrate redraw with corrected chemistry symbology, P-T stability gate, and North Slope context. The deliverable base in `docs/deliverable_revision_base_2026_06_12/` now consolidates source coverage, email rules, current audits, format rules, and slide/Word alignment for the next pass. | In progress | Align the deck with workbook formulas, approved-data figures, and final Word text when available |
 | Excel design | Header screenshots recovered; workbook missing | Partial | Confirm formulas, units, and mnemonics from the workbook |
 | Source library | Index recovered; full library incomplete | Partial | Recover and inventory public sources |
 | Git history | Connected and synchronized with GitHub | Complete | Preserve the normal commit-and-push workflow |
@@ -88,7 +88,7 @@ The public website must never load authorized runtime data.
 | ID | Workstream | Status | Immediate activity | Dependency | Completion signal |
 |---|---|---|---|---|---|
 | W1 | Recover project artifacts | In progress | Collect the full Excel workbook, remaining manuscript variants, and source files; the header screenshots and PowerPoint are recovered | Access to other laptop | Recovery inventory is complete |
-| W2 | Organize source intake | Waiting | Classify recovered files as public, synthetic, or restricted and place them appropriately | W1 | Every recovered file has a location and classification |
+| W2 | Organize source intake | Waiting | Classify recovered files as public, synthetic, or restricted and place them appropriately; the June 11 Gmail ML sources are stored and documented in `references/ml-sources/2026-06-11/` | W1 | Every recovered file has a location and classification |
 | W3 | Extract Excel requirements | In progress | Confirm the three-header-reference map against workbook formulas, units, tool mnemonics, and alignment logic; generated samples remain synthetic only | Full workbook recovery | Approved requirements map is complete |
 | W4 | Gap analysis | Waiting | Compare spreadsheet requirements with the current engine and runtime package | W3 | Missing and existing capabilities are listed |
 | W5 | Implement well-log scaffold | In progress | Runtime Readiness, source-derived QC, target contracts, and grouped-well split planning are implemented and exposed as the website `Log Scaffold` page; next add workbook-derived mapping and baseline evaluation | W3, W4 | Requirements are implemented with tests |
@@ -96,7 +96,7 @@ The public website must never load authorized runtime data.
 | W7 | Scientific alignment | Partial | Reconcile equations and interpretation rules across code, manuscript, and presentation | W1, W3, W5 | No material scientific contradictions remain |
 | W8 | Git and project stabilization | Complete | Keep local `main` synchronized with `origin/main` and preserve focused commits | None | Clean history, remote, and documented workflow |
 | W9 | Authorized-data execution | Future | Configure approved runtime and run real-data validation only in the authorized environment | W5, authorization | Reproducible authorized outputs exist |
-| W10 | Word and PowerPoint deliverables | In progress | Rebuilt the PowerPoint from the latest Drive deck export with a packed parameter signal slide, parameter masking/effect trees, and a two-level ML architecture, then imported it back to Drive; next align the Word document | W3, W5, W7 | Both deliverables use the verified workflow, figures, terminology, and validation plan |
+| W10 | Word and PowerPoint deliverables | In progress | Use `docs/deliverable_revision_base_2026_06_12/` as the controlling base for the next Word/PPT revision; it folds in Gmail instructions, current deliverable audits, source registry, format rules, and the slide-to-Word matrix. Add the comparative ML source tier, then update the Word builder before the slide builder | W3, W5, W7 | Both deliverables use the verified workflow, figures, terminology, and validation plan |
 
 Status vocabulary: `Ready`, `In progress`, `Waiting`, `Blocked`, `Partial`,
 `Complete`, or `Future`.
@@ -135,9 +135,9 @@ After recovery, create `docs/WELL_LOG_REQUIREMENTS_MAP.md` containing:
 ### Priority 3: Implement, Validate, and Build Deliverables
 
 Use the requirements map to make focused code changes, add tests, and visually
-inspect the Streamlit workflow. Build reusable figures for the Word document and
-reduce the recovered PowerPoint scaffold toward the requested approximately
-eight-slide visual presentation.
+inspect the Streamlit workflow. Keep the Word document and the corrected
+9-slide PowerPoint deck synchronized as workbook formulas, target provenance,
+and approved-data figures become available.
 
 ## Blockers and Risks
 
@@ -157,8 +157,11 @@ eight-slide visual presentation.
 4. Build the well-log requirements map.
 5. Perform the code-to-requirements gap analysis.
 6. Extend the implemented Runtime Readiness and grouped-well split scaffolds with workbook-derived rules and baseline models.
-7. Build the parameter signal/masking matrix and two-level ML architecture plan.
-8. Align the Word document with the same parameter/masking and ML architecture.
+7. Use `docs/deliverable_revision_base_2026_06_12/` to revise the Word document
+   first, then the nine-slide deck, so source claims, ML pipeline explanation,
+   format rules, and visual language stay synchronized.
+8. Keep the Word and PowerPoint deliverables synchronized as workbook formulas,
+   approved labels, and final figures become available.
 9. Polish and deploy the implemented four-page Processing-style website redesign.
 10. Run complete website visual QA.
 11. Keep the architecture tracker, tests, commits, and hosted deployment synchronized.
@@ -206,3 +209,16 @@ eight-slide visual presentation.
 | 2026-06-10 | Added ML visual architecture sketches | Created a source-backed ML visual plan and added Processing-style header-to-model knowledge graph and hydrate decision-tree sketches to the active Analyze Hydrates workflow |
 | 2026-06-10 | Recorded the user-approved deck revamp direction | Shifted priority back to Word/PPT, added a parameter signal and masking-tree plan, and created a machine-readable parameter/effect matrix for the upcoming PowerPoint rebuild |
 | 2026-06-10 | Rebuilt the latest Drive PowerPoint as a visual ML architecture deck | Generated a 12-slide public-safe PPTX with parameter signal bars, conceptual importance weights, masking/effect trees, MLOps-style architecture maps, parallel classification/regression branches, and overburden/sweet-spot review visuals; imported it to Drive as `REVAMPED June 10 North Slope Gas Hydrate ML Parameter Architecture Slides` |
+| 2026-06-10 | Aligned the Word deliverable with the ML deck revamp | Regenerated the research-overview DOCX from the reproducible builder using the same parameter/effect matrix, expanded the methodology and ML validation sections, preserved the website/source-integration section, and changed the builder default so it no longer overwrites the current ML deck |
+| 2026-06-11 | Corrected the Drive deck to the requested 9-slide final revision | Added `docs/NINE_SLIDE_POWERPOINT_REVISION_WORKFLOW.md`, rebuilt the parameter matrix with measurement/caveat/model-role language, restored the profile photo on slide 1, added named ML feature equations including acoustic impedance and NMR-density separation, regenerated the local PPTX, imported the verified native Google Slides deck as `FINAL 9-SLIDE REVISION North Slope Gas Hydrate ML Parameter Architecture Slides 2026-06-11`, and confirmed 23 tests passed |
+| 2026-06-11 | Restored the older deck topic sequence with stronger ML visuals | Rebuilt the local PPTX and imported the verified native Google Slides deck as `FINAL TOPIC-ALIGNED ML VISUAL REVISION North Slope Gas Hydrate Slides 2026-06-11`; the deck keeps exactly 9 slides, restores the older slide topics, keeps the profile photo, and connects equations, feature logic, complete-well splits, target-leakage prevention, classification/regression branches, and error review in the ML section |
+| 2026-06-11 | Folded the Classification Methods Draft into the final deck | Regenerated and imported `FINAL CLASSIFICATION-METHODS ML VISUAL REVISION North Slope Gas Hydrate Slides 2026-06-11`; the verified 9-slide deck keeps the older topic sequence while adding six interpretation gates, well/compartment validation, model-ladder rationale, probability calibration, reason-code outputs, and results/discussion review flags |
+| 2026-06-11 | Recovered and integrated the latest Gmail ML sources | Added `s10596-022-10151-9.pdf` and `ML_Project_Reference_and_CreditScoreV4_Case_Notes.docx` to `references/ml-sources/2026-06-11/`, documented their public-safe source roles, enriched the fixed 9-slide local deck builder, and expanded the Word builder with Chong et al. ANN workflow details plus leakage-safe preprocessing, data-quality, validation, calibration, residual, and drift-monitoring controls |
+| 2026-06-11 | Imported the enriched deliverables to Google Drive | Imported the enriched local DOCX and PPTX into the connected Google Drive account as native files named `ENRICHED ML PIPELINE North Slope Gas Hydrate Research Overview 2026-06-11` and `ENRICHED 9-SLIDE ML PIPELINE North Slope Gas Hydrate Slides 2026-06-11`; Drive readback verified both files exist and the Slides deck contains exactly 9 slides |
+| 2026-06-11 | Prepared the slide 1-6 visual revision package | Added `references/presentation-revision-2026-06-11/` with public-domain USGS image assets, the current Streamlit structural explorer asset, a source manifest, reusable parameter icon registry, slide-by-slide plan, and detailed change prompt for the next PowerPoint pass |
+| 2026-06-11 | Executed the all-slide visual revision and Drive upload | Rebuilt the local 9-slide PPTX with about-me/title polish, current Streamlit structural explorer, public gas-hydrate and log-image assets, parameter symbol chips, corrected QC-gate ML architecture, behavior panels, geomechanical sketch, results visuals, and conclusion graphics; imported it as native Google Slides named `FINAL VISUAL REVISION 9-SLIDE North Slope Gas Hydrate Slides 2026-06-11`; Drive metadata/readback verified a native 9-slide deck and Google-rendered thumbnails were checked for all slides |
+| 2026-06-12 | Executed the latest Gmail visual-feedback deck pass | Recovered the user's latest Gmail instructions and inline visual references, generated nine source-backed Processing-style raster panels, rebuilt the local PPTX, imported it to Drive as native Google Slides named `GMAIL VISUAL REVISION 9-SLIDE North Slope Gas Hydrate Slides 2026-06-11`, verified Drive metadata/readback plus large thumbnails for all nine slides, and confirmed 23 project tests pass |
+| 2026-06-12 | Scoped the next deck edit to slide 2 | Added `references/presentation-revision-2026-06-11/slide_02_instruction_sheet.md` with the desired gas-hydrate introduction story, layout, visual assets, source basis, implementation prompt, and acceptance checklist before touching the deck |
+| 2026-06-12 | Rebuilt slide 2 with source-backed hydrate visuals | Updated the Processing-style slide asset to lead with the USGS SEM image, clathrate cage symbol, manually rendered `CH4`/`H2O` subscripts and hydrate dot, USGS/NETL definition stream, P-T stability gate, and North Slope context; replaced only slide 2 in the current Drive deck and verified the fresh Google-rendered thumbnail |
+| 2026-06-12 | Audited ML source coverage for the next Word/PPT pass | Added `docs/ML_SOURCE_COVERAGE_AND_DELIVERABLE_REVISION_PLAN.md` to separate primary North Slope science, direct permafrost ML evidence, comparative ML methods, project synthesis, and general ML controls before further deliverable edits |
+| 2026-06-12 | Created the Word/PPT deliverable revision base | Added `docs/deliverable_revision_base_2026_06_12/` with the Gmail instruction digest, current PPTX/DOCX audit, source registry, format rules, slide-to-Word alignment matrix, and next execution checklist; website work is explicitly out of scope except for app/runtime skeleton and reusable visuals |

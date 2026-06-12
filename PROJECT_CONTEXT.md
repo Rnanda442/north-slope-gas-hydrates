@@ -1,6 +1,6 @@
 # North Slope Gas Hydrates Project Context
 
-Last updated: 2026-06-10
+Last updated: 2026-06-12
 
 ## Purpose
 
@@ -47,14 +47,29 @@ scientific calculations.
 - The authorized runtime skeleton is implemented in `dashboard/runtime/`.
 - Tests exist in `tests/test_well_log_engine.py` and
   `tests/test_runtime_skeleton.py`.
-- The full project test suite passed on 2026-06-08: 20 tests passed.
+- The full project test suite passed on 2026-06-12: 23 tests passed.
 - Public GIS layers, notebooks, structural surfaces, and Plotly exports are
   present.
 - Two working Word drafts and a new research-overview Word/PPT deliverable pair
   are present in `docs/project_blueprints/`.
-- The latest Drive PowerPoint was exported and rebuilt into a visual-first
-  12-slide ML parameter architecture deck with signal bars, masking trees,
-  parallel model branches, and overburden/sweet-spot review visuals.
+- The current presentation baseline is the public-safe Gmail visual-feedback
+  9-slide revision imported to Drive as `GMAIL VISUAL REVISION 9-SLIDE North
+  Slope Gas Hydrate Slides 2026-06-11`; it applies the latest Gmail
+  instructions with user-provided about-me visuals, the current Streamlit
+  structural explorer, gas-hydrate stability visuals, parameter symbols, a
+  shared-gate ML architecture, behavior panels, geomechanics, results visuals,
+  and conclusion graphics. The current Drive deck preserves these
+  Processing-style revisions as full-slide raster panels.
+- The latest Gmail ML sources were recovered into
+  `references/ml-sources/2026-06-11/` and used to enrich the local Word/PPTX
+  builders with Chong et al. ANN workflow specifics, leakage-safe
+  preprocessing, model validation, data-quality, calibration, residual, and
+  drift-review controls while preserving the 9-slide deck count.
+- The enriched local DOCX/PPTX were imported to the connected Google Drive
+  account as native Google Docs/Slides files:
+  `ENRICHED ML PIPELINE North Slope Gas Hydrate Research Overview 2026-06-11`
+  and `ENRICHED 9-SLIDE ML PIPELINE North Slope Gas Hydrate Slides
+  2026-06-11`.
 - The public source-library index is present in `docs/source_library_index/`.
 - Three Excel header references were reviewed from the user's email. The images
   are not stored in Git or shown on the website; their public-safe schema
@@ -146,6 +161,8 @@ It must not load or expose authorized well-log or core data.
   graph, hydrate decision tree, target-leakage barrier, and validation visuals
 - `docs/ML_PARAMETER_TREE_AND_DECK_REVAMP_PLAN.md`: user-approved revamp plan
   for parameter signal visuals, masking trees, ML architecture, and deck order
+- `docs/NINE_SLIDE_POWERPOINT_REVISION_WORKFLOW.md`: specific correction
+  workflow for the final 9-slide Drive deck revision
 - `docs/WELL_LOG_REQUIREMENTS_MAP.md`: screenshot-derived header schema,
   scaffold requirements, track groups, and unresolved questions
 - `docs/SWEET_SPOT_SCIENCE_BASIS.md`: research-backed directional relationships,
@@ -274,3 +291,34 @@ blockers, and next activities in the architecture/activity map.
   saturation regression as parallel branches.
 - 2026-06-10: Rebuilt the latest Drive PowerPoint into a public-safe 12-slide
   visual ML architecture deck for Drive review.
+- 2026-06-11: Corrected the Drive deck into a verified final 9-slide native
+  Google Slides revision with the profile photo restored, slide 4 rebuilt as a
+  measurement/caveat/model-role grid, named ML feature equations, detailed ML
+  workflow/error slides, and public-source/runtime-boundary language.
+- 2026-06-11: Restored the older nine-slide topic sequence for the Drive deck
+  while preserving the newer visual style, profile photo, parameter caveats,
+  equation-connected ML workflow, complete-well validation, and public-safe
+  source boundary.
+- 2026-06-11: Folded the Classification Methods Draft into the verified
+  nine-slide Drive deck by strengthening the ML workflow gates, model ladder,
+  well/compartment validation split, probability calibration, reason-code
+  outputs, and results/discussion review flags.
+- 2026-06-11: Recovered the user's latest Gmail ML sources into
+  `references/ml-sources/2026-06-11/`, documented their public-safe intake, and
+  enriched the local Word/PPTX builders with gas-hydrate-specific ANN workflow
+  details plus general ML pipeline quality controls.
+- 2026-06-11: Imported the enriched local Word and PowerPoint deliverables to
+  Google Drive as native Google Docs/Slides files in the connected account and
+  verified the Slides deck readback has exactly nine slides.
+- 2026-06-11: Executed the all-nine-slide visual revision package, rebuilt the
+  local PPTX with current Streamlit, gas-hydrate, well-log, parameter-icon,
+  architecture, behavior, geomechanics, results, and conclusion visuals,
+  imported it as a native Google Slides deck named `FINAL VISUAL REVISION
+  9-SLIDE North Slope Gas Hydrate Slides 2026-06-11`, and verified 9-slide
+  Drive readback plus Google-rendered thumbnails.
+- 2026-06-12: Processed the user's latest Gmail visual-feedback instructions,
+  generated source-backed Processing-style panels for all nine slides, rebuilt
+  the local PPTX, imported it to the connected Google Drive as `GMAIL VISUAL
+  REVISION 9-SLIDE North Slope Gas Hydrate Slides 2026-06-11`, verified native
+  Slides metadata/readback and all nine Google-rendered thumbnails, and
+  confirmed 23 project tests pass.

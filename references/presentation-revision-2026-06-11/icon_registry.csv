@@ -1,0 +1,16 @@
+symbol,name,parameter_family,icon_idea,reuse_on_slides,notes
+GR,Gamma ray,lithology,Yellow gamma burst over sand-shale layers with a low-to-high GR curve,3;4;5,Use as reservoir/lithology gate rather than hydrate proof
+Rt,Deep resistivity,electrical,Orange current path around pores with hydrate blocking conductive water,3;4;5,Pair with clean sand and porosity context to avoid high-Rt false positives
+RHOB,Bulk density,density-porosity,Green rock cube on a small density scale with rho_b label,3;4;6,Use as measured density input and equation source
+phi_D,Density porosity,density-porosity,Open pore gauge derived from RHOB with a small equation tag,3;4;6,Show as derived feature unless workbook confirms supplied field
+phi_NMR,NMR porosity,porosity-fluid,Blue pulse rings around pore-fluid droplets,3;4;5,Separate measured NMRPHI from target-derived NMR_SAT
+Vp,Compressional velocity,elastic,Blue compression wave passing through a rock block,3;4;5;6,Used for velocity and acoustic impedance features
+Vs,Shear velocity,elastic,Purple sideways shear wave bending a rock block,3;4;5;6,Used for rigidity and Vp/Vs context
+Vp/Vs,Velocity ratio,derived-elastic,Split P-wave and S-wave icon with ratio badge,3;4;5;6,Derived feature that inherits Vp and Vs quality
+AI,Acoustic impedance,derived-elastic,Rock block plus wave with AI = rho_b * Vp badge,4;5;6,Use as rock-physics feature not direct label
+mu-rho,Shear stiffness feature,derived-elastic,Shear wave plus rho_b * Vs^2 mini-equation,4;6,Use with lambda-rho in geomechanical feature sketch
+lambda-rho,Compressional stiffness feature,derived-elastic,Compression wave plus rho_b * (Vp^2 - 2Vs^2) mini-equation,4;6,Keep equation readable and avoid overexplaining on slide
+CAL/DCAL,Caliper and differential caliper,borehole-QC,Red borehole walls with caliper arms and in-gauge/washout markers,3;4;5,QC gate that controls trust in other logs
+z / P-T,Depth and pressure-temperature context,context,Vertical depth ruler with pressure-temperature stability envelope,3;4;6,Depth remains alignment/context and is not normalized like other values
+Core,Core calibration,calibration,Core plug linked to a log depth tick,3;4;5,Calibration and validation anchor where approved data exist
+S_h locked,Hydrate saturation target,target,Lock icon over S_h/NMR_SAT label,3;4,Target or calibration output only; never an input feature

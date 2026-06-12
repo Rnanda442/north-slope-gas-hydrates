@@ -36,6 +36,7 @@ OUT_DIR = REPO_ROOT / "docs" / "project_blueprints"
 DOCX_OUT = OUT_DIR / "North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.docx"
 PPTX_OUT = OUT_DIR / "North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx"
 ASSET_DIR = OUT_DIR / "presentation_assets"
+PARAMETER_CSV = OUT_DIR / "ml_parameter_effect_tree.csv"
 MASTER_3D = REPO_ROOT / "03_data_final" / "master_layers" / "north_slope_master_3d_surfaces.parquet"
 MASTER_2D = REPO_ROOT / "03_data_final" / "master_layers" / "north_slope_master_2d_layers.parquet"
 STREAMLIT_URL = "https://north-slope-gas-hydrates-vj67xkke9ksfzveon8ldt2.streamlit.app/"
@@ -58,6 +59,7 @@ REFERENCES = [
     "Lee, M.W., and Collett, T.S. 2011. In-situ gas hydrate saturation estimated from various well logs at the Mount Elbert Gas Hydrate Stratigraphic Test Well, Alaska North Slope. Marine and Petroleum Geology, 28, 439-449. https://pubs.usgs.gov/publication/70036903",
     "Haines, S.S., Collett, T.S., Yoneda, J., Shimoda, N., Boswell, R., and Okinaka, N. 2022. Gas hydrate saturation estimates, gas hydrate occurrence, and reservoir characteristics based on well log data from the Hydrate-01 stratigraphic test well, Alaska North Slope. Energy & Fuels, 36, 3040-3050. DOI: 10.1021/acs.energyfuels.1c04100. https://pubs.acs.org/doi/10.1021/acs.energyfuels.1c04100",
     "Zyrianova, M.V., Collett, T.S., and Boswell, R. 2024. Characterization of structural, stratigraphic, and reservoir controls on gas hydrate occurrence in the Eileen Gas Hydrate Trend, Alaska North Slope. https://www.mdpi.com/2077-1312/12/3/472",
+    "Rohan Nanda. 2026. ML Project Reference and CreditScoreV4 Case Notes. User-supplied general ML methodology notes recovered from Gmail on 2026-06-11 and stored in references/ml-sources/2026-06-11/.",
 ]
 
 
@@ -390,6 +392,57 @@ def add_process_sketch(doc: Document, title: str, labels: list[str], fill=SAND) 
     doc.add_paragraph()
 
 
+def read_parameter_matrix() -> list[dict[str, str]]:
+    if not PARAMETER_CSV.exists():
+        return []
+    matrix = pd.read_csv(PARAMETER_CSV).fillna("")
+    return [{key: str(value) for key, value in row.items()} for row in matrix.to_dict("records")]
+
+
+def add_parameter_matrix_table(doc: Document, params: list[dict[str, str]]) -> None:
+    if not params:
+        add_note(doc, "Parameter matrix not found; regenerate docs/project_blueprints/ml_parameter_effect_tree.csv before finalizing this section.")
+        return
+
+    doc.add_heading("Current parameter and masking matrix", level=2)
+    add_body(
+        doc,
+        "The matrix below matches the current PowerPoint revamp plan. The percentages are visual planning priors, not trained feature importance, and will be replaced or recalibrated only after approved data, labels, and held-out-well results are available.",
+    )
+    table = doc.add_table(rows=1, cols=5)
+    table.style = "Table Grid"
+    set_borders(table, "C5D3D8")
+    headers = ["Parameter family", "Weight", "Hydrate-supportive evidence", "Major masks", "Model role"]
+    widths = [1.55, 0.55, 2.15, 2.25, 1.65]
+    for idx, header in enumerate(headers):
+        cell = table.cell(0, idx)
+        cell.width = Inches(widths[idx])
+        shade_cell(cell, NAVY)
+        write_cell(cell, header, bold=True, size=7.3, color=WHITE, align=WD_ALIGN_PARAGRAPH.CENTER)
+
+    for row in params:
+        cells = table.add_row().cells
+        values = [
+            row.get("parameter", ""),
+            f"{row.get('planned_importance_percent', '').strip()}%",
+            row.get("primary_hydrate_effect", ""),
+            row.get("major_masks_or_false_positives", "").replace("; ", "; "),
+            row.get("model_role", ""),
+        ]
+        for idx, value in enumerate(values):
+            cells[idx].width = Inches(widths[idx])
+            shade_cell(cells[idx], ICE if idx in {0, 1} else WHITE)
+            write_cell(
+                cells[idx],
+                value,
+                bold=idx == 0,
+                size=6.6 if idx in {2, 3, 4} else 6.9,
+                color=NAVY if idx in {0, 1} else INK,
+                align=WD_ALIGN_PARAGRAPH.CENTER if idx == 1 else WD_ALIGN_PARAGRAPH.LEFT,
+            )
+    doc.add_paragraph()
+
+
 def add_placeholder_section(doc: Document, title: str, sentence: str) -> None:
     doc.add_heading(title, level=1)
     add_body(doc, sentence)
@@ -398,6 +451,7 @@ def add_placeholder_section(doc: Document, title: str, sentence: str) -> None:
 def build_docx() -> None:
     doc = Document()
     configure_doc(doc)
+    parameter_matrix = read_parameter_matrix()
 
     title = doc.add_paragraph()
     title.paragraph_format.space_after = Pt(2)
@@ -407,7 +461,7 @@ def build_docx() -> None:
     run.font.size = Pt(20)
     run.font.color.rgb = RGBColor.from_string(NAVY)
 
-    subtitle = doc.add_paragraph("Research-paper outline updated with website visuals and header-derived synthetic-data provenance")
+    subtitle = doc.add_paragraph("Research-paper outline updated with ML source specifics, parameter logic, and pipeline controls")
     subtitle.paragraph_format.space_after = Pt(8)
     for run in subtitle.runs:
         run.font.name = "Aptos"
@@ -418,12 +472,16 @@ def build_docx() -> None:
         doc,
         "Boundary: this public-source planning document contains no restricted well logs, approved-runtime data, named restricted well identifiers, populated model results, credentials, or sensitive derived outputs.",
     )
+    add_note(
+        doc,
+        "Source update: this revision incorporates the June 11 Gmail ML sources now stored under references/ml-sources/2026-06-11/. Chong et al. (2022) supplies the gas-hydrate ANN/well-log anchor; the ML Project Reference Notes supply general leakage-safe pipeline, data-quality, validation, and monitoring controls.",
+    )
     add_note(doc, HEADER_DERIVED_SYNTHETIC_NOTE)
 
     doc.add_heading("Abstract", level=1)
     add_body(
         doc,
-        "Gas hydrates are solid crystalline compounds in which gas molecules, dominantly methane, are trapped inside cages of water molecules under cold and high-pressure conditions. On the Alaska North Slope, permafrost and shallow subsurface pressure-temperature conditions create a setting where hydrate can accumulate in sand-rich reservoirs and represent a significant natural-gas resource. The United States Geological Survey assessed the North Slope gas hydrate system as containing a mean of approximately 53.8 trillion cubic feet of undiscovered, technically recoverable gas in hydrate accumulations, making the region an important target for energy-resource characterization and long-term energy security planning. This project develops a physics-constrained machine-learning workflow for predicting gas hydrate occurrence and saturation from approved well-log and core-analysis data. The workflow will compile published AI/ML methods, generate a depth-indexed dataset from density, porosity, natural gamma ray, resistivity, acoustic velocity, NMR, and core measurements, train classification and regression models, and calibrate predictions against core and interpreted saturation evidence. The expected outcome is an auditable reservoir characterization framework that separates hydrate occurrence, saturation, reservoir quality, uncertainty, and later producibility screening.",
+        "Gas hydrates are solid crystalline compounds in which gas molecules, dominantly methane, are trapped inside cages of water molecules under cold and high-pressure conditions. On the Alaska North Slope, permafrost and shallow subsurface pressure-temperature conditions create a setting where hydrate can accumulate in sand-rich reservoirs and represent a significant natural-gas resource. The United States Geological Survey assessed the North Slope gas hydrate system as containing a mean of approximately 53.8 trillion cubic feet of undiscovered, technically recoverable gas in hydrate accumulations, making the region an important target for energy-resource characterization and long-term energy security planning. This project develops a physics-constrained machine-learning workflow for predicting gas hydrate occurrence and saturation from approved well-log and core-analysis data. The workflow adapts the Chong et al. ANN saturation approach, builds a depth-indexed feature table from density, porosity, natural gamma ray, resistivity, Vp, Vs, NMR, caliper, and core measurements, keeps NMR/core saturation fields as labels rather than predictors, compares baseline and nonlinear models, and validates by complete wells. The expected outcome is an auditable reservoir characterization framework that separates hydrate occurrence, saturation, reservoir quality, uncertainty, data-quality state, and later producibility screening.",
     )
 
     doc.add_heading("Introduction", level=1)
@@ -434,6 +492,10 @@ def build_docx() -> None:
     add_body(
         doc,
         "The Alaska North Slope is a strong study area because it combines permafrost-associated hydrate stability, documented hydrate-bearing test wells, public regional geologic context, and a history of DOE, NETL, USGS, and industry-supported hydrate research. Mount Elbert, Hydrate-01, and Eileen-trend studies show that hydrate-bearing sands can be investigated using a multi-log interpretation that includes resistivity, density, neutron and NMR porosity, sonic velocity, and core calibration. This project uses that research base to build a practical workflow for approved data. The final scientific question is whether well-log and core measurements can be processed into reliable machine-learning features that predict occurrence and saturation across known and prediction wells."
+    )
+    add_body(
+        doc,
+        "The closest published machine-learning anchor is Chong et al. (2022), which used permafrost-associated gas hydrate wells from the Alaska North Slope and Mallik, more than 10,000 depth points, and Keras/TensorFlow artificial neural networks to predict NMR-density-derived gas hydrate saturation from combinations of density, density porosity, gamma ray, resistivity, Vp, and Vs. Their workflow included preprocessing, hyperparameter tuning, well-log combination optimization, model validation, caliper-based washout removal, multivariate outlier review, min-max normalization, and R2-style saturation accuracy scoring. This project uses that paper as a methodological analogue, but it upgrades the validation design for the current DOE-style workflow by holding out complete wells or compartments rather than relying on neighboring random depth rows.",
     )
     add_body(
         doc,
@@ -473,11 +535,24 @@ def build_docx() -> None:
         "A key methodological control is validation by complete well. Randomly splitting neighboring depth samples can make performance appear stronger than it will be on an unseen well because adjacent samples are highly correlated. The planned workflow will reserve complete wells for validation and testing, report classification and regression error, and compare predicted saturation against core and interpreted reference measurements. The final deliverables will present the work in graphical and tabular form so that conclusions, recommendations, and uncertainty can be reviewed by geoscientists and energy-resource decision makers."
     )
 
-    add_placeholder_section(
+    doc.add_heading("Parameters", level=1)
+    add_body(
         doc,
-        "Parameters",
-        "This section will define each input variable, unit convention, source mnemonic, derived feature, and target field used in the approved-data workflow, including density, porosity, gamma ray, resistivity, Vp, Vs, NMR, caliper, hydrate saturation, core porosity, core permeability, and lithology.",
+        "The approved-data workflow will treat each well-log family as physical evidence with limits, not as an isolated hydrate label. Density, porosity, gamma ray, resistivity, Vp, Vs, NMR, caliper, core porosity, permeability, lithology, and pressure-temperature context all support different parts of the interpretation. The key rule is parameter -> hydrate effect -> masking condition -> QC or context decision.",
     )
+    add_body(
+        doc,
+        "Depth remains an alignment, stratigraphic, and pressure-temperature context variable. It should not be normalized in the same way as the privacy-protected curve values. Non-depth log and core variables may be standardized or normalized for modeling, but those transformations must be fitted on training wells only and then applied unchanged to validation, locked-test, and prediction wells.",
+    )
+    add_body(
+        doc,
+        "Target columns such as Sgh, S_h, NMR_SAT, phase labels, final hydrate calls, and sweet-spot rankings are supervised labels or outputs. They must be kept out of the predictor matrix except when they are explicitly used as calibration, training target, validation reference, or post-prediction review evidence.",
+    )
+    add_body(
+        doc,
+        "For each approved-data curve, the feature table should retain the original mnemonic, canonical field, source unit, standardized unit, schema role, missingness flag, QC state, and provenance. That level of metadata is necessary because the same physical parameter can serve different roles depending on source: measured NMR porosity can be an input, while NMR-derived saturation is a label; density can be a measured input, while density porosity or acoustic impedance may be derived features.",
+    )
+    add_parameter_matrix_table(doc, parameter_matrix)
     add_process_sketch(
         doc,
         "Parameter-role sketch",
@@ -485,20 +560,44 @@ def build_docx() -> None:
         fill=SAND,
     )
 
-    add_placeholder_section(
+    doc.add_heading("Methodology", level=1)
+    add_body(
         doc,
-        "Methodology",
-        "This section will describe data intake, unit standardization, outlier removal, depth matching, feature engineering, core-log calibration, and the workflow used to generate the final machine-learning dataset.",
+        "The methodology begins with source classification and data intake. Public GIS and source documents remain in the repository, while approved LAS, CSV, Excel, and core-analysis files remain in the authorized runtime. The runtime workflow standardizes curve aliases, verifies units, checks monotonic depth, flags missing or out-of-range fields, and records whether each output is ready, partial, or blocked.",
+    )
+    add_body(
+        doc,
+        "Quality control happens before feature generation. Caliper and differential-caliper fields are used to identify washout, rugosity, and tool-standoff risk; missing-curve routing prevents an absent measurement from becoming a silent zero; and depth matching controls how log curves, NMR-derived values, and core intervals are aligned. Each derived feature must retain provenance from the curves used to calculate it.",
+    )
+    add_body(
+        doc,
+        "The approved-data QC sequence should be explicit and reproducible: verify schema and units; standardize depth; drop or quarantine rows where a required feature or label is missing for the intended task; flag the upper-tail caliper washout intervals before model fitting; run multivariate outlier screening on the feature space; and record row loss after every step. This mirrors the source-paper logic while leaving real logs and row-level outputs inside the authorized runtime.",
     )
     add_body(
         doc,
         "The geomechanical feature set will include dynamic Young's modulus, Poisson's ratio, brittleness, lambda-rho, and mu-rho where density, Vp, and Vs are available. These features help place hydrate interpretation in a rock-physics context because stiffness, rigidity, and incompressibility can help distinguish hydrate-supported responses from gas, lithology, or stress effects."
     )
-
-    add_placeholder_section(
+    add_body(
         doc,
-        "Machine-Learning Framework",
-        "This section will compare classification models for hydrate occurrence, regression models for continuous hydrate saturation, and nonlinear ANN methods informed by Chong et al. (2022), while preserving complete-well validation and target-leakage controls.",
+        "The future overburden map is a context layer, not a hydrate classifier. Its role is to explain how burial pressure, stratigraphic load, structural position, and compaction can shift density, porosity, Vp, Vs, acoustic impedance, and geomechanical baselines across the Alaska North Slope. That context helps prevent one universal threshold from being applied across wells with different burial histories.",
+    )
+
+    doc.add_heading("Machine-Learning Framework", level=1)
+    add_body(
+        doc,
+        "The model architecture uses shared physics-backed inputs and then separates into two parallel heads: a classification branch for hydrate phase or occurrence and a saturation-regression branch for continuous hydrate saturation. The branches share QC-reviewed logs, derived petrophysical features, rock-physics attributes, and approved core or interpretation context, but they optimize different outputs and should report different uncertainty measures.",
+    )
+    add_body(
+        doc,
+        "The planned model ladder is baseline-first. Rule-based screens and simple linear or logistic baselines establish defensible reference behavior; tree-based models then test nonlinear interactions; artificial neural networks are appropriate after label quality, curve coverage, missingness, and complete-well validation are understood. Chong et al. (2022) is the closest source anchor for ANN-style hydrate-saturation modeling, but this project will use held-out wells rather than random neighboring depth samples for field-generalization checks.",
+    )
+    add_body(
+        doc,
+        "The general ML notes add three implementation controls to that ladder. First, the validation scheme must mimic the production use case: if the model will predict unseen wells, the evaluation must withhold unseen wells. Second, train-only preprocessing must be leakage-safe: imputation, scaling, min-max normalization, feature selection, and dimensionality reduction are fitted on training wells only and then applied unchanged to validation, locked-test, and prediction wells. Third, flexible models such as gradient boosting or ANN/Keras should be adopted only if they materially improve held-out performance over simpler baselines without increasing false positives, drift sensitivity, or interpretability risk.",
+    )
+    add_body(
+        doc,
+        "A visible target-leakage barrier is required in every modeling implementation. Hydrate saturation labels, NMR-derived target fields, phase labels, and final sweet-spot rankings may supervise or calibrate the model, but they cannot be included as predictors. The exported feature matrix should show which columns are measured inputs, derived inputs, QC/context variables, calibration fields, labels, and blocked outputs.",
     )
     add_process_sketch(
         doc,
@@ -507,15 +606,31 @@ def build_docx() -> None:
         fill=ICE,
     )
 
-    add_placeholder_section(
+    doc.add_heading("Error and Validation", level=1)
+    add_body(
         doc,
-        "Error and Validation",
-        "This section will report classification precision, recall, F1, confusion matrices, regression MAE, RMSE, R2, calibration by saturation band, outlier behavior, missing-curve performance, and validation against unseen wells.",
+        "Validation must be performed by complete well. Random row splitting is not sufficient because adjacent depth samples share geology, tool response, and labeling assumptions. The known-well cohort should be divided into training, validation, and locked-test wells, and any prediction-well outcomes should remain hidden until predictions are frozen.",
     )
-    add_placeholder_section(
+    add_body(
         doc,
-        "Discussion",
-        "This section will interpret the predicted hydrate intervals, compare model behavior against geologic expectations, discuss false positives and ambiguous intervals, and explain how reservoir quality and uncertainty affect sweet-spot ranking.",
+        "Classification reporting should include per-class precision, recall, F1, confusion matrices, abstention or expert-review counts, and false-positive review by masking condition. Saturation reporting should include MAE, RMSE, R2, calibration by saturation band, residuals by well, and sensitivity to missing curves. Both branches should report where the model is blocked, partial, or uncertain rather than forcing an unsupported hydrate call.",
+    )
+    add_body(
+        doc,
+        "Pipeline validation should also report data quality, not just model metrics. Required checks include completeness, uniqueness, validity, cross-field consistency, row-count reconciliation, source-to-feature row loss, out-of-range values, duplicate depth keys, unit mismatches, core-log depth offsets, and feature drift by well, unit, or compartment. Distribution-shift triage should separate sampling noise, pipeline changes, and real geologic or acquisition differences before the model is blamed or trusted.",
+    )
+    doc.add_heading("Discussion", level=1)
+    add_body(
+        doc,
+        "The discussion will interpret predicted hydrate intervals only after approved-data execution. Until then, the public deliverables should emphasize the review logic: high resistivity must be checked against lithology, gas, ice, carbonate, porosity, and water-salinity assumptions; density and velocity features must be read with overburden and mineralogy context; and NMR or core evidence must be checked for depth alignment and target provenance.",
+    )
+    add_body(
+        doc,
+        "Sweet-spot ranking should combine occurrence probability, predicted saturation, reservoir quality, uncertainty, and masking explanations. It should not collapse hydrate presence, saturation, producibility, and confidence into a single hidden score. The final ranking should remain traceable back to measured curves, derived physics, core or interpretation support, and the validation results for unseen wells.",
+    )
+    add_body(
+        doc,
+        "The final discussion should therefore read the model as an evidence system: which parameters supported the prediction, which masking conditions were ruled out or left open, which QC checks passed, which wells or compartments drove the error, and whether the predicted interval should be accepted, reviewed, or held back for more data.",
     )
     doc.add_heading("Current Evidence Anchors", level=1)
     for anchor in SOURCE_ANCHORS:
@@ -525,6 +640,19 @@ def build_docx() -> None:
         "Conclusion",
         "This section will summarize what the workflow demonstrates, what the final approved-data results show, and how the project supports North Slope gas hydrate reservoir characterization for future energy-resource evaluation.",
     )
+    doc.add_heading("Current Website and Source Integration", level=1)
+    add_body(
+        doc,
+        "The Streamlit website now uses a four-page visual workflow: Overview, Explore North Slope, Analyze Hydrates, and Project Plan. The visuals are public/synthetic communication surfaces, while the real-data execution path remains the approved runtime.",
+    )
+    for item in [
+        "ML inputs and saturation target design are anchored to Chong et al. (2022): density, porosity, resistivity, gamma ray, Vp, Vs, and NMR/core-calibrated saturation references.",
+        "NMR, sonic, density, and resistivity comparison logic is cross-checked against Lee and Collett (2011) and Haines et al. (2022).",
+        "Reservoir quality and hydrate presence remain separate interpretations; clean sand, stability, and gas charge can still produce no-hydrate cases.",
+        "Public maps constrain structural and regional context, but they do not classify hydrate occurrence without direct log/core evidence.",
+        "Generated rows in the public website and tests are header-derived synthetic records, not user-supplied sample data.",
+    ]:
+        add_body(doc, f"- {item}", size=9.8)
 
     doc.add_heading("References", level=1)
     for ref in REFERENCES:
@@ -744,9 +872,8 @@ def build_pptx() -> None:
 
 def main() -> None:
     build_docx()
-    build_pptx()
     print(DOCX_OUT)
-    print(PPTX_OUT)
+    print("Current PPTX is built by docs/project_blueprints/build_ml_revamp_powerpoint.py")
 
 
 if __name__ == "__main__":

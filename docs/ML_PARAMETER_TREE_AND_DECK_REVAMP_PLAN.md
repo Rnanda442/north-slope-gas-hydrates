@@ -1,11 +1,16 @@
 # ML Parameter Tree and Deck Revamp Plan
 
-Last updated: 2026-06-10
+Last updated: 2026-06-11
 
 ## Source Instruction
 
 This plan follows the user's self-sent Gmail message
 `North slope gas hydrates new changes and instructions` from 2026-06-10.
+It was updated after the user's Drive review requests to correct the 12-slide
+revamped deck into an exactly 9-slide revision, then restore the older
+topic sequence while keeping the improved visuals and ML detail. It now also
+incorporates the user's June 11 Gmail ML sources recovered into
+`references/ml-sources/2026-06-11/`.
 
 The priority has changed:
 
@@ -19,7 +24,9 @@ The priority has changed:
 
 - Deck style: hybrid. Use dark MLOps-style architecture visuals, but keep
   scientific parameter slides clean and readable.
-- Parameter slide: one packed slide, not one slide per parameter.
+- Parameter slide: one packed slide, not one slide per parameter. Each entry
+  must separate what the curve measures from what can mask or caveat hydrate
+  interpretation.
 - Architecture depth: two-level. Start with a readable overview, then show the
   detailed ML architecture.
 - Model framing: parallel classification and saturation-regression branches
@@ -50,15 +57,16 @@ Examples:
 The parameter slide should use a packed visual grid. Each parameter gets:
 
 - an icon or mini-scene;
-- a horizontal signal line;
-- a negative/ambiguous side on the left;
-- a hydrate-supportive side on the right;
-- a visible masking-condition callout;
-- a planning importance weight.
+- the measured property;
+- the hydrate-supportive interpretation;
+- a visible caveat or masking-condition line;
+- the ML role, such as input feature, derived feature, QC gate, calibration
+  anchor, or context variable.
 
 The weights are planning priors for visual emphasis only, not trained model
-feature importance. They must stay labeled as conceptual until approved data are
-available.
+feature importance. They remain in the CSV as planning context until approved
+data are available, but the final slide emphasizes measurement/caveat clarity
+over showing numeric weights.
 
 The current planning matrix lives at:
 
@@ -121,17 +129,29 @@ Required visible decisions:
   physics-backed features;
 - validation is by held-out wells, not random neighboring depth rows;
 - output is predicted sweet spots with uncertainty and masking explanations.
+- the Classification Methods Draft requires the model to act like a disciplined
+  interpreter: QC, pressure-temperature admissibility, reservoir quality,
+  multi-log phase evidence, competing rock-type explanations, and producibility
+  risk are explicit interpretation gates before final labels or sweet-spot
+  ranking.
 
-## Next Slide Sequence
+## Final Topic-Aligned 9-Slide Sequence
 
-1. Parameter signal grid.
-2. ML architecture overview.
-3. Detailed architecture map with decision branches.
-4. Target-leakage and normalization rule.
-5. Classification versus saturation-regression branch.
-6. Masking/failure-mode examples: gas, ice, shale, carbonate, overburden,
-   bad-hole response.
-7. Predicted sweet-spot output concept.
+1. Gas Hydrate Occurrence and Saturation Prediction.
+2. Introduction: What and Why Gas Hydrates.
+3. Parameters: Well-Log Scaffold.
+4. ML Methodology: Architecture.
+5. ML Methodology: Why These Parameters.
+6. Geomechanical Feature Sketch.
+7. 3D Map and Well Context.
+8. Results and Discussion Plan.
+9. Conclusion.
+
+The earlier final-revision requirements are folded into this restored sequence:
+slide 3 carries the one-slide parameter scaffold, slide 4 connects equations to
+the ML pipeline, slide 5 explains equation/feature, physical reason, caveat or
+error, and ML use, and slide 6 shows the geomechanical equation sketch and
+non-hydrate caveats.
 
 ## Word Document Effect
 
@@ -144,3 +164,32 @@ logic in methodology language:
 - target-leakage rule;
 - classification/regression branch logic;
 - overburden map role once shapefiles are available.
+
+## Implementation Status
+
+- `docs/project_blueprints/build_ml_revamp_powerpoint.py` rebuilt the tracked
+  PowerPoint as the final topic-aligned 9-slide revision with the profile photo,
+  parameter measurement/caveat/model-role logic, named feature equations,
+  equation-connected ML workflow, Classification Methods Draft gates,
+  model-family rationale, well/compartment validation, calibration/error-control
+  language, and public-safe probability/reason-code output summary.
+- `docs/project_blueprints/build_research_overview_deliverables.py` now reads
+  `docs/project_blueprints/ml_parameter_effect_tree.csv` for the Word document,
+  expands the Parameters, Methodology, Machine-Learning Framework, Error and
+  Validation, and Discussion sections, and keeps the current website/source
+  integration summary.
+- The Word builder default now regenerates the DOCX only. The current deck is
+  rebuilt with `build_ml_revamp_powerpoint.py` so the older PPT helper cannot
+  accidentally overwrite the visual-first ML deck during routine Word updates.
+- The final Drive import is
+  `FINAL CLASSIFICATION-METHODS ML VISUAL REVISION North Slope Gas Hydrate
+  Slides 2026-06-11`.
+- The June 11 local enrichment recovered `s10596-022-10151-9.pdf` and
+  `ML_Project_Reference_and_CreditScoreV4_Case_Notes.docx` from Gmail into
+  `references/ml-sources/2026-06-11/`, then updated the reproducible PPTX and
+  DOCX builders with source-specific ML pipeline details: Chong et al.'s
+  five-well ANN saturation workflow, density/porosity/GR/Rt/Vp/Vs feature
+  families, caliper/outlier preprocessing, Keras/feature-combination context,
+  train-only transforms, baseline-first model selection, complete-well
+  validation, model metrics, calibration, residual review, and data-quality or
+  drift checks.

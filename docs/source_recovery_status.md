@@ -1,6 +1,6 @@
 # Source Recovery Status
 
-Last checked: 2026-06-07
+Last checked: 2026-06-11
 
 ## Summary
 
@@ -32,6 +32,8 @@ source paths referred to a separate Windows profile on the source laptop.
 - `docs/project_blueprints/Alaska_North_Slope_Wireline_ML_Classification_Methods_Draft.docx`
 - `docs/source_library_index/source_index.md`
 - `docs/source_library_index/source_manifest.csv`
+- `references/ml-sources/2026-06-11/s10596-022-10151-9.pdf`
+- `references/ml-sources/2026-06-11/ML_Project_Reference_and_CreditScoreV4_Case_Notes.docx`
 - The public website, notebooks, GIS layers, and well-log runtime scaffold
 
 ## Relevant Files Found on Connected Google Drive

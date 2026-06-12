@@ -1,6 +1,6 @@
 # ML Visual Architecture Plan
 
-Last updated: 2026-06-10
+Last updated: 2026-06-11
 
 ## Purpose
 
@@ -8,6 +8,7 @@ Define the machine-learning visuals that should explain the project using the
 most concrete references currently available:
 
 - Chong et al. (2022) and its well-log ML feature families;
+- the June 11 recovered Gmail ML sources in `references/ml-sources/2026-06-11/`;
 - the screenshot-derived Excel header roles in `docs/WELL_LOG_REQUIREMENTS_MAP.md`;
 - the equation and feature logic in the runtime scaffold;
 - the project rule that targets cannot leak into input features.
@@ -95,6 +96,9 @@ Gates:
   `dashboard/processing_visuals.py`.
 - Added the website tab `Log Scaffold -> ML Visual Architecture` in
   `dashboard/app.py`.
+- The fixed 9-slide local deck builder now folds the recovered June 11 ML
+  sources into the parameter, ML architecture, model-rationale, and
+  results/discussion slides without changing slide count.
 
 ## Next Use
 
