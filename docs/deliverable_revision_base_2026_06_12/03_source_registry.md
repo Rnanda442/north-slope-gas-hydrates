@@ -45,10 +45,13 @@ Use sources by evidence tier:
 These sources should support ML method design only. They should not replace
 North Slope calibration or be presented as North Slope field evidence.
 
+Ready-to-cite strings, allowed deliverable language, and guardrails are recorded
+in `docs/ML_CITATION_PACKET_FOR_DELIVERABLES.md`.
+
 | Source | Current status | Use |
 |---|---|---|
-| Singh et al. (2021), `Prediction of gas hydrate saturation using machine learning and optimal set of well-logs`, DOI `10.1007/s10596-020-10004-3` | Listed in `docs/ML_SOURCE_COVERAGE_AND_DELIVERABLE_REVISION_PLAN.md` for next citation pass | Comparative ML saturation prediction and feature-set rationale |
-| Chong et al. (2024), `Machine learning application to assess occurrence and saturations of methane hydrate in marine deposits offshore India` | Listed in `docs/ML_SOURCE_COVERAGE_AND_DELIVERABLE_REVISION_PLAN.md` for next citation pass | Comparative occurrence plus saturation prediction and balanced-accuracy framing |
+| Singh et al. (2021), `Prediction of gas hydrate saturation using machine learning and optimal set of well-logs`, DOI `10.1007/s10596-020-10004-3` | Verified in `docs/ML_CITATION_PACKET_FOR_DELIVERABLES.md` | Comparative ML saturation prediction and feature-set rationale |
+| Chong et al. (2024), `Machine learning application to assess occurrence and saturations of methane hydrate in marine deposits offshore India`, DOI `10.1190/int-2023-0056.1` | Verified in `docs/ML_CITATION_PACKET_FOR_DELIVERABLES.md` | Comparative occurrence plus saturation prediction and balanced-accuracy framing |
 
 ## Primary North Slope Hydrate Science
 

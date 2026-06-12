@@ -53,6 +53,9 @@ anchored to North Slope sources such as Lee and Collett (2011), Haines et al.
 
 ## Source Status
 
+Use `docs/ML_CITATION_PACKET_FOR_DELIVERABLES.md` for the ready-to-cite ML
+source strings, slide/Word language, and comparative-source guardrails.
+
 ### Already Local and Usable
 
 - `references/ml-sources/2026-06-11/s10596-022-10151-9.pdf`
@@ -75,11 +78,12 @@ anchored to North Slope sources such as Lee and Collett (2011), Haines et al.
   - Knowledge-graph, decision-tree, leakage-barrier, and whole-well validation
     visual contracts.
 
-### Add or Cite in the Next Source Pass
+### Verified Comparative Sources To Cite
 
 These do not need to dominate the deck, but they should be recorded in the Word
 references and source matrix before claiming that the ML method is fully
-covered:
+covered. The citation packet now records the exact citation strings, source
+URLs, deliverable use, and guardrails:
 
 - Singh et al. (2021), `Prediction of gas hydrate saturation using machine
   learning and optimal set of well-logs`, DOI `10.1007/s10596-020-10004-3`.

@@ -96,7 +96,7 @@ The public website must never load authorized runtime data.
 | W7 | Scientific alignment | Partial | Reconcile equations and interpretation rules across code, manuscript, and presentation | W1, W3, W5 | No material scientific contradictions remain |
 | W8 | Git and project stabilization | Complete | Keep local `main` synchronized with `origin/main` and preserve focused commits | None | Clean history, remote, and documented workflow |
 | W9 | Authorized-data execution | Future | Configure approved runtime and run real-data validation only in the authorized environment | W5, authorization | Reproducible authorized outputs exist |
-| W10 | Word and PowerPoint deliverables | In progress | First review `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md`, then use `docs/deliverable_revision_base_2026_06_12/` as the controlling base for the next Word/PPT revision. Add the comparative ML source tier, then update the Word builder before the slide builder | W3, W5, W7 | Both deliverables use the verified workflow, figures, terminology, and validation plan |
+| W10 | Word and PowerPoint deliverables | In progress | First review `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md`, then use `docs/ML_CITATION_PACKET_FOR_DELIVERABLES.md` and `docs/deliverable_revision_base_2026_06_12/` as the controlling source and format base for the next Word/PPT revision. Update the Word builder before the slide builder | W3, W5, W7 | Both deliverables use the verified workflow, figures, terminology, and validation plan |
 
 Status vocabulary: `Ready`, `In progress`, `Waiting`, `Blocked`, `Partial`,
 `Complete`, or `Future`.
@@ -161,6 +161,7 @@ and approved-data figures become available.
 5. Perform the code-to-requirements gap analysis.
 6. Extend the implemented Runtime Readiness and grouped-well split scaffolds with workbook-derived rules and baseline models.
 7. Review `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md`, then use
+   `docs/ML_CITATION_PACKET_FOR_DELIVERABLES.md` and
    `docs/deliverable_revision_base_2026_06_12/` to revise the Word document
    first, then the nine-slide deck, so source claims, ML pipeline explanation,
    format rules, and visual language stay synchronized.
@@ -229,3 +230,4 @@ and approved-data figures become available.
 | 2026-06-12 | Audited ML source coverage for the next Word/PPT pass | Added `docs/ML_SOURCE_COVERAGE_AND_DELIVERABLE_REVISION_PLAN.md` to separate primary North Slope science, direct permafrost ML evidence, comparative ML methods, project synthesis, and general ML controls before further deliverable edits |
 | 2026-06-12 | Created the Word/PPT deliverable revision base | Added `docs/deliverable_revision_base_2026_06_12/` with the Gmail instruction digest, current PPTX/DOCX audit, source registry, format rules, slide-to-Word alignment matrix, and next execution checklist; website work is explicitly out of scope except for app/runtime skeleton and reusable visuals |
 | 2026-06-12 | Added the project direction review lock | Added `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md` so the user can revise the shared goal, audience, deliverable order, science/ML rules, data boundary, open decisions, and acceptance criteria before further Word, PowerPoint, or website edits |
+| 2026-06-12 | Verified the comparative ML citation packet | Added `docs/ML_CITATION_PACKET_FOR_DELIVERABLES.md` with ready-to-cite Chong et al. (2022), Singh et al. (2021), and Chong et al. (2024) entries, allowed Word/slide language, and guardrails against using comparative sources as North Slope field truth |
