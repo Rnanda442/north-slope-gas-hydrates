@@ -156,6 +156,13 @@ Screenshot review notes:
 - The `IGS` screenshot shows `Sh` and `Swr`.
 - The `MTE_refined` and `IGS_refined` screenshots show `Sgh` / hydrate saturation tied to depth correspondence.
 - Working interpretation for now: the target family is hydrate saturation, but the exact column name depends on sheet/well/source context. Preserve original headers and document equivalences rather than renaming them away.
+- The screenshots are enough to document the header/schema families and sheet/tab
+  names. They are not enough to prove workbook identity, so public deliverables
+  should refer to the current real files as `Dataset 1`, `Dataset 2`, and
+  `Dataset 3`.
+- The visible sheet/tab names include `MTE`, `IGS`, `MTE_refined`, and
+  `IGS_refined`. Treat these as evidence of raw/refined table structure until
+  the user can safely describe the full workbook organization.
 
 Important working rule:
 
@@ -177,6 +184,14 @@ Project goals from screenshot:
 - Analyze well log information to generate a dataset including density, porosity, natural gamma ray, and acoustic wave velocity readings versus depth at wellbores penetrating permafrost gas hydrate deposits.
 - Utilize the generated dataset to train machine learning models to predict occurrence and saturation of gas hydrate.
 - Calibrate and refine machine learning models using core analysis data by comparing log predictions against core measurements.
+
+Working implication:
+
+- The DOE overview explicitly names both occurrence and saturation prediction.
+- The ML workflow should therefore be framed as two related tasks:
+  occurrence classification and saturation regression/estimation.
+- Do not invent final metrics or labels yet; the real target roles should be
+  refined after the parameter logic and external-factor matrix is built.
 
 Learning/workflow wording from screenshot:
 
@@ -344,13 +359,17 @@ Recommended next build:
 
 ## Questions For User
 
-Please answer these before the next major build.
+Remaining questions before the next major build.
 
-1. For the target family, should we describe `Sgh`, `S_h`, `Sh`, and `NMR_SAT` as equivalent hydrate-saturation labels across different sheets, or do they each mean something slightly different in your files?
-2. For the three wells you currently have access to, what public-safe names should we use: `Dataset 1`, `Dataset 2`, `Dataset 3`, or anonymous well-style names?
-3. When the DOE wording says "occurrence and saturation prediction," should the deliverables show this as two model heads/tasks: occurrence classification and saturation regression?
-4. For "sweet spot," should the first definition be tied directly to the DOE goal: hydrate occurrence plus saturation, then later add confidence, producibility, and uncertainty?
-5. Do you want every parameter in the matrix to have a required "outside factors / false positives" row?
+1. After the parameter logic/source matrix is built, do `Sgh`, `S_h`, `Sh`, and
+   `NMR_SAT` behave as equivalent hydrate-saturation labels, or are some of
+   them refined/interpreted/calibrated versions?
+2. After the parameter logic/source matrix is built, what should "sweet spot"
+   mean for this project: occurrence + saturation only, or occurrence +
+   saturation + confidence + producibility?
+3. Should each parameter's outside factors/false positives become a separate
+   required row in the Word document and slide logic, or stay in the source
+   matrix only?
 
 ## Current Answers Already Given
 
@@ -364,3 +383,8 @@ Please answer these before the next major build.
 - Headers: preserve the screenshot/origin headers in the scaffold and deliverables.
 - DOE project overview screenshots: official wording/evidence.
 - Next build: yes, create the parameter logic/source matrix before Word/PPT.
+- Current real files: refer to them publicly as `Dataset 1`, `Dataset 2`, and
+  `Dataset 3`.
+- Occurrence and saturation: yes, the DOE overview explicitly specifies both.
+- Sweet spot: wait to define fully until the parameter logic and external-factor
+  reasoning are built.
