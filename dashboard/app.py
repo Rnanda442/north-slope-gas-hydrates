@@ -89,6 +89,83 @@ CONTEXT_OVERLAYS = [
     "Assessment-unit outlines",
     "North Slope public wells",
 ]
+TOPIC5_EVIDENCE_ATLAS_PRIORITY = [
+    {
+        "Evidence object": "Regional atlas and satellite-style context",
+        "Why it moved up": "Sets the public, basin-scale context before any interval receives an ML score.",
+        "How AI uses it": "Constrains confidence, flags out-of-context predictions, and supports reviewer triage.",
+        "Boundary": "Context feature only; it does not label hydrate intervals.",
+    },
+    {
+        "Evidence object": "Assessment units, structure, 2D/3D seismic footprints",
+        "Why it moved up": "Explains where the well-log evidence sits inside the larger North Slope system.",
+        "How AI uses it": "Groups wells, preserves holdout logic, and keeps regional comparability visible.",
+        "Boundary": "Public-source atlas layer; not a replacement for approved logs or cores.",
+    },
+    {
+        "Evidence object": "Well-log scaffold",
+        "Why it moved up": "Removes the blank Topic 5 placeholder and shows the exact panel expected in outputs.",
+        "How AI uses it": "Turns GR, Rt, RHOB, NMR, Vp, and Vs into QC'd physics features and review intervals.",
+        "Boundary": "Synthetic/header-derived in this hosted site.",
+    },
+    {
+        "Evidence object": "Output visualization pack",
+        "Why it moved up": "Connects model results to explainable figures rather than hidden table rows.",
+        "How AI uses it": "Displays interval classification, saturation proxy, uncertainty, and calibration behavior.",
+        "Boundary": "Export scaffold until authorized runtime data are loaded.",
+    },
+]
+
+TOPIC5_SCAFFOLD_OUTPUTS = [
+    {
+        "Output": "Well-log panel",
+        "What it shows": "Depth-aligned GR, Rt, RHOB, NMR, Vp, Vs, and highlighted review intervals.",
+        "AI contribution": "Screens curve agreement, QC flags, hydrate-supportive intervals, and competing explanations.",
+    },
+    {
+        "Output": "Variable range table",
+        "What it shows": "Per-well ranges and medians for model-ready input variables.",
+        "AI contribution": "Catches missing curves, out-of-range values, and feature distributions before fitting.",
+    },
+    {
+        "Output": "Cross-well comparison",
+        "What it shows": "The same variable compared across the synthetic well cohort.",
+        "AI contribution": "Supports whole-well validation and prevents nearby-depth leakage from looking like skill.",
+    },
+    {
+        "Output": "Interval interpretation table",
+        "What it shows": "Candidate intervals, evidence domains, blockers, and uncertainty flags.",
+        "AI contribution": "Separates hydrate classification, saturation proxy, reservoir quality, and review priority.",
+    },
+    {
+        "Output": "Model diagnostic panels",
+        "What it shows": "Placeholder confusion matrix and calibration curve for the future approved-data run.",
+        "AI contribution": "Shows where the classifier abstains, fails, or needs calibration before delivery.",
+    },
+]
+
+TOPIC5_AI_WORKFLOW = [
+    {
+        "Workflow step": "Prepare inputs",
+        "AI role": "Map approved workbook headers into canonical log, QC, target, and derived-feature roles.",
+        "Human check": "Confirm units, depth alignment, missing curves, and sensitive-data boundaries.",
+    },
+    {
+        "Workflow step": "Engineer features",
+        "AI role": "Compute porosity, Vsh, Vp/Vs, acoustic impedance, lambda-rho, and mu-rho consistently.",
+        "Human check": "Review assumptions where tool response, shale, gas, ice, or borehole condition may mimic hydrate.",
+    },
+    {
+        "Workflow step": "Model outcomes",
+        "AI role": "Use separate classification, saturation/regression, and uncertainty outputs.",
+        "Human check": "Keep saturation fields, phase labels, and sweet-spot ranks out of the feature inputs.",
+    },
+    {
+        "Workflow step": "Explain outputs",
+        "AI role": "Attach evidence domains and visualization outputs to every flagged interval.",
+        "Human check": "Approve final hydrate calls only after source, core/log, and regional context review.",
+    },
+]
 
 SURFACE_CATALOG = {
     "NStopo": {
@@ -1602,16 +1679,36 @@ def render_runtime_readiness(logs: pd.DataFrame) -> None:
 
 
 def render_ml_visual_architecture() -> None:
-    st.subheader("ML Visual Architecture")
+    st.subheader("Topic 5: ML Evidence and Well-Log Scaffold")
     st.caption(
-        "A source-backed visual map from the Excel header roles through equations, "
-        "model branches, and decision outputs."
+        "Updated Topic 5 brings the evidence atlas and satellite-style regional "
+        "variables forward, then connects them to the well-log scaffold, ML model "
+        "branches, and output visualizations."
     )
+    st.info(
+        "Topic 5 now uses the newer well-log ML scaffold direction: regional atlas "
+        "context first, synthetic/header-derived logs second, and explainable model "
+        "outputs last. The hosted app still avoids approved logs, core rows, and "
+        "sensitive derived outputs."
+    )
+
+    metrics = st.columns(3)
+    metrics[0].metric("Scaffold sync", "2026-06-02")
+    metrics[1].metric("Evidence update", "2026-06-09")
+    metrics[2].metric("Validation unit", "Whole wells")
+
+    st.markdown("#### Evidence Atlas Priority")
+    st.dataframe(
+        pd.DataFrame(TOPIC5_EVIDENCE_ATLAS_PRIORITY),
+        use_container_width=True,
+        hide_index=True,
+    )
+
     render_processing_sketch(
         "ml_architecture",
         ML_ARCHITECTURE,
         "Header-to-Model Knowledge Graph",
-        "Concrete headers and equations stay attached to every model output.",
+        "Concrete headers, regional context, and equations stay attached to every model output.",
         height=430,
     )
     st.warning(
@@ -1626,6 +1723,7 @@ def render_ml_visual_architecture() -> None:
         "The model should preserve no-hydrate, gas, bad-hole, and uncertainty branches.",
         height=430,
     )
+
     cols = st.columns(2)
     with cols[0]:
         st.markdown("#### Visual Contract")
@@ -1633,9 +1731,19 @@ def render_ml_visual_architecture() -> None:
             pd.DataFrame(
                 [
                     {
+                        "Visual": "Evidence atlas context",
+                        "Source basis": "Public North Slope atlas, assessment units, structural layers, and well inventory",
+                        "Reader takeaway": "Regional and satellite-style variables influence confidence and triage before interval scoring.",
+                    },
+                    {
                         "Visual": "Knowledge graph",
                         "Source basis": "Excel header roles; Chong feature set; equation library",
                         "Reader takeaway": "Inputs, features, labels, and outputs are separate.",
+                    },
+                    {
+                        "Visual": "Well-log scaffold",
+                        "Source basis": "Synthetic/header-derived GR, Rt, RHOB, NMR, Vp, Vs tracks",
+                        "Reader takeaway": "The once-blank scaffold now shows the output panel and downloadable evidence tables.",
                     },
                     {
                         "Visual": "Decision tree",
@@ -1657,6 +1765,7 @@ def render_ml_visual_architecture() -> None:
         st.dataframe(
             pd.DataFrame(
                 [
+                    {"Family": "Regional context", "Fields": "assessment unit, structural position, public well context, atlas layer flags", "Use": "Confidence, grouping, and review triage"},
                     {"Family": "Measured", "Fields": "GR, Rt, RHOB, NMR, Vp, Vs, caliper", "Use": "Model inputs after QC"},
                     {"Family": "Derived", "Fields": "Vsh, density porosity, Vp/Vs, acoustic impedance, lambda-rho, mu-rho", "Use": "Physics-backed features"},
                     {"Family": "Targets", "Fields": "Sgh, S_h, NMR_SAT, phase class, sweet-spot rank", "Use": "Supervision or review only"},
@@ -1666,6 +1775,19 @@ def render_ml_visual_architecture() -> None:
             hide_index=True,
         )
 
+    st.markdown("#### Embedded Well-Log Scaffold Outputs")
+    st.dataframe(
+        pd.DataFrame(TOPIC5_SCAFFOLD_OUTPUTS),
+        use_container_width=True,
+        hide_index=True,
+    )
+
+    st.markdown("#### How AI Helps This Workflow")
+    st.dataframe(
+        pd.DataFrame(TOPIC5_AI_WORKFLOW),
+        use_container_width=True,
+        hide_index=True,
+    )
 
 def render_variable_range_explorer(logs: pd.DataFrame) -> None:
     st.subheader("Variable Range Explorer")
@@ -1862,7 +1984,21 @@ def render_core_calibration(calibrated_core: pd.DataFrame) -> None:
 
 def render_presentation_outputs(logs: pd.DataFrame, intervals: pd.DataFrame, calibrated_core: pd.DataFrame) -> None:
     st.subheader("Presentation Outputs")
-    st.caption(f"{SYNTHETIC_LABEL} | Export-ready placeholders for the existing PowerPoint scaffold.")
+    st.caption(
+        f"{SYNTHETIC_LABEL} | Topic 5 embedded well-log scaffold synced to the newer "
+        "ML evidence direction."
+    )
+    st.info(
+        "This is the embedded well-log scaffold for Topic 5: it shows the interval-level "
+        "log panel, variable range table, cross-well comparison, uncertainty summary, "
+        "and model diagnostics used to explain how AI helped produce and review outputs."
+    )
+    st.markdown("#### Output Visualization Map")
+    st.dataframe(
+        pd.DataFrame(TOPIC5_SCAFFOLD_OUTPUTS),
+        use_container_width=True,
+        hide_index=True,
+    )
     well = st.selectbox("Presentation-output synthetic well", sorted(logs["well_alias"].unique()))
     panel = well_log_panel(logs, well)
     st.plotly_chart(panel, use_container_width=True)
