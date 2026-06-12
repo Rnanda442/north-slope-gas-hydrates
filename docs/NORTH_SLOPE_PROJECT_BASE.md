@@ -19,7 +19,7 @@ The public repo should contain:
 - public GIS context;
 - source-backed science explanation;
 - Word and slide deliverables;
-- synthetic/fake scaffold data only;
+- header/schema examples and synthetic scaffold data only if needed later for code testing;
 - code skeletons for future approved-runtime work;
 - diagrams, parameter logic, and equations.
 
@@ -36,13 +36,16 @@ The public repo should not contain:
 
 - Main goal is the Word document and 9-slide PowerPoint.
 - Website is secondary and should act as a skeleton/middle layer for future DOE/Anaconda execution.
-- The website can store structure, schema, fake data, diagrams, and export layouts.
+- The website can store structure, schema, diagrams, export layouts, and later optional synthetic examples for code testing.
 - Real data work and real model metrics will happen later inside the DOE/approved environment.
 - Screenshots of headers, equations, and project overview are acceptable evidence and should stay available in Git.
 - The project needs actual ranges, numbers, scientific reasoning, and source backing before major deliverable edits.
 - Slide 1 of the latest Gmail deck is basically ready. Slides 2-9 need stronger specifics, formatting, syntax, science, and ML pipeline clarity.
 - The deck must stay exactly 9 slides.
 - Word first, slides second, website third.
+- Do not make fake datasets as the next priority. Focus first on equations, parameter logic, source-backed hydrate constraints, and the ML pipeline design.
+- If synthetic/fake data is ever used later, it should only test code structure and must preserve the screenshot header style. It should not drive the science narrative.
+- DOE project overview screenshots are official wording/evidence, not casual notes.
 
 ## Current Deliverable Inventory
 
@@ -90,6 +93,7 @@ The public repo should not contain:
   - geomechanical equation screenshots;
   - project goal/objective screenshots;
   - contact sheet.
+- Treat these screenshots as origin evidence supplied by the user. Do not lose them or replace them with generic summaries.
 
 ### ML Sources
 
@@ -145,11 +149,58 @@ Label / target / ground-truth fields:
 - `Hydrate Saturation`
 - `Swr`
 
+Screenshot review notes:
+
+- The header screenshot explicitly marks `Sgh / NMR_SAT` as `GROUND TRUTH`.
+- The `MTE` screenshot shows `S_h` and `S_wr` beside measured and derived log fields.
+- The `IGS` screenshot shows `Sh` and `Swr`.
+- The `MTE_refined` and `IGS_refined` screenshots show `Sgh` / hydrate saturation tied to depth correspondence.
+- Working interpretation for now: the target family is hydrate saturation, but the exact column name depends on sheet/well/source context. Preserve original headers and document equivalences rather than renaming them away.
+
 Important working rule:
 
-- We need to clarify which target is authoritative.
-- Label/ground-truth columns should score, supervise, validate, or calibrate.
-- They should not be accidentally used as ordinary predictor inputs.
+- The CSV/header scaffold should preserve the screenshot headers.
+- Do not internally rename the project away from the origin headers when explaining the deliverables.
+- If code eventually needs canonical aliases, keep that mapping visible and secondary. The Word/slides should show the headers as given.
+- Label/ground-truth columns should be handled carefully as targets, calibration, validation, or comparison fields.
+- We still need to define exactly when a saturation-related field is an input support field versus the target being predicted.
+
+## Official DOE Project Overview From Screenshots
+
+Project title from screenshot:
+
+> Gas hydrate occurrence and saturation prediction in permafrost sediments on Alaska North Slope using AI/ML.
+
+Project goals from screenshot:
+
+- Do a literature review and compile AI/ML research methodology applicable for marine and permafrost gas hydrate deposits.
+- Analyze well log information to generate a dataset including density, porosity, natural gamma ray, and acoustic wave velocity readings versus depth at wellbores penetrating permafrost gas hydrate deposits.
+- Utilize the generated dataset to train machine learning models to predict occurrence and saturation of gas hydrate.
+- Calibrate and refine machine learning models using core analysis data by comparing log predictions against core measurements.
+
+Learning/workflow wording from screenshot:
+
+- Remove outliers.
+- Select relevant depth intervals.
+- Process raw well log data for the dataset.
+- Use Python code and Keras libraries.
+- Perform hyperparameter tuning for an artificial neural network algorithm.
+- Run optimization tasks.
+- Conduct ML model validation and testing.
+- Post-process results into graphical and tabular forms.
+- Deduce conclusions and recommendations from results.
+
+Project objective bullets from screenshot:
+
+- Compare historical AI/ML techniques employed for predicting hydrate occurrence and saturation predictions.
+- Compare and analyze raw well log readings.
+- Perform data pre-processing for generation of the database.
+- Carry out hyperparameter tuning.
+- Calculate ML model performance metrics for classification and regression analyses.
+- Optimize ML model performance.
+- Validate ML predictions and test using unseen data.
+
+Use these screenshots as official DOE project-origin language. Rewrite for clarity where needed, but do not change the project meaning.
 
 ## Main Scientific Gap
 
@@ -208,7 +259,7 @@ Important:
 
 Public repo role:
 
-- build the ML explanation, schema, pipeline, fake-data tests, and diagrams;
+- build the ML explanation, schema, equations, parameter logic, pipeline, and diagrams;
 - do not claim real approved-data performance;
 - do not train/report real project metrics from classified data.
 
@@ -238,8 +289,8 @@ Website should eventually include:
 
 - public map/GIS context;
 - runtime readiness checklist;
-- header/schema mapper;
-- fake/synthetic CSV examples using the same header shapes;
+- header/schema reference using the exact screenshot header style;
+- optional synthetic/fake CSV examples only if needed later for code testing, using the same header shapes;
 - parameter range explorer;
 - equation-to-feature diagrams;
 - target registry and leakage warning;
@@ -260,7 +311,7 @@ Website should not include:
 
 For this project:
 
-- Public runtime = local/GitHub-safe app using synthetic examples and public GIS context.
+- Public runtime = local/GitHub-safe app using header references, public GIS context, and optional synthetic examples only if needed later.
 - Approved runtime = DOE/authorized desktop or Anaconda environment where real data is loaded later.
 
 ## Work Order For Good Commits
@@ -295,13 +346,11 @@ Recommended next build:
 
 Please answer these before the next major build.
 
-1. Which hydrate target should be treated as the main target: `Sgh`, `S_h`, `Sh`, `NMR_SAT`, or are these different names/versions from different sheets?
-2. For fake/synthetic testing, should the CSVs use the exact screenshot headers first, then map internally to cleaner names?
-3. Should fake data mirror the 3 datasets you currently have access to, or should it represent the future 71 datasets?
-4. Are the 3 datasets different wells, different tabs, or different processed versions of the same wells?
-5. For "sweet spot," should it mean highest saturation, best producibility, best confidence, or a combined review score?
-6. Should the project overview screenshots be treated as official wording for the Word abstract/introduction, or as notes that we rewrite into cleaner DOE style?
-7. Do you want the parameter logic/source matrix to be the next thing built before touching the Word/PPT?
+1. For the target family, should we describe `Sgh`, `S_h`, `Sh`, and `NMR_SAT` as equivalent hydrate-saturation labels across different sheets, or do they each mean something slightly different in your files?
+2. For the three wells you currently have access to, what public-safe names should we use: `Dataset 1`, `Dataset 2`, `Dataset 3`, or anonymous well-style names?
+3. When the DOE wording says "occurrence and saturation prediction," should the deliverables show this as two model heads/tasks: occurrence classification and saturation regression?
+4. For "sweet spot," should the first definition be tied directly to the DOE goal: hydrate occurrence plus saturation, then later add confidence, producibility, and uncertainty?
+5. Do you want every parameter in the matrix to have a required "outside factors / false positives" row?
 
 ## Current Answers Already Given
 
@@ -311,4 +360,7 @@ Please answer these before the next major build.
 - Website: skeleton for transfer into DOE/Anaconda, not final public science proof.
 - Real data: no real rows in public repo; headers/screenshots only for now.
 - Metrics: real metrics come later after approved-data execution.
-
+- Fake data: do not build fake data as the next priority.
+- Headers: preserve the screenshot/origin headers in the scaffold and deliverables.
+- DOE project overview screenshots: official wording/evidence.
+- Next build: yes, create the parameter logic/source matrix before Word/PPT.
