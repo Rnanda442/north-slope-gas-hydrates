@@ -13,9 +13,10 @@ live in `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md`.
 
 Build a scientifically defensible North Slope gas-hydrate research workflow that
 connects public regional GIS context with an authorized, runtime-only well-log
-and core-analysis system. The immediate goal is to finish the well-log
-scaffolding using the user's Excel-based design as a visual and functional
-reference.
+and core-analysis system. The immediate coordination goal is to review and lock
+the shared Word/PowerPoint/website direction in
+`docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md` before the next major deliverable
+edit.
 
 The intended analysis chain is:
 
@@ -32,10 +33,12 @@ regional geology and stability context
 
 ## Current Focus
 
-Use the recovered normalized Excel header screenshots to define the canonical
-well-log schema, unit conversions, curve roles, track groups, and target-leakage
-guardrails. Continue recovering the workbook and formulas before changing
-scientific calculations.
+Use `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md` as the review draft for the
+next work session. After the user revises or accepts that file, update the Word
+document first, rebuild the nine-slide PowerPoint second, and update the
+website/app skeleton only where it supports the approved workflow. Continue
+recovering the full workbook and formulas before changing scientific
+calculations or claiming model results.
 
 ## Current State
 
@@ -149,6 +152,9 @@ It must not load or expose authorized well-log or core data.
   recovery checklist
 - `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md`: authoritative architecture,
   priorities, workstream status, blockers, and next-work sequence
+- `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md`: reviewable shared direction for
+  the Word document, nine-slide deck, website/app skeleton, scientific rules,
+  ML rules, open decisions, and acceptance criteria before the next major edit
 - `docs/PROJECT_IMPROVEMENT_STRATEGY.md`: principles and phased improvement
   strategy for keeping product changes aligned with the scientific goal
 - `docs/PROJECT_VISION_GOALS_AND_NEXT_STEPS.md`: email-derived project vision,
@@ -322,3 +328,5 @@ blockers, and next activities in the architecture/activity map.
   REVISION 9-SLIDE North Slope Gas Hydrate Slides 2026-06-11`, verified native
   Slides metadata/readback and all nine Google-rendered thumbnails, and
   confirmed 23 project tests pass.
+- 2026-06-12: Added `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md` as the
+  reviewable goal lock before further Word, PowerPoint, or website edits.

@@ -82,24 +82,39 @@ Supporting docs:
 
 ## Slides
 
-No North Slope PPTX slide deck is currently tracked in this repository.
+Tracked slide deliverable:
 
-Local slide sources found in `C:\Users\gargi\Downloads`:
+- `docs/project_blueprints/North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`
+  - Current tracked PowerPoint deliverable path.
+  - The live working Drive deck has been repeatedly imported as native Google
+    Slides during the June 2026 revision passes.
 
-- `GMAIL VISUAL REVISION 9-SLIDE North Slope Gas Hydrate Slides 2026-06-11.pptx`
-- `FINAL CLASSIFICATION-METHODS ML VISUAL REVISION North Slope Gas Hydrate Slides 2026-06-11.pptx`
-- `REVAMPED June 10 North Slope Gas Hydrate ML Parameter Architecture Slides.pptx`
-- `UPDATED North Slope Gas Hydrate Reservoir Characterization Research Overview Slides.pptx`
+Tracked slide builders and safe public assets:
 
-Email source:
+- `docs/project_blueprints/build_ml_revamp_powerpoint.py`
+- `docs/project_blueprints/build_processing_slide_assets.py`
+- `docs/project_blueprints/presentation_assets/processing_revisions_2026_06_11/`
+  - Public-safe generated panels for slides 2-9 are tracked.
+  - Slide 1 generated/about-me panels that contain personal visual material are
+    ignored.
+- `references/presentation-revision-2026-06-11/`
+  - Source manifest, icon registry, USGS/public images, slide 2 plan, and
+    detailed revision prompt.
 
-- Gmail message `19eba86da8752830`, subject `New pressy`, includes `GMAIL VISUAL REVISION 9-SLIDE North Slope Gas Hydrate Slides 2026-06-11.pptx`.
+Local-only slide assets intentionally ignored:
+
+- `docs/project_blueprints/presentation_assets/rohan_profile_photo.jpg`
+- `references/presentation-revision-2026-06-11/gmail-2026-06-11/`
+- `references/presentation-revision-2026-06-11/drive-thumbnails-2026-06-12/`
 
 Slide status:
 
-- The deck exists locally/email-side.
-- It has not yet been copied into this Git repo.
-- If a PPTX deliverable needs to live in Git, decide whether to track the final small deck or keep the full deck in Drive/email and track only exported screenshots/source manifests.
+- The deck is tracked, but the current local PPTX may include personal slide-1
+  content and should not be recommitted until the user decides whether that
+  material belongs in Git or stays Drive/local only.
+- The next slide pass should follow
+  `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md` and
+  `docs/deliverable_revision_base_2026_06_12/`.
 
 ## Source Evidence And Screenshots
 
@@ -129,9 +144,11 @@ Tracked source-library index:
 
 ## Next Work Order
 
-1. Goal and vision section: use the project-goal screenshots plus the research/classification drafts.
-2. Well-log scaffold: update schema and app explanation around the Excel header screenshots.
-3. Equation scaffold: add geomechanical equations and explain each as a derived feature.
-4. ML source integration: tie Chong et al. 2022 and the ML reliability notes to model ladder, validation, leakage prevention, and Keras/ANN explanation.
-5. Slide/doc alignment: decide whether the local PPTX deck should be tracked, exported, or referenced through a manifest only.
+1. Review and revise `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md`.
+2. Update the Word document first using the direction file and revision base.
+3. Rebuild the nine-slide deck second using the Word/source plan.
+4. Update the website/app skeleton only where it supports the accepted
+   Word/PPT workflow.
+5. Decide whether personal slide-1 visuals stay Drive/local only or can be
+   tracked in Git.
 

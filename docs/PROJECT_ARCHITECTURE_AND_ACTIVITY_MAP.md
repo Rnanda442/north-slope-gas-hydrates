@@ -96,7 +96,7 @@ The public website must never load authorized runtime data.
 | W7 | Scientific alignment | Partial | Reconcile equations and interpretation rules across code, manuscript, and presentation | W1, W3, W5 | No material scientific contradictions remain |
 | W8 | Git and project stabilization | Complete | Keep local `main` synchronized with `origin/main` and preserve focused commits | None | Clean history, remote, and documented workflow |
 | W9 | Authorized-data execution | Future | Configure approved runtime and run real-data validation only in the authorized environment | W5, authorization | Reproducible authorized outputs exist |
-| W10 | Word and PowerPoint deliverables | In progress | Use `docs/deliverable_revision_base_2026_06_12/` as the controlling base for the next Word/PPT revision; it folds in Gmail instructions, current deliverable audits, source registry, format rules, and the slide-to-Word matrix. Add the comparative ML source tier, then update the Word builder before the slide builder | W3, W5, W7 | Both deliverables use the verified workflow, figures, terminology, and validation plan |
+| W10 | Word and PowerPoint deliverables | In progress | First review `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md`, then use `docs/deliverable_revision_base_2026_06_12/` as the controlling base for the next Word/PPT revision. Add the comparative ML source tier, then update the Word builder before the slide builder | W3, W5, W7 | Both deliverables use the verified workflow, figures, terminology, and validation plan |
 
 Status vocabulary: `Ready`, `In progress`, `Waiting`, `Blocked`, `Partial`,
 `Complete`, or `Future`.
@@ -104,9 +104,12 @@ Status vocabulary: `Ready`, `In progress`, `Waiting`, `Blocked`, `Partial`,
 ## Current Priority
 
 Improvement decisions should follow
-`docs/PROJECT_IMPROVEMENT_STRATEGY.md`. The project will prioritize scientific
-traceability and runtime readiness over adding disconnected pages or opaque
-classification features.
+`docs/PROJECT_IMPROVEMENT_STRATEGY.md`. Before the next major Word,
+PowerPoint, or website edit, review
+`docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md` so the goal, audience,
+deliverable order, and public-data boundary are explicit. The project will
+prioritize scientific traceability and runtime readiness over adding
+disconnected pages or opaque classification features.
 
 ### Priority 1: Confirm Inputs and Targets
 
@@ -157,7 +160,8 @@ and approved-data figures become available.
 4. Build the well-log requirements map.
 5. Perform the code-to-requirements gap analysis.
 6. Extend the implemented Runtime Readiness and grouped-well split scaffolds with workbook-derived rules and baseline models.
-7. Use `docs/deliverable_revision_base_2026_06_12/` to revise the Word document
+7. Review `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md`, then use
+   `docs/deliverable_revision_base_2026_06_12/` to revise the Word document
    first, then the nine-slide deck, so source claims, ML pipeline explanation,
    format rules, and visual language stay synchronized.
 8. Keep the Word and PowerPoint deliverables synchronized as workbook formulas,
@@ -174,6 +178,8 @@ and approved-data figures become available.
 - The classification-methods draft is the primary scientific methods direction.
 - The public website remains public-source and synthetic only.
 - Real approved data remains in the authorized runtime environment.
+- `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md` is the editable goal-lock draft
+  for the next Word/PPT/website pass.
 
 ## Important Activity Log
 
@@ -222,3 +228,4 @@ and approved-data figures become available.
 | 2026-06-12 | Rebuilt slide 2 with source-backed hydrate visuals | Updated the Processing-style slide asset to lead with the USGS SEM image, clathrate cage symbol, manually rendered `CH4`/`H2O` subscripts and hydrate dot, USGS/NETL definition stream, P-T stability gate, and North Slope context; replaced only slide 2 in the current Drive deck and verified the fresh Google-rendered thumbnail |
 | 2026-06-12 | Audited ML source coverage for the next Word/PPT pass | Added `docs/ML_SOURCE_COVERAGE_AND_DELIVERABLE_REVISION_PLAN.md` to separate primary North Slope science, direct permafrost ML evidence, comparative ML methods, project synthesis, and general ML controls before further deliverable edits |
 | 2026-06-12 | Created the Word/PPT deliverable revision base | Added `docs/deliverable_revision_base_2026_06_12/` with the Gmail instruction digest, current PPTX/DOCX audit, source registry, format rules, slide-to-Word alignment matrix, and next execution checklist; website work is explicitly out of scope except for app/runtime skeleton and reusable visuals |
+| 2026-06-12 | Added the project direction review lock | Added `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md` so the user can revise the shared goal, audience, deliverable order, science/ML rules, data boundary, open decisions, and acceptance criteria before further Word, PowerPoint, or website edits |
