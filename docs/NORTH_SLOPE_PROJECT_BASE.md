@@ -269,6 +269,112 @@ External factors to explicitly discuss:
 - missing NMR or missing shear sonic;
 - tool/mnemonic differences across sheets.
 
+## Stability Parameter Source Plan
+
+Goal: add a public-source stability layer to the Structural Explorer only after
+each stability input has a clear source, unit, and confidence label. This layer
+should be described as a **gas hydrate stability admissibility screen**, not as
+hydrate detection or saturation prediction.
+
+Core stability equation/workflow:
+
+```text
+well location
++ well depth
++ base of ice-bearing permafrost
++ geothermal gradient / temperature context
++ hydrostatic pressure assumption
++ methane hydrate phase curve
+= estimated top, base, and thickness of gas hydrate stability zone
+```
+
+Current input status:
+
+| Stability input | Current status | Source or proxy plan |
+| --- | --- | --- |
+| Well location | Available locally | Alaska DNR Well Bottom Hole Location shapefile in `raw_data/Wells/Well_Bottom_Hole_Location/`; use wellhead/bottom-hole `lat`/`lon` for spatial joins. |
+| Well depth | Mostly available locally | Use `TrueVertic` first and `DrillerTot` as fallback from the Alaska DNR well file. These are public well-depth fields, not a separate user-downloaded dataset. Confirm units before calculations; working assumption is feet until field documentation confirms otherwise. |
+| Base of ice-bearing permafrost | Missing as ready GIS locally | Best source is USGS OM-222, "Map showing depth to the base of deepest ice-bearing permafrost as determined from well logs, North Slope, Alaska." It appears available as a PDF/plate rather than a ready GeoPackage. Search for a digitized derivative; otherwise digitize contours/control points and record that provenance. |
+| Geothermal gradient / temperature | Missing as well-specific layer locally | Use public borehole temperature sources: NSIDC G10015 Arctic Slope deep borehole temperature profiles, NSIDC GGD223 borehole/permafrost context, USGS OFR 82-1039, and USGS OFR 82-535. Calculate local gradients where profiles exist; use scenario gradients where not. |
+| Pressure | Available as assumption | Use hydrostatic pore-pressure gradient as first-pass source-backed assumption, currently `9.795 kPa/m`; flag as assumed rather than measured. |
+| Hydrate phase curve | Available from literature | Use a published methane hydrate pressure-temperature phase curve or lookup. USGS SIR 2008-5175 and USGS phase-boundary sources support the stability-screen framing. |
+| Regional hydrate context | Public GIS available | Use USGS 2019 Gas Hydrate Assessment Unit boundaries and input forms for regional context and well/AU joins. This is not direct hydrate proof. |
+
+Current local well-depth coverage check from the Alaska DNR well file:
+
+- statewide well records: `10,250`;
+- North Slope / Arctic Slope-ish records checked: about `8,278`;
+- positive `DrillerTot`: about `7,730` of `8,278` records, or `93.4%`;
+- positive `TrueVertic`: about `7,728` of `8,278` records, or `93.4%`.
+
+`TrueVertic` is preferred for stability because pressure and temperature depend
+on vertical depth. `DrillerTot` is useful for reach/depth-availability screening
+but can overstate vertical depth in deviated wells.
+
+Stability-source tasks before coding the explorer layer:
+
+1. Download or link the public sources into a stability source ledger.
+2. Confirm whether OM-222 or a derivative provides usable GIS contours/control
+   points for base of ice-bearing permafrost.
+3. Download NSIDC/public borehole temperature data and inspect columns, units,
+   depth conventions, and station locations.
+4. Define scenario fallbacks:
+   - permafrost base: `305`, `610`, and `914 m` unless replaced by mapped data;
+   - geothermal gradient: `2.0`, `3.2`, and `4.0 C / 100 m` unless replaced by
+     local borehole-derived gradients;
+   - pressure gradient: `9.795 kPa/m` hydrostatic first-pass.
+5. Decide the phase-curve implementation: formula, lookup table, or digitized
+   published curve.
+6. Build confidence labels:
+   - `high`: nearby well-specific temperature/permafrost control;
+   - `medium`: mapped/interpolated public source;
+   - `low`: regional scenario assumption only.
+
+Target output fields for a future stability table:
+
+```text
+well_id
+lat
+lon
+tvd_m
+depth_source
+permafrost_base_m
+permafrost_source
+geothermal_gradient_c_per_100m
+temperature_source
+pressure_gradient_kpa_m
+pressure_source
+phase_curve_source
+stability_top_m
+stability_base_m
+stability_thickness_m
+reaches_stability_zone
+stability_confidence
+stability_notes
+```
+
+Structural Explorer layer direction:
+
+- show wells colored by `reaches_stability_zone`;
+- overlay hydrate assessment units;
+- show permafrost-base contours/control points where available;
+- show geothermal-gradient or temperature-control confidence;
+- include a low/mid/high scenario toggle;
+- label every result as "stability admissibility, not hydrate proof."
+
+Public sources to prioritize:
+
+- Alaska DNR Well Bottom Hole Location dataset for well location and depth
+  fields;
+- USGS OM-222 for base of deepest ice-bearing permafrost from well logs;
+- NSIDC G10015 for Arctic Slope borehole temperature profiles;
+- NSIDC GGD223 for borehole/permafrost-depth context;
+- USGS OFR 82-1039 and OFR 82-535 for North Slope permafrost and thermal
+  context;
+- USGS SIR 2008-5175 for North Slope gas hydrate prospect/stability method;
+- USGS 2019 Gas Hydrate Assessment Unit boundaries and input forms for regional
+  hydrate assessment context.
+
 ## Equations To Preserve
 
 From the screenshots and slide materials, preserve equations for:
