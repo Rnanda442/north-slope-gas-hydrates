@@ -33,6 +33,7 @@ north-slope-gas-hydrates/
   models_runtime/               # ignored: fitted models and serialized artifacts
   logs_runtime/                 # ignored: local execution logs
   configs_local/                # ignored: populated local mappings and paths
+  data/source_library/          # ignored/local: uploaded public source bundle
   wireline_ml/configs/          # tracked: public example templates only
 ```
 
@@ -40,4 +41,23 @@ north-slope-gas-hydrates/
 
 Run `git status --short` before every commit or push. Only reusable code,
 documentation, empty-folder setup logic, and synthetic examples belong in Git.
+
+## Stability Source Bundle
+
+The 2026-06-13 public-source bundle for the Structural Explorer should be
+uploaded into OpenScienceLab and extracted to:
+
+```text
+data/source_library/north_slope_stability_sources_2026-06-13/
+```
+
+The local laptop upload zip is:
+
+```text
+C:\Users\gargi\Downloads\north_slope_stability_sources_2026-06-13_UPLOAD_TO_OPENSCIENCE.zip
+```
+
+See `docs/source_library_index/stability_source_bundle_2026_06_13.md` for the
+file inventory and setup order. Do not commit the unzipped source files unless
+the project later chooses a small, license-safe subset for public vendoring.
 

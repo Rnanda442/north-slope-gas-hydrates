@@ -375,6 +375,21 @@ Public sources to prioritize:
 - USGS 2019 Gas Hydrate Assessment Unit boundaries and input forms for regional
   hydrate assessment context.
 
+Download/upload inventory:
+
+- The laptop source bundle prepared on 2026-06-13 is documented in
+  `docs/source_library_index/stability_source_bundle_2026_06_13.md`.
+- Local laptop zip to upload into OpenScienceLab:
+  `C:\Users\gargi\Downloads\north_slope_stability_sources_2026-06-13_UPLOAD_TO_OPENSCIENCE.zip`.
+- Recommended OpenScienceLab extraction path:
+  `data/source_library/north_slope_stability_sources_2026-06-13/`.
+- Keep raw downloaded source files out of Git. Commit source maps, parsers,
+  setup instructions, and public-safe derived indexes only.
+- NSIDC GGD223 is no longer missing locally. Its raw FTP folder was downloaded
+  into the bundle with `305` files. Use `stnlist.dat` for point permafrost-depth
+  control (`pf_depth` in meters), while the Alaska DNR shapefile remains the
+  main well inventory.
+
 ## Equations To Preserve
 
 From the screenshots and slide materials, preserve equations for:
