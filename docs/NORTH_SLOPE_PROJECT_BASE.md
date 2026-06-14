@@ -390,6 +390,27 @@ Download/upload inventory:
   control (`pf_depth` in meters), while the Alaska DNR shapefile remains the
   main well inventory.
 
+Current OpenScienceLab-to-website workflow:
+
+- Treat OpenScienceLab as the heavy-data workbench. Use it for the full
+  stability source bundle, raw PDFs, shapefiles, NSIDC temperature profiles,
+  GeoPandas parsing, and any future approved/runtime data processing.
+- Treat GitHub/Streamlit as the public delivery surface. Push only finished
+  public-safe products: compact CSV/GeoJSON layers, stability-screen output
+  tables, exported figures, source/provenance notes, tests, and app code.
+- Do not spend project time depending on OpenScienceLab external/proxy URLs for
+  final presentation access. Those links can fail by environment. Instead,
+  build in OpenScienceLab, commit/push the derived public outputs, and let the
+  hosted or local website render from those committed outputs.
+- Current public fallback product:
+  `data/public_stability_snapshot/north_slope_stability_snapshot_2026-06-13/`.
+  It contains parsed GGD223 permafrost-depth controls and USGS
+  `GasHydrateAUs.geojson`, so the website can show real map context even when
+  the full local bundle is absent.
+- Current full-bundle path remains
+  `data/source_library/north_slope_stability_sources_2026-06-13/`, which is
+  ignored by Git and should stay local to OpenScienceLab or the laptop.
+
 ## Equations To Preserve
 
 From the screenshots and slide materials, preserve equations for:
