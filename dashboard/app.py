@@ -17,10 +17,13 @@ from dashboard.runtime.schemas import (
     TARGET_LABEL_CONTRACT,
 )
 from dashboard.stability_sources import (
+    active_stability_source_path,
     default_stability_bundle_path,
+    default_stability_snapshot_path,
     load_ggd223_permafrost_points,
     load_hydrate_assessment_units,
     stability_bundle_metrics,
+    stability_source_kind,
     stability_source_status_frame,
 )
 from dashboard.runtime.validation import (
@@ -1485,13 +1488,16 @@ def render_regional_atlas() -> None:
 
 
 def render_stability_source_bundle() -> None:
-    bundle_root = default_stability_bundle_path(PROJECT_ROOT)
-    bundle_label = project_relative_or_absolute(bundle_root)
-    status = cached_stability_source_status(str(bundle_root))
-    metrics = cached_stability_bundle_metrics(str(bundle_root))
+    full_bundle_root = default_stability_bundle_path(PROJECT_ROOT)
+    snapshot_root = default_stability_snapshot_path(PROJECT_ROOT)
+    source_root = active_stability_source_path(PROJECT_ROOT)
+    source_label = project_relative_or_absolute(source_root)
+    status = cached_stability_source_status(str(source_root))
+    metrics = cached_stability_bundle_metrics(str(source_root))
+    source_kind = stability_source_kind(source_root)
 
     st.markdown("### Public Stability Source Bundle")
-    st.caption(f"Expected local source path: `{bundle_label}`")
+    st.caption(f"Active stability source: `{source_label}`")
     st.warning(
         "This is a stability admissibility screen. It can show where hydrate could "
         "be thermodynamically plausible, but it is not hydrate proof and not a "
@@ -1508,17 +1514,30 @@ def render_stability_source_bundle() -> None:
     cols[2].metric("Hydrate AUs", f'{metrics["Hydrate AUs"]:,}')
     cols[3].metric("G10015 profiles", f'{metrics["G10015 profiles"]:,}')
 
-    if not bundle_root.exists():
+    if not source_root.exists():
         st.info(
-            "Upload or recreate the source bundle in OpenScienceLab before using "
-            "the public stability layers. The app will read it locally from the "
-            "ignored `data/source_library/` folder after `git pull`."
+            "No full source bundle or committed public snapshot was found. The "
+            "full OpenScienceLab source-bundle path is "
+            f"`{project_relative_or_absolute(full_bundle_root)}` and the public "
+            "snapshot fallback path is "
+            f"`{project_relative_or_absolute(snapshot_root)}`."
         )
         st.dataframe(status, use_container_width=True, hide_index=True)
         return
 
     missing = status[status["Status"] != "Ready"]
-    if missing.empty:
+    if source_kind == "Public snapshot":
+        st.success(
+            "Using the committed public snapshot: GGD223 permafrost-depth controls "
+            "and USGS hydrate assessment units are available without the large "
+            "local source bundle."
+        )
+        st.caption(
+            "Upload the full source bundle in OpenScienceLab when you need the "
+            "G10015 temperature-profile files, the OM-222 source plate, and the "
+            "full Alaska DNR well package."
+        )
+    elif missing.empty:
         st.success("All tracked source-bundle items are present.")
     else:
         st.warning(
@@ -1527,8 +1546,8 @@ def render_stability_source_bundle() -> None:
         )
     st.dataframe(status, use_container_width=True, hide_index=True)
 
-    permafrost_points = cached_ggd223_points(str(bundle_root))
-    assessment_units = cached_hydrate_assessment_units(str(bundle_root))
+    permafrost_points = cached_ggd223_points(str(source_root))
+    assessment_units = cached_hydrate_assessment_units(str(source_root))
     if permafrost_points.empty and assessment_units.empty:
         st.info("No mappable stability-source layers were found yet.")
         return

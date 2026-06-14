@@ -9,6 +9,25 @@ import pandas as pd
 
 
 BUNDLE_DIR_NAME = "north_slope_stability_sources_2026-06-13"
+SNAPSHOT_DIR_NAME = "north_slope_stability_snapshot_2026-06-13"
+
+SNAPSHOT_SOURCE_ITEMS = [
+    {
+        "Item": "NSIDC GGD223 parsed permafrost controls",
+        "Relative path": "ggd223_permafrost_controls.csv",
+        "Stability use": "Committed point controls with pf_depth in meters.",
+    },
+    {
+        "Item": "USGS gas hydrate assessment units",
+        "Relative path": "GasHydrateAUs.geojson",
+        "Stability use": "Committed regional hydrate assessment unit overlay.",
+    },
+    {
+        "Item": "Public snapshot README",
+        "Relative path": "README.md",
+        "Stability use": "Snapshot provenance and Git/runtime boundary.",
+    },
+]
 
 SOURCE_ITEMS = [
     {
@@ -71,10 +90,41 @@ def default_stability_bundle_path(project_root: Path) -> Path:
     return project_root / "data" / "source_library" / BUNDLE_DIR_NAME
 
 
+def default_stability_snapshot_path(project_root: Path) -> Path:
+    return project_root / "data" / "public_stability_snapshot" / SNAPSHOT_DIR_NAME
+
+
+def is_public_stability_snapshot(source_root: Path) -> bool:
+    root = Path(source_root)
+    return (root / "ggd223_permafrost_controls.csv").exists() or (
+        root / "GasHydrateAUs.geojson"
+    ).exists()
+
+
+def active_stability_source_path(project_root: Path) -> Path:
+    bundle = default_stability_bundle_path(project_root)
+    if bundle.exists():
+        return bundle
+    snapshot = default_stability_snapshot_path(project_root)
+    if snapshot.exists():
+        return snapshot
+    return bundle
+
+
+def stability_source_kind(source_root: Path) -> str:
+    root = Path(source_root)
+    if is_public_stability_snapshot(root):
+        return "Public snapshot"
+    if root.exists():
+        return "Full local bundle"
+    return "Missing"
+
+
 def stability_source_status_frame(bundle_root: Path) -> pd.DataFrame:
     root = Path(bundle_root)
+    source_items = SNAPSHOT_SOURCE_ITEMS if is_public_stability_snapshot(root) else SOURCE_ITEMS
     rows = []
-    for item in SOURCE_ITEMS:
+    for item in source_items:
         path = root / item["Relative path"]
         file_count = 0
         if path.is_file():
@@ -117,6 +167,20 @@ def load_ggd223_permafrost_points(bundle_root: Path) -> gpd.GeoDataFrame:
         "permafrost_depth_m",
         "source",
     ]
+    snapshot_path = Path(bundle_root) / "ggd223_permafrost_controls.csv"
+    if snapshot_path.exists():
+        try:
+            frame = pd.read_csv(snapshot_path)
+        except Exception:
+            return _empty_geodataframe(columns)
+        if frame.empty or {"longitude", "latitude"} - set(frame.columns):
+            return _empty_geodataframe(columns)
+        return gpd.GeoDataFrame(
+            frame,
+            geometry=gpd.points_from_xy(frame["longitude"], frame["latitude"]),
+            crs="EPSG:4326",
+        )
+
     path = (
         Path(bundle_root)
         / "03_temperature_geothermal"
@@ -168,7 +232,13 @@ def load_ggd223_permafrost_points(bundle_root: Path) -> gpd.GeoDataFrame:
 
 def load_hydrate_assessment_units(bundle_root: Path) -> gpd.GeoDataFrame:
     columns = ["ASSESSCODE", "ASSESSNAME", "geometry"]
-    path = Path(bundle_root) / "04_hydrate_assessment_units" / "GasHydrateAUs.geojson"
+    root = Path(bundle_root)
+    snapshot_path = root / "GasHydrateAUs.geojson"
+    path = (
+        snapshot_path
+        if snapshot_path.exists()
+        else root / "04_hydrate_assessment_units" / "GasHydrateAUs.geojson"
+    )
     if not path.exists():
         return _empty_geodataframe(columns[:-1])
     try:
@@ -193,7 +263,7 @@ def stability_bundle_metrics(bundle_root: Path) -> dict[str, object]:
     well_dir = root / "01_wells_public" / "Well_Bottom_Hole_Location"
 
     return {
-        "Bundle": "Found" if root.exists() else "Missing",
+        "Bundle": stability_source_kind(root),
         "Ready source items": int((status["Status"] == "Ready").sum()),
         "Total source items": int(len(status)),
         "GGD223 controls": int(len(permafrost_points)),

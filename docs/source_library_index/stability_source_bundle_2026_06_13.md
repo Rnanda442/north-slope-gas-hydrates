@@ -67,6 +67,12 @@ Implementation note:
 - The Structural Explorer shows source-item readiness, GGD223 permafrost-depth
   control points, and USGS hydrate assessment unit boundaries when the bundle is
   present in OpenScienceLab.
+- The public Streamlit website can now fall back to the small committed
+  snapshot at
+  `data/public_stability_snapshot/north_slope_stability_snapshot_2026-06-13/`.
+  That snapshot contains parsed GGD223 permafrost controls and
+  `GasHydrateAUs.geojson` so the map still works when OpenScienceLab proxy
+  routing or local source-bundle upload is unavailable.
 - For local testing outside OpenScienceLab, set
   `NORTH_SLOPE_STABILITY_SOURCE_DIR` to a full bundle path.
 - `data/source_library/` remains ignored by Git.

@@ -5,10 +5,13 @@ import json
 from streamlit.testing.v1 import AppTest
 
 from dashboard.stability_sources import (
+    active_stability_source_path,
     default_stability_bundle_path,
+    default_stability_snapshot_path,
     load_ggd223_permafrost_points,
     load_hydrate_assessment_units,
     stability_bundle_metrics,
+    stability_source_kind,
     stability_source_status_frame,
 )
 
@@ -69,12 +72,66 @@ def make_stability_bundle(tmp_path):
     return bundle
 
 
+def make_public_snapshot(tmp_path):
+    snapshot = tmp_path / "data" / "public_stability_snapshot" / "north_slope_stability_snapshot_2026-06-13"
+    snapshot.mkdir(parents=True)
+    (snapshot / "ggd223_permafrost_controls.csv").write_text(
+        "\n".join(
+            [
+                "well_designation,code,latitude,longitude,elevation_m,permafrost_depth_m,source",
+                "Atigaru,ATI,70.55611944444445,-151.71718055555556,2,405,NSIDC GGD223 stnlist.dat",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    (snapshot / "GasHydrateAUs.geojson").write_text(
+        json.dumps(
+            {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "ASSESSCODE": "50010203",
+                            "ASSESSNAME": "Nanushuk Formation Gas Hydrate",
+                        },
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [
+                                    [-151.0, 70.0],
+                                    [-150.0, 70.0],
+                                    [-150.0, 71.0],
+                                    [-151.0, 71.0],
+                                    [-151.0, 70.0],
+                                ]
+                            ],
+                        },
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (snapshot / "README.md").write_text("public snapshot\n", encoding="utf-8")
+    return snapshot
+
+
 def test_default_stability_bundle_path_uses_project_source_library(tmp_path, monkeypatch) -> None:
     monkeypatch.delenv("NORTH_SLOPE_STABILITY_SOURCE_DIR", raising=False)
 
     assert default_stability_bundle_path(tmp_path) == (
         tmp_path / "data" / "source_library" / "north_slope_stability_sources_2026-06-13"
     )
+
+
+def test_active_stability_source_path_falls_back_to_public_snapshot(tmp_path, monkeypatch) -> None:
+    monkeypatch.delenv("NORTH_SLOPE_STABILITY_SOURCE_DIR", raising=False)
+    snapshot = make_public_snapshot(tmp_path)
+
+    assert default_stability_snapshot_path(tmp_path) == snapshot
+    assert active_stability_source_path(tmp_path) == snapshot
+    assert stability_source_kind(snapshot) == "Public snapshot"
 
 
 def test_ggd223_stnlist_parser_returns_permafrost_control_points(tmp_path) -> None:
@@ -105,10 +162,25 @@ def test_stability_source_status_and_metrics_are_source_aware(tmp_path) -> None:
     metrics = stability_bundle_metrics(bundle)
 
     assert "NSIDC GGD223 permafrost controls" in status["Item"].tolist()
-    assert metrics["Bundle"] == "Found"
+    assert metrics["Bundle"] == "Full local bundle"
     assert metrics["GGD223 controls"] == 2
     assert metrics["G10015 profiles"] == 1
     assert metrics["Hydrate AUs"] == 1
+
+
+def test_public_snapshot_loads_mappable_stability_layers(tmp_path) -> None:
+    snapshot = make_public_snapshot(tmp_path)
+    status = stability_source_status_frame(snapshot)
+    metrics = stability_bundle_metrics(snapshot)
+    controls = load_ggd223_permafrost_points(snapshot)
+    units = load_hydrate_assessment_units(snapshot)
+
+    assert status["Status"].tolist() == ["Ready", "Ready", "Ready"]
+    assert metrics["Bundle"] == "Public snapshot"
+    assert metrics["GGD223 controls"] == 1
+    assert metrics["Hydrate AUs"] == 1
+    assert len(controls) == 1
+    assert len(units) == 1
 
 
 def test_explore_page_renders_stability_source_panel(monkeypatch) -> None:
