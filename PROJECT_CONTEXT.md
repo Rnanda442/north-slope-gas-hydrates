@@ -122,6 +122,16 @@ calculations or claiming model results.
   statuses for missing depth, missing profiles, above-range depths, or
   below-profile depths without a gradient. They do not calculate stability
   top/base/thickness.
+- Local fixture-based stability depth-grid and intersection helpers now exist.
+  They combine modeled temperature, absolute hydrostatic pressure, and the
+  phase lookup into per-depth stability flags, test synthetic top/base
+  crossings and open-base cases, and block incomplete pressure-temperature
+  grids. They have not been applied to the public scaffold or written to a
+  public `stability_screen_*.csv`.
+- Local source-control confidence-label helpers now exist for fixture rows.
+  Tests cover high, medium, low, blocked, and outside-AU labels, but these are
+  source-control labels only and do not imply hydrate occurrence, saturation,
+  producibility, or sweet spots.
 - `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`
   defines the target public website shape for the future stability screen:
   status strip, readiness/capability, map, selected-well audit panel,
@@ -394,3 +404,10 @@ blockers, and next activities in the architecture/activity map.
   interpolation/extrapolation helpers with fixture tests, while keeping real
   temperature-model products and final stability outputs gated behind OSL
   source rebuilds and boundary/confidence tests.
+- 2026-06-14: Added local fixture tests for stability depth grids, synthetic
+  phase-boundary intersections, open-base/extrapolation caveats, and blocked
+  incomplete pressure-temperature grids without calculating public
+  top/base/thickness outputs.
+- 2026-06-14: Added source-control confidence-label helper tests for high,
+  medium, low, blocked, and outside-AU cases while keeping public stability
+  screen outputs uncreated.

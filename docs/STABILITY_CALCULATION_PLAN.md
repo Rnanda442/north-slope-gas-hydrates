@@ -307,6 +307,21 @@ temperature model or phase curve does not cover the required range, set
 `stability_result_status = not_calculated` and leave all top/base/thickness
 fields null.
 
+Implemented local helper status:
+
+- `stability_depth_grid(...)` creates an inclusive depth grid from `0` to the
+  modeled depth limit and always includes the modeled limit even when it is not
+  an exact multiple of the grid step.
+- `stability_condition_grid_from_profile(...)` combines the tested temperature
+  model, absolute hydrostatic pressure, and phase-curve equilibrium-temperature
+  lookup into per-depth `is_stable` flags.
+- `stability_interval_from_condition_grid(...)` finds the first stable interval
+  with interpolated top/base crossings for fixture tests only. It returns
+  `blocked_incomplete_pressure_temperature_grid` if any grid row lacks a
+  calculated temperature or phase-curve value.
+- The helper can mark open-below-model bases and temperature extrapolation
+  caveats, but no real public `stability_screen_*.csv` has been written.
+
 ## Confidence Labels
 
 These labels describe source control for a stability-admissibility screen. They
@@ -330,6 +345,17 @@ Suggested numeric flags for later implementation:
 | `minor_extrapolation_m` | `<= 100 m below measured profile max depth` |
 
 Adjust these thresholds only with a documented reason and test update.
+
+Implemented local helper status:
+
+- `stability_source_control_label(...)` assigns
+  `high_source_control`, `medium_source_control`, `low_source_control`,
+  `blocked_missing_inputs`, or `outside_public_au_context` from fixture rows.
+- Tests cover TrueVertic/near-control high confidence, moderate
+  extrapolation/distance medium confidence, DrillerTot or large extrapolation
+  low confidence, missing temperature blocking, and outside-AU separation.
+- These labels are source-control labels only. They are not hydrate-confidence,
+  saturation, producibility, or sweet-spot labels.
 
 ## Required Caveats For Website And CSV
 
@@ -453,22 +479,28 @@ Do these before creating a non-empty `stability_screen_*.csv`:
 4. Add phase-curve interpolation tests across the expected pressure range.
 5. Add temperature-model tests for interpolation, extrapolation, and blocked
    rows.
-6. Add confidence-label tests that preserve the guardrail that stability is not
+6. Add depth-grid and boundary-crossing tests for closed intervals, open bases,
+   and blocked incomplete pressure-temperature grids.
+7. Add confidence-label tests that preserve the guardrail that stability is not
    hydrate proof.
-7. Update the Structural Explorer to show the run ID, phase-curve source,
+8. Build the real public temperature-model product from the full OSL/source
+   bundle before applying the interval helper to public rows.
+9. Update the Structural Explorer to show the run ID, phase-curve source,
    pressure assumption, confidence label, and caveat codes beside any result.
 
 Current implementation status:
 
-- Gates 1 through 5 now have local code/tests for the public input contract,
+- Gates 1 through 7 now have local code/tests for the public input contract,
   absolute/gauge pressure helpers, phase-curve lookup interpolation, and
-  fixture-based G10015 temperature interpolation/extrapolation behavior.
+  fixture-based G10015 temperature interpolation/extrapolation behavior,
+  depth-grid construction, stable-interval crossing, open-base handling, and
+  blocked incomplete-grid behavior, plus source-control confidence labels.
 - The real public temperature-model product still requires the full
   OpenScienceLab/source bundle because raw G10015 profile rows are not committed
   to Git.
-- Confidence-label tests, depth-grid boundary-crossing tests, and website result
-  display remain required before any non-null stability top/base/thickness
-  output is written.
+- Real OSL-derived temperature-model products, a guarded public
+  `stability_screen_*.csv` writer, and website result display remain required
+  before any non-null public stability top/base/thickness output is written.
 
 Until those gates are complete, the public scaffold remains an input scaffold:
 `phase_curve_status = not_applied` and

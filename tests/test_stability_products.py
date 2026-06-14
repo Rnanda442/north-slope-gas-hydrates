@@ -33,11 +33,15 @@ from dashboard.stability_products import (
     parse_g10015_temperature_profile,
     phase_curve_equilibrium_temperature_c,
     stability_input_capability_matrix_frame,
+    stability_condition_grid_from_profile,
     stability_osl_pull_triggers_frame,
     stability_parameter_readiness_frame,
     stability_context_summary_frame,
+    stability_depth_grid,
+    stability_interval_from_condition_grid,
     stability_input_scaffold_summary_frame,
     stability_website_product_spec_frame,
+    stability_source_control_label,
     temperature_model_from_profile,
     temperature_inventory_summary_frame,
     write_public_stability_products,
@@ -258,6 +262,18 @@ def make_phase_curve_scenario_catalog(project_root):
             },
         ]
     ).to_csv(default_phase_curve_scenario_catalog_path(project_root), index=False)
+
+
+def make_linear_phase_curve_from_depth_temperatures(depth_temperatures):
+    rows = []
+    for depth_m, equilibrium_temperature_c in depth_temperatures:
+        rows.append(
+            {
+                "pressure_mpa_absolute": hydrostatic_pressure_mpa_absolute(depth_m),
+                "equilibrium_temperature_c": equilibrium_temperature_c,
+            }
+        )
+    return pd.DataFrame(rows)
 
 
 def test_hydrostatic_pressure_helpers_track_gauge_and_absolute_pressure() -> None:
@@ -544,6 +560,156 @@ def test_temperature_model_blocks_empty_profile_and_missing_depth() -> None:
     assert usable_depth["temperature_model_status"] == "blocked_no_temperature_profile"
     assert pd.isna(missing_depth["temperature_model_c"])
     assert missing_depth["temperature_model_status"] == "blocked_missing_depth"
+
+
+def test_stability_depth_grid_includes_modeled_depth_limit() -> None:
+    grid = stability_depth_grid(125.0, step_m=50.0)
+
+    assert grid.tolist() == [0.0, 50.0, 100.0, 125.0]
+
+
+def test_stability_interval_finds_interpolated_top_and_base() -> None:
+    profile_points = pd.DataFrame(
+        {
+            "depth_m": [0.0, 100.0, 200.0],
+            "temperature_c": [5.0, 5.0, 25.0],
+        }
+    )
+    phase_curve = make_linear_phase_curve_from_depth_temperatures(
+        [(0.0, 0.0), (100.0, 10.0), (200.0, 20.0)]
+    )
+
+    condition_grid = stability_condition_grid_from_profile(
+        profile_points,
+        phase_curve,
+        depth_limit_m=200.0,
+        step_m=100.0,
+    )
+    interval = stability_interval_from_condition_grid(
+        condition_grid,
+        depth_limit_m=200.0,
+        step_m=100.0,
+    )
+
+    assert condition_grid["is_stable"].tolist() == [False, True, False]
+    assert interval["stability_result_status"] == "calculated"
+    assert interval["stability_top_m"] == 50.0
+    assert interval["stability_base_m"] == 150.0
+    assert interval["stability_thickness_m"] == 100.0
+    assert interval["well_penetrated_stability_thickness_m"] == 100.0
+    assert interval["top_boundary_method"] == "interpolated_crossing"
+    assert interval["base_boundary_method"] == "interpolated_crossing"
+    assert "not_hydrate_proof" in interval["caveat_codes"]
+
+
+def test_stability_interval_marks_open_base_and_extrapolation_caveat() -> None:
+    profile_points = pd.DataFrame(
+        {
+            "depth_m": [0.0, 100.0],
+            "temperature_c": [0.0, 0.0],
+        }
+    )
+    phase_curve = make_linear_phase_curve_from_depth_temperatures(
+        [(0.0, 0.0), (100.0, 10.0), (200.0, 20.0)]
+    )
+
+    condition_grid = stability_condition_grid_from_profile(
+        profile_points,
+        phase_curve,
+        depth_limit_m=200.0,
+        gradient_c_per_100m=0.0,
+        step_m=100.0,
+    )
+    interval = stability_interval_from_condition_grid(
+        condition_grid,
+        depth_limit_m=200.0,
+        step_m=100.0,
+    )
+
+    assert condition_grid["is_stable"].tolist() == [True, True, True]
+    assert interval["stability_result_status"] == "calculated"
+    assert interval["stability_top_m"] == 0.0
+    assert interval["stability_base_m"] == 200.0
+    assert interval["base_boundary_method"] == "open_below_model_depth_limit"
+    assert interval["temperature_extrapolated_below_profile"]
+    assert interval["temperature_extrapolation_below_profile_m"] == 100.0
+    assert "temperature_profile_extrapolated" in interval["caveat_codes"]
+
+
+def test_stability_interval_blocks_incomplete_pressure_temperature_grid() -> None:
+    profile_points = pd.DataFrame(
+        {
+            "depth_m": [0.0, 100.0],
+            "temperature_c": [0.0, 0.0],
+        }
+    )
+    phase_curve = make_linear_phase_curve_from_depth_temperatures(
+        [(0.0, 0.0), (100.0, 10.0), (200.0, 20.0)]
+    )
+
+    condition_grid = stability_condition_grid_from_profile(
+        profile_points,
+        phase_curve,
+        depth_limit_m=200.0,
+        step_m=100.0,
+    )
+    interval = stability_interval_from_condition_grid(
+        condition_grid,
+        depth_limit_m=200.0,
+        step_m=100.0,
+    )
+
+    assert condition_grid["temperature_model_status"].tolist() == [
+        "calculated",
+        "calculated",
+        "blocked_below_profile_no_gradient",
+    ]
+    assert interval["stability_result_status"] == "blocked_incomplete_pressure_temperature_grid"
+    assert pd.isna(interval["stability_top_m"])
+    assert pd.isna(interval["stability_base_m"])
+    assert "temperature_profile_missing" in interval["caveat_codes"]
+
+
+def test_stability_source_control_label_assigns_high_medium_low_and_blocked() -> None:
+    high = {
+        "within_hydrate_assessment_unit": True,
+        "depth_basis": "TrueVertic",
+        "phase_curve_status": "applied",
+        "phase_curve_allowed_use": PHASE_CURVE_ALLOWED_USE,
+        "temperature_model_status": "calculated",
+        "stability_result_status": "calculated",
+        "temperature_control_distance_km": 3.0,
+        "temperature_extrapolation_below_profile_m": 0.0,
+    }
+    medium = high | {
+        "temperature_control_distance_km": 20.0,
+        "temperature_extrapolation_below_profile_m": 150.0,
+    }
+    low = high | {
+        "depth_basis": "DrillerTot",
+        "temperature_control_distance_km": 75.0,
+        "temperature_extrapolation_below_profile_m": 300.0,
+    }
+    blocked = high | {
+        "temperature_model_status": "blocked_no_temperature_profile",
+    }
+
+    assert stability_source_control_label(high) == "high_source_control"
+    assert stability_source_control_label(medium) == "medium_source_control"
+    assert stability_source_control_label(low) == "low_source_control"
+    assert stability_source_control_label(blocked) == "blocked_missing_inputs"
+
+
+def test_stability_source_control_label_keeps_outside_au_separate() -> None:
+    outside = {
+        "within_hydrate_assessment_unit": False,
+        "depth_basis": "TrueVertic",
+        "phase_curve_status": "applied",
+        "temperature_model_status": "calculated",
+        "stability_result_status": "calculated",
+    }
+
+    assert stability_source_control_label(outside) == "outside_public_au_context"
 
 
 def test_stability_parameter_readiness_keeps_final_zone_as_pending() -> None:

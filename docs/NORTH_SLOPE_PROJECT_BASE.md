@@ -498,15 +498,27 @@ Fresh-chat handoff as of 2026-06-14:
   with a supplied gradient, and returns blocked statuses when inputs are
   insufficient. It is tested with fixtures only and has not produced final
   stability top/base/thickness outputs.
+- Local stability depth-grid and intersection helper code now exists in
+  `dashboard/stability_products.py`: it builds an inclusive depth grid, combines
+  temperature, hydrostatic pressure, and phase lookup into per-depth stability
+  flags, finds synthetic top/base crossings in fixture tests, and blocks
+  incomplete pressure-temperature grids. It has not been applied to the public
+  scaffold.
+- Local source-control confidence-label helper code now exists in
+  `dashboard/stability_products.py`: fixture tests cover high, medium, low,
+  blocked, and outside-AU labels. These are source-control labels only, not
+  hydrate-confidence or saturation labels.
 - Website end-state control now exists as
   `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`:
   the final public stability view should show run assumptions, readiness gates,
   map status, selected-well audit details, temperature-phase intersections,
   result tables, scenario controls, and exports/citations without claiming
   hydrate proof, saturation, sweet spots, or validated ML results.
-- Next scientific task: implement the stability depth-grid/intersection rules
-  and confidence-label/caveat tests before calculating any stability
-  top/base/thickness fields.
+- Next scientific task: decide when to pull/sync the full source bundle on OSL
+  for real public temperature-model products, then build a guarded
+  `stability_screen_*.csv` writer that only fills top/base/thickness for rows
+  passing the tested pressure, temperature, phase-curve, intersection, and
+  confidence gates.
   Do not label the current scaffold as hydrate proof.
 
 ## Equations To Preserve

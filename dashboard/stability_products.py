@@ -44,6 +44,11 @@ NUMERIC_PROFILE_RE = re.compile(r"^\s*(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s*$"
 HYDROSTATIC_PRESSURE_MPA_PER_M = 0.00980665
 SURFACE_PRESSURE_MPA = 0.101325
 TEMPERATURE_MODEL_ID = "g10015_profile_interpolation_v1"
+DEFAULT_STABILITY_DEPTH_GRID_STEP_M = 5.0
+NEAR_TEMPERATURE_CONTROL_KM = 5.0
+MODERATE_TEMPERATURE_CONTROL_KM = 50.0
+MINOR_TEMPERATURE_EXTRAPOLATION_M = 100.0
+LARGE_TEMPERATURE_EXTRAPOLATION_M = 250.0
 
 PHASE_CURVE_COLUMNS = [
     "phase_curve_id",
@@ -116,6 +121,37 @@ TEMPERATURE_MODEL_COLUMNS = [
     "temperature_extrapolated_below_profile",
     "temperature_extrapolation_below_profile_m",
     "temperature_model_status",
+]
+
+STABILITY_CONDITION_GRID_COLUMNS = [
+    "depth_m",
+    "pressure_mpa_absolute",
+    "temperature_model_c",
+    "temperature_equilibrium_c",
+    "is_stable",
+    "temperature_model_method",
+    "temperature_extrapolated_below_profile",
+    "temperature_extrapolation_below_profile_m",
+    "temperature_model_status",
+]
+
+STABILITY_INTERVAL_RESULT_COLUMNS = [
+    "stability_result_status",
+    "stable_depth_grid_step_m",
+    "stability_top_m",
+    "stability_top_pressure_mpa_absolute",
+    "stability_top_temperature_c",
+    "stability_base_m",
+    "stability_base_pressure_mpa_absolute",
+    "stability_base_temperature_c",
+    "stability_thickness_m",
+    "well_penetrated_stability_thickness_m",
+    "reaches_stability_zone",
+    "top_boundary_method",
+    "base_boundary_method",
+    "temperature_extrapolated_below_profile",
+    "temperature_extrapolation_below_profile_m",
+    "caveat_codes",
 ]
 
 WELL_CONTEXT_COLUMNS = [
@@ -316,6 +352,320 @@ def phase_curve_equilibrium_temperature_c(
     if isinstance(pressure_mpa_absolute, pd.Series):
         return pd.Series(result, index=pressure_mpa_absolute.index)
     return result
+
+
+def stability_depth_grid(
+    depth_limit_m: object,
+    step_m: object = DEFAULT_STABILITY_DEPTH_GRID_STEP_M,
+) -> np.ndarray:
+    limit = pd.to_numeric(depth_limit_m, errors="coerce")
+    step = pd.to_numeric(step_m, errors="coerce")
+    if not np.isfinite(step) or float(step) <= 0:
+        raise ValueError("Stability depth-grid step must be a positive number.")
+    if not np.isfinite(limit) or float(limit) < 0:
+        return np.array([], dtype=float)
+
+    limit_value = float(limit)
+    if limit_value == 0:
+        return np.array([0.0], dtype=float)
+
+    grid = np.arange(0.0, limit_value, float(step))
+    grid = np.append(grid, limit_value)
+    return np.unique(np.round(grid, 10)).astype(float)
+
+
+def stability_condition_grid_from_profile(
+    profile_points: pd.DataFrame,
+    phase_curve: pd.DataFrame,
+    depth_limit_m: object,
+    gradient_c_per_100m: object | None = None,
+    step_m: object = DEFAULT_STABILITY_DEPTH_GRID_STEP_M,
+) -> pd.DataFrame:
+    grid = stability_depth_grid(depth_limit_m, step_m)
+    if len(grid) == 0:
+        return pd.DataFrame(columns=STABILITY_CONDITION_GRID_COLUMNS)
+
+    temperature = temperature_model_from_profile(
+        profile_points,
+        grid,
+        gradient_c_per_100m=gradient_c_per_100m,
+    )
+    pressure = hydrostatic_pressure_mpa_absolute(temperature["depth_m"])
+    equilibrium = phase_curve_equilibrium_temperature_c(phase_curve, pressure)
+    frame = temperature.copy()
+    frame["pressure_mpa_absolute"] = pd.to_numeric(pressure, errors="coerce")
+    frame["temperature_equilibrium_c"] = pd.to_numeric(equilibrium, errors="coerce")
+    has_complete_conditions = (
+        frame["temperature_model_status"].eq("calculated")
+        & frame["temperature_model_c"].notna()
+        & frame["temperature_equilibrium_c"].notna()
+    )
+    frame["is_stable"] = False
+    frame.loc[has_complete_conditions, "is_stable"] = (
+        frame.loc[has_complete_conditions, "temperature_model_c"]
+        <= frame.loc[has_complete_conditions, "temperature_equilibrium_c"]
+    )
+    return frame[STABILITY_CONDITION_GRID_COLUMNS]
+
+
+def _zero_crossing_depth(
+    shallower_depth: float,
+    shallower_delta: float,
+    deeper_depth: float,
+    deeper_delta: float,
+) -> float:
+    if deeper_delta == shallower_delta:
+        return float(deeper_depth)
+    fraction = -shallower_delta / (deeper_delta - shallower_delta)
+    return float(shallower_depth + fraction * (deeper_depth - shallower_depth))
+
+
+def _empty_stability_interval_result(
+    status: str,
+    caveat_codes: list[str] | None = None,
+    step_m: object = pd.NA,
+) -> pd.Series:
+    caveats = caveat_codes or [
+        "hydrostatic_pressure_assumed",
+        "phase_curve_methane_5ppt",
+        "not_hydrate_proof",
+    ]
+    return pd.Series(
+        {
+            "stability_result_status": status,
+            "stable_depth_grid_step_m": step_m,
+            "stability_top_m": np.nan,
+            "stability_top_pressure_mpa_absolute": np.nan,
+            "stability_top_temperature_c": np.nan,
+            "stability_base_m": np.nan,
+            "stability_base_pressure_mpa_absolute": np.nan,
+            "stability_base_temperature_c": np.nan,
+            "stability_thickness_m": np.nan,
+            "well_penetrated_stability_thickness_m": np.nan,
+            "reaches_stability_zone": False,
+            "top_boundary_method": "not_calculated",
+            "base_boundary_method": "not_calculated",
+            "temperature_extrapolated_below_profile": False,
+            "temperature_extrapolation_below_profile_m": 0.0,
+            "caveat_codes": ";".join(caveats),
+        },
+        index=STABILITY_INTERVAL_RESULT_COLUMNS,
+    )
+
+
+def stability_interval_from_condition_grid(
+    condition_grid: pd.DataFrame,
+    depth_limit_m: object | None = None,
+    step_m: object = DEFAULT_STABILITY_DEPTH_GRID_STEP_M,
+) -> pd.Series:
+    if condition_grid.empty:
+        return _empty_stability_interval_result(
+            "blocked_incomplete_pressure_temperature_grid",
+            step_m=step_m,
+        )
+
+    frame = condition_grid.copy()
+    numeric_columns = [
+        "depth_m",
+        "pressure_mpa_absolute",
+        "temperature_model_c",
+        "temperature_equilibrium_c",
+        "temperature_extrapolation_below_profile_m",
+    ]
+    for column in numeric_columns:
+        frame[column] = pd.to_numeric(frame[column], errors="coerce")
+    frame = frame.sort_values("depth_m").reset_index(drop=True)
+    complete_conditions = (
+        frame["temperature_model_status"].eq("calculated")
+        & frame["pressure_mpa_absolute"].notna()
+        & frame["temperature_model_c"].notna()
+        & frame["temperature_equilibrium_c"].notna()
+    )
+    if not complete_conditions.all():
+        caveats = [
+            "hydrostatic_pressure_assumed",
+            "phase_curve_methane_5ppt",
+            "not_hydrate_proof",
+        ]
+        if frame["temperature_model_status"].astype(str).str.startswith("blocked").any():
+            caveats.append("temperature_profile_missing")
+        return _empty_stability_interval_result(
+            "blocked_incomplete_pressure_temperature_grid",
+            caveats,
+            step_m,
+        )
+
+    stable = frame["is_stable"].astype(bool).to_numpy()
+    if not stable.any():
+        result = _empty_stability_interval_result(
+            "calculated_no_stable_interval",
+            step_m=step_m,
+        )
+        result["well_penetrated_stability_thickness_m"] = 0.0
+        return result
+
+    depths = frame["depth_m"].to_numpy(dtype=float)
+    deltas = (
+        frame["temperature_equilibrium_c"] - frame["temperature_model_c"]
+    ).to_numpy(dtype=float)
+
+    start_index = int(np.flatnonzero(stable)[0])
+    if start_index == 0:
+        top_m = float(depths[start_index])
+        top_method = "stable_at_shallowest_grid"
+    else:
+        top_m = _zero_crossing_depth(
+            depths[start_index - 1],
+            deltas[start_index - 1],
+            depths[start_index],
+            deltas[start_index],
+        )
+        top_method = "interpolated_crossing"
+
+    unstable_after = np.flatnonzero(~stable[start_index:])
+    if len(unstable_after) == 0:
+        base_m = float(depths[-1])
+        base_method = "open_below_model_depth_limit"
+    else:
+        first_unstable_index = start_index + int(unstable_after[0])
+        base_m = _zero_crossing_depth(
+            depths[first_unstable_index - 1],
+            deltas[first_unstable_index - 1],
+            depths[first_unstable_index],
+            deltas[first_unstable_index],
+        )
+        base_method = "interpolated_crossing"
+
+    modeled_depth_limit = depth_limit_m
+    if modeled_depth_limit is None:
+        modeled_depth_limit = float(depths[-1])
+    modeled_depth_limit = pd.to_numeric(modeled_depth_limit, errors="coerce")
+    if not np.isfinite(modeled_depth_limit):
+        modeled_depth_limit = float(depths[-1])
+    modeled_depth_limit = float(modeled_depth_limit)
+
+    reaches_stability_zone = modeled_depth_limit >= top_m
+    penetrated_thickness = 0.0
+    if reaches_stability_zone:
+        penetrated_thickness = max(0.0, min(base_m, modeled_depth_limit) - top_m)
+
+    interval_rows = frame[frame["depth_m"].between(top_m, base_m)]
+    extrapolated = bool(interval_rows["temperature_extrapolated_below_profile"].any())
+    extrapolation_m = 0.0
+    if extrapolated:
+        extrapolation_m = float(
+            interval_rows["temperature_extrapolation_below_profile_m"].max()
+        )
+
+    caveats = [
+        "hydrostatic_pressure_assumed",
+        "phase_curve_methane_5ppt",
+        "not_hydrate_proof",
+    ]
+    if extrapolated:
+        caveats.append("temperature_profile_extrapolated")
+
+    result = pd.Series(
+        {
+            "stability_result_status": "calculated",
+            "stable_depth_grid_step_m": step_m,
+            "stability_top_m": top_m,
+            "stability_top_pressure_mpa_absolute": float(
+                np.interp(top_m, depths, frame["pressure_mpa_absolute"])
+            ),
+            "stability_top_temperature_c": float(
+                np.interp(top_m, depths, frame["temperature_model_c"])
+            ),
+            "stability_base_m": base_m,
+            "stability_base_pressure_mpa_absolute": float(
+                np.interp(base_m, depths, frame["pressure_mpa_absolute"])
+            ),
+            "stability_base_temperature_c": float(
+                np.interp(base_m, depths, frame["temperature_model_c"])
+            ),
+            "stability_thickness_m": max(0.0, base_m - top_m),
+            "well_penetrated_stability_thickness_m": penetrated_thickness,
+            "reaches_stability_zone": reaches_stability_zone,
+            "top_boundary_method": top_method,
+            "base_boundary_method": base_method,
+            "temperature_extrapolated_below_profile": extrapolated,
+            "temperature_extrapolation_below_profile_m": extrapolation_m,
+            "caveat_codes": ";".join(caveats),
+        },
+        index=STABILITY_INTERVAL_RESULT_COLUMNS,
+    )
+    return result
+
+
+def _series_value(row: pd.Series | dict[str, object], *names: str, default: object = pd.NA) -> object:
+    for name in names:
+        if name in row and pd.notna(row[name]):
+            return row[name]
+    return default
+
+
+def stability_source_control_label(row: pd.Series | dict[str, object]) -> str:
+    inside_au = bool(_series_value(row, "within_hydrate_assessment_unit", default=False))
+    if not inside_au:
+        return "outside_public_au_context"
+
+    depth_basis = str(_series_value(row, "depth_source", "depth_basis", default="")).strip()
+    phase_status = str(_series_value(row, "phase_curve_status", default="")).strip()
+    temperature_status = str(_series_value(row, "temperature_model_status", default="")).strip()
+    result_status = str(_series_value(row, "stability_result_status", default="")).strip()
+
+    if (
+        not depth_basis
+        or depth_basis == "missing"
+        or phase_status != "applied"
+        or temperature_status != "calculated"
+        or result_status.startswith("blocked")
+    ):
+        return "blocked_missing_inputs"
+
+    allowed_use = str(_series_value(row, "phase_curve_allowed_use", default="")).strip()
+    if allowed_use and allowed_use != PHASE_CURVE_ALLOWED_USE:
+        return "low_source_control"
+
+    control_distance = pd.to_numeric(
+        _series_value(
+            row,
+            "temperature_control_distance_km",
+            "permafrost_control_distance_km",
+            "nearest_ggd223_distance_km",
+            default=np.nan,
+        ),
+        errors="coerce",
+    )
+    extrapolation_m = pd.to_numeric(
+        _series_value(row, "temperature_extrapolation_below_profile_m", default=0.0),
+        errors="coerce",
+    )
+    if not np.isfinite(control_distance):
+        control_distance = np.inf
+    if not np.isfinite(extrapolation_m):
+        extrapolation_m = np.inf
+
+    is_true_vertical = depth_basis == "TrueVertic"
+    is_driller_fallback = depth_basis == "DrillerTot"
+    minor_extrapolation = extrapolation_m <= MINOR_TEMPERATURE_EXTRAPOLATION_M
+    moderate_extrapolation = extrapolation_m <= LARGE_TEMPERATURE_EXTRAPOLATION_M
+
+    if (
+        is_true_vertical
+        and control_distance <= NEAR_TEMPERATURE_CONTROL_KM
+        and minor_extrapolation
+    ):
+        return "high_source_control"
+    if (
+        is_true_vertical
+        and control_distance <= MODERATE_TEMPERATURE_CONTROL_KM
+        and moderate_extrapolation
+    ):
+        return "medium_source_control"
+    if is_driller_fallback or result_status == "calculated":
+        return "low_source_control"
+    return "blocked_missing_inputs"
 
 
 def load_arctic_slope_public_wells(project_root: Path) -> gpd.GeoDataFrame:

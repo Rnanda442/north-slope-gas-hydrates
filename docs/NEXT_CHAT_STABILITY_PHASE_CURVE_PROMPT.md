@@ -78,6 +78,20 @@ gradient-based extrapolation, missing-gradient blocking, empty-profile
 blocking, and missing-depth blocking. This is still fixture-only code; no real
 public temperature-model product has been rebuilt from OSL yet.
 
+Current local intersection code:
+`dashboard/stability_products.py` also includes
+`stability_depth_grid(...)`, `stability_condition_grid_from_profile(...)`, and
+`stability_interval_from_condition_grid(...)`. Tests cover inclusive depth-grid
+construction, interpolated top/base crossings for a synthetic closed interval,
+open-below-model bases with extrapolation caveats, and blocked incomplete
+pressure-temperature grids. This has not been applied to the public scaffold.
+
+Current local confidence-label code:
+`stability_source_control_label(...)` assigns source-control confidence labels
+for fixture rows. Tests cover high, medium, low, blocked, and outside-AU cases.
+These are not hydrate-confidence labels and do not estimate occurrence,
+saturation, producibility, or sweet spots.
+
 Current website product spec:
 `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`
 defines the final public website shape for stability: status strip, readiness
@@ -85,16 +99,17 @@ tables, map, selected-well audit panel, temperature-phase plot, results table,
 scenario controls, and exports/citations.
 
 Next task:
-Build the stability-depth-grid and intersection tests before calculating any
-final top/base/thickness fields:
+Decide whether the next work happens locally or in OSL:
 1. keep the input capability matrix and phase lookup metadata current;
-2. design the stability-depth grid and boundary-crossing tests using the
-   tested temperature-model helper plus the methane phase lookup;
-3. implement confidence-label and caveat-code tests;
-4. decide when to pull OSL to build real public temperature-model products from
-   raw G10015 rows;
-5. keep `phase_curve_status = not_applied` and top/base/thickness null until
-   temperature, pressure, phase-curve, and confidence-label tests are ready.
+2. local-only next step: build a guarded `stability_screen_*.csv` writer with
+   tiny fixtures and confirm blocked rows remain null;
+3. OSL next step: pull/sync the full source bundle and build real public
+   temperature-model products from raw G10015 rows;
+4. after the real temperature product exists, apply the tested interval and
+   confidence helpers only to eligible rows;
+5. keep the current scaffold at `phase_curve_status = not_applied` and
+   top/base/thickness null until a versioned stability screen product is
+   intentionally created.
 
 Do not calculate final top/base/thickness until those implementation gates are
 complete. If web research is needed, use primary/public sources and cite them.

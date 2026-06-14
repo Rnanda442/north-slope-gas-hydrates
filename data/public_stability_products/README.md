@@ -99,6 +99,17 @@ statuses when inputs are insufficient. They are not a real public temperature
 model product until the raw G10015 profile rows are rebuilt from the full
 OpenScienceLab/source bundle.
 
+The same module now includes fixture-tested stability depth-grid and
+intersection helpers. They can combine modeled temperature, absolute
+hydrostatic pressure, and the methane phase lookup for synthetic test cases,
+but they have not been applied to this public scaffold. No committed public
+product in this folder is a final stability-screen result yet.
+
+Fixture-tested source-control confidence labels also exist for future stability
+screen rows. They separate high, medium, low, blocked, and outside-AU source
+control. They do not label hydrate occurrence, saturation, reservoir quality, or
+sweet spots.
+
 ## Assessment Unit Codes
 
 | Code | Name |
