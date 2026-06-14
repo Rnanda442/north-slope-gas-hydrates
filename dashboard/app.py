@@ -27,9 +27,12 @@ from dashboard.stability_sources import (
     stability_source_status_frame,
 )
 from dashboard.stability_products import (
+    default_g10015_inventory_path,
     default_well_context_path,
+    load_g10015_temperature_inventory,
     load_public_well_stability_context,
     stability_context_summary_frame,
+    temperature_inventory_summary_frame,
 )
 from dashboard.runtime.validation import (
     curve_coverage_frame,
@@ -860,6 +863,11 @@ def cached_public_well_stability_context(project_root: str) -> pd.DataFrame:
     return load_public_well_stability_context(Path(project_root))
 
 
+@st.cache_data
+def cached_g10015_temperature_inventory(project_root: str) -> pd.DataFrame:
+    return load_g10015_temperature_inventory(Path(project_root))
+
+
 def project_relative_or_absolute(path: Path) -> str:
     try:
         return path.relative_to(PROJECT_ROOT).as_posix()
@@ -1522,7 +1530,7 @@ def render_stability_source_bundle() -> None:
     )
     cols[1].metric("GGD223 controls", f'{metrics["GGD223 controls"]:,}')
     cols[2].metric("Hydrate AUs", f'{metrics["Hydrate AUs"]:,}')
-    cols[3].metric("G10015 profiles", f'{metrics["G10015 profiles"]:,}')
+    cols[3].metric("Source G10015 files", f'{metrics["G10015 profiles"]:,}')
 
     if not source_root.exists():
         st.info(
@@ -1649,6 +1657,67 @@ def render_public_well_stability_context_product() -> None:
         "Download public well context CSV",
         context.to_csv(index=False).encode("utf-8"),
         file_name=context_path.name,
+        mime="text/csv",
+        use_container_width=True,
+    )
+
+    render_g10015_temperature_inventory_product()
+
+
+def render_g10015_temperature_inventory_product() -> None:
+    inventory_path = default_g10015_inventory_path(PROJECT_ROOT)
+    inventory = cached_g10015_temperature_inventory(str(PROJECT_ROOT))
+    if inventory.empty:
+        st.info(
+            "No G10015 temperature-profile inventory has been generated yet. "
+            f"Expected path: `{project_relative_or_absolute(inventory_path)}`."
+        )
+        return
+
+    st.markdown("#### G10015 Temperature Profile Inventory")
+    st.caption(
+        "Compact inventory of public processed borehole temperature logs. "
+        "The gradient value is a rough deepest-window context estimate, not a "
+        "calibrated geothermal model."
+    )
+    max_depth = float(pd.to_numeric(inventory["max_depth_m"], errors="coerce").max())
+    gradient_count = int(
+        pd.to_numeric(
+            inventory["deepest_window_gradient_c_per_100m"],
+            errors="coerce",
+        ).notna().sum()
+    )
+    cols = st.columns(4)
+    cols[0].metric("G10015 profiles", f"{len(inventory):,}")
+    cols[1].metric("Well codes", f"{inventory['well_code'].nunique():,}")
+    cols[2].metric("Deepest log", f"{max_depth:,.1f} m")
+    cols[3].metric("Gradient estimates", f"{gradient_count:,}")
+    st.dataframe(
+        temperature_inventory_summary_frame(inventory),
+        use_container_width=True,
+        hide_index=True,
+    )
+    preview = inventory.sort_values(["well_code", "max_depth_m"], ascending=[True, False]).head(14)
+    st.dataframe(
+        preview[
+            [
+                "file_name",
+                "well_code",
+                "well_name",
+                "log_date",
+                "sample_count",
+                "max_depth_m",
+                "deepest_temperature_c",
+                "deepest_window_gradient_c_per_100m",
+            ]
+        ],
+        use_container_width=True,
+        hide_index=True,
+    )
+    st.download_button(
+        "Download G10015 inventory CSV",
+        inventory.to_csv(index=False).encode("utf-8"),
+        file_name=inventory_path.name,
         mime="text/csv",
         use_container_width=True,
     )

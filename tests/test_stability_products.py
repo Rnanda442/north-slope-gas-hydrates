@@ -7,10 +7,13 @@ import pandas as pd
 from shapely.geometry import Point, Polygon
 
 from dashboard.stability_products import (
+    build_g10015_temperature_inventory,
     build_public_well_stability_context,
     default_well_context_path,
     load_arctic_slope_public_wells,
+    parse_g10015_temperature_profile,
     stability_context_summary_frame,
+    temperature_inventory_summary_frame,
     write_public_stability_products,
 )
 
@@ -101,6 +104,31 @@ def make_public_snapshot(tmp_path):
     }
     (snapshot / "GasHydrateAUs.geojson").write_text(json.dumps(geojson), encoding="utf-8")
     (snapshot / "README.md").write_text("snapshot\n", encoding="utf-8")
+    return snapshot
+
+
+def make_temperature_profile(source_root):
+    profile_dir = source_root / "03_temperature_geothermal" / "NSIDC_G10015_extracted"
+    profile_dir.mkdir(parents=True)
+    profile = profile_dir / "SYN_24JUN14.txt"
+    profile.write_text(
+        "\n".join(
+            [
+                "Temperature Log Information:",
+                "  Well name:   Synthetic Test Well",
+                "  File name:   SYN_24JUN14_c_d",
+                "  Log date:    14-JUN-2026",
+                "",
+                " Depth  Temperature",
+                "  0.00  -10.0",
+                " 50.00  -7.0",
+                "100.00  -4.0",
+                "150.00  -1.0",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    return profile
 
 
 def test_load_arctic_slope_public_wells_filters_source_package(tmp_path) -> None:
@@ -132,12 +160,36 @@ def test_build_public_well_stability_context_assigns_science_context(tmp_path) -
 
 def test_write_public_stability_products_creates_csv_outputs(tmp_path) -> None:
     make_public_well_package(tmp_path)
-    make_public_snapshot(tmp_path)
+    snapshot = make_public_snapshot(tmp_path)
+    make_temperature_profile(snapshot)
 
-    context_path, summary_path = write_public_stability_products(tmp_path)
+    context_path, summary_path, inventory_path, inventory_summary_path = write_public_stability_products(
+        tmp_path
+    )
 
     assert context_path == default_well_context_path(tmp_path)
     assert context_path.exists()
     assert summary_path.exists()
+    assert inventory_path is not None
+    assert inventory_path.exists()
+    assert inventory_summary_path is not None
+    assert inventory_summary_path.exists()
     context = pd.read_csv(context_path)
     assert context["well_name"].tolist() == ["TEST NORTH SLOPE 1"]
+
+
+def test_g10015_temperature_profile_inventory_summarizes_processed_logs(tmp_path) -> None:
+    snapshot = make_public_snapshot(tmp_path)
+    profile = make_temperature_profile(snapshot)
+
+    parsed = parse_g10015_temperature_profile(profile)
+    inventory = build_g10015_temperature_inventory(snapshot)
+    summary = temperature_inventory_summary_frame(inventory)
+
+    assert parsed["well_code"] == "SYN"
+    assert parsed["well_name"] == "Synthetic Test Well"
+    assert parsed["sample_count"] == 4
+    assert parsed["max_depth_m"] == 150.0
+    assert round(float(parsed["deepest_window_gradient_c_per_100m"]), 2) == 6.0
+    assert len(inventory) == 1
+    assert summary.loc[summary["metric"] == "G10015 profiles", "value"].iloc[0] == 1

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
+import re
 
 import geopandas as gpd
+import numpy as np
 import pandas as pd
 
 from dashboard.stability_sources import (
@@ -15,10 +17,14 @@ from dashboard.stability_sources import (
 PRODUCT_DIR_NAME = "public_stability_products"
 WELL_CONTEXT_FILE_NAME = "north_slope_well_stability_context_2026-06-14.csv"
 WELL_CONTEXT_SUMMARY_FILE_NAME = "north_slope_well_stability_context_summary_2026-06-14.csv"
+G10015_INVENTORY_FILE_NAME = "g10015_temperature_profile_inventory_2026-06-14.csv"
+G10015_SUMMARY_FILE_NAME = "g10015_temperature_profile_summary_2026-06-14.csv"
 
 WELL_SOURCE_RELATIVE_PATH = (
     "raw_data/Wells/Well_Bottom_Hole_Location/Well_Bottom_Hole_Location.shp"
 )
+G10015_RELATIVE_PATH = "03_temperature_geothermal/NSIDC_G10015_extracted"
+NUMERIC_PROFILE_RE = re.compile(r"^\s*(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s*$")
 
 WELL_CONTEXT_COLUMNS = [
     "object_id",
@@ -59,6 +65,14 @@ def default_well_context_path(project_root: Path) -> Path:
 
 def default_well_context_summary_path(project_root: Path) -> Path:
     return default_stability_products_dir(project_root) / WELL_CONTEXT_SUMMARY_FILE_NAME
+
+
+def default_g10015_inventory_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / G10015_INVENTORY_FILE_NAME
+
+
+def default_g10015_summary_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / G10015_SUMMARY_FILE_NAME
 
 
 def load_arctic_slope_public_wells(project_root: Path) -> gpd.GeoDataFrame:
@@ -308,16 +322,140 @@ def load_public_well_stability_context(project_root: Path) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
+def _header_value(lines: list[str], label: str) -> str:
+    prefix = f"{label}:"
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith(prefix):
+            return stripped.split(":", 1)[1].strip()
+    return ""
+
+
+def parse_g10015_temperature_profile(path: Path) -> dict[str, object]:
+    lines = Path(path).read_text(encoding="utf-8", errors="replace").splitlines()
+    records = []
+    for line in lines:
+        match = NUMERIC_PROFILE_RE.match(line)
+        if match:
+            records.append((float(match.group(1)), float(match.group(2))))
+
+    well_code = Path(path).stem.split("_", 1)[0]
+    result: dict[str, object] = {
+        "file_name": Path(path).name,
+        "well_code": well_code,
+        "well_name": _header_value(lines, "Well name"),
+        "profile_file_name": _header_value(lines, "File name"),
+        "log_date": _header_value(lines, "Log date"),
+        "sample_count": len(records),
+        "min_depth_m": pd.NA,
+        "max_depth_m": pd.NA,
+        "min_temperature_c": pd.NA,
+        "max_temperature_c": pd.NA,
+        "deepest_temperature_c": pd.NA,
+        "deepest_window_gradient_c_per_100m": pd.NA,
+    }
+    if not records:
+        return result
+
+    profile = pd.DataFrame(records, columns=["depth_m", "temperature_c"]).sort_values("depth_m")
+    deepest_depth = float(profile["depth_m"].max())
+    deepest_window = profile[profile["depth_m"] >= deepest_depth - 100]
+    gradient = pd.NA
+    if len(deepest_window) >= 3 and deepest_window["depth_m"].nunique() >= 2:
+        slope = np.polyfit(
+            deepest_window["depth_m"].to_numpy(),
+            deepest_window["temperature_c"].to_numpy(),
+            1,
+        )[0]
+        gradient = float(slope * 100)
+
+    result.update(
+        {
+            "min_depth_m": float(profile["depth_m"].min()),
+            "max_depth_m": deepest_depth,
+            "min_temperature_c": float(profile["temperature_c"].min()),
+            "max_temperature_c": float(profile["temperature_c"].max()),
+            "deepest_temperature_c": float(profile.iloc[-1]["temperature_c"]),
+            "deepest_window_gradient_c_per_100m": gradient,
+        }
+    )
+    return result
+
+
+def build_g10015_temperature_inventory(source_root: Path) -> pd.DataFrame:
+    profile_dir = Path(source_root) / G10015_RELATIVE_PATH
+    if not profile_dir.exists():
+        return pd.DataFrame()
+    records = [
+        parse_g10015_temperature_profile(path)
+        for path in sorted(profile_dir.glob("*.txt"))
+    ]
+    if not records:
+        return pd.DataFrame()
+    inventory = pd.DataFrame(records)
+    return inventory.sort_values(["well_code", "log_date", "file_name"]).reset_index(drop=True)
+
+
+def temperature_inventory_summary_frame(inventory: pd.DataFrame) -> pd.DataFrame:
+    if inventory.empty:
+        return pd.DataFrame(columns=["metric", "value", "meaning"])
+    gradient_count = pd.to_numeric(
+        inventory["deepest_window_gradient_c_per_100m"],
+        errors="coerce",
+    ).notna()
+    rows = [
+        {
+            "metric": "G10015 profiles",
+            "value": int(len(inventory)),
+            "meaning": "Processed public borehole temperature log files indexed.",
+        },
+        {
+            "metric": "Unique well codes",
+            "value": int(inventory["well_code"].nunique()),
+            "meaning": "Unique public G10015/GGD223-style well codes represented by profiles.",
+        },
+        {
+            "metric": "Maximum logged depth m",
+            "value": round(float(pd.to_numeric(inventory["max_depth_m"], errors="coerce").max()), 2),
+            "meaning": "Deepest depth reached by any indexed public temperature profile.",
+        },
+        {
+            "metric": "Profiles with deepest-window gradient",
+            "value": int(gradient_count.sum()),
+            "meaning": "Profiles with enough deepest-window samples for a rough C per 100 m context estimate.",
+        },
+    ]
+    return pd.DataFrame(rows)
+
+
+def load_g10015_temperature_inventory(project_root: Path) -> pd.DataFrame:
+    path = default_g10015_inventory_path(project_root)
+    if not path.exists():
+        return pd.DataFrame()
+    return pd.read_csv(path)
+
+
 def write_public_stability_products(
     project_root: Path,
     source_root: Path | None = None,
-) -> tuple[Path, Path]:
+) -> tuple[Path, Path, Path | None, Path | None]:
     product_dir = default_stability_products_dir(project_root)
     product_dir.mkdir(parents=True, exist_ok=True)
-    context = build_public_well_stability_context(project_root, source_root)
+    active_source = Path(source_root) if source_root is not None else active_stability_source_path(project_root)
+    context = build_public_well_stability_context(project_root, active_source)
     summary = stability_context_summary_frame(context)
     context_path = default_well_context_path(project_root)
     summary_path = default_well_context_summary_path(project_root)
     context.to_csv(context_path, index=False)
     summary.to_csv(summary_path, index=False)
-    return context_path, summary_path
+
+    inventory = build_g10015_temperature_inventory(active_source)
+    if inventory.empty:
+        return context_path, summary_path, None, None
+
+    inventory_summary = temperature_inventory_summary_frame(inventory)
+    inventory_path = default_g10015_inventory_path(project_root)
+    inventory_summary_path = default_g10015_summary_path(project_root)
+    inventory.to_csv(inventory_path, index=False)
+    inventory_summary.to_csv(inventory_summary_path, index=False)
+    return context_path, summary_path, inventory_path, inventory_summary_path

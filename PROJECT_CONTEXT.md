@@ -84,7 +84,9 @@ calculations or claiming model results.
   public well-context product is also present under
   `data/public_stability_products/`, joining Arctic Slope public wells to
   nearest GGD223 controls and USGS hydrate AU membership for screening context
-  only.
+  only. The same product folder includes a compact G10015 temperature-profile
+  inventory for geothermal context; it summarizes public logs and rough
+  deepest-window gradients without committing raw profile rows.
 - Three Excel header references were reviewed from the user's email. The images
   are not stored in Git or shown on the website; their public-safe schema
   derivative is maintained in `docs/WELL_LOG_REQUIREMENTS_MAP.md`.

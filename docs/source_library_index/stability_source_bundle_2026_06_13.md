@@ -78,6 +78,10 @@ Implementation note:
   It joins public Alaska DNR Arctic Slope wells to nearest GGD223
   permafrost-depth controls and USGS hydrate AU membership. Treat its
   `public_context_candidate` flag as screening context only, not hydrate proof.
+- A compact G10015 temperature-profile inventory now lives at
+  `data/public_stability_products/g10015_temperature_profile_inventory_2026-06-14.csv`.
+  It records profile metadata, depth/temperature ranges, deepest temperature,
+  and rough deepest-window gradient context without committing raw profile rows.
 - For local testing outside OpenScienceLab, set
   `NORTH_SLOPE_STABILITY_SOURCE_DIR` to a full bundle path.
 - `data/source_library/` remains ignored by Git.

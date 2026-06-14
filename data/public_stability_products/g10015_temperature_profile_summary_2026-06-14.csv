@@ -1,0 +1,5 @@
+metric,value,meaning
+G10015 profiles,184.0,Processed public borehole temperature log files indexed.
+Unique well codes,24.0,Unique public G10015/GGD223-style well codes represented by profiles.
+Maximum logged depth m,882.6,Deepest depth reached by any indexed public temperature profile.
+Profiles with deepest-window gradient,184.0,Profiles with enough deepest-window samples for a rough C per 100 m context estimate.

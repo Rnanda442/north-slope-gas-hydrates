@@ -419,6 +419,12 @@ Current OpenScienceLab-to-website workflow:
   the nearest GGD223 permafrost-depth control." It is not a hydrate label, not
   a saturation estimate, and not a pressure-temperature stability-zone
   calculation.
+- Current derived temperature-profile inventory:
+  `data/public_stability_products/g10015_temperature_profile_inventory_2026-06-14.csv`.
+  It summarizes `184` public NSIDC G10015 processed borehole temperature logs
+  across `24` well codes, with maximum logged depth `882.6 m` and rough
+  deepest-window gradient context for each profile. These gradient values are
+  context estimates only, not a calibrated geothermal model.
 - Current full-bundle path remains
   `data/source_library/north_slope_stability_sources_2026-06-13/`, which is
   ignored by Git and should stay local to OpenScienceLab or the laptop.
