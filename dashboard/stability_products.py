@@ -428,6 +428,68 @@ def temperature_inventory_summary_frame(inventory: pd.DataFrame) -> pd.DataFrame
     return pd.DataFrame(rows)
 
 
+def stability_parameter_readiness_frame() -> pd.DataFrame:
+    rows = [
+        {
+            "input": "Well location",
+            "current_status": "Ready",
+            "current_source": "Alaska DNR Well Bottom Hole Location",
+            "use_in_stability": "Spatial anchor for public well context and future stability joins.",
+            "next_step": "Keep public well identifiers and coordinates separate from any future restricted rows.",
+        },
+        {
+            "input": "Well depth",
+            "current_status": "Ready for public context",
+            "current_source": "DNR TrueVertic preferred, DrillerTot fallback",
+            "use_in_stability": "Depth basis for checking whether a well reaches candidate stability intervals.",
+            "next_step": "Confirm final approved depth basis and units when real workbook data arrives.",
+        },
+        {
+            "input": "Base of ice-bearing permafrost",
+            "current_status": "Partial",
+            "current_source": "Nearest NSIDC GGD223 point controls; OM-222 plate not digitized",
+            "use_in_stability": "Upper thermal boundary/context for permafrost-associated hydrate stability.",
+            "next_step": "Digitize/georeference OM-222 or locate a ready public GIS derivative.",
+        },
+        {
+            "input": "Temperature context",
+            "current_status": "Ready as inventory",
+            "current_source": "NSIDC G10015 processed borehole temperature logs",
+            "use_in_stability": "Constrains local temperature-depth behavior and geothermal-gradient context.",
+            "next_step": "Build well-specific or area-specific geothermal profiles from the inventory.",
+        },
+        {
+            "input": "Geothermal gradient",
+            "current_status": "Context only",
+            "current_source": "Deepest-window estimates from G10015 profiles",
+            "use_in_stability": "Approximate temperature increase with depth.",
+            "next_step": "Replace rough estimates with calibrated gradients and uncertainty bands.",
+        },
+        {
+            "input": "Pressure assumption",
+            "current_status": "Planned",
+            "current_source": "Hydrostatic pressure assumption to be sourced and parameterized",
+            "use_in_stability": "Converts depth to pressure for pressure-temperature phase comparison.",
+            "next_step": "Add hydrostatic pressure equation, units, density assumption, and scenario toggle.",
+        },
+        {
+            "input": "Hydrate phase curve",
+            "current_status": "Planned",
+            "current_source": "USGS/NETL methane hydrate phase-boundary sources",
+            "use_in_stability": "Defines pressure-temperature conditions where methane hydrate can exist.",
+            "next_step": "Add a cited lookup/table or equation and document gas/salinity assumptions.",
+        },
+        {
+            "input": "Stability top/base/thickness",
+            "current_status": "Not calculated yet",
+            "current_source": "Requires all inputs above",
+            "use_in_stability": "Final admissibility-zone result for ML feature engineering and screening.",
+            "next_step": "Calculate only after pressure, temperature, permafrost-base, and phase-curve assumptions are locked.",
+        },
+    ]
+    return pd.DataFrame(rows)
+
+
 def load_g10015_temperature_inventory(project_root: Path) -> pd.DataFrame:
     path = default_g10015_inventory_path(project_root)
     if not path.exists():

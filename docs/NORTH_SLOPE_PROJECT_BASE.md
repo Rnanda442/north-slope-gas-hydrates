@@ -425,6 +425,9 @@ Current OpenScienceLab-to-website workflow:
   across `24` well codes, with maximum logged depth `882.6 m` and rough
   deepest-window gradient context for each profile. These gradient values are
   context estimates only, not a calibrated geothermal model.
+- The Structural Explorer now includes a stability pipeline readiness table
+  that marks pressure assumptions, phase-curve selection, and final
+  top/base/thickness calculation as planned or not calculated yet.
 - Current full-bundle path remains
   `data/source_library/north_slope_stability_sources_2026-06-13/`, which is
   ignored by Git and should stay local to OpenScienceLab or the laptop.

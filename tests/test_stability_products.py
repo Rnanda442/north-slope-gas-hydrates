@@ -12,6 +12,7 @@ from dashboard.stability_products import (
     default_well_context_path,
     load_arctic_slope_public_wells,
     parse_g10015_temperature_profile,
+    stability_parameter_readiness_frame,
     stability_context_summary_frame,
     temperature_inventory_summary_frame,
     write_public_stability_products,
@@ -193,3 +194,12 @@ def test_g10015_temperature_profile_inventory_summarizes_processed_logs(tmp_path
     assert round(float(parsed["deepest_window_gradient_c_per_100m"]), 2) == 6.0
     assert len(inventory) == 1
     assert summary.loc[summary["metric"] == "G10015 profiles", "value"].iloc[0] == 1
+
+
+def test_stability_parameter_readiness_keeps_final_zone_as_pending() -> None:
+    readiness = stability_parameter_readiness_frame()
+
+    assert "Hydrate phase curve" in readiness["input"].tolist()
+    final_row = readiness.loc[readiness["input"] == "Stability top/base/thickness"].iloc[0]
+    assert final_row["current_status"] == "Not calculated yet"
+    assert "pressure" in final_row["next_step"].lower()

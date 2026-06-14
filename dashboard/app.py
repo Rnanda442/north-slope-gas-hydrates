@@ -31,6 +31,7 @@ from dashboard.stability_products import (
     default_well_context_path,
     load_g10015_temperature_inventory,
     load_public_well_stability_context,
+    stability_parameter_readiness_frame,
     stability_context_summary_frame,
     temperature_inventory_summary_frame,
 )
@@ -1720,6 +1721,20 @@ def render_g10015_temperature_inventory_product() -> None:
         file_name=inventory_path.name,
         mime="text/csv",
         use_container_width=True,
+    )
+    render_stability_parameter_readiness()
+
+
+def render_stability_parameter_readiness() -> None:
+    st.markdown("#### Stability Pipeline Readiness")
+    st.caption(
+        "Current input status before calculating stability top, base, and thickness. "
+        "Rows marked context or planned should not be treated as final model features yet."
+    )
+    st.dataframe(
+        stability_parameter_readiness_frame(),
+        use_container_width=True,
+        hide_index=True,
     )
 
 
