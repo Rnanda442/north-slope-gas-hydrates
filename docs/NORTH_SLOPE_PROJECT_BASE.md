@@ -296,8 +296,8 @@ Current input status:
 | Well depth | Mostly available locally | Use `TrueVertic` first and `DrillerTot` as fallback from the Alaska DNR well file. These are public well-depth fields, not a separate user-downloaded dataset. Confirm units before calculations; working assumption is feet until field documentation confirms otherwise. |
 | Base of ice-bearing permafrost | Missing as ready GIS locally | Best source is USGS OM-222, "Map showing depth to the base of deepest ice-bearing permafrost as determined from well logs, North Slope, Alaska." It appears available as a PDF/plate rather than a ready GeoPackage. Search for a digitized derivative; otherwise digitize contours/control points and record that provenance. |
 | Geothermal gradient / temperature | Missing as well-specific layer locally | Use public borehole temperature sources: NSIDC G10015 Arctic Slope deep borehole temperature profiles, NSIDC GGD223 borehole/permafrost context, USGS OFR 82-1039, and USGS OFR 82-535. Calculate local gradients where profiles exist; use scenario gradients where not. |
-| Pressure | Available as assumption | Use hydrostatic pore-pressure gradient as first-pass source-backed assumption, currently `9.795 kPa/m`; flag as assumed rather than measured. |
-| Hydrate phase curve | Available from literature | Use a published methane hydrate pressure-temperature phase curve or lookup. USGS SIR 2008-5175 and USGS phase-boundary sources support the stability-screen framing. |
+| Pressure | Available as assumption | Use hydrostatic pore-pressure gradient as first-pass source-backed assumption, currently `9.80665 kPa/m` plus atmospheric pressure for absolute phase-curve comparison; flag as assumed rather than measured. |
+| Hydrate phase curve | First lookup and scenario catalog available | Use `phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv` as the mentor-approved 100 percent methane baseline, digitized from the methane and 5 ppt salt-water phase boundary in USGS SIR 2008-5175 Figure 1A. The scenario catalog records a Collett et al. (2011) / Holder et al. (1987) mixed-gas source as sensitivity-only until it is digitized or generated from a cited thermodynamic model. |
 | Regional hydrate context | Public GIS available | Use USGS 2019 Gas Hydrate Assessment Unit boundaries and input forms for regional context and well/AU joins. This is not direct hydrate proof. |
 
 Current local well-depth coverage check from the Alaska DNR well file:
@@ -322,13 +322,15 @@ Stability-source tasks before coding the explorer layer:
    - permafrost base: `305`, `610`, and `914 m` unless replaced by mapped data;
    - geothermal gradient: `2.0`, `3.2`, and `4.0 C / 100 m` unless replaced by
      local borehole-derived gradients;
-   - pressure gradient: `9.795 kPa/m` hydrostatic first-pass.
-5. Decide the phase-curve implementation: formula, lookup table, or digitized
-   published curve.
-6. Build confidence labels:
-   - `high`: nearby well-specific temperature/permafrost control;
-   - `medium`: mapped/interpolated public source;
-   - `low`: regional scenario assumption only.
+   - pressure gradient: `9.80665 kPa/m` hydrostatic first-pass, with
+     atmospheric pressure added for absolute phase-curve comparison.
+5. Use `docs/STABILITY_CALCULATION_PLAN.md` as the controlling calculation
+   contract before coding the phase-curve step.
+6. Build source-control confidence labels from that plan:
+   - `high_source_control`: nearby well-specific temperature/permafrost control;
+   - `medium_source_control`: mapped/interpolated public source;
+   - `low_source_control`: regional scenario assumption only;
+   - `blocked_missing_inputs`: no final stability result.
 
 Target output fields for a future stability table:
 
@@ -352,6 +354,10 @@ reaches_stability_zone
 stability_confidence
 stability_notes
 ```
+
+The expanded output schema and caveat codes for the future
+`stability_screen_*.csv` are now defined in
+`docs/STABILITY_CALCULATION_PLAN.md`.
 
 Structural Explorer layer direction:
 
@@ -433,9 +439,10 @@ Current OpenScienceLab-to-website workflow:
   Current summary: `8,084` scaffold wells, `483` rows with a G10015 profile
   match, `374` rows ready for the next phase-curve input step, and `0` final
   stability top/base/thickness results.
-- The Structural Explorer now includes a stability pipeline readiness table
-  that marks pressure assumptions, phase-curve selection, and final
-  top/base/thickness calculation as planned or not calculated yet.
+  - The Structural Explorer now includes a stability pipeline readiness table
+    that marks pressure assumptions and the digitized phase-curve lookup as
+    ready public inputs while keeping final top/base/thickness calculation as
+    not calculated yet.
 - Current full-bundle path remains
   `data/source_library/north_slope_stability_sources_2026-06-13/`, which is
   ignored by Git and should stay local to OpenScienceLab or the laptop.
@@ -453,7 +460,7 @@ python 01_pipeline/build_public_stability_products.py
 
 Fresh-chat handoff as of 2026-06-14:
 
-- Latest stable public-product commit pulled locally:
+- Previous OSL-derived public-product baseline commit:
   `aedd734 Rebuild stability products with complete G10015 profiles`.
 - OpenScienceLab full source bundle is now complete enough for the current
   stability product rebuild: `7/7` tracked source items, `43` GGD223 controls,
@@ -466,9 +473,41 @@ Fresh-chat handoff as of 2026-06-14:
 - The next chat should not revisit OpenScienceLab proxy/browser debugging.
   Use OpenScienceLab for source/product rebuilds only, then push derived
   outputs and view them locally or on the hosted public website.
-- Next scientific task: lock a cited hydrate phase curve plus pressure and
-  temperature assumptions before calculating any stability top/base/thickness
-  fields. Do not label the current scaffold as hydrate proof.
+- Current stability calculation plan:
+  `docs/STABILITY_CALCULATION_PLAN.md`. It locks the hydrostatic pressure
+  equation, G10015/GGD223 temperature model hierarchy, methane 5 ppt phase-curve
+  lookup source, confidence labels, caveats, and the future
+  `stability_screen_*.csv` schema.
+- Phase-curve input now exists as
+  `data/public_stability_products/phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv`.
+- Phase-curve scenario control now exists as
+  `data/public_stability_products/phase_curve_scenario_catalog_2026-06-14.csv`:
+  official baseline is 100 percent methane; mixed-gas chemistry remains a
+  sensitivity candidate only.
+- Input capability control now exists as
+  `data/public_stability_products/stability_input_capability_matrix_2026-06-14.csv`:
+  it separates ready public inputs, baseline assumptions, sensitivity-only
+  inputs, and blocked future approved-data inputs.
+- OSL pull/rebuild control now exists as
+  `data/public_stability_products/stability_osl_pull_triggers_2026-06-14.csv`:
+  unit-test fixture work can continue in Git, but real public temperature-model
+  products require OSL because raw G10015 profile rows are not committed.
+- Local temperature-model helper code now exists in
+  `dashboard/stability_products.py`: it parses G10015-style profile points,
+  interpolates inside measured depths, extrapolates below profile depth only
+  with a supplied gradient, and returns blocked statuses when inputs are
+  insufficient. It is tested with fixtures only and has not produced final
+  stability top/base/thickness outputs.
+- Website end-state control now exists as
+  `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`:
+  the final public stability view should show run assumptions, readiness gates,
+  map status, selected-well audit details, temperature-phase intersections,
+  result tables, scenario controls, and exports/citations without claiming
+  hydrate proof, saturation, sweet spots, or validated ML results.
+- Next scientific task: implement the stability depth-grid/intersection rules
+  and confidence-label/caveat tests before calculating any stability
+  top/base/thickness fields.
+  Do not label the current scaffold as hydrate proof.
 
 ## Equations To Preserve
 

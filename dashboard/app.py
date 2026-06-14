@@ -33,9 +33,12 @@ from dashboard.stability_products import (
     load_g10015_temperature_inventory,
     load_public_well_stability_context,
     load_stability_input_scaffold,
+    stability_input_capability_matrix_frame,
+    stability_osl_pull_triggers_frame,
     stability_parameter_readiness_frame,
     stability_context_summary_frame,
     stability_input_scaffold_summary_frame,
+    stability_website_product_spec_frame,
     temperature_inventory_summary_frame,
 )
 from dashboard.runtime.validation import (
@@ -1767,20 +1770,23 @@ def render_stability_input_scaffold_product() -> None:
     if preview_source.empty:
         preview_source = scaffold
     preview = preview_source.sort_values(["nearest_ggd223_distance_km", "well_name"]).head(14)
+    preview_columns = [
+        "well_name",
+        "depth_basis_m",
+        "nearest_ggd223_code",
+        "nearest_permafrost_depth_m",
+        "nearest_temperature_profile_code",
+        "rough_geothermal_gradient_c_per_100m",
+        "hydrostatic_pressure_mpa_at_depth_basis",
+        "hydrostatic_pressure_mpa_absolute_at_depth_basis",
+        "phase_curve_status",
+        "planned_phase_curve_id",
+        "planned_phase_curve_role",
+        "planned_gas_composition_assumption",
+        "stability_input_readiness",
+    ]
     st.dataframe(
-        preview[
-            [
-                "well_name",
-                "depth_basis_m",
-                "nearest_ggd223_code",
-                "nearest_permafrost_depth_m",
-                "nearest_temperature_profile_code",
-                "rough_geothermal_gradient_c_per_100m",
-                "hydrostatic_pressure_mpa_at_depth_basis",
-                "phase_curve_status",
-                "stability_input_readiness",
-            ]
-        ],
+        preview[[column for column in preview_columns if column in preview.columns]],
         use_container_width=True,
         hide_index=True,
     )
@@ -1801,6 +1807,36 @@ def render_stability_parameter_readiness() -> None:
     )
     st.dataframe(
         stability_parameter_readiness_frame(),
+        use_container_width=True,
+        hide_index=True,
+    )
+    st.markdown("#### Input Capability Matrix")
+    st.caption(
+        "What the public inputs can support now, what remains scenario-only, "
+        "and what must wait for approved runtime data."
+    )
+    st.dataframe(
+        stability_input_capability_matrix_frame(),
+        use_container_width=True,
+        hide_index=True,
+    )
+    st.markdown("#### OpenScienceLab Pull Triggers")
+    st.caption(
+        "When the public repo is enough, and when the heavy source bundle in "
+        "OpenScienceLab is required."
+    )
+    st.dataframe(
+        stability_osl_pull_triggers_frame(),
+        use_container_width=True,
+        hide_index=True,
+    )
+    st.markdown("#### Final Website Product Shape")
+    st.caption(
+        "Target website sections for the future baseline stability screen, "
+        "with the claims each section must avoid."
+    )
+    st.dataframe(
+        stability_website_product_spec_frame(),
         use_container_width=True,
         hide_index=True,
     )

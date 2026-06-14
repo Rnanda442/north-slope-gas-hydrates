@@ -9,6 +9,13 @@ organized for the Alaska North Slope gas hydrate project.
   path, copied-library path, file size, and modification time.
 - `source_index.md` summarizes the organized source groups and gives orientation
   snippets for later citation work.
+- `stability_source_bundle_2026_06_13.md` documents the OpenScienceLab stability
+  source bundle behind the current public stability products. Pair it with
+  `../STABILITY_CALCULATION_PLAN.md` before implementing the temperature model
+  and stability intersection step.
+- `source_index.md` also includes `permafrost-mtelbert (1).pdf`, the Collett
+  et al. (2011) Alaska North Slope occurrence paper now used to justify
+  mixed-gas phase-curve sensitivity planning.
 
 ## How the Sources Are Used
 

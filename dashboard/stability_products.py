@@ -21,6 +21,20 @@ G10015_INVENTORY_FILE_NAME = "g10015_temperature_profile_inventory_2026-06-14.cs
 G10015_SUMMARY_FILE_NAME = "g10015_temperature_profile_summary_2026-06-14.csv"
 STABILITY_INPUT_SCAFFOLD_FILE_NAME = "stability_input_scaffold_2026-06-14.csv"
 STABILITY_INPUT_SCAFFOLD_SUMMARY_FILE_NAME = "stability_input_scaffold_summary_2026-06-14.csv"
+STABILITY_INPUT_CAPABILITY_MATRIX_FILE_NAME = "stability_input_capability_matrix_2026-06-14.csv"
+STABILITY_OSL_PULL_TRIGGERS_FILE_NAME = "stability_osl_pull_triggers_2026-06-14.csv"
+STABILITY_WEBSITE_PRODUCT_SPEC_FILE_NAME = "stability_website_product_spec_2026-06-14.csv"
+PHASE_CURVE_FILE_NAME = "phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv"
+PHASE_CURVE_SCENARIO_CATALOG_FILE_NAME = "phase_curve_scenario_catalog_2026-06-14.csv"
+PHASE_CURVE_ID = "methane_5ppt_sir2008_csmhyd_digitized_v1"
+PHASE_CURVE_ROLE = "baseline"
+PHASE_CURVE_ALLOWED_USE = "official_public_baseline"
+PHASE_CURVE_GAS_COMPOSITION_ASSUMPTION = "100_percent_methane"
+PHASE_CURVE_GAS_METHANE_MOL_PCT = 100.0
+PHASE_CURVE_GAS_ETHANE_MOL_PCT = 0.0
+PHASE_CURVE_GAS_PROPANE_MOL_PCT = 0.0
+PHASE_CURVE_GAS_BUTANE_PLUS_MOL_PCT = 0.0
+PHASE_CURVE_SALINITY_PPT = 5.0
 
 WELL_SOURCE_RELATIVE_PATH = (
     "raw_data/Wells/Well_Bottom_Hole_Location/Well_Bottom_Hole_Location.shp"
@@ -28,6 +42,81 @@ WELL_SOURCE_RELATIVE_PATH = (
 G10015_RELATIVE_PATH = "03_temperature_geothermal/NSIDC_G10015_extracted"
 NUMERIC_PROFILE_RE = re.compile(r"^\s*(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s*$")
 HYDROSTATIC_PRESSURE_MPA_PER_M = 0.00980665
+SURFACE_PRESSURE_MPA = 0.101325
+TEMPERATURE_MODEL_ID = "g10015_profile_interpolation_v1"
+
+PHASE_CURVE_COLUMNS = [
+    "phase_curve_id",
+    "phase_curve_role",
+    "source_depth_m",
+    "pressure_mpa_absolute",
+    "equilibrium_temperature_c",
+    "gas_composition_assumption",
+    "gas_methane_mol_pct",
+    "gas_ethane_mol_pct",
+    "gas_propane_mol_pct",
+    "gas_butane_plus_mol_pct",
+    "salinity_ppt_assumption",
+    "source_citation",
+    "source_url",
+    "source_extraction_method",
+    "source_notes",
+]
+
+PHASE_CURVE_SCENARIO_CATALOG_COLUMNS = [
+    "phase_curve_id",
+    "phase_curve_role",
+    "curve_status",
+    "gas_composition_assumption",
+    "gas_methane_mol_pct",
+    "gas_ethane_mol_pct",
+    "gas_propane_mol_pct",
+    "gas_butane_plus_mol_pct",
+    "salinity_ppt_assumption",
+    "pressure_gradient_mpa_per_m",
+    "source_citation",
+    "source_url",
+    "source_notes",
+    "allowed_use",
+]
+
+STABILITY_INPUT_CAPABILITY_MATRIX_COLUMNS = [
+    "input_name",
+    "capability_status",
+    "current_source",
+    "current_coverage",
+    "supports_now",
+    "does_not_support_yet",
+    "future_upgrade",
+    "screen_role",
+    "guardrail",
+]
+
+STABILITY_OSL_PULL_TRIGGER_COLUMNS = [
+    "trigger",
+    "needs_osl",
+    "why",
+    "expected_action",
+    "public_output_after_pull",
+]
+
+STABILITY_WEBSITE_PRODUCT_SPEC_COLUMNS = [
+    "website_area",
+    "final_content",
+    "primary_user_action",
+    "must_show",
+    "must_not_claim",
+    "data_dependency",
+]
+
+TEMPERATURE_MODEL_COLUMNS = [
+    "depth_m",
+    "temperature_model_c",
+    "temperature_model_method",
+    "temperature_extrapolated_below_profile",
+    "temperature_extrapolation_below_profile_m",
+    "temperature_model_status",
+]
 
 WELL_CONTEXT_COLUMNS = [
     "object_id",
@@ -84,6 +173,149 @@ def default_stability_input_scaffold_path(project_root: Path) -> Path:
 
 def default_stability_input_scaffold_summary_path(project_root: Path) -> Path:
     return default_stability_products_dir(project_root) / STABILITY_INPUT_SCAFFOLD_SUMMARY_FILE_NAME
+
+
+def default_stability_input_capability_matrix_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / STABILITY_INPUT_CAPABILITY_MATRIX_FILE_NAME
+
+
+def default_stability_osl_pull_triggers_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / STABILITY_OSL_PULL_TRIGGERS_FILE_NAME
+
+
+def default_stability_website_product_spec_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / STABILITY_WEBSITE_PRODUCT_SPEC_FILE_NAME
+
+
+def default_phase_curve_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / PHASE_CURVE_FILE_NAME
+
+
+def default_phase_curve_scenario_catalog_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / PHASE_CURVE_SCENARIO_CATALOG_FILE_NAME
+
+
+def hydrostatic_pressure_mpa_gauge(
+    depth_m: object,
+    pressure_gradient_mpa_per_m: float = HYDROSTATIC_PRESSURE_MPA_PER_M,
+) -> object:
+    depth = pd.to_numeric(depth_m, errors="coerce")
+    return depth * pressure_gradient_mpa_per_m
+
+
+def hydrostatic_pressure_mpa_absolute(
+    depth_m: object,
+    surface_pressure_mpa: float = SURFACE_PRESSURE_MPA,
+    pressure_gradient_mpa_per_m: float = HYDROSTATIC_PRESSURE_MPA_PER_M,
+) -> object:
+    return surface_pressure_mpa + hydrostatic_pressure_mpa_gauge(
+        depth_m,
+        pressure_gradient_mpa_per_m,
+    )
+
+
+def load_phase_curve(project_root: Path, phase_curve_id: str = PHASE_CURVE_ID) -> pd.DataFrame:
+    path = default_phase_curve_path(project_root)
+    if not path.exists():
+        return pd.DataFrame(columns=PHASE_CURVE_COLUMNS)
+
+    curve = pd.read_csv(path)
+    missing_columns = [column for column in PHASE_CURVE_COLUMNS if column not in curve.columns]
+    if missing_columns:
+        missing = ", ".join(missing_columns)
+        raise ValueError(f"Phase curve lookup is missing required columns: {missing}")
+
+    curve = curve[curve["phase_curve_id"].eq(phase_curve_id)].copy()
+    curve["pressure_mpa_absolute"] = pd.to_numeric(
+        curve["pressure_mpa_absolute"],
+        errors="coerce",
+    )
+    curve["equilibrium_temperature_c"] = pd.to_numeric(
+        curve["equilibrium_temperature_c"],
+        errors="coerce",
+    )
+    curve = curve.dropna(
+        subset=["pressure_mpa_absolute", "equilibrium_temperature_c"],
+    )
+    curve = curve.sort_values("pressure_mpa_absolute").reset_index(drop=True)
+    if curve["pressure_mpa_absolute"].duplicated().any():
+        raise ValueError("Phase curve lookup has duplicate absolute-pressure values.")
+    return curve[PHASE_CURVE_COLUMNS]
+
+
+def load_methane_phase_curve(project_root: Path) -> pd.DataFrame:
+    return load_phase_curve(project_root, PHASE_CURVE_ID)
+
+
+def load_phase_curve_scenario_catalog(project_root: Path) -> pd.DataFrame:
+    path = default_phase_curve_scenario_catalog_path(project_root)
+    if not path.exists():
+        return pd.DataFrame(columns=PHASE_CURVE_SCENARIO_CATALOG_COLUMNS)
+
+    catalog = pd.read_csv(path)
+    missing_columns = [
+        column for column in PHASE_CURVE_SCENARIO_CATALOG_COLUMNS if column not in catalog.columns
+    ]
+    if missing_columns:
+        missing = ", ".join(missing_columns)
+        raise ValueError(f"Phase curve scenario catalog is missing required columns: {missing}")
+
+    numeric_columns = [
+        "gas_methane_mol_pct",
+        "gas_ethane_mol_pct",
+        "gas_propane_mol_pct",
+        "gas_butane_plus_mol_pct",
+        "salinity_ppt_assumption",
+        "pressure_gradient_mpa_per_m",
+    ]
+    for column in numeric_columns:
+        catalog[column] = pd.to_numeric(catalog[column], errors="coerce")
+    return catalog[PHASE_CURVE_SCENARIO_CATALOG_COLUMNS]
+
+
+def phase_curve_equilibrium_temperature_c(
+    phase_curve: pd.DataFrame,
+    pressure_mpa_absolute: object,
+) -> object:
+    if phase_curve.empty:
+        return np.nan
+
+    pressures = pd.to_numeric(
+        phase_curve["pressure_mpa_absolute"],
+        errors="coerce",
+    ).to_numpy(dtype=float)
+    temperatures = pd.to_numeric(
+        phase_curve["equilibrium_temperature_c"],
+        errors="coerce",
+    ).to_numpy(dtype=float)
+    valid = np.isfinite(pressures) & np.isfinite(temperatures)
+    pressures = pressures[valid]
+    temperatures = temperatures[valid]
+    if len(pressures) < 2:
+        return np.nan
+
+    order = np.argsort(pressures)
+    pressures = pressures[order]
+    temperatures = temperatures[order]
+
+    if np.isscalar(pressure_mpa_absolute):
+        pressure = pd.to_numeric(pressure_mpa_absolute, errors="coerce")
+        if not np.isfinite(pressure) or pressure < pressures[0] or pressure > pressures[-1]:
+            return np.nan
+        return float(np.interp(float(pressure), pressures, temperatures))
+
+    values = pd.to_numeric(pressure_mpa_absolute, errors="coerce")
+    pressure_values = np.asarray(values, dtype=float)
+    result = np.full(pressure_values.shape, np.nan, dtype=float)
+    in_range = (
+        np.isfinite(pressure_values)
+        & (pressure_values >= pressures[0])
+        & (pressure_values <= pressures[-1])
+    )
+    result[in_range] = np.interp(pressure_values[in_range], pressures, temperatures)
+    if isinstance(pressure_mpa_absolute, pd.Series):
+        return pd.Series(result, index=pressure_mpa_absolute.index)
+    return result
 
 
 def load_arctic_slope_public_wells(project_root: Path) -> gpd.GeoDataFrame:
@@ -342,13 +574,127 @@ def _header_value(lines: list[str], label: str) -> str:
     return ""
 
 
-def parse_g10015_temperature_profile(path: Path) -> dict[str, object]:
+def load_g10015_temperature_profile_points(path: Path) -> pd.DataFrame:
     lines = Path(path).read_text(encoding="utf-8", errors="replace").splitlines()
     records = []
     for line in lines:
         match = NUMERIC_PROFILE_RE.match(line)
         if match:
             records.append((float(match.group(1)), float(match.group(2))))
+
+    profile = pd.DataFrame(records, columns=["depth_m", "temperature_c"])
+    if profile.empty:
+        return profile
+
+    profile = profile.sort_values("depth_m").reset_index(drop=True)
+    if profile["depth_m"].duplicated().any():
+        duplicate_depths = profile.loc[
+            profile["depth_m"].duplicated(keep=False),
+            "depth_m",
+        ]
+        formatted = ", ".join(str(float(value)) for value in sorted(duplicate_depths.unique()))
+        raise ValueError(f"G10015 profile has duplicate depth values: {formatted}")
+    return profile
+
+
+def temperature_model_from_profile(
+    profile_points: pd.DataFrame,
+    depth_m: object,
+    gradient_c_per_100m: object | None = None,
+) -> pd.DataFrame:
+    depth = pd.to_numeric(depth_m, errors="coerce")
+    if isinstance(depth_m, pd.Series):
+        depth_values = pd.Series(depth, index=depth_m.index, dtype="float64")
+    elif np.isscalar(depth_m):
+        depth_values = pd.Series([depth], dtype="float64")
+    else:
+        depth_values = pd.Series(np.asarray(depth, dtype=float), dtype="float64")
+
+    result = pd.DataFrame({"depth_m": depth_values.to_numpy(dtype=float)})
+    result["temperature_model_c"] = np.nan
+    result["temperature_model_method"] = "not_calculated"
+    result["temperature_extrapolated_below_profile"] = False
+    result["temperature_extrapolation_below_profile_m"] = 0.0
+    result["temperature_model_status"] = "not_calculated"
+
+    missing_depth = result["depth_m"].isna()
+    result.loc[missing_depth, ["temperature_model_method", "temperature_model_status"]] = (
+        "blocked_missing_depth"
+    )
+
+    required_columns = {"depth_m", "temperature_c"}
+    if profile_points.empty or not required_columns.issubset(profile_points.columns):
+        modeled = ~missing_depth
+        result.loc[modeled, ["temperature_model_method", "temperature_model_status"]] = (
+            "blocked_no_temperature_profile"
+        )
+        return result[TEMPERATURE_MODEL_COLUMNS]
+
+    profile = profile_points[["depth_m", "temperature_c"]].copy()
+    profile["depth_m"] = pd.to_numeric(profile["depth_m"], errors="coerce")
+    profile["temperature_c"] = pd.to_numeric(profile["temperature_c"], errors="coerce")
+    profile = profile.dropna(subset=["depth_m", "temperature_c"]).sort_values("depth_m")
+    if len(profile) < 2 or profile["depth_m"].nunique() < 2:
+        modeled = ~missing_depth
+        result.loc[modeled, ["temperature_model_method", "temperature_model_status"]] = (
+            "blocked_no_temperature_profile"
+        )
+        return result[TEMPERATURE_MODEL_COLUMNS]
+    if profile["depth_m"].duplicated().any():
+        raise ValueError("Temperature profile points must not contain duplicate depths.")
+
+    profile_depth = profile["depth_m"].to_numpy(dtype=float)
+    profile_temperature = profile["temperature_c"].to_numpy(dtype=float)
+    shallowest_depth = float(profile_depth[0])
+    deepest_depth = float(profile_depth[-1])
+    deepest_temperature = float(profile_temperature[-1])
+
+    valid_depth = result["depth_m"].notna()
+    above_profile = valid_depth & (result["depth_m"] < shallowest_depth)
+    in_profile = valid_depth & result["depth_m"].between(shallowest_depth, deepest_depth)
+    below_profile = valid_depth & (result["depth_m"] > deepest_depth)
+
+    if in_profile.any():
+        result.loc[in_profile, "temperature_model_c"] = np.interp(
+            result.loc[in_profile, "depth_m"].to_numpy(dtype=float),
+            profile_depth,
+            profile_temperature,
+        )
+        result.loc[in_profile, "temperature_model_method"] = "measured_profile_interpolated"
+        result.loc[in_profile, "temperature_model_status"] = "calculated"
+
+    if above_profile.any():
+        result.loc[above_profile, ["temperature_model_method", "temperature_model_status"]] = (
+            "blocked_above_profile_range"
+        )
+
+    gradient = pd.to_numeric(gradient_c_per_100m, errors="coerce")
+    if np.isscalar(gradient) and np.isfinite(gradient):
+        if below_profile.any():
+            extrapolation_m = result.loc[below_profile, "depth_m"] - deepest_depth
+            result.loc[below_profile, "temperature_model_c"] = (
+                deepest_temperature + extrapolation_m * float(gradient) / 100
+            )
+            result.loc[below_profile, "temperature_model_method"] = (
+                "measured_profile_plus_gradient_extrapolation"
+            )
+            result.loc[below_profile, "temperature_model_status"] = "calculated"
+            result.loc[below_profile, "temperature_extrapolated_below_profile"] = True
+            result.loc[
+                below_profile,
+                "temperature_extrapolation_below_profile_m",
+            ] = extrapolation_m
+    elif below_profile.any():
+        result.loc[below_profile, ["temperature_model_method", "temperature_model_status"]] = (
+            "blocked_below_profile_no_gradient"
+        )
+
+    return result[TEMPERATURE_MODEL_COLUMNS]
+
+
+def parse_g10015_temperature_profile(path: Path) -> dict[str, object]:
+    lines = Path(path).read_text(encoding="utf-8", errors="replace").splitlines()
+    profile = load_g10015_temperature_profile_points(path)
 
     well_code = Path(path).stem.split("_", 1)[0]
     result: dict[str, object] = {
@@ -357,7 +703,7 @@ def parse_g10015_temperature_profile(path: Path) -> dict[str, object]:
         "well_name": _header_value(lines, "Well name"),
         "profile_file_name": _header_value(lines, "File name"),
         "log_date": _header_value(lines, "Log date"),
-        "sample_count": len(records),
+        "sample_count": len(profile),
         "min_depth_m": pd.NA,
         "max_depth_m": pd.NA,
         "min_temperature_c": pd.NA,
@@ -365,10 +711,9 @@ def parse_g10015_temperature_profile(path: Path) -> dict[str, object]:
         "deepest_temperature_c": pd.NA,
         "deepest_window_gradient_c_per_100m": pd.NA,
     }
-    if not records:
+    if profile.empty:
         return result
 
-    profile = pd.DataFrame(records, columns=["depth_m", "temperature_c"]).sort_values("depth_m")
     deepest_depth = float(profile["depth_m"].max())
     deepest_window = profile[profile["depth_m"] >= deepest_depth - 100]
     gradient = pd.NA
@@ -478,17 +823,29 @@ def stability_parameter_readiness_frame() -> pd.DataFrame:
         },
         {
             "input": "Pressure assumption",
-            "current_status": "Planned",
-            "current_source": "Hydrostatic pressure assumption to be sourced and parameterized",
+            "current_status": "Ready as public assumption",
+            "current_source": (
+                "Freshwater hydrostatic equation; absolute pressure adds "
+                "surface_pressure_mpa = 0.101325"
+            ),
             "use_in_stability": "Converts depth to pressure for pressure-temperature phase comparison.",
-            "next_step": "Add hydrostatic pressure equation, units, density assumption, and scenario toggle.",
+            "next_step": (
+                "Keep assumption code visible and replace only with a cited measured-pressure "
+                "or brine-density scenario run."
+            ),
         },
         {
             "input": "Hydrate phase curve",
-            "current_status": "Planned",
-            "current_source": "USGS/NETL methane hydrate phase-boundary sources",
+            "current_status": "Ready as digitized lookup",
+            "current_source": (
+                "USGS SIR 2008-5175 Figure 1A 100 percent methane + 5 ppt "
+                "baseline; Collett et al. 2011 mixed-gas source cataloged as sensitivity-only"
+            ),
             "use_in_stability": "Defines pressure-temperature conditions where methane hydrate can exist.",
-            "next_step": "Add a cited lookup/table or equation and document gas/salinity assumptions.",
+            "next_step": (
+                "Keep 100 percent methane as the official baseline; add mixed-gas "
+                "lookup only after digitizing or generating a cited curve."
+            ),
         },
         {
             "input": "Stability top/base/thickness",
@@ -499,6 +856,251 @@ def stability_parameter_readiness_frame() -> pd.DataFrame:
         },
     ]
     return pd.DataFrame(rows)
+
+
+def stability_input_capability_matrix_frame() -> pd.DataFrame:
+    rows = [
+        {
+            "input_name": "Public well location",
+            "capability_status": "ready_public_input",
+            "current_source": "Alaska DNR Well Bottom Hole Location",
+            "current_coverage": "8,084 Arctic Slope public wells in current scaffold",
+            "supports_now": "Map joins, AU context, nearest public permafrost/temperature control joins.",
+            "does_not_support_yet": "Bottom-hole path, deviation survey, or approved well-log depth alignment.",
+            "future_upgrade": "Approved well coordinates, deviation surveys, and interval-level joins.",
+            "screen_role": "Spatial context and control-distance confidence input.",
+            "guardrail": "Location context is not hydrate evidence.",
+        },
+        {
+            "input_name": "Public well depth",
+            "capability_status": "ready_public_input_with_caveat",
+            "current_source": "DNR TrueVertic preferred; DrillerTot fallback",
+            "current_coverage": "Public depth available for 7,578 scaffold wells",
+            "supports_now": "Pressure-at-depth estimates and reach tests for candidate intervals.",
+            "does_not_support_yet": "Final log-depth datums, measured-depth to TVD conversion, or interval picks.",
+            "future_upgrade": "Approved workbook/LAS depth basis and datum reconciliation.",
+            "screen_role": "Depth basis for public stability screening.",
+            "guardrail": "DrillerTot fallback is lower-confidence than TrueVertic.",
+        },
+        {
+            "input_name": "Permafrost point control",
+            "capability_status": "partial_public_input",
+            "current_source": "NSIDC GGD223 nearest permafrost-depth controls",
+            "current_coverage": "43 public controls; nearest control assigned to 8,084 scaffold wells",
+            "supports_now": "Permafrost context and control-distance confidence labels.",
+            "does_not_support_yet": "Continuous base-of-ice-bearing-permafrost surface.",
+            "future_upgrade": "Digitized/georeferenced USGS OM-222 or another public GIS surface.",
+            "screen_role": "Thermal-context input and caveat source.",
+            "guardrail": "Nearest point control is not a mapped permafrost-base surface.",
+        },
+        {
+            "input_name": "Temperature profiles",
+            "capability_status": "partial_public_input",
+            "current_source": "NSIDC G10015 processed borehole temperature logs",
+            "current_coverage": "184 profiles; 483 scaffold rows matched; 374 rows ready for phase-curve inputs",
+            "supports_now": "Temperature interpolation and limited gradient extrapolation for matched rows.",
+            "does_not_support_yet": "Final stability calculation for unmatched wells.",
+            "future_upgrade": "Well-specific temperature models and uncertainty bands.",
+            "screen_role": "Primary temperature model source for the first public screen.",
+            "guardrail": "Rows without a matched profile stay blocked or scenario-only.",
+        },
+        {
+            "input_name": "Hydrostatic pressure",
+            "capability_status": "ready_baseline_assumption",
+            "current_source": "Freshwater hydrostatic equation plus atmospheric pressure for absolute P-T comparison",
+            "current_coverage": "Available for scaffold rows with public depth or permafrost-control depth",
+            "supports_now": "Gauge and absolute pressure estimates for phase-curve lookup.",
+            "does_not_support_yet": "Measured formation pressure, overpressure, salinity-density, or gas-column effects.",
+            "future_upgrade": "Approved pressure data or versioned brine-density scenarios.",
+            "screen_role": "Baseline pressure model.",
+            "guardrail": "Hydrostatic pressure is an assumption, not measured reservoir pressure.",
+        },
+        {
+            "input_name": "100 percent methane phase curve",
+            "capability_status": "ready_official_baseline",
+            "current_source": "USGS SIR 2008-5175 Figure 1A digitized lookup",
+            "current_coverage": "41 monotonic lookup rows; official_public_baseline",
+            "supports_now": "Baseline methane hydrate pressure-temperature equilibrium lookup.",
+            "does_not_support_yet": "Mixed gas, measured gas, or alternate salinity final runs.",
+            "future_upgrade": "Direct CSMHYD/CSMGem export if obtained.",
+            "screen_role": "Official mentor-approved phase-curve baseline.",
+            "guardrail": "Baseline stability is necessary but not sufficient for hydrate presence.",
+        },
+        {
+            "input_name": "Mixed-gas phase curve",
+            "capability_status": "scenario_candidate_only",
+            "current_source": "Collett et al. 2011 / Holder et al. 1987 mixed-gas figure",
+            "current_coverage": "Source identified for 98% methane, 1.5% ethane, 0.5% propane; no lookup yet",
+            "supports_now": "Justifies variable-capable architecture and sensitivity planning.",
+            "does_not_support_yet": "Final stability outputs or freeform composition interpolation.",
+            "future_upgrade": "Digitize the curve or generate it from a cited thermodynamic model.",
+            "screen_role": "Sensitivity candidate only.",
+            "guardrail": "Do not apply until a versioned lookup or model export exists.",
+        },
+        {
+            "input_name": "Gas composition",
+            "capability_status": "future_approved_or_scenario_input",
+            "current_source": "Baseline assumption and literature scenario only",
+            "current_coverage": "Baseline methane fraction is fixed at 100%; no measured well gas composition in repo",
+            "supports_now": "Baseline and cataloged sensitivity metadata.",
+            "does_not_support_yet": "Measured-gas stability calculation.",
+            "future_upgrade": "Approved gas composition fields or cited composition-specific model curves.",
+            "screen_role": "Phase-curve selector metadata.",
+            "guardrail": "No freeform gas slider without thermodynamic-model support.",
+        },
+        {
+            "input_name": "Salinity",
+            "capability_status": "baseline_assumption_only",
+            "current_source": "USGS SIR 2008-5175 methane + 5 ppt salt-water curve",
+            "current_coverage": "Baseline salinity fixed at 5 ppt for current lookup",
+            "supports_now": "Official baseline phase-curve assumption.",
+            "does_not_support_yet": "Well-specific salinity or alternate salinity final runs.",
+            "future_upgrade": "Approved formation-water salinity or versioned salinity scenarios.",
+            "screen_role": "Phase-curve assumption metadata.",
+            "guardrail": "Changing salinity requires a new curve/run ID.",
+        },
+        {
+            "input_name": "Hydrate assessment units",
+            "capability_status": "ready_public_context",
+            "current_source": "USGS 2019 Northern Alaska gas hydrate assessment unit polygons",
+            "current_coverage": "3 hydrate AUs; 7,992 scaffold wells inside one or more AUs",
+            "supports_now": "Regional context and outside-AU caveat labels.",
+            "does_not_support_yet": "Direct hydrate occurrence, saturation, or reservoir quality.",
+            "future_upgrade": "Approved interval evidence and reservoir-quality data.",
+            "screen_role": "Regional context filter, not proof.",
+            "guardrail": "AU membership is not a detection.",
+        },
+        {
+            "input_name": "Approved logs and core labels",
+            "capability_status": "blocked_future_approved_data",
+            "current_source": "Not present in public repo",
+            "current_coverage": "No real well-log rows, core rows, or authoritative saturation labels committed",
+            "supports_now": "Architecture and schema planning only.",
+            "does_not_support_yet": "Occurrence classification, saturation regression, or sweet-spot ranking.",
+            "future_upgrade": "Approved runtime workbook/LAS/core tables and target registry.",
+            "screen_role": "Future ML input and target source.",
+            "guardrail": "Do not train or claim model results from public scaffold rows.",
+        },
+    ]
+    return pd.DataFrame(rows, columns=STABILITY_INPUT_CAPABILITY_MATRIX_COLUMNS)
+
+
+def stability_osl_pull_triggers_frame() -> pd.DataFrame:
+    rows = [
+        {
+            "trigger": "Develop temperature-model logic with unit-test fixtures",
+            "needs_osl": "no",
+            "why": "Synthetic or tiny fixture profiles are enough to test interpolation, extrapolation, and blocked-row behavior.",
+            "expected_action": "Implement and test local functions without rebuilding public products.",
+            "public_output_after_pull": "None.",
+        },
+        {
+            "trigger": "Build real public temperature-model products from G10015 rows",
+            "needs_osl": "yes",
+            "why": "The repo commits only the compact G10015 inventory; raw processed profile rows remain in the full OSL/source bundle.",
+            "expected_action": "Pull or sync the full OSL source bundle, then run the product builder against `data/source_library/north_slope_stability_sources_2026-06-13/`.",
+            "public_output_after_pull": "Versioned temperature-model product and updated summaries under `data/public_stability_products/`.",
+        },
+        {
+            "trigger": "Regenerate well context, GGD223 joins, G10015 inventory, or AU joins from raw public sources",
+            "needs_osl": "yes",
+            "why": "Those rebuilds require raw shapefiles, raw NSIDC files, and source bundle folder structure that are intentionally not committed to Git.",
+            "expected_action": "Run `python 01_pipeline/build_public_stability_products.py` from a workspace with the full bundle present.",
+            "public_output_after_pull": "Refreshed public-safe context/scaffold CSVs.",
+        },
+        {
+            "trigger": "Add OM-222 digitized/georeferenced permafrost-base surface",
+            "needs_osl": "yes",
+            "why": "The source plate and any GIS digitizing workflow belong in the heavy-data workbench before compact derived layers are committed.",
+            "expected_action": "Digitize/georeference in OSL or local GIS, record provenance, export a compact public-safe surface/control product.",
+            "public_output_after_pull": "Versioned OM-222-derived permafrost product plus source/provenance note.",
+        },
+        {
+            "trigger": "Replace digitized SIR phase curve with direct CSMHYD/CSMGem or a new digitized source",
+            "needs_osl": "maybe",
+            "why": "No OSL pull is needed for metadata or tests, but heavy external model files, PDFs, or digitization artifacts should live outside Git.",
+            "expected_action": "Generate or digitize the new curve, save only the compact versioned lookup and catalog metadata in Git.",
+            "public_output_after_pull": "New `phase_curve_*_v*.csv` plus updated scenario catalog and tests.",
+        },
+        {
+            "trigger": "Run approved well-log/core ML workflow",
+            "needs_osl": "no_public_repo_pull",
+            "why": "Approved/runtime data are outside the public Git workflow and should not be pulled into this repo.",
+            "expected_action": "Run only inside the authorized environment; export public-safe summaries only if approved.",
+            "public_output_after_pull": "No raw approved data; possibly approved-safe aggregate figures/tables later.",
+        },
+    ]
+    return pd.DataFrame(rows, columns=STABILITY_OSL_PULL_TRIGGER_COLUMNS)
+
+
+def stability_website_product_spec_frame() -> pd.DataFrame:
+    rows = [
+        {
+            "website_area": "Top status strip",
+            "final_content": "Run ID, baseline/scenario role, phase-curve ID, pressure model, temperature model, and final-result count.",
+            "primary_user_action": "Verify what assumptions the displayed screen is using.",
+            "must_show": "`official_public_baseline` for the default 100 percent methane run.",
+            "must_not_claim": "Do not call the run hydrate proof or a validated ML result.",
+            "data_dependency": "Scenario catalog, pressure model metadata, temperature-model product, future stability screen.",
+        },
+        {
+            "website_area": "Input readiness and capability",
+            "final_content": "Readiness table plus capability matrix showing ready, partial, scenario-only, and blocked inputs.",
+            "primary_user_action": "See why some rows can be calculated and others are blocked.",
+            "must_show": "Rows without matched temperature profiles are blocked or scenario-only.",
+            "must_not_claim": "Do not imply every public well has enough temperature control for final stability.",
+            "data_dependency": "Capability matrix and scaffold summary.",
+        },
+        {
+            "website_area": "Map view",
+            "final_content": "Wells colored by stability result status or confidence, hydrate AU outlines, GGD223 controls, and later OM-222 surface/context.",
+            "primary_user_action": "Scan where baseline-eligible, blocked, and outside-AU wells are located.",
+            "must_show": "Legend entries for calculated, blocked, scenario-only, and outside-AU rows.",
+            "must_not_claim": "Do not color a point as hydrate occurrence or saturation.",
+            "data_dependency": "Well context, scaffold, future stability screen, public snapshot/bundle layers.",
+        },
+        {
+            "website_area": "Well detail panel",
+            "final_content": "Selected well summary with depth basis, nearest permafrost control, matched temperature profile, pressure assumption, phase curve, result status, caveats, and notes.",
+            "primary_user_action": "Audit why a single well is calculated, blocked, or scenario-only.",
+            "must_show": "Control distance, temperature profile code/file, extrapolation flag, caveat codes.",
+            "must_not_claim": "Do not hide DrillerTot fallback, extrapolation, or missing-profile caveats.",
+            "data_dependency": "Scaffold, temperature-model product, future stability screen.",
+        },
+        {
+            "website_area": "Temperature and phase plot",
+            "final_content": "Depth-temperature profile with measured and extrapolated temperature segments plus selected phase-boundary curve.",
+            "primary_user_action": "Visually inspect the top/base intersection logic for a selected calculated row.",
+            "must_show": "Measured versus extrapolated segments and the selected phase-curve source.",
+            "must_not_claim": "Do not draw intersections for rows with missing temperature models.",
+            "data_dependency": "Raw/profile-derived temperature model from OSL and phase lookup.",
+        },
+        {
+            "website_area": "Results table",
+            "final_content": "Downloadable `stability_screen_*.csv` preview with top/base/thickness only for rows that pass the gates; nulls and blocked reasons for the rest.",
+            "primary_user_action": "Filter by result status, confidence, caveat code, AU, and temperature-control status.",
+            "must_show": "Run ID, phase-curve role, confidence, caveat codes, and blocked reasons.",
+            "must_not_claim": "Do not fill top/base/thickness for blocked rows.",
+            "data_dependency": "Future tested stability-screen product.",
+        },
+        {
+            "website_area": "Scenario controls",
+            "final_content": "Disabled or clearly caveated controls for mixed gas, salinity, pressure-density, and regional-gradient scenarios until their lookups/models exist.",
+            "primary_user_action": "Understand which assumptions are baseline and which are sensitivity-only.",
+            "must_show": "Mixed-gas source is cataloged but not applied until a lookup/model export exists.",
+            "must_not_claim": "No freeform gas slider without thermodynamic-model backing.",
+            "data_dependency": "Scenario catalog and future versioned lookups.",
+        },
+        {
+            "website_area": "Exports and citations",
+            "final_content": "Download buttons for scaffold, capability matrix, scenario catalog, phase curve, and future stability screen, plus source/caveat citations.",
+            "primary_user_action": "Export public-safe products and cite assumptions.",
+            "must_show": "USGS SIR 2008-5175, NSIDC G10015/GGD223, USGS AU source, and Collett et al. 2011 for sensitivity planning.",
+            "must_not_claim": "Do not expose raw source bundles or approved runtime rows.",
+            "data_dependency": "Committed public products and docs.",
+        },
+    ]
+    return pd.DataFrame(rows, columns=STABILITY_WEBSITE_PRODUCT_SPEC_COLUMNS)
 
 
 def load_g10015_temperature_inventory(project_root: Path) -> pd.DataFrame:
@@ -586,14 +1188,29 @@ def build_stability_input_scaffold(project_root: Path) -> pd.DataFrame:
 
     depth_m = pd.to_numeric(scaffold["depth_basis_m"], errors="coerce")
     permafrost_m = pd.to_numeric(scaffold["nearest_permafrost_depth_m"], errors="coerce")
-    scaffold["hydrostatic_pressure_mpa_at_depth_basis"] = (
-        depth_m * HYDROSTATIC_PRESSURE_MPA_PER_M
-    )
+    scaffold["hydrostatic_pressure_mpa_at_depth_basis"] = hydrostatic_pressure_mpa_gauge(depth_m)
     scaffold["hydrostatic_pressure_mpa_at_nearest_permafrost_control"] = (
-        permafrost_m * HYDROSTATIC_PRESSURE_MPA_PER_M
+        hydrostatic_pressure_mpa_gauge(permafrost_m)
     )
-    scaffold["pressure_assumption_code"] = "hydrostatic_freshwater_0p00980665_mpa_per_m"
+    scaffold["hydrostatic_pressure_mpa_absolute_at_depth_basis"] = (
+        hydrostatic_pressure_mpa_absolute(depth_m)
+    )
+    scaffold["hydrostatic_pressure_mpa_absolute_at_nearest_permafrost_control"] = (
+        hydrostatic_pressure_mpa_absolute(permafrost_m)
+    )
+    scaffold["pressure_assumption_code"] = (
+        "hydrostatic_freshwater_0p00980665_mpa_per_m_surface_0p101325_mpa"
+    )
     scaffold["phase_curve_status"] = "not_applied"
+    scaffold["planned_phase_curve_id"] = PHASE_CURVE_ID
+    scaffold["planned_phase_curve_role"] = PHASE_CURVE_ROLE
+    scaffold["planned_phase_curve_allowed_use"] = PHASE_CURVE_ALLOWED_USE
+    scaffold["planned_gas_composition_assumption"] = PHASE_CURVE_GAS_COMPOSITION_ASSUMPTION
+    scaffold["planned_gas_methane_mol_pct"] = PHASE_CURVE_GAS_METHANE_MOL_PCT
+    scaffold["planned_gas_ethane_mol_pct"] = PHASE_CURVE_GAS_ETHANE_MOL_PCT
+    scaffold["planned_gas_propane_mol_pct"] = PHASE_CURVE_GAS_PROPANE_MOL_PCT
+    scaffold["planned_gas_butane_plus_mol_pct"] = PHASE_CURVE_GAS_BUTANE_PLUS_MOL_PCT
+    scaffold["planned_salinity_ppt_assumption"] = PHASE_CURVE_SALINITY_PPT
     scaffold["stability_top_base_thickness_status"] = "not_calculated"
 
     scaffold["stability_input_readiness"] = "missing_depth_or_permafrost_context"
@@ -644,8 +1261,19 @@ def build_stability_input_scaffold(project_root: Path) -> pd.DataFrame:
         "temperature_profile_link_method",
         "hydrostatic_pressure_mpa_at_depth_basis",
         "hydrostatic_pressure_mpa_at_nearest_permafrost_control",
+        "hydrostatic_pressure_mpa_absolute_at_depth_basis",
+        "hydrostatic_pressure_mpa_absolute_at_nearest_permafrost_control",
         "pressure_assumption_code",
         "phase_curve_status",
+        "planned_phase_curve_id",
+        "planned_phase_curve_role",
+        "planned_phase_curve_allowed_use",
+        "planned_gas_composition_assumption",
+        "planned_gas_methane_mol_pct",
+        "planned_gas_ethane_mol_pct",
+        "planned_gas_propane_mol_pct",
+        "planned_gas_butane_plus_mol_pct",
+        "planned_salinity_ppt_assumption",
         "stability_top_base_thickness_status",
         "stability_input_readiness",
     ]

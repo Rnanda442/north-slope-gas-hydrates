@@ -1,6 +1,6 @@
 # North Slope Gas Hydrates Project Context
 
-Last updated: 2026-06-12
+Last updated: 2026-06-14
 
 ## Purpose
 
@@ -90,6 +90,42 @@ calculations or claiming model results.
   input scaffold now combines public well depth, nearest permafrost control,
   matched G10015 context where available, and provisional hydrostatic pressure,
   but keeps phase-curve and top/base/thickness results explicitly uncalculated.
+- `docs/STABILITY_CALCULATION_PLAN.md` now locks the source-backed plan for the
+  future stability screen: hydrostatic pressure equation, G10015/GGD223
+  temperature-model hierarchy, methane 5 ppt phase-curve lookup source,
+  source-control confidence labels, caveats, and the future
+  `stability_screen_*.csv` output schema.
+- `data/public_stability_products/phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv`
+  is now the first cited phase-curve lookup input, digitized from USGS SIR
+  2008-5175 Figure 1A for methane and 5 ppt salt water. Pressure helper tests
+  now distinguish gauge and absolute hydrostatic pressure, and phase-curve
+  interpolation tests preserve the guardrail that final stability
+  top/base/thickness remain uncalculated.
+- `data/public_stability_products/phase_curve_scenario_catalog_2026-06-14.csv`
+  now makes the phase-curve system variable-capable while keeping the mentor-
+  approved 100 percent methane curve as the official public baseline. The
+  Collett et al. (2011) / Holder et al. (1987) mixed-gas curve is recorded as a
+  sensitivity candidate only until it is digitized or regenerated from a cited
+  thermodynamic model.
+- `data/public_stability_products/stability_input_capability_matrix_2026-06-14.csv`
+  now records what current public inputs can support, what remains
+  scenario-only, and what must wait for approved runtime data before any
+  stability or ML claim is made.
+- `data/public_stability_products/stability_osl_pull_triggers_2026-06-14.csv`
+  records when the public repo is enough versus when the full OSL/source bundle
+  is needed. Real public temperature-model products require OSL because raw
+  G10015 profile rows are not committed to Git.
+- Local fixture-based temperature-model helpers now exist in
+  `dashboard/stability_products.py`. They parse G10015-style depth/temperature
+  rows, interpolate within measured profile depth, extrapolate below the deepest
+  measured point only when a numeric gradient is supplied, and return blocked
+  statuses for missing depth, missing profiles, above-range depths, or
+  below-profile depths without a gradient. They do not calculate stability
+  top/base/thickness.
+- `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`
+  defines the target public website shape for the future stability screen:
+  status strip, readiness/capability, map, selected-well audit panel,
+  temperature-phase plot, results table, scenario controls, and exports.
 - Three Excel header references were reviewed from the user's email. The images
   are not stored in Git or shown on the website; their public-safe schema
   derivative is maintained in `docs/WELL_LOG_REQUIREMENTS_MAP.md`.
@@ -164,6 +200,8 @@ It must not load or expose authorized well-log or core data.
   broader manuscript and source synthesis
 - `docs/source_library_index/source_index.md`: source orientation
 - `docs/source_library_index/source_manifest.csv`: source inventory
+- `docs/STABILITY_CALCULATION_PLAN.md`: source-backed pressure-temperature
+  stability-screen plan and future `stability_screen_*.csv` schema
 - `docs/source_recovery_status.md`: Drive search results, original paths, and
   recovery checklist
 - `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md`: authoritative architecture,
@@ -349,3 +387,10 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-13: Added the OpenScienceLab stability source-bundle loader and
   Structural Explorer source-status/map panel for GGD223 permafrost controls and
   USGS gas hydrate assessment units.
+- 2026-06-14: Added the source-backed stability calculation plan for the future
+  public stability screen while keeping final top/base/thickness outputs
+  uncalculated.
+- 2026-06-14: Added local G10015-style temperature-profile parsing and
+  interpolation/extrapolation helpers with fixture tests, while keeping real
+  temperature-model products and final stability outputs gated behind OSL
+  source rebuilds and boundary/confidence tests.

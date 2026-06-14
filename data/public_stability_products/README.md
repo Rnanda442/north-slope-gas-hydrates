@@ -35,12 +35,69 @@ the nearest GGD223 control code, then adds a provisional hydrostatic pressure
 estimate:
 
 ```text
-pressure_mpa = depth_m * 0.00980665
+pressure_mpa_gauge = depth_m * 0.00980665
+pressure_mpa_absolute = 0.101325 + pressure_mpa_gauge
 ```
 
 This is a convenience scaffold, not a final stability result. It intentionally
 keeps `phase_curve_status = not_applied` and
 `stability_top_base_thickness_status = not_calculated`.
+
+`phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv`
+
+This table is the first cited methane hydrate pressure-temperature lookup for
+the public stability workflow. It is digitized from USGS SIR 2008-5175 Figure
+1A, using the curve labeled for methane and 5 ppt salt water. It is an
+auditable lookup input, not a fitted equation and not a final stability result.
+Replace it with a direct CSMHYD/CSMGem export if one becomes available, using a
+new versioned file name.
+
+`phase_curve_scenario_catalog_2026-06-14.csv`
+
+This table records which phase-curve scenarios are allowed to be selected. The
+current official baseline is the mentor-approved 100 percent methane curve from
+USGS SIR 2008-5175. A mixed-gas Alaska North Slope source is also recorded from
+Collett et al. (2011), modified from Holder et al. (1987), but it is marked as
+`source_identified_not_digitized` and `sensitivity_only_not_final`. Do not use a
+mixed-gas curve for final stability until it has a versioned lookup or a cited
+thermodynamic-model export.
+
+`stability_input_capability_matrix_2026-06-14.csv`
+
+This table records what each current input can support now, what remains
+scenario-only, and what must wait for approved runtime data. It is the guardrail
+between public stability screening and future ML claims: public well/depth,
+GGD223, G10015, hydrostatic pressure, and the 100 percent methane phase curve
+can support a baseline screen, while mixed-gas chemistry, well-specific salinity,
+and approved log/core labels remain future or sensitivity inputs.
+
+`stability_osl_pull_triggers_2026-06-14.csv`
+
+This table records when the public repository is enough and when the full
+OpenScienceLab/source bundle is required. Temperature-model logic can be built
+with unit-test fixtures in Git, but real public temperature-model products need
+the raw G10015 profile rows from the full source bundle because Git commits only
+the compact inventory.
+
+`stability_website_product_spec_2026-06-14.csv`
+
+This table defines the intended final website shape for the public stability
+screen: status strip, readiness/capability tables, map view, well detail panel,
+temperature-phase plot, results table, scenario controls, and export/citation
+area. Each row also states what that website area must not claim.
+
+The source-backed calculation contract for the future
+`stability_screen_*.csv` lives in `docs/STABILITY_CALCULATION_PLAN.md`. Build
+the temperature model, intersection rules, and confidence-label tests before
+writing any non-null top/base/thickness fields.
+
+The local code now includes fixture-tested temperature-model helpers in
+`dashboard/stability_products.py`. These helpers parse G10015-style profile
+points, interpolate within measured profile depth, extrapolate below measured
+depth only when a numeric gradient is supplied, and return explicit blocked
+statuses when inputs are insufficient. They are not a real public temperature
+model product until the raw G10015 profile rows are rebuilt from the full
+OpenScienceLab/source bundle.
 
 ## Assessment Unit Codes
 
