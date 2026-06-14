@@ -1,6 +1,6 @@
 metric,value,meaning
 Wells in input scaffold,8084,Public Arctic Slope wells carried into the stability-input scaffold.
-Temperature profile matched,412,Rows where the nearest GGD223 permafrost-control code has a G10015 profile inventory match.
-Ready for phase-curve inputs,347,"Rows with AU context, depth, permafrost control, and temperature-profile context."
-Needs temperature profile match,7140,Rows with public depth/permafrost context but no matching G10015 inventory code yet.
+Temperature profile matched,483,Rows where the nearest GGD223 permafrost-control code has a G10015 profile inventory match.
+Ready for phase-curve inputs,374,"Rows with AU context, depth, permafrost control, and temperature-profile context."
+Needs temperature profile match,7113,Rows with public depth/permafrost context but no matching G10015 inventory code yet.
 Final stability results,0,Top/base/thickness are intentionally not calculated until phase-curve and pressure-temperature assumptions are locked.
