@@ -24,6 +24,8 @@ STABILITY_INPUT_SCAFFOLD_SUMMARY_FILE_NAME = "stability_input_scaffold_summary_2
 STABILITY_INPUT_CAPABILITY_MATRIX_FILE_NAME = "stability_input_capability_matrix_2026-06-14.csv"
 STABILITY_OSL_PULL_TRIGGERS_FILE_NAME = "stability_osl_pull_triggers_2026-06-14.csv"
 STABILITY_WEBSITE_PRODUCT_SPEC_FILE_NAME = "stability_website_product_spec_2026-06-14.csv"
+STABILITY_TEMPERATURE_MODEL_FILE_NAME = "stability_temperature_model_2026-06-14.csv"
+STABILITY_TEMPERATURE_MODEL_SUMMARY_FILE_NAME = "stability_temperature_model_summary_2026-06-14.csv"
 PHASE_CURVE_FILE_NAME = "phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv"
 PHASE_CURVE_SCENARIO_CATALOG_FILE_NAME = "phase_curve_scenario_catalog_2026-06-14.csv"
 PHASE_CURVE_ID = "methane_5ppt_sir2008_csmhyd_digitized_v1"
@@ -154,6 +156,30 @@ STABILITY_INTERVAL_RESULT_COLUMNS = [
     "caveat_codes",
 ]
 
+STABILITY_TEMPERATURE_MODEL_PRODUCT_COLUMNS = [
+    "object_id",
+    "permit_number",
+    "api_number",
+    "well_name",
+    "temperature_model_id",
+    "temperature_model_depth_role",
+    "depth_m",
+    "temperature_model_c",
+    "temperature_model_method",
+    "temperature_extrapolated_below_profile",
+    "temperature_extrapolation_below_profile_m",
+    "temperature_model_status",
+    "temperature_profile_code",
+    "temperature_profile_file",
+    "temperature_profile_max_depth_m",
+    "temperature_gradient_c_per_100m",
+    "temperature_gradient_source",
+    "temperature_profile_link_method",
+    "stability_input_readiness",
+    "temperature_model_product_role",
+    "stability_top_base_thickness_status",
+]
+
 WELL_CONTEXT_COLUMNS = [
     "object_id",
     "permit_number",
@@ -221,6 +247,14 @@ def default_stability_osl_pull_triggers_path(project_root: Path) -> Path:
 
 def default_stability_website_product_spec_path(project_root: Path) -> Path:
     return default_stability_products_dir(project_root) / STABILITY_WEBSITE_PRODUCT_SPEC_FILE_NAME
+
+
+def default_stability_temperature_model_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / STABILITY_TEMPERATURE_MODEL_FILE_NAME
+
+
+def default_stability_temperature_model_summary_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / STABILITY_TEMPERATURE_MODEL_SUMMARY_FILE_NAME
 
 
 def default_phase_curve_path(project_root: Path) -> Path:
@@ -1460,6 +1494,13 @@ def load_g10015_temperature_inventory(project_root: Path) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
+def load_stability_temperature_model(project_root: Path) -> pd.DataFrame:
+    path = default_stability_temperature_model_path(project_root)
+    if not path.exists():
+        return pd.DataFrame(columns=STABILITY_TEMPERATURE_MODEL_PRODUCT_COLUMNS)
+    return pd.read_csv(path)
+
+
 def representative_temperature_profiles(inventory: pd.DataFrame) -> pd.DataFrame:
     if inventory.empty:
         return pd.DataFrame()
@@ -1486,6 +1527,127 @@ def representative_temperature_profiles(inventory: pd.DataFrame) -> pd.DataFrame
         ascending=[True, False, False, True],
     )
     return frame.drop_duplicates("well_code", keep="first").reset_index(drop=True)
+
+
+def _profile_points_from_source(
+    source_root: Path,
+    file_name: object,
+    cache: dict[str, pd.DataFrame],
+) -> pd.DataFrame:
+    if pd.isna(file_name) or not str(file_name).strip():
+        return pd.DataFrame(columns=["depth_m", "temperature_c"])
+    name = str(file_name)
+    if name not in cache:
+        path = Path(source_root) / G10015_RELATIVE_PATH / name
+        if path.exists():
+            cache[name] = load_g10015_temperature_profile_points(path)
+        else:
+            cache[name] = pd.DataFrame(columns=["depth_m", "temperature_c"])
+    return cache[name]
+
+
+def build_stability_temperature_model(
+    project_root: Path,
+    source_root: Path,
+) -> pd.DataFrame:
+    scaffold = load_stability_input_scaffold(project_root)
+    if scaffold.empty:
+        return pd.DataFrame(columns=STABILITY_TEMPERATURE_MODEL_PRODUCT_COLUMNS)
+
+    profile_cache: dict[str, pd.DataFrame] = {}
+    rows: list[dict[str, object]] = []
+    key_depths = [
+        ("nearest_permafrost_control", "nearest_permafrost_depth_m"),
+        ("depth_basis", "depth_basis_m"),
+    ]
+    for _, row in scaffold.iterrows():
+        profile_points = _profile_points_from_source(
+            source_root,
+            row.get("nearest_temperature_profile_file"),
+            profile_cache,
+        )
+        gradient = pd.to_numeric(row.get("rough_geothermal_gradient_c_per_100m"), errors="coerce")
+        gradient_source = "deepest_window_g10015_inventory"
+        if not np.isfinite(gradient):
+            gradient = None
+            gradient_source = "none"
+
+        for depth_role, depth_column in key_depths:
+            model = temperature_model_from_profile(
+                profile_points,
+                row.get(depth_column),
+                gradient_c_per_100m=gradient,
+            ).iloc[0]
+            rows.append(
+                {
+                    "object_id": row.get("object_id"),
+                    "permit_number": row.get("permit_number"),
+                    "api_number": row.get("api_number"),
+                    "well_name": row.get("well_name"),
+                    "temperature_model_id": TEMPERATURE_MODEL_ID,
+                    "temperature_model_depth_role": depth_role,
+                    "depth_m": model["depth_m"],
+                    "temperature_model_c": model["temperature_model_c"],
+                    "temperature_model_method": model["temperature_model_method"],
+                    "temperature_extrapolated_below_profile": model[
+                        "temperature_extrapolated_below_profile"
+                    ],
+                    "temperature_extrapolation_below_profile_m": model[
+                        "temperature_extrapolation_below_profile_m"
+                    ],
+                    "temperature_model_status": model["temperature_model_status"],
+                    "temperature_profile_code": row.get("nearest_temperature_profile_code"),
+                    "temperature_profile_file": row.get("nearest_temperature_profile_file"),
+                    "temperature_profile_max_depth_m": row.get("temperature_profile_max_depth_m"),
+                    "temperature_gradient_c_per_100m": gradient,
+                    "temperature_gradient_source": gradient_source,
+                    "temperature_profile_link_method": row.get("temperature_profile_link_method"),
+                    "stability_input_readiness": row.get("stability_input_readiness"),
+                    "temperature_model_product_role": "temperature_input_only_not_stability_result",
+                    "stability_top_base_thickness_status": "not_calculated",
+                }
+            )
+
+    if not rows:
+        return pd.DataFrame(columns=STABILITY_TEMPERATURE_MODEL_PRODUCT_COLUMNS)
+    model = pd.DataFrame(rows)
+    return model[STABILITY_TEMPERATURE_MODEL_PRODUCT_COLUMNS]
+
+
+def stability_temperature_model_summary_frame(model: pd.DataFrame) -> pd.DataFrame:
+    if model.empty:
+        return pd.DataFrame(columns=["metric", "value", "meaning"])
+
+    calculated = model["temperature_model_status"].eq("calculated")
+    extrapolated = model["temperature_extrapolated_below_profile"].fillna(False).astype(bool)
+    rows = [
+        {
+            "metric": "Temperature model rows",
+            "value": int(len(model)),
+            "meaning": "One row per scaffold well per modeled key depth.",
+        },
+        {
+            "metric": "Calculated key depths",
+            "value": int(calculated.sum()),
+            "meaning": "Key-depth temperatures calculated from profile interpolation or gradient extrapolation.",
+        },
+        {
+            "metric": "Extrapolated key depths",
+            "value": int((calculated & extrapolated).sum()),
+            "meaning": "Calculated key depths below measured profile coverage.",
+        },
+        {
+            "metric": "Blocked key depths",
+            "value": int((~calculated).sum()),
+            "meaning": "Key-depth rows left without modeled temperature because required profile/depth inputs are missing.",
+        },
+        {
+            "metric": "Final stability results",
+            "value": 0,
+            "meaning": "This product models temperature inputs only; top/base/thickness remain uncalculated.",
+        },
+    ]
+    return pd.DataFrame(rows)
 
 
 def build_stability_input_scaffold(project_root: Path) -> pd.DataFrame:
@@ -1669,6 +1831,29 @@ def load_stability_input_scaffold(project_root: Path) -> pd.DataFrame:
     if not path.exists():
         return pd.DataFrame()
     return pd.read_csv(path)
+
+
+def write_stability_temperature_model_product(
+    project_root: Path,
+    source_root: Path | None = None,
+) -> tuple[Path, Path] | tuple[None, None]:
+    active_source = Path(source_root) if source_root is not None else active_stability_source_path(project_root)
+    profile_dir = active_source / G10015_RELATIVE_PATH
+    if not profile_dir.exists() or not any(profile_dir.glob("*.txt")):
+        return None, None
+
+    model = build_stability_temperature_model(project_root, active_source)
+    if model.empty:
+        return None, None
+
+    product_dir = default_stability_products_dir(project_root)
+    product_dir.mkdir(parents=True, exist_ok=True)
+    model_summary = stability_temperature_model_summary_frame(model)
+    model_path = default_stability_temperature_model_path(project_root)
+    model_summary_path = default_stability_temperature_model_summary_path(project_root)
+    model.to_csv(model_path, index=False)
+    model_summary.to_csv(model_summary_path, index=False)
+    return model_path, model_summary_path
 
 
 def write_public_stability_products(

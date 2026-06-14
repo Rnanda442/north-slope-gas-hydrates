@@ -92,6 +92,15 @@ for fixture rows. Tests cover high, medium, low, blocked, and outside-AU cases.
 These are not hydrate-confidence labels and do not estimate occurrence,
 saturation, producibility, or sweet spots.
 
+Current OSL temperature-product writer:
+`01_pipeline/build_public_stability_products.py` now calls
+`write_stability_temperature_model_product(...)`. When the active source root
+contains raw G10015 processed profile `.txt` files, the pipeline writes
+`data/public_stability_products/stability_temperature_model_2026-06-14.csv`
+and `stability_temperature_model_summary_2026-06-14.csv`. The product is one
+row per scaffold well per modeled key depth and keeps
+`stability_top_base_thickness_status = not_calculated`.
+
 Current website product spec:
 `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`
 defines the final public website shape for stability: status strip, readiness
@@ -99,17 +108,15 @@ tables, map, selected-well audit panel, temperature-phase plot, results table,
 scenario controls, and exports/citations.
 
 Next task:
-Decide whether the next work happens locally or in OSL:
+The next work should happen in OSL if the full source bundle is available:
 1. keep the input capability matrix and phase lookup metadata current;
-2. local-only next step: build a guarded `stability_screen_*.csv` writer with
-   tiny fixtures and confirm blocked rows remain null;
-3. OSL next step: pull/sync the full source bundle and build real public
-   temperature-model products from raw G10015 rows;
-4. after the real temperature product exists, apply the tested interval and
-   confidence helpers only to eligible rows;
-5. keep the current scaffold at `phase_curve_status = not_applied` and
-   top/base/thickness null until a versioned stability screen product is
-   intentionally created.
+2. pull/sync this GitHub state on OSL;
+3. run `python 01_pipeline/build_public_stability_products.py` from the repo
+   with the full source bundle available;
+4. review and commit only derived public outputs, especially the new
+   `stability_temperature_model_*.csv` files;
+5. after the real temperature product exists, build a guarded
+   `stability_screen_*.csv` writer and keep blocked rows null.
 
 Do not calculate final top/base/thickness until those implementation gates are
 complete. If web research is needed, use primary/public sources and cite them.

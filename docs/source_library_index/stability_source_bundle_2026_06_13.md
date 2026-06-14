@@ -88,6 +88,11 @@ Implementation note:
   G10015 profile context where available, and provisional hydrostatic pressure.
   Phase-curve application and final stability top/base/thickness remain
   explicitly uncalculated.
+- The public rebuild pipeline can now write
+  `data/public_stability_products/stability_temperature_model_2026-06-14.csv`
+  and its summary when the full bundle includes raw G10015 processed profile
+  `.txt` files. This output is a temperature-input product only; it is not a
+  final stability screen.
 - For local testing outside OpenScienceLab, set
   `NORTH_SLOPE_STABILITY_SOURCE_DIR` to a full bundle path.
 - `data/source_library/` remains ignored by Git.

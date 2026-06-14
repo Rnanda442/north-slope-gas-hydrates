@@ -501,6 +501,10 @@ Current implementation status:
 - Real OSL-derived temperature-model products, a guarded public
   `stability_screen_*.csv` writer, and website result display remain required
   before any non-null public stability top/base/thickness output is written.
+- The OSL rebuild script now has a guarded temperature-model writer that emits
+  `stability_temperature_model_2026-06-14.csv` and its summary only when raw
+  G10015 profile `.txt` rows are available in the active source bundle. This is
+  a temperature-input product, not a stability-screen result.
 
 Until those gates are complete, the public scaffold remains an input scaffold:
 `phase_curve_status = not_applied` and

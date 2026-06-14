@@ -132,6 +132,10 @@ calculations or claiming model results.
   Tests cover high, medium, low, blocked, and outside-AU labels, but these are
   source-control labels only and do not imply hydrate occurrence, saturation,
   producibility, or sweet spots.
+- The public stability rebuild pipeline is now ready for the OSL step. When it
+  runs with the full source bundle and raw G10015 profile `.txt` files present,
+  it writes a compact temperature-model product at key scaffold depths while
+  keeping final stability top/base/thickness uncalculated.
 - `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`
   defines the target public website shape for the future stability screen:
   status strip, readiness/capability, map, selected-well audit panel,
@@ -411,3 +415,6 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-14: Added source-control confidence-label helper tests for high,
   medium, low, blocked, and outside-AU cases while keeping public stability
   screen outputs uncreated.
+- 2026-06-14: Added an OSL-ready temperature-model product writer to the public
+  stability pipeline. It writes temperature-input rows only when raw G10015
+  profile files are present and does not create final stability-screen outputs.

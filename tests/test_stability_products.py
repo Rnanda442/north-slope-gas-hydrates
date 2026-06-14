@@ -17,8 +17,10 @@ from dashboard.stability_products import (
     build_g10015_temperature_inventory,
     build_public_well_stability_context,
     build_stability_input_scaffold,
+    build_stability_temperature_model,
     default_phase_curve_path,
     default_phase_curve_scenario_catalog_path,
+    default_stability_temperature_model_path,
     default_stability_input_capability_matrix_path,
     default_stability_osl_pull_triggers_path,
     default_stability_website_product_spec_path,
@@ -40,11 +42,13 @@ from dashboard.stability_products import (
     stability_depth_grid,
     stability_interval_from_condition_grid,
     stability_input_scaffold_summary_frame,
+    stability_temperature_model_summary_frame,
     stability_website_product_spec_frame,
     stability_source_control_label,
     temperature_model_from_profile,
     temperature_inventory_summary_frame,
     write_public_stability_products,
+    write_stability_temperature_model_product,
 )
 
 
@@ -754,6 +758,54 @@ def test_stability_input_scaffold_links_pressure_and_temperature_without_final_z
         > row["hydrostatic_pressure_mpa_at_depth_basis"]
     )
     assert summary.loc[summary["metric"] == "Final stability results", "value"].iloc[0] == 0
+
+
+def test_stability_temperature_model_builds_key_depth_rows_from_osl_profiles(tmp_path) -> None:
+    make_public_well_package(tmp_path)
+    snapshot = make_public_snapshot(tmp_path)
+    make_temperature_profile(snapshot)
+    write_public_stability_products(tmp_path)
+
+    model = build_stability_temperature_model(tmp_path, snapshot)
+    summary = stability_temperature_model_summary_frame(model)
+
+    assert len(model) == 2
+    assert set(model["temperature_model_depth_role"]) == {
+        "nearest_permafrost_control",
+        "depth_basis",
+    }
+    assert set(model["temperature_model_status"]) == {"calculated"}
+    assert model["temperature_extrapolated_below_profile"].all()
+    assert set(model["temperature_model_product_role"]) == {
+        "temperature_input_only_not_stability_result"
+    }
+    assert set(model["stability_top_base_thickness_status"]) == {"not_calculated"}
+    assert summary.loc[summary["metric"] == "Final stability results", "value"].iloc[0] == 0
+
+
+def test_write_stability_temperature_model_product_creates_public_safe_csv(tmp_path) -> None:
+    make_public_well_package(tmp_path)
+    snapshot = make_public_snapshot(tmp_path)
+    make_temperature_profile(snapshot)
+    write_public_stability_products(tmp_path)
+
+    model_path, summary_path = write_stability_temperature_model_product(tmp_path, snapshot)
+
+    assert model_path == default_stability_temperature_model_path(tmp_path)
+    assert model_path is not None
+    assert model_path.exists()
+    assert summary_path is not None
+    assert summary_path.exists()
+    model = pd.read_csv(model_path)
+    assert len(model) == 2
+    assert "stability_top_m" not in model.columns
+    assert set(model["stability_top_base_thickness_status"]) == {"not_calculated"}
+
+
+def test_write_stability_temperature_model_product_requires_raw_profile_rows(tmp_path) -> None:
+    snapshot = make_public_snapshot(tmp_path)
+
+    assert write_stability_temperature_model_product(tmp_path, snapshot) == (None, None)
 
 
 def test_public_stability_product_runner_has_help() -> None:

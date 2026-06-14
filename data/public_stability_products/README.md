@@ -110,6 +110,14 @@ screen rows. They separate high, medium, low, blocked, and outside-AU source
 control. They do not label hydrate occurrence, saturation, reservoir quality, or
 sweet spots.
 
+The OSL rebuild pipeline is now prepared to write
+`stability_temperature_model_2026-06-14.csv` and
+`stability_temperature_model_summary_2026-06-14.csv` when the full source
+bundle contains raw G10015 processed profile `.txt` files. This product is one
+row per scaffold well per key modeled depth, currently nearest permafrost
+control depth and well depth. It remains a temperature-input product only and
+keeps top/base/thickness uncalculated.
+
 ## Assessment Unit Codes
 
 | Code | Name |

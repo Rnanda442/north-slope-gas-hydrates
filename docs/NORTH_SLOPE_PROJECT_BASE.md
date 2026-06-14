@@ -508,17 +508,24 @@ Fresh-chat handoff as of 2026-06-14:
   `dashboard/stability_products.py`: fixture tests cover high, medium, low,
   blocked, and outside-AU labels. These are source-control labels only, not
   hydrate-confidence or saturation labels.
+- The OSL rebuild script is now prepared to write
+  `stability_temperature_model_2026-06-14.csv` and
+  `stability_temperature_model_summary_2026-06-14.csv` when the full source
+  bundle has raw G10015 processed profile `.txt` files. This product is one row
+  per scaffold well per modeled key depth and remains
+  temperature-input-only, not a stability result.
 - Website end-state control now exists as
   `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`:
   the final public stability view should show run assumptions, readiness gates,
   map status, selected-well audit details, temperature-phase intersections,
   result tables, scenario controls, and exports/citations without claiming
   hydrate proof, saturation, sweet spots, or validated ML results.
-- Next scientific task: decide when to pull/sync the full source bundle on OSL
-  for real public temperature-model products, then build a guarded
-  `stability_screen_*.csv` writer that only fills top/base/thickness for rows
-  passing the tested pressure, temperature, phase-curve, intersection, and
-  confidence gates.
+- Next scientific task: pull/sync this GitHub state on OSL and run
+  `python 01_pipeline/build_public_stability_products.py` against the full
+  source bundle to create the real public temperature-model product. After that,
+  build a guarded `stability_screen_*.csv` writer that only fills
+  top/base/thickness for rows passing the tested pressure, temperature,
+  phase-curve, intersection, and confidence gates.
   Do not label the current scaffold as hydrate proof.
 
 ## Equations To Preserve

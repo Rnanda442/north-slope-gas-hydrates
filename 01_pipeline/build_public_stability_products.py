@@ -13,10 +13,13 @@ from dashboard.stability_products import (
     load_g10015_temperature_inventory,
     load_public_well_stability_context,
     load_stability_input_scaffold,
+    load_stability_temperature_model,
     stability_context_summary_frame,
     stability_input_scaffold_summary_frame,
+    stability_temperature_model_summary_frame,
     temperature_inventory_summary_frame,
     write_public_stability_products,
+    write_stability_temperature_model_product,
 )
 from dashboard.stability_sources import (
     active_stability_source_path,
@@ -68,18 +71,21 @@ def main() -> None:
     print(f"Source metrics: {stability_bundle_metrics(source_root)}")
 
     outputs = write_public_stability_products(project_root, source_root)
+    temperature_model_outputs = write_stability_temperature_model_product(project_root, source_root)
     print("\n## Written outputs")
-    for output in outputs:
+    for output in outputs + temperature_model_outputs:
         if output is not None:
             print(output)
 
     well_context = load_public_well_stability_context(project_root)
     temperature_inventory = load_g10015_temperature_inventory(project_root)
     scaffold = load_stability_input_scaffold(project_root)
+    temperature_model = load_stability_temperature_model(project_root)
 
     print_frame("Well Context Summary", stability_context_summary_frame(well_context))
     print_frame("G10015 Temperature Inventory Summary", temperature_inventory_summary_frame(temperature_inventory))
     print_frame("Stability Input Scaffold Summary", stability_input_scaffold_summary_frame(scaffold))
+    print_frame("Stability Temperature Model Summary", stability_temperature_model_summary_frame(temperature_model))
 
     print(
         "\nDone. Review changed files under data/public_stability_products/ and "
