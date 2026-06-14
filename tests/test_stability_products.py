@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 
 import geopandas as gpd
 import pandas as pd
@@ -234,3 +236,14 @@ def test_stability_input_scaffold_links_pressure_and_temperature_without_final_z
     assert row["stability_input_readiness"] == "ready_for_phase_curve_inputs"
     assert row["hydrostatic_pressure_mpa_at_depth_basis"] > 0
     assert summary.loc[summary["metric"] == "Final stability results", "value"].iloc[0] == 0
+
+
+def test_public_stability_product_runner_has_help() -> None:
+    result = subprocess.run(
+        [sys.executable, "01_pipeline/build_public_stability_products.py", "--help"],
+        capture_output=True,
+        check=True,
+        text=True,
+    )
+
+    assert "--source-root" in result.stdout

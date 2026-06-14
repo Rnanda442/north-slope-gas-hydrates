@@ -439,6 +439,17 @@ Current OpenScienceLab-to-website workflow:
 - Current full-bundle path remains
   `data/source_library/north_slope_stability_sources_2026-06-13/`, which is
   ignored by Git and should stay local to OpenScienceLab or the laptop.
+- To rebuild the public stability products from the full OpenScienceLab bundle,
+  run:
+
+```bash
+cd ~/north-slope-gas-hydrates
+git pull origin main
+python 01_pipeline/build_public_stability_products.py
+```
+
+  The script prints source metrics and writes only derived outputs under
+  `data/public_stability_products/`.
 
 ## Equations To Preserve
 

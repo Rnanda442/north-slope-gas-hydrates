@@ -50,6 +50,40 @@ jupyter server list
 
 Use the displayed base URL and append `proxy/8501/`.
 
+## OpenScienceLab Stability Product Rebuild
+
+Use OpenScienceLab as the heavy-data workbench for the full public source
+bundle. Keep raw source files in the ignored local folder:
+
+```text
+data/source_library/north_slope_stability_sources_2026-06-13/
+```
+
+After pulling the latest code and confirming the bundle exists, rebuild the
+public-safe stability products with:
+
+```bash
+cd ~/north-slope-gas-hydrates
+git pull origin main
+python 01_pipeline/build_public_stability_products.py
+```
+
+If the bundle is somewhere else, pass it explicitly:
+
+```bash
+python 01_pipeline/build_public_stability_products.py \
+  --source-root data/source_library/north_slope_stability_sources_2026-06-13
+```
+
+The script writes derived outputs only under:
+
+```text
+data/public_stability_products/
+```
+
+Commit the derived outputs, code, docs, and tests. Do not commit
+`data/source_library/`.
+
 ## Stable Hosted Atlas URL
 
 The unclassified regional atlas can also be deployed through Streamlit Community

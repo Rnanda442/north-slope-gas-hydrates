@@ -92,6 +92,17 @@ Implementation note:
   `NORTH_SLOPE_STABILITY_SOURCE_DIR` to a full bundle path.
 - `data/source_library/` remains ignored by Git.
 
+OpenScienceLab rebuild command:
+
+```bash
+cd ~/north-slope-gas-hydrates
+git pull origin main
+python 01_pipeline/build_public_stability_products.py
+```
+
+Use this after the full source bundle is present locally. The script should
+write only derived public-safe outputs under `data/public_stability_products/`.
+
 ## Future Explorer Fields
 
 The public-safe explorer table should eventually support:

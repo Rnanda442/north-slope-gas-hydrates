@@ -1,0 +1,91 @@
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+import sys
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from dashboard.stability_products import (
+    load_g10015_temperature_inventory,
+    load_public_well_stability_context,
+    load_stability_input_scaffold,
+    stability_context_summary_frame,
+    stability_input_scaffold_summary_frame,
+    temperature_inventory_summary_frame,
+    write_public_stability_products,
+)
+from dashboard.stability_sources import (
+    active_stability_source_path,
+    default_stability_bundle_path,
+    default_stability_snapshot_path,
+    stability_bundle_metrics,
+)
+
+
+def project_root_from_script() -> Path:
+    return PROJECT_ROOT
+
+
+def print_frame(title: str, frame) -> None:
+    print(f"\n## {title}")
+    if frame.empty:
+        print("(empty)")
+        return
+    print(frame.to_string(index=False))
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Build public-safe North Slope stability products from the full "
+            "OpenScienceLab source bundle when present, or from the committed "
+            "public snapshot fallback."
+        )
+    )
+    parser.add_argument(
+        "--source-root",
+        type=Path,
+        default=None,
+        help=(
+            "Optional source bundle path. Defaults to "
+            "data/source_library/north_slope_stability_sources_2026-06-13 if "
+            "present, otherwise the committed public snapshot."
+        ),
+    )
+    args = parser.parse_args()
+
+    project_root = project_root_from_script()
+    source_root = args.source_root or active_stability_source_path(project_root)
+
+    print(f"Project root: {project_root}")
+    print(f"Active source root: {source_root}")
+    print(f"Default full bundle: {default_stability_bundle_path(project_root)}")
+    print(f"Default public snapshot: {default_stability_snapshot_path(project_root)}")
+    print(f"Source metrics: {stability_bundle_metrics(source_root)}")
+
+    outputs = write_public_stability_products(project_root, source_root)
+    print("\n## Written outputs")
+    for output in outputs:
+        if output is not None:
+            print(output)
+
+    well_context = load_public_well_stability_context(project_root)
+    temperature_inventory = load_g10015_temperature_inventory(project_root)
+    scaffold = load_stability_input_scaffold(project_root)
+
+    print_frame("Well Context Summary", stability_context_summary_frame(well_context))
+    print_frame("G10015 Temperature Inventory Summary", temperature_inventory_summary_frame(temperature_inventory))
+    print_frame("Stability Input Scaffold Summary", stability_input_scaffold_summary_frame(scaffold))
+
+    print(
+        "\nDone. Review changed files under data/public_stability_products/ and "
+        "commit only derived public outputs, code, docs, and tests."
+    )
+
+
+if __name__ == "__main__":
+    main()
