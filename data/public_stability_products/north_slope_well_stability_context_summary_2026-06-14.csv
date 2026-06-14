@@ -1,0 +1,6 @@
+metric,value,meaning
+Arctic Slope public wells,8084,Alaska DNR wells filtered to Geographic = ARCTIC SLOPE.
+Inside USGS hydrate AU,7992,Wellhead point falls inside one or more USGS 2019 hydrate assessment units.
+Depth field available,7578,TrueVertic preferred; DrillerTot used only when TrueVertic is unavailable.
+Nearest GGD223 control assigned,8084,Nearest public permafrost-depth control point assigned by projected distance.
+Public context candidates,7463,Inside a USGS hydrate AU and deeper than the nearest GGD223 permafrost-depth control.

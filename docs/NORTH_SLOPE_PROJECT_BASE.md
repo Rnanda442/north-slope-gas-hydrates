@@ -407,6 +407,18 @@ Current OpenScienceLab-to-website workflow:
   It contains parsed GGD223 permafrost-depth controls and USGS
   `GasHydrateAUs.geojson`, so the website can show real map context even when
   the full local bundle is absent.
+- Current derived well-context product:
+  `data/public_stability_products/north_slope_well_stability_context_2026-06-14.csv`.
+  It combines public Alaska DNR Arctic Slope well locations/depth fields,
+  nearest GGD223 permafrost-depth controls, and USGS hydrate AU membership.
+  Current public summary: `8,084` Arctic Slope wells with valid wellhead
+  coordinates, `7,992` inside at least one USGS hydrate AU, `7,578` with a
+  usable TrueVertic/DrillerTot depth field, and `7,463` first-pass public
+  context candidates.
+- `public_context_candidate` means "inside a USGS hydrate AU and deeper than
+  the nearest GGD223 permafrost-depth control." It is not a hydrate label, not
+  a saturation estimate, and not a pressure-temperature stability-zone
+  calculation.
 - Current full-bundle path remains
   `data/source_library/north_slope_stability_sources_2026-06-13/`, which is
   ignored by Git and should stay local to OpenScienceLab or the laptop.

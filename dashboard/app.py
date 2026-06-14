@@ -26,6 +26,11 @@ from dashboard.stability_sources import (
     stability_source_kind,
     stability_source_status_frame,
 )
+from dashboard.stability_products import (
+    default_well_context_path,
+    load_public_well_stability_context,
+    stability_context_summary_frame,
+)
 from dashboard.runtime.validation import (
     curve_coverage_frame,
     grouped_well_split_frame,
@@ -850,6 +855,11 @@ def cached_hydrate_assessment_units(bundle_root: str):
     return load_hydrate_assessment_units(Path(bundle_root))
 
 
+@st.cache_data
+def cached_public_well_stability_context(project_root: str) -> pd.DataFrame:
+    return load_public_well_stability_context(Path(project_root))
+
+
 def project_relative_or_absolute(path: Path) -> str:
     try:
         return path.relative_to(PROJECT_ROOT).as_posix()
@@ -1550,6 +1560,7 @@ def render_stability_source_bundle() -> None:
     assessment_units = cached_hydrate_assessment_units(str(source_root))
     if permafrost_points.empty and assessment_units.empty:
         st.info("No mappable stability-source layers were found yet.")
+        render_public_well_stability_context_product()
         return
 
     st.plotly_chart(
@@ -1580,6 +1591,67 @@ def render_stability_source_bundle() -> None:
             use_container_width=True,
             hide_index=True,
         )
+
+    render_public_well_stability_context_product()
+
+
+def render_public_well_stability_context_product() -> None:
+    context_path = default_well_context_path(PROJECT_ROOT)
+    context = cached_public_well_stability_context(str(PROJECT_ROOT))
+    if context.empty:
+        st.info(
+            "No public well stability-context product has been generated yet. "
+            f"Expected path: `{project_relative_or_absolute(context_path)}`."
+        )
+        return
+
+    st.markdown("#### Public Well Stability Context Product")
+    st.caption(
+        "Derived from public DNR well locations/depths, nearest GGD223 "
+        "permafrost-depth controls, and USGS hydrate assessment-unit membership. "
+        "This is screening context, not hydrate proof."
+    )
+    summary = stability_context_summary_frame(context)
+    candidate_count = int((context["stability_context_flag"] == "public_context_candidate").sum())
+    au_count = int(context["within_hydrate_assessment_unit"].sum())
+    depth_count = int(pd.to_numeric(context["depth_basis_m"], errors="coerce").notna().sum())
+
+    cols = st.columns(4)
+    cols[0].metric("Arctic Slope wells", f"{len(context):,}")
+    cols[1].metric("Inside hydrate AU", f"{au_count:,}")
+    cols[2].metric("Depth available", f"{depth_count:,}")
+    cols[3].metric("Context candidates", f"{candidate_count:,}")
+    st.dataframe(summary, use_container_width=True, hide_index=True)
+
+    candidate_preview = context[
+        context["stability_context_flag"] == "public_context_candidate"
+    ].copy()
+    preview_source = candidate_preview if not candidate_preview.empty else context
+    preview = preview_source.sort_values(["nearest_ggd223_distance_km", "well_name"]).head(14)
+    st.dataframe(
+        preview[
+            [
+                "well_name",
+                "field",
+                "depth_basis",
+                "depth_basis_ft",
+                "hydrate_assessment_codes",
+                "nearest_ggd223_code",
+                "nearest_permafrost_depth_m",
+                "nearest_ggd223_distance_km",
+                "stability_context_flag",
+            ]
+        ],
+        use_container_width=True,
+        hide_index=True,
+    )
+    st.download_button(
+        "Download public well context CSV",
+        context.to_csv(index=False).encode("utf-8"),
+        file_name=context_path.name,
+        mime="text/csv",
+        use_container_width=True,
+    )
 
 
 def render_structural_explorer() -> None:

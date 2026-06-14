@@ -73,6 +73,11 @@ Implementation note:
   That snapshot contains parsed GGD223 permafrost controls and
   `GasHydrateAUs.geojson` so the map still works when OpenScienceLab proxy
   routing or local source-bundle upload is unavailable.
+- A public well-context product now lives at
+  `data/public_stability_products/north_slope_well_stability_context_2026-06-14.csv`.
+  It joins public Alaska DNR Arctic Slope wells to nearest GGD223
+  permafrost-depth controls and USGS hydrate AU membership. Treat its
+  `public_context_candidate` flag as screening context only, not hydrate proof.
 - For local testing outside OpenScienceLab, set
   `NORTH_SLOPE_STABILITY_SOURCE_DIR` to a full bundle path.
 - `data/source_library/` remains ignored by Git.

@@ -80,7 +80,11 @@ calculations or claiming model results.
   back to the committed public snapshot under
   `data/public_stability_snapshot/north_slope_stability_snapshot_2026-06-13/`
   so hosted/browser views can still show GGD223 permafrost controls and USGS
-  hydrate assessment units when the full local bundle is unavailable.
+  hydrate assessment units when the full local bundle is unavailable. A derived
+  public well-context product is also present under
+  `data/public_stability_products/`, joining Arctic Slope public wells to
+  nearest GGD223 controls and USGS hydrate AU membership for screening context
+  only.
 - Three Excel header references were reviewed from the user's email. The images
   are not stored in Git or shown on the website; their public-safe schema
   derivative is maintained in `docs/WELL_LOG_REQUIREMENTS_MAP.md`.
