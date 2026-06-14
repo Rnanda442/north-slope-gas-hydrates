@@ -451,6 +451,25 @@ python 01_pipeline/build_public_stability_products.py
   The script prints source metrics and writes only derived outputs under
   `data/public_stability_products/`.
 
+Fresh-chat handoff as of 2026-06-14:
+
+- Latest stable public-product commit pulled locally:
+  `aedd734 Rebuild stability products with complete G10015 profiles`.
+- OpenScienceLab full source bundle is now complete enough for the current
+  stability product rebuild: `7/7` tracked source items, `43` GGD223 controls,
+  `184` G10015 temperature profiles, and `3` hydrate AUs.
+- Local website on the laptop has been restarted and verified at:
+  `http://localhost:8517/?page=Explore%20North%20Slope`.
+- Verified local website counts after the OSL rebuild:
+  `G10015 profiles = 184`, `Well codes = 24`, `Gradient estimates = 184`,
+  `Temperature matched = 483`, and `Next-step ready = 374`.
+- The next chat should not revisit OpenScienceLab proxy/browser debugging.
+  Use OpenScienceLab for source/product rebuilds only, then push derived
+  outputs and view them locally or on the hosted public website.
+- Next scientific task: lock a cited hydrate phase curve plus pressure and
+  temperature assumptions before calculating any stability top/base/thickness
+  fields. Do not label the current scaffold as hydrate proof.
+
 ## Equations To Preserve
 
 From the screenshots and slide materials, preserve equations for:
