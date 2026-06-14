@@ -27,6 +27,21 @@ It stores per-file metadata, depth/temperature ranges, deepest temperature, and
 a rough deepest-window temperature-gradient context estimate. It does not store
 the raw profile rows and does not replace a calibrated geothermal model.
 
+`stability_input_scaffold_2026-06-14.csv`
+
+This table is the next-step input scaffold for future stability calculations.
+It joins the public well context product to the compact G10015 inventory through
+the nearest GGD223 control code, then adds a provisional hydrostatic pressure
+estimate:
+
+```text
+pressure_mpa = depth_m * 0.00980665
+```
+
+This is a convenience scaffold, not a final stability result. It intentionally
+keeps `phase_curve_status = not_applied` and
+`stability_top_base_thickness_status = not_calculated`.
+
 ## Assessment Unit Codes
 
 | Code | Name |
@@ -47,3 +62,8 @@ pressure assumptions, and a methane hydrate phase curve.
 The G10015 gradient field is calculated from the deepest 100 m of each
 available profile where enough samples exist. Use it as temperature context only
 until a proper well-specific geothermal model is built.
+
+The stability scaffold is ready for the next phase-curve step only where it has
+public AU membership, public well depth, nearest GGD223 permafrost context, and
+a matching G10015 temperature profile. Rows without a profile match remain
+useful for inventory and gap analysis, not calculation.

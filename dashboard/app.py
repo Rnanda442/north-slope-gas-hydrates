@@ -28,11 +28,14 @@ from dashboard.stability_sources import (
 )
 from dashboard.stability_products import (
     default_g10015_inventory_path,
+    default_stability_input_scaffold_path,
     default_well_context_path,
     load_g10015_temperature_inventory,
     load_public_well_stability_context,
+    load_stability_input_scaffold,
     stability_parameter_readiness_frame,
     stability_context_summary_frame,
+    stability_input_scaffold_summary_frame,
     temperature_inventory_summary_frame,
 )
 from dashboard.runtime.validation import (
@@ -867,6 +870,11 @@ def cached_public_well_stability_context(project_root: str) -> pd.DataFrame:
 @st.cache_data
 def cached_g10015_temperature_inventory(project_root: str) -> pd.DataFrame:
     return load_g10015_temperature_inventory(Path(project_root))
+
+
+@st.cache_data
+def cached_stability_input_scaffold(project_root: str) -> pd.DataFrame:
+    return load_stability_input_scaffold(Path(project_root))
 
 
 def project_relative_or_absolute(path: Path) -> str:
@@ -1722,7 +1730,67 @@ def render_g10015_temperature_inventory_product() -> None:
         mime="text/csv",
         use_container_width=True,
     )
+    render_stability_input_scaffold_product()
     render_stability_parameter_readiness()
+
+
+def render_stability_input_scaffold_product() -> None:
+    scaffold_path = default_stability_input_scaffold_path(PROJECT_ROOT)
+    scaffold = cached_stability_input_scaffold(str(PROJECT_ROOT))
+    if scaffold.empty:
+        st.info(
+            "No stability input scaffold has been generated yet. "
+            f"Expected path: `{project_relative_or_absolute(scaffold_path)}`."
+        )
+        return
+
+    st.markdown("#### Stability Input Scaffold")
+    st.caption(
+        "One-row-per-public-well input table for the next stability calculation. "
+        "It lines up public depth, nearest permafrost control, G10015 temperature "
+        "context where available, and a provisional hydrostatic pressure estimate. "
+        "Top/base/thickness are intentionally not calculated here."
+    )
+    summary = stability_input_scaffold_summary_frame(scaffold)
+    matched = int(scaffold["nearest_temperature_profile_code"].notna().sum())
+    ready = int((scaffold["stability_input_readiness"] == "ready_for_phase_curve_inputs").sum())
+    cols = st.columns(4)
+    cols[0].metric("Scaffold wells", f"{len(scaffold):,}")
+    cols[1].metric("Temperature matched", f"{matched:,}")
+    cols[2].metric("Next-step ready", f"{ready:,}")
+    cols[3].metric("Final results", "0")
+    st.dataframe(summary, use_container_width=True, hide_index=True)
+
+    preview_source = scaffold[
+        scaffold["stability_input_readiness"] == "ready_for_phase_curve_inputs"
+    ].copy()
+    if preview_source.empty:
+        preview_source = scaffold
+    preview = preview_source.sort_values(["nearest_ggd223_distance_km", "well_name"]).head(14)
+    st.dataframe(
+        preview[
+            [
+                "well_name",
+                "depth_basis_m",
+                "nearest_ggd223_code",
+                "nearest_permafrost_depth_m",
+                "nearest_temperature_profile_code",
+                "rough_geothermal_gradient_c_per_100m",
+                "hydrostatic_pressure_mpa_at_depth_basis",
+                "phase_curve_status",
+                "stability_input_readiness",
+            ]
+        ],
+        use_container_width=True,
+        hide_index=True,
+    )
+    st.download_button(
+        "Download stability input scaffold CSV",
+        scaffold.to_csv(index=False).encode("utf-8"),
+        file_name=scaffold_path.name,
+        mime="text/csv",
+        use_container_width=True,
+    )
 
 
 def render_stability_parameter_readiness() -> None:

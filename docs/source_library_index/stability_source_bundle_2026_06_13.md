@@ -82,6 +82,12 @@ Implementation note:
   `data/public_stability_products/g10015_temperature_profile_inventory_2026-06-14.csv`.
   It records profile metadata, depth/temperature ranges, deepest temperature,
   and rough deepest-window gradient context without committing raw profile rows.
+- A stability input scaffold now lives at
+  `data/public_stability_products/stability_input_scaffold_2026-06-14.csv`.
+  It combines public well depth, nearest GGD223 permafrost context, matched
+  G10015 profile context where available, and provisional hydrostatic pressure.
+  Phase-curve application and final stability top/base/thickness remain
+  explicitly uncalculated.
 - For local testing outside OpenScienceLab, set
   `NORTH_SLOPE_STABILITY_SOURCE_DIR` to a full bundle path.
 - `data/source_library/` remains ignored by Git.

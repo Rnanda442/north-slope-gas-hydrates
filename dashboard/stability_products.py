@@ -19,12 +19,15 @@ WELL_CONTEXT_FILE_NAME = "north_slope_well_stability_context_2026-06-14.csv"
 WELL_CONTEXT_SUMMARY_FILE_NAME = "north_slope_well_stability_context_summary_2026-06-14.csv"
 G10015_INVENTORY_FILE_NAME = "g10015_temperature_profile_inventory_2026-06-14.csv"
 G10015_SUMMARY_FILE_NAME = "g10015_temperature_profile_summary_2026-06-14.csv"
+STABILITY_INPUT_SCAFFOLD_FILE_NAME = "stability_input_scaffold_2026-06-14.csv"
+STABILITY_INPUT_SCAFFOLD_SUMMARY_FILE_NAME = "stability_input_scaffold_summary_2026-06-14.csv"
 
 WELL_SOURCE_RELATIVE_PATH = (
     "raw_data/Wells/Well_Bottom_Hole_Location/Well_Bottom_Hole_Location.shp"
 )
 G10015_RELATIVE_PATH = "03_temperature_geothermal/NSIDC_G10015_extracted"
 NUMERIC_PROFILE_RE = re.compile(r"^\s*(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s*$")
+HYDROSTATIC_PRESSURE_MPA_PER_M = 0.00980665
 
 WELL_CONTEXT_COLUMNS = [
     "object_id",
@@ -73,6 +76,14 @@ def default_g10015_inventory_path(project_root: Path) -> Path:
 
 def default_g10015_summary_path(project_root: Path) -> Path:
     return default_stability_products_dir(project_root) / G10015_SUMMARY_FILE_NAME
+
+
+def default_stability_input_scaffold_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / STABILITY_INPUT_SCAFFOLD_FILE_NAME
+
+
+def default_stability_input_scaffold_summary_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / STABILITY_INPUT_SCAFFOLD_SUMMARY_FILE_NAME
 
 
 def load_arctic_slope_public_wells(project_root: Path) -> gpd.GeoDataFrame:
@@ -497,10 +508,195 @@ def load_g10015_temperature_inventory(project_root: Path) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
+def representative_temperature_profiles(inventory: pd.DataFrame) -> pd.DataFrame:
+    if inventory.empty:
+        return pd.DataFrame()
+
+    frame = inventory.copy()
+    numeric_columns = [
+        "sample_count",
+        "max_depth_m",
+        "deepest_temperature_c",
+        "deepest_window_gradient_c_per_100m",
+    ]
+    for column in numeric_columns:
+        if column in frame.columns:
+            frame[column] = pd.to_numeric(frame[column], errors="coerce")
+
+    frame["profile_count_for_code"] = frame.groupby("well_code")["file_name"].transform("count")
+    frame = frame.sort_values(
+        [
+            "well_code",
+            "max_depth_m",
+            "sample_count",
+            "file_name",
+        ],
+        ascending=[True, False, False, True],
+    )
+    return frame.drop_duplicates("well_code", keep="first").reset_index(drop=True)
+
+
+def build_stability_input_scaffold(project_root: Path) -> pd.DataFrame:
+    context = load_public_well_stability_context(project_root)
+    inventory = load_g10015_temperature_inventory(project_root)
+    if context.empty:
+        return pd.DataFrame()
+
+    representative_profiles = representative_temperature_profiles(inventory)
+    profile_columns = [
+        "well_code",
+        "file_name",
+        "well_name",
+        "log_date",
+        "profile_count_for_code",
+        "max_depth_m",
+        "deepest_temperature_c",
+        "deepest_window_gradient_c_per_100m",
+    ]
+    if representative_profiles.empty:
+        profile_lookup = pd.DataFrame(columns=profile_columns)
+    else:
+        profile_lookup = representative_profiles[
+            [column for column in profile_columns if column in representative_profiles.columns]
+        ].rename(
+            columns={
+                "well_code": "nearest_temperature_profile_code",
+                "file_name": "nearest_temperature_profile_file",
+                "well_name": "nearest_temperature_profile_well",
+                "log_date": "nearest_temperature_profile_log_date",
+                "profile_count_for_code": "temperature_profile_count_for_code",
+                "max_depth_m": "temperature_profile_max_depth_m",
+                "deepest_temperature_c": "temperature_profile_deepest_temperature_c",
+                "deepest_window_gradient_c_per_100m": "rough_geothermal_gradient_c_per_100m",
+            }
+        )
+
+    scaffold = context.merge(
+        profile_lookup,
+        left_on="nearest_ggd223_code",
+        right_on="nearest_temperature_profile_code",
+        how="left",
+    )
+
+    scaffold["temperature_profile_link_method"] = "no_matching_g10015_profile_for_nearest_ggd223_code"
+    scaffold.loc[
+        scaffold["nearest_temperature_profile_code"].notna(),
+        "temperature_profile_link_method",
+    ] = "matched_nearest_ggd223_code"
+
+    depth_m = pd.to_numeric(scaffold["depth_basis_m"], errors="coerce")
+    permafrost_m = pd.to_numeric(scaffold["nearest_permafrost_depth_m"], errors="coerce")
+    scaffold["hydrostatic_pressure_mpa_at_depth_basis"] = (
+        depth_m * HYDROSTATIC_PRESSURE_MPA_PER_M
+    )
+    scaffold["hydrostatic_pressure_mpa_at_nearest_permafrost_control"] = (
+        permafrost_m * HYDROSTATIC_PRESSURE_MPA_PER_M
+    )
+    scaffold["pressure_assumption_code"] = "hydrostatic_freshwater_0p00980665_mpa_per_m"
+    scaffold["phase_curve_status"] = "not_applied"
+    scaffold["stability_top_base_thickness_status"] = "not_calculated"
+
+    scaffold["stability_input_readiness"] = "missing_depth_or_permafrost_context"
+    scaffold.loc[
+        ~scaffold["within_hydrate_assessment_unit"],
+        "stability_input_readiness",
+    ] = "outside_usgs_hydrate_au"
+    scaffold.loc[
+        scaffold["within_hydrate_assessment_unit"]
+        & depth_m.notna()
+        & permafrost_m.notna()
+        & scaffold["nearest_temperature_profile_code"].isna(),
+        "stability_input_readiness",
+    ] = "needs_temperature_profile_match"
+    scaffold.loc[
+        scaffold["within_hydrate_assessment_unit"]
+        & depth_m.notna()
+        & permafrost_m.notna()
+        & scaffold["nearest_temperature_profile_code"].notna(),
+        "stability_input_readiness",
+    ] = "ready_for_phase_curve_inputs"
+
+    keep_columns = [
+        "object_id",
+        "permit_number",
+        "api_number",
+        "well_name",
+        "field",
+        "pool",
+        "wellhead_latitude",
+        "wellhead_longitude",
+        "depth_basis",
+        "depth_basis_m",
+        "hydrate_assessment_codes",
+        "within_hydrate_assessment_unit",
+        "nearest_ggd223_code",
+        "nearest_ggd223_well",
+        "nearest_permafrost_depth_m",
+        "nearest_ggd223_distance_km",
+        "nearest_temperature_profile_code",
+        "nearest_temperature_profile_file",
+        "nearest_temperature_profile_well",
+        "nearest_temperature_profile_log_date",
+        "temperature_profile_count_for_code",
+        "temperature_profile_max_depth_m",
+        "temperature_profile_deepest_temperature_c",
+        "rough_geothermal_gradient_c_per_100m",
+        "temperature_profile_link_method",
+        "hydrostatic_pressure_mpa_at_depth_basis",
+        "hydrostatic_pressure_mpa_at_nearest_permafrost_control",
+        "pressure_assumption_code",
+        "phase_curve_status",
+        "stability_top_base_thickness_status",
+        "stability_input_readiness",
+    ]
+    return scaffold[[column for column in keep_columns if column in scaffold.columns]]
+
+
+def stability_input_scaffold_summary_frame(scaffold: pd.DataFrame) -> pd.DataFrame:
+    if scaffold.empty:
+        return pd.DataFrame(columns=["metric", "value", "meaning"])
+
+    rows = [
+        {
+            "metric": "Wells in input scaffold",
+            "value": int(len(scaffold)),
+            "meaning": "Public Arctic Slope wells carried into the stability-input scaffold.",
+        },
+        {
+            "metric": "Temperature profile matched",
+            "value": int(scaffold["nearest_temperature_profile_code"].notna().sum()),
+            "meaning": "Rows where the nearest GGD223 permafrost-control code has a G10015 profile inventory match.",
+        },
+        {
+            "metric": "Ready for phase-curve inputs",
+            "value": int((scaffold["stability_input_readiness"] == "ready_for_phase_curve_inputs").sum()),
+            "meaning": "Rows with AU context, depth, permafrost control, and temperature-profile context.",
+        },
+        {
+            "metric": "Needs temperature profile match",
+            "value": int((scaffold["stability_input_readiness"] == "needs_temperature_profile_match").sum()),
+            "meaning": "Rows with public depth/permafrost context but no matching G10015 inventory code yet.",
+        },
+        {
+            "metric": "Final stability results",
+            "value": 0,
+            "meaning": "Top/base/thickness are intentionally not calculated until phase-curve and pressure-temperature assumptions are locked.",
+        },
+    ]
+    return pd.DataFrame(rows)
+
+
+def load_stability_input_scaffold(project_root: Path) -> pd.DataFrame:
+    path = default_stability_input_scaffold_path(project_root)
+    if not path.exists():
+        return pd.DataFrame()
+    return pd.read_csv(path)
+
+
 def write_public_stability_products(
     project_root: Path,
     source_root: Path | None = None,
-) -> tuple[Path, Path, Path | None, Path | None]:
+) -> tuple[Path, Path, Path | None, Path | None, Path | None, Path | None]:
     product_dir = default_stability_products_dir(project_root)
     product_dir.mkdir(parents=True, exist_ok=True)
     active_source = Path(source_root) if source_root is not None else active_stability_source_path(project_root)
@@ -513,11 +709,25 @@ def write_public_stability_products(
 
     inventory = build_g10015_temperature_inventory(active_source)
     if inventory.empty:
-        return context_path, summary_path, None, None
+        return context_path, summary_path, None, None, None, None
 
     inventory_summary = temperature_inventory_summary_frame(inventory)
     inventory_path = default_g10015_inventory_path(project_root)
     inventory_summary_path = default_g10015_summary_path(project_root)
     inventory.to_csv(inventory_path, index=False)
     inventory_summary.to_csv(inventory_summary_path, index=False)
-    return context_path, summary_path, inventory_path, inventory_summary_path
+
+    scaffold = build_stability_input_scaffold(project_root)
+    scaffold_summary = stability_input_scaffold_summary_frame(scaffold)
+    scaffold_path = default_stability_input_scaffold_path(project_root)
+    scaffold_summary_path = default_stability_input_scaffold_summary_path(project_root)
+    scaffold.to_csv(scaffold_path, index=False)
+    scaffold_summary.to_csv(scaffold_summary_path, index=False)
+    return (
+        context_path,
+        summary_path,
+        inventory_path,
+        inventory_summary_path,
+        scaffold_path,
+        scaffold_summary_path,
+    )

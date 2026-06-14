@@ -9,11 +9,13 @@ from shapely.geometry import Point, Polygon
 from dashboard.stability_products import (
     build_g10015_temperature_inventory,
     build_public_well_stability_context,
+    build_stability_input_scaffold,
     default_well_context_path,
     load_arctic_slope_public_wells,
     parse_g10015_temperature_profile,
     stability_parameter_readiness_frame,
     stability_context_summary_frame,
+    stability_input_scaffold_summary_frame,
     temperature_inventory_summary_frame,
     write_public_stability_products,
 )
@@ -164,9 +166,14 @@ def test_write_public_stability_products_creates_csv_outputs(tmp_path) -> None:
     snapshot = make_public_snapshot(tmp_path)
     make_temperature_profile(snapshot)
 
-    context_path, summary_path, inventory_path, inventory_summary_path = write_public_stability_products(
-        tmp_path
-    )
+    (
+        context_path,
+        summary_path,
+        inventory_path,
+        inventory_summary_path,
+        scaffold_path,
+        scaffold_summary_path,
+    ) = write_public_stability_products(tmp_path)
 
     assert context_path == default_well_context_path(tmp_path)
     assert context_path.exists()
@@ -175,6 +182,10 @@ def test_write_public_stability_products_creates_csv_outputs(tmp_path) -> None:
     assert inventory_path.exists()
     assert inventory_summary_path is not None
     assert inventory_summary_path.exists()
+    assert scaffold_path is not None
+    assert scaffold_path.exists()
+    assert scaffold_summary_path is not None
+    assert scaffold_summary_path.exists()
     context = pd.read_csv(context_path)
     assert context["well_name"].tolist() == ["TEST NORTH SLOPE 1"]
 
@@ -203,3 +214,23 @@ def test_stability_parameter_readiness_keeps_final_zone_as_pending() -> None:
     final_row = readiness.loc[readiness["input"] == "Stability top/base/thickness"].iloc[0]
     assert final_row["current_status"] == "Not calculated yet"
     assert "pressure" in final_row["next_step"].lower()
+
+
+def test_stability_input_scaffold_links_pressure_and_temperature_without_final_zone(tmp_path) -> None:
+    make_public_well_package(tmp_path)
+    snapshot = make_public_snapshot(tmp_path)
+    make_temperature_profile(snapshot)
+    write_public_stability_products(tmp_path)
+
+    scaffold = build_stability_input_scaffold(tmp_path)
+    summary = stability_input_scaffold_summary_frame(scaffold)
+
+    assert len(scaffold) == 1
+    row = scaffold.iloc[0]
+    assert row["nearest_temperature_profile_code"] == "SYN"
+    assert row["temperature_profile_link_method"] == "matched_nearest_ggd223_code"
+    assert row["phase_curve_status"] == "not_applied"
+    assert row["stability_top_base_thickness_status"] == "not_calculated"
+    assert row["stability_input_readiness"] == "ready_for_phase_curve_inputs"
+    assert row["hydrostatic_pressure_mpa_at_depth_basis"] > 0
+    assert summary.loc[summary["metric"] == "Final stability results", "value"].iloc[0] == 0

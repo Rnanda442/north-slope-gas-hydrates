@@ -86,7 +86,10 @@ calculations or claiming model results.
   nearest GGD223 controls and USGS hydrate AU membership for screening context
   only. The same product folder includes a compact G10015 temperature-profile
   inventory for geothermal context; it summarizes public logs and rough
-  deepest-window gradients without committing raw profile rows.
+  deepest-window gradients without committing raw profile rows. A stability
+  input scaffold now combines public well depth, nearest permafrost control,
+  matched G10015 context where available, and provisional hydrostatic pressure,
+  but keeps phase-curve and top/base/thickness results explicitly uncalculated.
 - Three Excel header references were reviewed from the user's email. The images
   are not stored in Git or shown on the website; their public-safe schema
   derivative is maintained in `docs/WELL_LOG_REQUIREMENTS_MAP.md`.

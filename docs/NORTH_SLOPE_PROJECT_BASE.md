@@ -425,6 +425,14 @@ Current OpenScienceLab-to-website workflow:
   across `24` well codes, with maximum logged depth `882.6 m` and rough
   deepest-window gradient context for each profile. These gradient values are
   context estimates only, not a calibrated geothermal model.
+- Current derived stability input scaffold:
+  `data/public_stability_products/stability_input_scaffold_2026-06-14.csv`.
+  It joins the public well context table to representative G10015 temperature
+  profiles through the nearest GGD223 control code and adds a provisional
+  hydrostatic pressure estimate using `pressure_mpa = depth_m * 0.00980665`.
+  Current summary: `8,084` scaffold wells, `483` rows with a G10015 profile
+  match, `374` rows ready for the next phase-curve input step, and `0` final
+  stability top/base/thickness results.
 - The Structural Explorer now includes a stability pipeline readiness table
   that marks pressure assumptions, phase-curve selection, and final
   top/base/thickness calculation as planned or not calculated yet.
