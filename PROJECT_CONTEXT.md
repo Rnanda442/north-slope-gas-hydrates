@@ -74,6 +74,9 @@ calculations or claiming model results.
   and `ENRICHED 9-SLIDE ML PIPELINE North Slope Gas Hydrate Slides
   2026-06-11`.
 - The public source-library index is present in `docs/source_library_index/`.
+- The 2026-06-13 stability source bundle is documented, locally uploaded in
+  OpenScienceLab under `data/source_library/`, and connected to the Structural
+  Explorer through `dashboard/stability_sources.py`.
 - Three Excel header references were reviewed from the user's email. The images
   are not stored in Git or shown on the website; their public-safe schema
   derivative is maintained in `docs/WELL_LOG_REQUIREMENTS_MAP.md`.
@@ -330,3 +333,6 @@ blockers, and next activities in the architecture/activity map.
   confirmed 23 project tests pass.
 - 2026-06-12: Added `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md` as the
   reviewable goal lock before further Word, PowerPoint, or website edits.
+- 2026-06-13: Added the OpenScienceLab stability source-bundle loader and
+  Structural Explorer source-status/map panel for GGD223 permafrost controls and
+  USGS gas hydrate assessment units.

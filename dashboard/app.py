@@ -16,6 +16,13 @@ from dashboard.runtime.schemas import (
     PROJECT_COHORT_ASSUMPTIONS,
     TARGET_LABEL_CONTRACT,
 )
+from dashboard.stability_sources import (
+    default_stability_bundle_path,
+    load_ggd223_permafrost_points,
+    load_hydrate_assessment_units,
+    stability_bundle_metrics,
+    stability_source_status_frame,
+)
 from dashboard.runtime.validation import (
     curve_coverage_frame,
     grouped_well_split_frame,
@@ -73,7 +80,18 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 EXPORT_DIR = PROJECT_ROOT / "05_exports" / "html"
 ARCHITECTURE_PATH = PROJECT_ROOT / "docs" / "PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md"
 VISION_PATH = PROJECT_ROOT / "docs" / "PROJECT_VISION_GOALS_AND_NEXT_STEPS.md"
-IGNORED_DIRS = {".git", ".ipynb_checkpoints", "__pycache__"}
+IGNORED_DIRS = {
+    ".git",
+    ".ipynb_checkpoints",
+    "__pycache__",
+    ".venv-dashboard",
+    "configs_local",
+    "data_runtime",
+    "logs_runtime",
+    "models_runtime",
+    "outputs_runtime",
+    "source_library",
+}
 
 REGIONAL_SCENE = EXPORT_DIR / "north_slope_plotly_advanced.html"
 STRUCTURAL_SCENES = {
@@ -808,6 +826,121 @@ def build_geographic_structural_figure(
     return figure
 
 
+@st.cache_data
+def cached_stability_source_status(bundle_root: str) -> pd.DataFrame:
+    return stability_source_status_frame(Path(bundle_root))
+
+
+@st.cache_data
+def cached_stability_bundle_metrics(bundle_root: str) -> dict[str, object]:
+    return stability_bundle_metrics(Path(bundle_root))
+
+
+@st.cache_data
+def cached_ggd223_points(bundle_root: str) -> pd.DataFrame:
+    points = load_ggd223_permafrost_points(Path(bundle_root))
+    return pd.DataFrame(points.drop(columns="geometry", errors="ignore"))
+
+
+@st.cache_data
+def cached_hydrate_assessment_units(bundle_root: str):
+    return load_hydrate_assessment_units(Path(bundle_root))
+
+
+def project_relative_or_absolute(path: Path) -> str:
+    try:
+        return path.relative_to(PROJECT_ROOT).as_posix()
+    except ValueError:
+        return str(path)
+
+
+def polygon_parts(geometry):
+    if geometry is None or geometry.is_empty:
+        return []
+    if geometry.geom_type == "Polygon":
+        return [geometry]
+    if geometry.geom_type == "MultiPolygon":
+        return list(geometry.geoms)
+    return []
+
+
+def build_stability_source_figure(
+    permafrost_points: pd.DataFrame,
+    assessment_units,
+) -> go.Figure:
+    figure = go.Figure()
+    has_traces = False
+
+    if not assessment_units.empty:
+        for index, (_, row) in enumerate(assessment_units.iterrows()):
+            assessment_name = row.get("ASSESSNAME", "Gas hydrate assessment unit")
+            for polygon in polygon_parts(row.geometry):
+                x, y = polygon.exterior.xy
+                figure.add_trace(
+                    go.Scattergeo(
+                        lon=list(x),
+                        lat=list(y),
+                        mode="lines",
+                        name="USGS hydrate AUs",
+                        legendgroup="USGS hydrate AUs",
+                        showlegend=index == 0,
+                        line={"color": "#d9773d", "width": 2},
+                        hovertemplate=(
+                            f"<b>{escape(str(assessment_name))}</b><br>"
+                            "USGS gas hydrate assessment unit<extra></extra>"
+                        ),
+                    )
+                )
+                has_traces = True
+
+    if not permafrost_points.empty:
+        figure.add_trace(
+            go.Scattergeo(
+                lon=permafrost_points["longitude"],
+                lat=permafrost_points["latitude"],
+                mode="markers",
+                name="GGD223 permafrost controls",
+                marker={
+                    "size": 9,
+                    "color": permafrost_points["permafrost_depth_m"],
+                    "colorscale": "Viridis",
+                    "line": {"color": "#ffffff", "width": 0.8},
+                    "colorbar": {"title": "pf depth m"},
+                },
+                text=permafrost_points["well_designation"],
+                customdata=permafrost_points[["code", "permafrost_depth_m", "elevation_m"]],
+                hovertemplate=(
+                    "<b>%{text}</b><br>"
+                    "Code: %{customdata[0]}<br>"
+                    "Permafrost depth: %{customdata[1]} m<br>"
+                    "Elevation: %{customdata[2]} m<br>"
+                    "Lon/lat: %{lon:.2f}, %{lat:.2f}<extra></extra>"
+                ),
+            )
+        )
+        has_traces = True
+
+    figure.update_layout(
+        height=520,
+        margin={"l": 0, "r": 0, "t": 10, "b": 0},
+        legend={"orientation": "h", "y": 1.03, "x": 0},
+        geo={
+            "scope": "north america",
+            "projection_type": "albers usa",
+            "showland": True,
+            "landcolor": "#f2f5f6",
+            "showocean": True,
+            "oceancolor": "#e9f2f3",
+            "showlakes": True,
+            "lakecolor": "#e9f2f3",
+            "subunitcolor": "#d4dde0",
+            "countrycolor": "#d4dde0",
+            "fitbounds": "locations" if has_traces else False,
+        },
+    )
+    return figure
+
+
 def render_scene(path: Path, height: int = 830) -> None:
     if not path.exists():
         st.warning(f"Scene has not been generated yet: {path.relative_to(PROJECT_ROOT)}")
@@ -1351,6 +1484,85 @@ def render_regional_atlas() -> None:
     render_scene(REGIONAL_SCENE, height=870)
 
 
+def render_stability_source_bundle() -> None:
+    bundle_root = default_stability_bundle_path(PROJECT_ROOT)
+    bundle_label = project_relative_or_absolute(bundle_root)
+    status = cached_stability_source_status(str(bundle_root))
+    metrics = cached_stability_bundle_metrics(str(bundle_root))
+
+    st.markdown("### Public Stability Source Bundle")
+    st.caption(f"Expected local source path: `{bundle_label}`")
+    st.warning(
+        "This is a stability admissibility screen. It can show where hydrate could "
+        "be thermodynamically plausible, but it is not hydrate proof and not a "
+        "saturation prediction."
+    )
+
+    cols = st.columns(4)
+    cols[0].metric(
+        "Source items",
+        f'{metrics["Ready source items"]}/{metrics["Total source items"]}',
+        metrics["Bundle"],
+    )
+    cols[1].metric("GGD223 controls", f'{metrics["GGD223 controls"]:,}')
+    cols[2].metric("Hydrate AUs", f'{metrics["Hydrate AUs"]:,}')
+    cols[3].metric("G10015 profiles", f'{metrics["G10015 profiles"]:,}')
+
+    if not bundle_root.exists():
+        st.info(
+            "Upload or recreate the source bundle in OpenScienceLab before using "
+            "the public stability layers. The app will read it locally from the "
+            "ignored `data/source_library/` folder after `git pull`."
+        )
+        st.dataframe(status, use_container_width=True, hide_index=True)
+        return
+
+    missing = status[status["Status"] != "Ready"]
+    if missing.empty:
+        st.success("All tracked source-bundle items are present.")
+    else:
+        st.warning(
+            "Some source-bundle items are still missing. The available layers will "
+            "load, but the stability workflow is incomplete."
+        )
+    st.dataframe(status, use_container_width=True, hide_index=True)
+
+    permafrost_points = cached_ggd223_points(str(bundle_root))
+    assessment_units = cached_hydrate_assessment_units(str(bundle_root))
+    if permafrost_points.empty and assessment_units.empty:
+        st.info("No mappable stability-source layers were found yet.")
+        return
+
+    st.plotly_chart(
+        build_stability_source_figure(permafrost_points, assessment_units),
+        use_container_width=True,
+    )
+
+    if not permafrost_points.empty:
+        depth_min = int(permafrost_points["permafrost_depth_m"].min())
+        depth_max = int(permafrost_points["permafrost_depth_m"].max())
+        st.caption(
+            f"GGD223 permafrost-depth controls range from {depth_min:,} to "
+            f"{depth_max:,} m in `stnlist.dat`. Use these as point controls and "
+            "OM-222 as the mapped plate until permafrost-base contours are digitized."
+        )
+        preview = permafrost_points.sort_values("permafrost_depth_m", ascending=False).head(12)
+        st.dataframe(
+            preview[
+                [
+                    "well_designation",
+                    "code",
+                    "latitude",
+                    "longitude",
+                    "elevation_m",
+                    "permafrost_depth_m",
+                ]
+            ],
+            use_container_width=True,
+            hide_index=True,
+        )
+
+
 def render_structural_explorer() -> None:
     st.markdown('<div class="atlas-kicker">Subsurface context</div>', unsafe_allow_html=True)
     st.title("Structural Explorer")
@@ -1395,6 +1607,8 @@ def render_structural_explorer() -> None:
     else:
         st.info("Select at least one structural layer to draw the 3D view.")
 
+    render_stability_source_bundle()
+
     st.markdown("### Structural Layer Labels")
     surface_rows = [
         {
@@ -1407,7 +1621,12 @@ def render_structural_explorer() -> None:
     ]
     st.dataframe(surface_rows, use_container_width=True, hide_index=True)
 
-    with st.expander("Advanced fallback: original heavy HTML scenes"):
+    show_heavy_scene = st.checkbox(
+        "Show original heavy HTML scene fallback",
+        value=False,
+        key="show_heavy_structural_scene",
+    )
+    if show_heavy_scene:
         st.warning(
             "These notebook exports are preserved for completeness. They can lag "
             "because they embed much larger point collections."

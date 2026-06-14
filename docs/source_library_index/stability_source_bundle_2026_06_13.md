@@ -61,6 +61,16 @@ bottom-hole shapefile.
 8. Add labels that clearly say the result is a stability admissibility screen,
    not hydrate proof and not saturation prediction.
 
+Implementation note:
+
+- `dashboard/stability_sources.py` now reads the local bundle.
+- The Structural Explorer shows source-item readiness, GGD223 permafrost-depth
+  control points, and USGS hydrate assessment unit boundaries when the bundle is
+  present in OpenScienceLab.
+- For local testing outside OpenScienceLab, set
+  `NORTH_SLOPE_STABILITY_SOURCE_DIR` to a full bundle path.
+- `data/source_library/` remains ignored by Git.
+
 ## Future Explorer Fields
 
 The public-safe explorer table should eventually support:
