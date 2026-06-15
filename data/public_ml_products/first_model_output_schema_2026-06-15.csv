@@ -1,0 +1,13 @@
+output_table,column_name,role,dtype,public_safe_to_show,guardrail
+model_prediction_package,runtime_well_id,provenance,string,no_public_values,Public exports must anonymize restricted identifiers.
+model_prediction_package,depth_m,alignment,float,no_public_values,Depth is row grain and alignment basis.
+model_prediction_package,occurrence_probability,model_output,float,no_public_values,Probability output is not hydrate proof.
+model_prediction_package,occurrence_class,model_output,category,no_public_values,Class threshold requires approved calibration policy.
+model_prediction_package,Sh_pred,model_output,float,no_public_values,Saturation estimate requires approved target validation.
+model_prediction_package,prediction_uncertainty,model_output,float_or_category,no_public_values,Uncertainty must travel with prediction.
+model_prediction_package,reason_flags,review_output,string,summary_after_review,Reason flags explain features caveats and mimic risks.
+model_prediction_package,blocked_reason,review_output,string,summary_after_review,Blocked rows remain blocked instead of being silently predicted.
+model_prediction_package,public_release_status,boundary_control,string,metadata_only,No row-level approved prediction leaves runtime before review.
+model_validation_summary,split_group,validation,string,summary_after_review,Validation split must be whole well compartment or geography.
+model_validation_summary,classification_metrics,validation,string,summary_after_review,Precision recall calibration only where approved labels exist.
+model_validation_summary,regression_metrics,validation,string,summary_after_review,R2 RMSE MAE only where approved saturation labels exist.

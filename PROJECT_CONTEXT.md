@@ -76,6 +76,12 @@ The practical next-products layer is now defined by
 headers/screenshots into a public-safe intake contract, separate
 occurrence-classification and saturation-regression tasks, and list the mentor
 decisions needed before approved-runtime model training.
+The intake contract is now operationalized in
+`dashboard/approved_data_intake.py`, with synthetic tests in
+`tests/test_approved_data_intake.py` and schema-only public templates under
+`data/public_ml_products/approved_data_intake_template_2026-06-15.csv`,
+`approved_data_intake_validation_schema_2026-06-15.csv`, and
+`first_model_output_schema_2026-06-15.csv`.
 
 The active workflow-diagram package is now the V5 completion pass under
 `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/`.
@@ -251,11 +257,21 @@ reopen OSL unless a source/product rebuild is actually needed.
   approved-data intake contract and first model experiment plan. They are
   header/schema products only: no approved rows, saturation values, trained
   metrics, occurrence probabilities, or public sensitive outputs are committed.
+- `dashboard/approved_data_intake.py` and
+  `tests/test_approved_data_intake.py` now provide a tested public-safe intake
+  validator. The validator accepts header lists or synthetic/test DataFrames,
+  reports recognized and unknown headers, target leakage, unresolved fields,
+  minimum predictor coverage, occurrence/saturation target authority, split
+  readiness, and blocked reasons without reading approved row values.
+- Public-safe runtime templates now exist under `data/public_ml_products/` for
+  the approved-data intake table contract, intake validation checks, and first
+  model output schema.
 - The `Analyze Hydrates` page now includes a `Schema Coverage & Architecture`
   tab that shows the about-3-of-71 coverage status, current public counts,
   public-now versus OSL-later contract, blocked reasons, mentor decisions,
-  role counts, target-only separation, approved-data field roles, and
-  architecture path without exposing approved rows or model metrics.
+  intake validator contract, runtime template downloads, role counts,
+  target-only separation, approved-data field roles, and architecture path
+  without exposing approved rows or model metrics.
 - Three Excel header references were reviewed from the user's email. The images
   are not stored in Git or shown on the website; their public-safe schema
   derivative is maintained in `docs/WELL_LOG_REQUIREMENTS_MAP.md`.
@@ -366,6 +382,11 @@ It must not load or expose authorized well-log or core data.
   regression
 - `docs/MENTOR_DECISION_REQUESTS_2026-06-15.md`: concise mentor update,
   decision questions, and weekday report bullets
+- `dashboard/approved_data_intake.py`: public-safe header/schema validator for
+  the approved-data intake contract
+- `tests/test_approved_data_intake.py`: synthetic tests for the intake
+  validator, target leakage barrier, target authority checks, stability context
+  rule, and split-before-preprocessing rule
 - `docs/PROJECT_IMPROVEMENT_STRATEGY.md`: principles and phased improvement
   strategy for keeping product changes aligned with the scientific goal
 - `docs/PROJECT_VISION_GOALS_AND_NEXT_STEPS.md`: email-derived project vision,
@@ -411,11 +432,12 @@ The current ordered plan is maintained in
 `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md`.
 
 Immediate 2026-06-15 handoff: use the completed V5 diagram package as the
-explanation foundation, then move forward with the approved-data field-role
-table, minimum intake spec, first model experiment plan, and mentor decision
-packet. The next approved-runtime step is to confirm target authority, units,
-well/depth alignment, validation split policy, and whether stability may enter
-`X_allowed` only as context, mask, confidence, caveat, or blocked reason.
+explanation foundation and the tested approved-data intake validator as the
+runtime contract. The next approved-runtime step is to run the header/schema
+validator against approved workbook/LAS/CSV/core/NMR sources, then confirm
+target authority, units, well/depth alignment, validation split policy, and
+whether stability may enter `X_allowed` only as context, mask, confidence,
+caveat, or blocked reason.
 
 ## Update Protocol
 
@@ -690,3 +712,8 @@ blockers, and next activities in the architecture/activity map.
   experiment plan, mentor decision packet, and website readiness tables. These
   keep occurrence and saturation as separate future tasks, keep target labels
   out of `X_allowed`, and do not expose approved rows or claim model results.
+- 2026-06-15: Operationalized the approved-data readiness layer with
+  `dashboard/approved_data_intake.py`, synthetic validator tests, public-safe
+  intake and output schema templates, and an expanded Schema Coverage website
+  section for required column families, leakage rules, blocked conditions, and
+  downloads.

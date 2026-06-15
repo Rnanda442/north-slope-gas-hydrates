@@ -71,7 +71,7 @@ The public website must never load authorized runtime data.
 
 | Component | Main location | Current state | Next outcome |
 |---|---|---|---|
-| Public atlas | `dashboard/app.py` | Four-page Processing-style visual redesign implemented with legacy route aliases; Explore North Slope exposes the guarded stability screen, and Analyze Hydrates now includes Public ML Readiness, Schema Coverage & Architecture, Target Registry & Leakage, and the synthetic ML visual architecture section. The Schema Coverage tab now shows current public counts, public-now versus OSL-later boundaries, blocked reasons, mentor decisions, and the approved-data field-role table without exposing approved rows. | Polish visuals and keep public/synthetic data boundary verified during deployment |
+| Public atlas | `dashboard/app.py` | Four-page Processing-style visual redesign implemented with legacy route aliases; Explore North Slope exposes the guarded stability screen, and Analyze Hydrates now includes Public ML Readiness, Schema Coverage & Architecture, Target Registry & Leakage, and the synthetic ML visual architecture section. The Schema Coverage tab now shows current public counts, public-now versus OSL-later boundaries, blocked reasons, mentor decisions, the intake validator contract, template downloads, and the approved-data field-role table without exposing approved rows. | Polish visuals and keep public/synthetic data boundary verified during deployment |
 | Website entry point | `streamlit_app.py` | Public deployment verified | Keep the hosted app synchronized with `main` |
 | Synthetic well-log engine | `dashboard/well_log_engine.py` | Working scaffold | Align with Excel design |
 | Authorized runtime | `dashboard/runtime/` | Source-driven readiness and grouped-well split scaffold implemented | Complete workbook-derived input mapping and model evaluation |
@@ -80,7 +80,7 @@ The public website must never load authorized runtime data.
 | Manuscript | `docs/project_blueprints/` | Two drafts recovered; the local research-overview Word deliverable was rebuilt on 2026-06-13 from the science-to-ML ladder, baseline source ledger, source-backed parameter movements, screening-envelope language, target leakage rules, model ladder, and validation plan; a 2026-06-15 pipeline status and forward workflow Word brief now exists for mentor/project review | Review the pipeline brief and rebuilt local DOCX, then calibrate claims against workbook formulas, approved labels, and recoverable range provenance before any results-bearing revision |
 | Presentation | Current Drive baseline is the public-safe 2026-06-13 science-to-ML 9-slide raster-panel revision. The first 2026-06-15 stability/ML remake draft was rejected as disconnected. The targeted Gmail-style final-presentation track remains `docs/project_blueprints/North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`, rebuilt from `docs/project_blueprints/build_ml_revamp_powerpoint.py`. The active V5 workflow package for mentor review is `docs/project_blueprints/FULL_WORKFLOW_ML_DIAGRAM_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`, regenerated from `docs/project_blueprints/build_full_workflow_diagram_deliverables.py` with slide 3 as the readable overview and slides 4-9 as detail zooms. | In progress | Review the V5 workflow package for mentor communication and keep it separate from any later Gmail-style final-presentation replacement |
 | Mentor and deliverable communication | `docs/MENTOR_STATUS_UPDATE_DRAFT.md`, `docs/WEEKDAY_PROGRESS_REPORT_TEMPLATE.md`, `docs/MENTOR_PROJECT_STATUS_PACKAGE_V5_WORKFLOW_2026-06-15.md`, `docs/DELIVERABLE_REFRESH_PLAN_STABILITY_AND_ML.md`, `docs/SLIDE_REMAKE_STORYBOARD_STABILITY_AND_ML.md`, `docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md`, `docs/PIPELINE_STATUS_AND_ML_WORKFLOW_BRIEF.md` | Drafted public-safe stability-screen status language, mentor questions, weekday reporting template, a diagram-first refresh plan, a superseded first slide storyboard, the full project workflow map, Word-ready status/diagram briefs, and a compact V5 mentor status package. The current V5 completion pass now separates the slide-sized workflow summary, detailed expanded poster-scale architecture map, and ML runtime detail while carrying source counts, stability equations, feature/QC/context families, target-only labels, validation controls, public-safe output rules, and mentor decisions. | Review the revised V5 workflow visuals and mentor package first, then use them as the anchor for Word, slides, and mentor explanation |
-| Approved-data schema and ML architecture | `docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`, `data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv`, `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`, `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`, `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md` | Public-safe methodology layer records expected approved-data header families, preserves original headers, separates measured inputs, derived features, QC/alignment fields, calibration/reference fields, target-only saturation fields, and unresolved fields, and now defines the minimum approved-data intake contract plus first results-free occurrence/saturation model experiment plan while only about 3 of 71 datasets are visible for schema design | Use this plan as the non-stability ML readiness baseline before approved-runtime loading, training, metrics, or occurrence/saturation claims |
+| Approved-data schema and ML architecture | `dashboard/approved_data_intake.py`, `docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`, `data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv`, `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`, `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`, `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md` | Public-safe methodology layer records expected approved-data header families, preserves original headers, separates measured inputs, derived features, QC/alignment fields, calibration/reference fields, target-only saturation fields, and unresolved fields, and now includes a tested metadata-only intake validator plus schema-only runtime templates while only about 3 of 71 datasets are visible for schema design | Use this plan and validator as the non-stability ML readiness baseline before approved-runtime loading, training, metrics, or occurrence/saturation claims |
 | Excel design | Header screenshots recovered; workbook missing | Partial | Confirm formulas, units, and mnemonics from the workbook |
 | Source library | Index recovered; 2026-06-13 stability source bundle documented, uploaded locally in OpenScienceLab, connected to a Structural Explorer source panel, paired with a committed public snapshot fallback, extended with public Arctic Slope well-context, G10015 temperature-inventory, sampled G10015 profile points, stability input scaffold, guarded stability screen, public ML feature scaffold, target registry, and leakage guardrail products; the hydrate ML/physics intake also records downloaded OSTI PDFs, official source-page backups, Google Drive PDF references, and a needs-PDF manifest | In progress | Use OpenScienceLab as the heavy-data workbench, commit only derived public-safe stability products, digitize/georeference OM-222 if no ready GIS derivative is found, and continue recovering institution-accessible/public sources |
 | Git history | Connected and synchronized with GitHub | Complete | Preserve the normal commit-and-push workflow |
@@ -102,7 +102,7 @@ The public website must never load authorized runtime data.
 | W11 | Stability-screen communication | In progress | Use the mentor update, weekday template, V5 mentor status package, deliverable refresh plan, and completed V5 workflow package to describe OpenScienceLab as the heavy-data workbench, GitHub/Streamlit as the public delivery surface, and the current stability workflow as an admissibility screen only | W7, W9, W10 | Mentor-facing language and refresh diagrams are approved without claiming hydrate proof, saturation, or sweet-spot ranking |
 | W12 | Public ML feature scaffold | Ready | `public_ml_feature_scaffold_2026-06-15.csv`, summary, dictionary, and the Analyze Hydrates Public ML Readiness panel now expose real public feature coverage while keeping occurrence/saturation labels unavailable | W7, W11 | Mentor can see which public features exist, which rows are constrained, and why no public row is training-ready yet |
 | W13 | Target registry and leakage barrier | Ready | `public_ml_target_registry_2026-06-15.csv`, `public_ml_leakage_guardrails_2026-06-15.csv`, and the Analyze Hydrates Target Registry & Leakage panel codify that saturation/ground-truth headers are target-only | W3, W7, W12 | Saturation and interpreted-label columns are visibly separated from input features before approved-data schema mapping begins |
-| W14 | Approved-data schema coverage and model architecture | Ready | `APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`, the public ML schema coverage matrix, the field-role table, the minimum intake spec, the first model experiment plan, and the Analyze Hydrates Schema Coverage & Architecture tab now show how the future approved workflow will map original headers to roles, block target leakage, separate occurrence classification from saturation regression, and validate by whole well before training | W3, W7, W13 | Mentor can see a clear ML/schema/methodology contribution outside the stability screen, with no final training or metrics claimed |
+| W14 | Approved-data schema coverage and model architecture | Ready | `APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`, the public ML schema coverage matrix, the field-role table, the minimum intake spec, the first model experiment plan, `dashboard/approved_data_intake.py`, synthetic validator tests, public-safe runtime templates, and the Analyze Hydrates Schema Coverage & Architecture tab now show how the future approved workflow will map original headers to roles, block target leakage, separate occurrence classification from saturation regression, and validate by whole well before training | W3, W7, W13 | Mentor can see a tested ML/schema/intake contribution outside the stability screen, with no final training or metrics claimed |
 
 Status vocabulary: `Ready`, `In progress`, `Waiting`, `Blocked`, `Partial`,
 `Complete`, or `Future`.
@@ -143,11 +143,13 @@ non-stability ML layer, use
 `data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv`,
 `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`,
 `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`, and
-`docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md` as the current
-schema-readiness and method baseline. Only about 3 of 71 datasets are visible
-for schema design, which supports intake planning and architecture design but
-not final training, public model metrics, occurrence probabilities, or
-saturation predictions.
+`docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md`, plus
+`dashboard/approved_data_intake.py` and the public-safe templates under
+`data/public_ml_products/`, as the current schema-readiness and method
+baseline. Only about 3 of 71 datasets are visible for schema design, which
+supports intake planning, validator testing, and architecture design but not
+final training, public model metrics, occurrence probabilities, or saturation
+predictions.
 
 ### Priority 1: Confirm Inputs and Targets
 
@@ -199,9 +201,10 @@ and approved-data figures become available.
 5. Perform the code-to-requirements gap analysis.
 6. Extend the implemented Runtime Readiness and grouped-well split scaffolds with workbook-derived rules and baseline models.
 7. Use the approved-data schema coverage matrix, field-role table, intake spec,
-   and first model experiment plan to resolve target authority, saturation
-   units, sheet/source identity, required curves, QC fields, blocked
-   conditions, and validation wells before final model training.
+   intake validator, public-safe templates, and first model experiment plan to
+   resolve target authority, saturation units, sheet/source identity, required
+   curves, QC fields, blocked conditions, and validation wells before final
+   model training.
 8. Get mentor decisions on phase-curve policy, official occurrence/saturation
    target authority, validation split, missing G10015 temperature handling,
    stability-as-context-only policy, and acceptable public website outputs
@@ -251,6 +254,11 @@ and approved-data figures become available.
   approved-data readiness contract. They define what needs to be loaded later
   in the authorized runtime and keep occurrence/saturation labels on the
   Y-only side until target authority is approved.
+- `dashboard/approved_data_intake.py`, `tests/test_approved_data_intake.py`,
+  and the schema-only public templates in `data/public_ml_products/` are the
+  runnable public-safe version of that contract. They validate headers,
+  leakage controls, blocked reasons, target authority metadata, and split
+  readiness without reading approved rows.
 - Stability-screen communication must say stability-admissibility only. It
   must not claim hydrate proof, saturation, final stability results, or
   sweet-spot ranking before approved-data validation.
@@ -344,3 +352,4 @@ and approved-data figures become available.
 | 2026-06-15 | Completed the V5 workflow package pass | Updated the V5 builder so the expanded poster includes the public counts, approved-OSL boundary, stability equations and caveats, measured/derived/QC/context feature families, target-only occurrence and saturation labels, split/preprocess/model controls, validation expectations, public-safe output rules, and mentor decisions; regenerated the PNGs, PPTX, DOCX, and contact sheet after visual inspection and tests. |
 | 2026-06-15 | Imported the V5 completion package to Drive | Created native Google Slides and Docs copies named with `V5 COMPLETION`, verified Drive metadata, checked representative imported slide thumbnails, and read back the Google Doc structure so the mentor-facing package can be reviewed outside the repo. |
 | 2026-06-15 | Added the approved-data intake and first model planning layer | Created a public-safe field-role table, minimum approved-data intake spec, first model experiment plan, mentor decision request packet, and Schema Coverage website readiness tables. The package separates occurrence classification from saturation regression, keeps target labels out of `X_allowed`, and does not expose approved rows or claim trained ML results. |
+| 2026-06-15 | Operationalized the approved-data intake contract | Added `dashboard/approved_data_intake.py`, synthetic validator tests, schema-only intake and output templates, and Schema Coverage website downloads so future approved-runtime builders can see required columns, predictor versus target roles, blocked reasons, template outputs, and leakage controls without exposing approved rows. |

@@ -60,6 +60,16 @@ docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md
 docs/MENTOR_DECISION_REQUESTS_2026-06-15.md
 ```
 
+Runnable public-safe intake contract:
+
+```text
+dashboard/approved_data_intake.py
+tests/test_approved_data_intake.py
+data/public_ml_products/approved_data_intake_template_2026-06-15.csv
+data/public_ml_products/approved_data_intake_validation_schema_2026-06-15.csv
+data/public_ml_products/first_model_output_schema_2026-06-15.csv
+```
+
 ## Header Preservation Rule
 
 The approved-data workflow will preserve original sheet/file names and original
@@ -207,6 +217,13 @@ The approved runtime should not start training until it can resolve:
 
 The detailed contract is in
 `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`.
+
+The public-safe validator in `dashboard/approved_data_intake.py` now implements
+these checks for header lists or synthetic/test DataFrames. It reports
+recognized headers, unknown headers, missing required families, target-only
+fields, leakage risk in `X_allowed`, unresolved fields, occurrence/saturation
+target authority, split readiness, and blocked reasons without reading
+approved row values.
 
 ## First Model Experiment Shape
 

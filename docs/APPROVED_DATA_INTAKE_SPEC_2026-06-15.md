@@ -53,6 +53,24 @@ Required columns in that table:
 | `public_safe_to_show` | Whether public outputs may show header/metadata only or public summaries. |
 | `caveats` | Specific unit, leakage, provenance, or unresolved-rule warning. |
 
+## Runnable Public-Safe Validator
+
+The header-only validator module is:
+
+```text
+dashboard/approved_data_intake.py
+```
+
+It loads the field-role table and can validate a list of source columns or a
+synthetic/test DataFrame. It reports recognized headers, unknown headers,
+missing required families, target-only fields, target-leakage risk in
+`X_allowed`, unresolved mnemonics, unresolved unit fields, minimum viable
+predictor coverage, occurrence/saturation target authority, split readiness,
+training readiness, and blocked reasons.
+
+The validator is metadata-only. It does not require or expose approved row
+values.
+
 ## Minimum Required Columns
 
 The approved runtime should refuse model training unless each loaded source can
@@ -152,3 +170,19 @@ environment:
 
 No public export should include approved row-level values until boundary review
 explicitly approves it.
+
+## Public-Safe Templates
+
+The public repo now includes schema-only CSV templates for the future approved
+runtime:
+
+```text
+data/public_ml_products/approved_data_intake_template_2026-06-15.csv
+data/public_ml_products/approved_data_intake_validation_schema_2026-06-15.csv
+data/public_ml_products/first_model_output_schema_2026-06-15.csv
+```
+
+These templates define expected table columns, validation checks, blocked
+reasons, and future model-output fields. They contain no approved rows,
+well-log values, private workbook rows, trained metrics, predictions, or
+sensitive identifiers.

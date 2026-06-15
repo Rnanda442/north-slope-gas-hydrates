@@ -109,11 +109,16 @@ The public repo should not contain:
 - `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`
 - `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`
 - `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md`
+- `dashboard/approved_data_intake.py`
+- `tests/test_approved_data_intake.py`
+- `data/public_ml_products/approved_data_intake_template_2026-06-15.csv`
+- `data/public_ml_products/approved_data_intake_validation_schema_2026-06-15.csv`
+- `data/public_ml_products/first_model_output_schema_2026-06-15.csv`
 
 These are the active public-safe readiness artifacts after the V5 diagram
-package. They define the field roles, approved-data intake contract, first
-model experiment shape, and mentor decisions without exposing approved rows or
-claiming occurrence/saturation results.
+package. They define and now test the field roles, approved-data intake
+contract, first model experiment shape, runtime templates, and mentor decisions
+without exposing approved rows or claiming occurrence/saturation results.
 
 ### Other Word Drafts
 
@@ -741,7 +746,10 @@ Current top-priority handoff for the PC:
 4. Use `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md` as the first approved-
    runtime model plan. It separates occurrence classification from saturation
    regression and keeps target labels out of `X_allowed`.
-5. Keep the website in readiness mode only: public counts, diagrams, schemas,
+5. Use `dashboard/approved_data_intake.py` and the public-safe templates in
+   `data/public_ml_products/` as the tested header/schema contract for later
+   approved-runtime loading.
+6. Keep the website in readiness mode only: public counts, diagrams, schemas,
    caveats, blocked reasons, and synthetic examples are acceptable; fake ML
    results, approved rows, trained metrics, occurrence probabilities, and
    saturation predictions are not.
@@ -752,7 +760,8 @@ Recommended next build:
    split, missing G10015 handling, stability-as-context policy, and public
    website output limits.
 2. Recover or inspect the approved workbook/data headers inside the authorized
-   environment and complete the field-role/intake mapping there.
+   environment and run the intake validator against the approved source
+   headers there.
 3. Confirm units, depth alignment, and target-label authority before training.
 4. Then extend the parameter logic/source matrix and Word/PPT narrative using
    the approved intake contract rather than making new synthetic datasets.

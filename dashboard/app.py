@@ -11,6 +11,7 @@ import plotly.graph_objects as go
 import streamlit as st
 import streamlit.components.v1 as components
 
+from dashboard.approved_data_intake import intake_validator_contract_frame
 from dashboard.processing_visuals import render_processing_sketch
 from dashboard.runtime.feature_engineering import add_standard_features
 from dashboard.runtime.schemas import (
@@ -148,6 +149,24 @@ APPROVED_DATA_FIELD_ROLE_TABLE = (
     / "data"
     / "public_ml_products"
     / "approved_data_field_role_table_2026-06-15.csv"
+)
+APPROVED_DATA_INTAKE_TEMPLATE = (
+    PROJECT_ROOT
+    / "data"
+    / "public_ml_products"
+    / "approved_data_intake_template_2026-06-15.csv"
+)
+APPROVED_DATA_INTAKE_VALIDATION_SCHEMA = (
+    PROJECT_ROOT
+    / "data"
+    / "public_ml_products"
+    / "approved_data_intake_validation_schema_2026-06-15.csv"
+)
+FIRST_MODEL_OUTPUT_SCHEMA = (
+    PROJECT_ROOT
+    / "data"
+    / "public_ml_products"
+    / "first_model_output_schema_2026-06-15.csv"
 )
 IGNORED_DIRS = {
     ".git",
@@ -4577,6 +4596,92 @@ def render_schema_coverage_architecture() -> None:
         ]
     )
     st.dataframe(blocked_decisions, use_container_width=True, hide_index=True)
+
+    st.markdown("##### Intake Validator Contract")
+    st.caption(
+        "Header-level validator only. It checks column roles, leakage, target "
+        "authority, unit policy, split readiness, and blocked reasons without "
+        "loading approved row values."
+    )
+    required_column_families = pd.DataFrame(
+        [
+            {
+                "Required family": "Depth basis",
+                "Accepted examples": "DEPTH, DEPT, Depth_ft, True Depth, depth_m",
+                "Blocked reason": "missing_required_field:depth_basis",
+            },
+            {
+                "Required family": "Reservoir or lithology curve",
+                "Accepted examples": "GR, RHOB/Rho_b, density or porosity family",
+                "Blocked reason": "missing_required_field:lithology_or_reservoir_curve",
+            },
+            {
+                "Required family": "Hydrate-response curve family",
+                "Accepted examples": "Rt/RES, NMRPHI, Vp, Vs, impedance",
+                "Blocked reason": "missing_required_field:hydrate_response_curve_family",
+            },
+            {
+                "Required family": "Target registry",
+                "Accepted examples": "Y-only occurrence and saturation labels with authority metadata",
+                "Blocked reason": "no_approved_target_authority_for_training",
+            },
+            {
+                "Required family": "Split group",
+                "Accepted examples": "whole-well, compartment, or geographic/geologic holdout",
+                "Blocked reason": "whole_well_split_required_before_train_only_preprocessing",
+            },
+        ]
+    )
+    st.dataframe(required_column_families, use_container_width=True, hide_index=True)
+    st.dataframe(intake_validator_contract_frame(), use_container_width=True, hide_index=True)
+
+    template_specs = [
+        (
+            "Approved-data intake template",
+            APPROVED_DATA_INTAKE_TEMPLATE,
+            "source registry, well-depth index, X_allowed, and Y target tables",
+            "download_approved_data_intake_template",
+        ),
+        (
+            "Intake validation schema",
+            APPROVED_DATA_INTAKE_VALIDATION_SCHEMA,
+            "validator checks, pass rules, blocked reasons, and guardrails",
+            "download_approved_data_intake_validation_schema",
+        ),
+        (
+            "First model output schema",
+            FIRST_MODEL_OUTPUT_SCHEMA,
+            "future occurrence, saturation, uncertainty, reason flag, and release fields",
+            "download_first_model_output_schema",
+        ),
+    ]
+    st.markdown("##### Public-safe runtime templates")
+    st.dataframe(
+        pd.DataFrame(
+            [
+                {
+                    "Template": label,
+                    "Purpose": purpose,
+                    "Path": project_relative_or_absolute(path),
+                    "Status": "available" if path.exists() else "missing",
+                }
+                for label, path, purpose, _ in template_specs
+            ]
+        ),
+        use_container_width=True,
+        hide_index=True,
+    )
+    for column, (label, path, _purpose, key) in zip(st.columns(3), template_specs):
+        if path.exists():
+            column.download_button(
+                f"Download {label}",
+                path.read_bytes(),
+                path.name,
+                "text/csv",
+                key=key,
+            )
+        else:
+            column.button(f"Download {label}", disabled=True, key=f"{key}_missing")
 
     role_counts = (
         matrix["role"]

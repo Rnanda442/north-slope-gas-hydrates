@@ -1,0 +1,30 @@
+template_table,column_name,role,required,unit_or_dtype,public_safe_to_show,description
+source_column_registry,source_dataset,provenance,yes,string,metadata_only,Public-safe source or sheet family name.
+source_column_registry,original_header,provenance,yes,string,metadata_only,Header exactly as supplied by approved runtime source.
+source_column_registry,normalized_name,provenance,yes,string,metadata_only,Runtime-safe alias after original header is preserved.
+source_column_registry,role,role_control,yes,enum,metadata_only,predictor or derived_feature or QC or context or target_only or calibration_reference or unresolved.
+source_column_registry,unit,unit_control,yes,string,metadata_only,Original and canonical unit expectation.
+source_column_registry,expected_dtype,type_control,yes,string,metadata_only,Expected runtime dtype.
+source_column_registry,required_for_model,readiness_control,yes,string,metadata_only,Required optional target-only calibration-only or blocked status.
+source_column_registry,public_safe_to_show,boundary_control,yes,string,metadata_only,Whether public outputs may show metadata or aggregate summary.
+source_column_registry,caveats,boundary_control,yes,string,metadata_only,Unit leakage provenance or unresolved-rule warning.
+well_depth_index,runtime_well_id,alignment,yes,string,no_public_values,Approved-runtime well identifier; public exports must anonymize or remove.
+well_depth_index,source_file_id,alignment,yes,string,no_public_values,Approved-runtime source file identifier.
+well_depth_index,depth_original,alignment,yes,float,no_public_values,Depth as read from source.
+well_depth_index,depth_unit,alignment,yes,string,metadata_only,Source depth unit.
+well_depth_index,depth_m,alignment,yes,float,no_public_values,Canonical depth in meters.
+well_depth_index,split_group,split_control,yes,string,metadata_only,Whole-well compartment or geographic split assignment before preprocessing.
+well_depth_index,alignment_status,QC,yes,string,metadata_only,Depth and source-alignment status.
+well_depth_index,public_release_status,boundary_control,yes,string,metadata_only,Public release review state.
+X_allowed_candidate,depth_m,predictor,yes,float,no_public_values,Canonical depth predictor or alignment index.
+X_allowed_candidate,predictor_column_placeholder,predictor,yes,mixed,no_public_values,Measured log predictor placeholder.
+X_allowed_candidate,derived_feature_placeholder,derived_feature,optional,mixed,no_public_values,Derived feature placeholder after source equations are approved.
+X_allowed_candidate,QC_context_placeholder,QC,yes,mixed,no_public_values,QC missingness washout alignment or source-confidence placeholder.
+X_allowed_candidate,stability_context_placeholder,context,optional,mixed,summary_only,Stability admissibility context or mask only.
+Y_target_registry,target_name,target_only,yes,string,metadata_only,Original target label name.
+Y_target_registry,target_task,target_only,yes,string,metadata_only,occurrence_classification or saturation_regression or calibration_reference.
+Y_target_registry,source_evidence_type,target_only,yes,string,metadata_only,Core pressure-core NMR/core log interpretation or seismic evidence type.
+Y_target_registry,unit,target_only,yes,string,metadata_only,Fraction percent categorical or boolean unit convention.
+Y_target_registry,allowed_use,target_only,yes,string,metadata_only,Training validation calibration or review use.
+Y_target_registry,confidence,target_only,yes,string,metadata_only,Approved label confidence.
+Y_target_registry,caveat,target_only,yes,string,metadata_only,Target authority caveat and uncertainty note.

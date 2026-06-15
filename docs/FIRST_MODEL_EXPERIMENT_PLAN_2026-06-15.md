@@ -20,6 +20,12 @@ saturation label rows and no training-ready public rows.
 The first real experiment waits for approved LAS/CSV/core/NMR/workbook rows in
 the authorized runtime.
 
+The public repo now has a tested intake validator in
+`dashboard/approved_data_intake.py`. It is a header/metadata check only: it can
+say whether an approved-runtime dataset has the required column families,
+target-leakage barrier, target authority metadata, unit policy, and split
+readiness, but it does not train a model or inspect approved row values.
+
 ## Dataset Shape Needed
 
 Minimum training table shape:
@@ -177,6 +183,12 @@ Approved runtime outputs later:
 | `reason_flags` | well-depth sample or interval | Top supporting features, missingness, caveats, mimic risks. |
 | `blocked_reason` | row/interval | Why the row cannot be predicted or validated. |
 | `public_release_status` | row/output package | Whether output is approved for public summary only. |
+
+The schema-only public template for these future outputs is:
+
+```text
+data/public_ml_products/first_model_output_schema_2026-06-15.csv
+```
 
 Public outputs before validation:
 
