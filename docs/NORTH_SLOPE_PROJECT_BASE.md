@@ -523,6 +523,10 @@ Fresh-chat handoff as of 2026-06-14:
   source and calculation gates pass, and keep blocked rows null with explicit
   blocked statuses. The first real screen product still needs an OSL run because
   raw G10015 profile rows are not committed to Git.
+- The first OSL screen run produced `8,084` rows but all were blocked because
+  the screen grid required phase-curve coverage from `0 m`. The writer now
+  starts at the phase-curve minimum covered depth and still blocks intervals
+  that cannot close within the cited phase-curve maximum depth.
 - Website end-state control now exists as
   `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`:
   the final public stability view should show run assumptions, readiness gates,

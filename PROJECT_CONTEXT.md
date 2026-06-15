@@ -143,6 +143,10 @@ calculations or claiming model results.
   profile rows, applies the cited methane 5 ppt phase lookup, and leaves blocked
   rows null. It must still be run in OSL to create the first real public
   `stability_screen_*.csv` output.
+- The first OSL screen run produced all blocked rows because the screen grid
+  demanded phase-curve coverage from `0 m`. The writer now starts at the phase
+  lookup's minimum covered depth and blocks only where the interval cannot close
+  within the lookup's maximum covered depth.
 - `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`
   defines the target public website shape for the future stability screen:
   status strip, readiness/capability, map, selected-well audit panel,
@@ -431,3 +435,6 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-14: Added a guarded baseline stability-screen writer with fixture
   tests for calculated, phase-range-blocked, and raw-profile-missing behavior;
   the real screen product still needs OSL raw profile rows.
+- 2026-06-14: Relaxed the guarded screen grid to begin at the cited phase-curve
+  minimum depth after the first OSL screen run correctly produced only blocked
+  rows under the earlier over-strict `0 m` coverage gate.

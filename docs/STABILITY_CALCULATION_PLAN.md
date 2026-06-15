@@ -514,6 +514,11 @@ Current implementation status:
   passes, and leaves blocked rows null with explicit blocked statuses. The first
   real public `stability_screen_*.csv` still needs to be generated in OSL where
   raw G10015 profile rows are available.
+- The screen grid now starts at the minimum depth covered by the cited phase
+  lookup instead of forcing phase-curve coverage from `0 m`. Rows are still
+  blocked if the modeled interval cannot close within the lookup's maximum
+  depth, because that would require extrapolating the phase curve beyond its
+  cited range.
 
 Until those gates are complete, the public scaffold remains an input scaffold:
 `phase_curve_status = not_applied` and

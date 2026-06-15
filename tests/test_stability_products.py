@@ -256,6 +256,33 @@ def make_broad_phase_curve_lookup(project_root):
     pd.DataFrame(rows).to_csv(default_phase_curve_path(project_root), index=False)
 
 
+def make_phase_curve_with_shallow_gap(project_root):
+    product_dir = project_root / "data" / "public_stability_products"
+    product_dir.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for depth_m, equilibrium_temperature_c in [(100.0, 5.0), (500.0, 15.0), (1000.0, 20.0)]:
+        rows.append(
+            {
+                "phase_curve_id": PHASE_CURVE_ID,
+                "source_depth_m": depth_m,
+                "pressure_mpa_absolute": hydrostatic_pressure_mpa_absolute(depth_m),
+                "equilibrium_temperature_c": equilibrium_temperature_c,
+                "phase_curve_role": "baseline",
+                "gas_composition_assumption": "100_percent_methane",
+                "gas_methane_mol_pct": 100,
+                "gas_ethane_mol_pct": 0,
+                "gas_propane_mol_pct": 0,
+                "gas_butane_plus_mol_pct": 0,
+                "salinity_ppt_assumption": 5,
+                "source_citation": "Synthetic shallow-gap phase-curve test row",
+                "source_url": "https://example.test/shallow-gap",
+                "source_extraction_method": "unit_test_fixture",
+                "source_notes": "synthetic",
+            }
+        )
+    pd.DataFrame(rows).to_csv(default_phase_curve_path(project_root), index=False)
+
+
 def make_phase_curve_scenario_catalog(project_root):
     product_dir = project_root / "data" / "public_stability_products"
     product_dir.mkdir(parents=True, exist_ok=True)
@@ -636,6 +663,12 @@ def test_stability_depth_grid_includes_modeled_depth_limit() -> None:
     assert grid.tolist() == [0.0, 50.0, 100.0, 125.0]
 
 
+def test_stability_depth_grid_can_start_at_phase_curve_minimum() -> None:
+    grid = stability_depth_grid(225.0, step_m=50.0, start_depth_m=100.0)
+
+    assert grid.tolist() == [100.0, 150.0, 200.0, 225.0]
+
+
 def test_stability_interval_finds_interpolated_top_and_base() -> None:
     profile_points = pd.DataFrame(
         {
@@ -892,6 +925,22 @@ def test_stability_screen_calculates_only_when_all_gates_pass(tmp_path) -> None:
     assert row["stability_confidence"] in {"high_source_control", "medium_source_control"}
     assert "not_hydrate_proof" in row["caveat_codes"]
     assert summary.loc[summary["metric"] == "Calculated stability intervals", "value"].iloc[0] == 1
+
+
+def test_stability_screen_starts_grid_at_phase_curve_minimum_depth(tmp_path) -> None:
+    make_public_well_package(tmp_path)
+    snapshot = make_public_snapshot(tmp_path)
+    make_temperature_profile(snapshot)
+    write_public_stability_products(tmp_path)
+    make_phase_curve_with_shallow_gap(tmp_path)
+
+    screen = build_stability_screen(tmp_path, snapshot, grid_step_m=25.0)
+
+    row = screen.iloc[0]
+    assert row["phase_curve_status"] == "applied"
+    assert row["stability_result_status"] == "calculated"
+    assert row["stability_top_m"] >= 100.0
+    assert pd.notna(row["stability_base_m"])
 
 
 def test_stability_screen_blocks_when_phase_curve_range_is_insufficient(tmp_path) -> None:

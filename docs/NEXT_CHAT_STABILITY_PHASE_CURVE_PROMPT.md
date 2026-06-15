@@ -116,6 +116,13 @@ phase-curve, intersection, and source-control confidence gates, and leaves
 blocked rows null. The screen remains a stability-admissibility screen, not
 hydrate proof or saturation.
 
+Current phase-curve range fix:
+The first OSL screen run wrote `8,084` screen rows but all were blocked. The
+cause was over-strict grid coverage: the screen grid started at `0 m`, while
+the cited phase lookup begins deeper. The writer now starts the calculation
+grid at the minimum depth covered by the phase lookup and still blocks any row
+whose modeled interval cannot close within the lookup's maximum covered depth.
+
 Current website product spec:
 `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`
 defines the final public website shape for stability: status strip, readiness

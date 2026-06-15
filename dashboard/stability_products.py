@@ -484,22 +484,43 @@ def phase_curve_max_depth_m(
     return float((max_pressure - surface_pressure_mpa) / pressure_gradient_mpa_per_m)
 
 
+def phase_curve_min_depth_m(
+    phase_curve: pd.DataFrame,
+    surface_pressure_mpa: float = SURFACE_PRESSURE_MPA,
+    pressure_gradient_mpa_per_m: float = HYDROSTATIC_PRESSURE_MPA_PER_M,
+) -> float:
+    if phase_curve.empty:
+        return np.nan
+    min_pressure = pd.to_numeric(
+        phase_curve["pressure_mpa_absolute"],
+        errors="coerce",
+    ).min()
+    if pd.isna(min_pressure):
+        return np.nan
+    return float((min_pressure - surface_pressure_mpa) / pressure_gradient_mpa_per_m)
+
+
 def stability_depth_grid(
     depth_limit_m: object,
     step_m: object = DEFAULT_STABILITY_DEPTH_GRID_STEP_M,
+    start_depth_m: object = 0.0,
 ) -> np.ndarray:
     limit = pd.to_numeric(depth_limit_m, errors="coerce")
     step = pd.to_numeric(step_m, errors="coerce")
+    start = pd.to_numeric(start_depth_m, errors="coerce")
     if not np.isfinite(step) or float(step) <= 0:
         raise ValueError("Stability depth-grid step must be a positive number.")
-    if not np.isfinite(limit) or float(limit) < 0:
+    if not np.isfinite(limit) or float(limit) < 0 or not np.isfinite(start):
         return np.array([], dtype=float)
 
     limit_value = float(limit)
-    if limit_value == 0:
-        return np.array([0.0], dtype=float)
+    start_value = max(0.0, float(start))
+    if limit_value < start_value:
+        return np.array([], dtype=float)
+    if limit_value == start_value:
+        return np.array([start_value], dtype=float)
 
-    grid = np.arange(0.0, limit_value, float(step))
+    grid = np.arange(start_value, limit_value, float(step))
     grid = np.append(grid, limit_value)
     return np.unique(np.round(grid, 10)).astype(float)
 
@@ -510,8 +531,9 @@ def stability_condition_grid_from_profile(
     depth_limit_m: object,
     gradient_c_per_100m: object | None = None,
     step_m: object = DEFAULT_STABILITY_DEPTH_GRID_STEP_M,
+    start_depth_m: object = 0.0,
 ) -> pd.DataFrame:
-    grid = stability_depth_grid(depth_limit_m, step_m)
+    grid = stability_depth_grid(depth_limit_m, step_m, start_depth_m=start_depth_m)
     if len(grid) == 0:
         return pd.DataFrame(columns=STABILITY_CONDITION_GRID_COLUMNS)
 
@@ -1858,6 +1880,7 @@ def build_stability_screen(
 
     active_source = Path(source_root) if source_root is not None else active_stability_source_path(project_root)
     profile_cache: dict[str, pd.DataFrame] = {}
+    curve_depth_start_m = phase_curve_min_depth_m(phase_curve)
     curve_depth_limit_m = phase_curve_max_depth_m(phase_curve)
     rows: list[dict[str, object]] = []
     for _, row in scaffold.iterrows():
@@ -1892,11 +1915,11 @@ def build_stability_screen(
             )
             continue
 
-        if np.isfinite(curve_depth_limit_m) and depth_m > curve_depth_limit_m:
+        if np.isfinite(curve_depth_start_m) and depth_m < curve_depth_start_m:
             blocked = _blocked_screen_row(
                 row,
                 "blocked_phase_curve_range_insufficient",
-                "Blocked because the public well depth exceeds the cited phase-curve lookup range.",
+                "Blocked because the public well depth is shallower than the cited phase-curve lookup range.",
             )
             blocked["phase_curve_status"] = "blocked_phase_curve_range_insufficient"
             rows.append(blocked)
@@ -1920,18 +1943,34 @@ def build_stability_screen(
         gradient = pd.to_numeric(row.get("rough_geothermal_gradient_c_per_100m"), errors="coerce")
         if not np.isfinite(gradient):
             gradient = None
+        range_truncated = np.isfinite(curve_depth_limit_m) and depth_m > curve_depth_limit_m
+        model_depth_limit_m = min(depth_m, curve_depth_limit_m) if range_truncated else depth_m
         condition_grid = stability_condition_grid_from_profile(
             profile_points,
             phase_curve,
-            depth_limit_m=depth_m,
+            depth_limit_m=model_depth_limit_m,
             gradient_c_per_100m=gradient,
             step_m=grid_step_m,
+            start_depth_m=curve_depth_start_m,
         )
         interval = stability_interval_from_condition_grid(
             condition_grid,
-            depth_limit_m=depth_m,
+            depth_limit_m=model_depth_limit_m,
             step_m=grid_step_m,
         )
+
+        if range_truncated and not (
+            interval["stability_result_status"] == "calculated"
+            and interval["base_boundary_method"] == "interpolated_crossing"
+        ):
+            blocked = _blocked_screen_row(
+                row,
+                "blocked_phase_curve_range_insufficient",
+                "Blocked because the modeled interval does not close within the cited phase-curve lookup range.",
+            )
+            blocked["phase_curve_status"] = "blocked_phase_curve_range_insufficient"
+            rows.append(blocked)
+            continue
 
         output = _base_screen_row(row)
         output.update(interval.to_dict())
