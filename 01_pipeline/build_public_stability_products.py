@@ -19,6 +19,8 @@ from dashboard.stability_products import (
     load_stability_screen,
     load_stability_temperature_model,
     public_ml_feature_scaffold_summary_frame,
+    public_ml_leakage_guardrails_frame,
+    public_ml_target_registry_frame,
     stability_context_summary_frame,
     stability_screen_summary_frame,
     stability_input_scaffold_summary_frame,
@@ -27,6 +29,7 @@ from dashboard.stability_products import (
     write_g10015_temperature_profile_points_product,
     write_public_stability_products,
     write_public_ml_feature_products,
+    write_public_ml_target_registry_products,
     write_stability_screen_product,
     write_stability_temperature_model_product,
 )
@@ -84,6 +87,7 @@ def main() -> None:
     temperature_model_outputs = write_stability_temperature_model_product(project_root, source_root)
     stability_screen_outputs = write_stability_screen_product(project_root, source_root)
     ml_feature_outputs = write_public_ml_feature_products(project_root)
+    ml_target_outputs = write_public_ml_target_registry_products(project_root)
     print("\n## Written outputs")
     for output in (
         outputs
@@ -91,6 +95,7 @@ def main() -> None:
         + temperature_model_outputs
         + stability_screen_outputs
         + ml_feature_outputs
+        + ml_target_outputs
     ):
         if output is not None:
             print(output)
@@ -113,6 +118,8 @@ def main() -> None:
     print_frame("Stability Temperature Model Summary", stability_temperature_model_summary_frame(temperature_model))
     print_frame("Stability Screen Summary", stability_screen_summary_frame(stability_screen))
     print_frame("Public ML Feature Scaffold Summary", public_ml_feature_scaffold_summary_frame(ml_feature_scaffold))
+    print_frame("Public ML Target Registry", public_ml_target_registry_frame())
+    print_frame("Public ML Leakage Guardrails", public_ml_leakage_guardrails_frame())
 
     print(
         "\nDone. Review changed files under data/public_stability_products/ and "

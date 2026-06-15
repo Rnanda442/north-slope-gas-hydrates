@@ -38,6 +38,8 @@ PUBLIC_ML_FEATURE_SCAFFOLD_VERSION = "2026-06-15.v1"
 PUBLIC_ML_FEATURE_SCAFFOLD_FILE_NAME = "public_ml_feature_scaffold_2026-06-15.csv"
 PUBLIC_ML_FEATURE_SCAFFOLD_SUMMARY_FILE_NAME = "public_ml_feature_scaffold_summary_2026-06-15.csv"
 PUBLIC_ML_FEATURE_DICTIONARY_FILE_NAME = "public_ml_feature_dictionary_2026-06-15.csv"
+PUBLIC_ML_TARGET_REGISTRY_FILE_NAME = "public_ml_target_registry_2026-06-15.csv"
+PUBLIC_ML_LEAKAGE_GUARDRAILS_FILE_NAME = "public_ml_leakage_guardrails_2026-06-15.csv"
 PHASE_CURVE_FILE_NAME = "phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv"
 PHASE_CURVE_SCENARIO_CATALOG_FILE_NAME = "phase_curve_scenario_catalog_2026-06-14.csv"
 PHASE_CURVE_ID = "methane_5ppt_sir2008_csmhyd_digitized_v1"
@@ -362,6 +364,32 @@ PUBLIC_ML_FEATURE_DICTIONARY_COLUMNS = [
     "notes",
 ]
 
+PUBLIC_ML_TARGET_REGISTRY_COLUMNS = [
+    "original_header",
+    "canonical_target_family",
+    "target_task",
+    "target_role",
+    "source_evidence",
+    "allowed_use",
+    "prohibited_use",
+    "leakage_policy",
+    "current_public_status",
+    "unit_or_scale_status",
+    "future_resolution_needed",
+    "notes",
+]
+
+PUBLIC_ML_LEAKAGE_GUARDRAIL_COLUMNS = [
+    "guardrail_id",
+    "pipeline_stage",
+    "rule",
+    "target_headers_covered",
+    "allowed_inputs",
+    "blocked_inputs",
+    "reason",
+    "implementation_status",
+]
+
 WELL_CONTEXT_COLUMNS = [
     "object_id",
     "permit_number",
@@ -465,6 +493,14 @@ def default_public_ml_feature_scaffold_summary_path(project_root: Path) -> Path:
 
 def default_public_ml_feature_dictionary_path(project_root: Path) -> Path:
     return default_stability_products_dir(project_root) / PUBLIC_ML_FEATURE_DICTIONARY_FILE_NAME
+
+
+def default_public_ml_target_registry_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / PUBLIC_ML_TARGET_REGISTRY_FILE_NAME
+
+
+def default_public_ml_leakage_guardrails_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / PUBLIC_ML_LEAKAGE_GUARDRAILS_FILE_NAME
 
 
 def default_phase_curve_path(project_root: Path) -> Path:
@@ -2316,6 +2352,181 @@ def public_ml_feature_dictionary_frame() -> pd.DataFrame:
     return pd.DataFrame(rows, columns=PUBLIC_ML_FEATURE_DICTIONARY_COLUMNS)
 
 
+def public_ml_target_registry_frame() -> pd.DataFrame:
+    rows = [
+        {
+            "original_header": "Sgh",
+            "canonical_target_family": "hydrate_saturation",
+            "target_task": "saturation_regression;occurrence_label_derivation_after_threshold_policy",
+            "target_role": "primary_ground_truth_or_calibration_target",
+            "source_evidence": "Header screenshots mark Sgh / NMR_SAT as GROUND TRUTH; refined sheets show Sgh tied to depth correspondence.",
+            "allowed_use": "Target for hydrate saturation regression; possible source for occurrence labels only after an explicit threshold/uncertainty policy.",
+            "prohibited_use": "Do not use as an input feature, normalization feature, ranking feature, or stability-screen predictor.",
+            "leakage_policy": "exclude_from_feature_matrix_before_training",
+            "current_public_status": "header_evidence_only_no_rows_committed",
+            "unit_or_scale_status": "unresolved_fraction_or_percent",
+            "future_resolution_needed": "Confirm workbook units, source method, depth alignment, and whether Sgh is supplied, interpreted, NMR-derived, or core-calibrated.",
+            "notes": "Preserve original header spelling in deliverables and map to canonical role only as metadata.",
+        },
+        {
+            "original_header": "S_h",
+            "canonical_target_family": "hydrate_saturation",
+            "target_task": "saturation_regression;occurrence_label_derivation_after_threshold_policy",
+            "target_role": "target_or_calibration_reference",
+            "source_evidence": "MTE screenshot shows S_h beside measured and derived log fields; science ladder says S_h is a target/calibration/output, not predictor.",
+            "allowed_use": "Target or calibration reference for hydrate saturation; compare against predictions during validation.",
+            "prohibited_use": "Do not use as an input feature or derive model features from it before splitting.",
+            "leakage_policy": "exclude_from_feature_matrix_before_training",
+            "current_public_status": "header_evidence_only_no_rows_committed",
+            "unit_or_scale_status": "unresolved_fraction_or_percent",
+            "future_resolution_needed": "Confirm whether S_h is interpreted, Archie-derived, NMR/core-calibrated, or supplied ground truth.",
+            "notes": "Keep distinct from measured inputs even when it appears in the same sheet region.",
+        },
+        {
+            "original_header": "Sh",
+            "canonical_target_family": "hydrate_saturation",
+            "target_task": "saturation_regression;occurrence_label_derivation_after_threshold_policy",
+            "target_role": "target_or_calibration_reference",
+            "source_evidence": "IGS screenshot shows Sh and Swr; base file lists Sh under label/target/ground-truth fields.",
+            "allowed_use": "Target or calibration reference for hydrate saturation after workbook role confirmation.",
+            "prohibited_use": "Do not use as an input feature, predictor, direct feature, or post-review ranking input.",
+            "leakage_policy": "exclude_from_feature_matrix_before_training",
+            "current_public_status": "header_evidence_only_no_rows_committed",
+            "unit_or_scale_status": "unresolved_fraction_or_percent",
+            "future_resolution_needed": "Confirm sheet-specific equivalence to Sgh/S_h and exact unit convention.",
+            "notes": "Header alias should be visible; do not silently rename it away.",
+        },
+        {
+            "original_header": "NMR_SAT",
+            "canonical_target_family": "hydrate_saturation",
+            "target_task": "saturation_regression;occurrence_label_derivation_after_threshold_policy",
+            "target_role": "ground_truth_or_independent_calibration_target",
+            "source_evidence": "Header screenshot explicitly marks Sgh / NMR_SAT as GROUND TRUTH; science ladder separates NMRPHI input from NMR_SAT target.",
+            "allowed_use": "Ground-truth, calibration, or validation target for saturation where available.",
+            "prohibited_use": "Do not use as an input feature; do not confuse with measured NMR porosity/NMRPHI.",
+            "leakage_policy": "exclude_from_feature_matrix_before_training",
+            "current_public_status": "header_evidence_only_no_rows_committed",
+            "unit_or_scale_status": "unresolved_fraction_or_percent",
+            "future_resolution_needed": "Confirm NMR processing method, depth alignment, and whether NMR_SAT is the authoritative target for known wells.",
+            "notes": "NMRPHI can be an input if measured; NMR_SAT is target-only.",
+        },
+        {
+            "original_header": "Hydrate Saturation",
+            "canonical_target_family": "hydrate_saturation",
+            "target_task": "saturation_regression;occurrence_label_derivation_after_threshold_policy",
+            "target_role": "target_or_reporting_output",
+            "source_evidence": "Base file lists Hydrate Saturation under label/target/ground-truth fields.",
+            "allowed_use": "Human-readable target/output field for saturation regression and validation reporting.",
+            "prohibited_use": "Do not use as an input feature or leakage-bearing helper variable.",
+            "leakage_policy": "exclude_from_feature_matrix_before_training",
+            "current_public_status": "header_evidence_only_no_rows_committed",
+            "unit_or_scale_status": "unresolved_fraction_or_percent",
+            "future_resolution_needed": "Confirm relationship to Sgh/S_h/Sh and whether this is supplied or derived.",
+            "notes": "This is the plain-language alias; preserve exact workbook header where present.",
+        },
+        {
+            "original_header": "Swr",
+            "canonical_target_family": "irreducible_or_residual_water_saturation",
+            "target_task": "calibration_reference;water_saturation_constraint",
+            "target_role": "target_or_calibration_reference_not_predictor",
+            "source_evidence": "Base file lists Swr under label/target/ground-truth fields; MTE/IGS screenshots show S_wr/Swr near saturation fields.",
+            "allowed_use": "Calibration/reference target for water saturation or hydrate-saturation equations after source role is confirmed.",
+            "prohibited_use": "Do not use as an input feature when predicting hydrate saturation if it is target-derived or post-processed.",
+            "leakage_policy": "exclude_until_workbook_formula_confirms_nonleakage_role",
+            "current_public_status": "header_evidence_only_no_rows_committed",
+            "unit_or_scale_status": "unresolved_fraction_or_percent",
+            "future_resolution_needed": "Confirm whether Swr/S_wr is measured, assumed, interpreted, or calculated from target-bearing fields.",
+            "notes": "Treat as target/calibration family by default because it is a saturation field.",
+        },
+        {
+            "original_header": "S_wr",
+            "canonical_target_family": "irreducible_or_residual_water_saturation",
+            "target_task": "calibration_reference;water_saturation_constraint",
+            "target_role": "target_or_calibration_reference_not_predictor",
+            "source_evidence": "MTE screenshot shows S_wr beside measured and derived fields; unresolved question asks whether S_wr is measured, assumed, or calculated.",
+            "allowed_use": "Calibration/reference target after workbook formula review.",
+            "prohibited_use": "Do not use as an input feature until proven independent of target outputs and split-safe.",
+            "leakage_policy": "exclude_until_workbook_formula_confirms_nonleakage_role",
+            "current_public_status": "header_evidence_only_no_rows_committed",
+            "unit_or_scale_status": "unresolved_fraction_or_percent",
+            "future_resolution_needed": "Confirm formula/provenance and relationship to Swr and hydrate saturation.",
+            "notes": "Kept as a separate original header because screenshots preserve this spelling.",
+        },
+        {
+            "original_header": "interpreted phase label",
+            "canonical_target_family": "hydrate_occurrence_or_phase_class",
+            "target_task": "occurrence_classification",
+            "target_role": "classification_target_after_label_policy",
+            "source_evidence": "Science ladder says interpreted phase labels are targets, calibration references, or outputs, not predictors.",
+            "allowed_use": "Target for occurrence/phase classification after label definitions and uncertainty classes are approved.",
+            "prohibited_use": "Do not use final phase labels, manual rankings, or post-review decisions as predictors.",
+            "leakage_policy": "exclude_from_feature_matrix_before_training",
+            "current_public_status": "not_present_as_rows_in_public_repo",
+            "unit_or_scale_status": "categorical_policy_unresolved",
+            "future_resolution_needed": "Define hydrate/gas/water/non-reservoir/uncertain class policy and whole-well split handling.",
+            "notes": "Occurrence labels may be derived from saturation targets only after threshold and uncertainty policy is approved.",
+        },
+    ]
+    return pd.DataFrame(rows, columns=PUBLIC_ML_TARGET_REGISTRY_COLUMNS)
+
+
+def public_ml_leakage_guardrails_frame() -> pd.DataFrame:
+    target_headers = "Sgh;S_h;Sh;NMR_SAT;Hydrate Saturation;Swr;S_wr;interpreted phase label"
+    rows = [
+        {
+            "guardrail_id": "LG-01",
+            "pipeline_stage": "schema_mapping",
+            "rule": "Preserve original saturation and label headers, then assign target-only role metadata.",
+            "target_headers_covered": target_headers,
+            "allowed_inputs": "Measured logs and public context fields only after unit/QC validation.",
+            "blocked_inputs": target_headers,
+            "reason": "The base file identifies these as label/target/ground-truth or saturation fields.",
+            "implementation_status": "documented_public_registry",
+        },
+        {
+            "guardrail_id": "LG-02",
+            "pipeline_stage": "feature_engineering",
+            "rule": "Do not derive predictor features from hydrate saturation, water saturation, interpreted class, or final ranking fields.",
+            "target_headers_covered": target_headers,
+            "allowed_inputs": "GR, Rt, RHOB, porosity inputs, Vp, Vs, caliper/QC, public stability context, and source-control metadata.",
+            "blocked_inputs": target_headers,
+            "reason": "Target-derived predictors would create leakage and inflate model performance.",
+            "implementation_status": "planned_runtime_check",
+        },
+        {
+            "guardrail_id": "LG-03",
+            "pipeline_stage": "train_validation_split",
+            "rule": "Split by whole well before fitting preprocessing, thresholds, scalers, or model weights.",
+            "target_headers_covered": target_headers,
+            "allowed_inputs": "Training-well features only for fitting transforms.",
+            "blocked_inputs": "Validation/test target distributions during transform fitting.",
+            "reason": "Neighboring depth rows within the same well are correlated; random row splits can leak target behavior.",
+            "implementation_status": "runtime_skeleton_exists",
+        },
+        {
+            "guardrail_id": "LG-04",
+            "pipeline_stage": "occurrence_label_derivation",
+            "rule": "Occurrence labels may be derived from saturation targets only after an explicit threshold, uncertainty, and class policy is approved.",
+            "target_headers_covered": "Sgh;S_h;Sh;NMR_SAT;Hydrate Saturation",
+            "allowed_inputs": "Approved target registry and mentor-approved threshold policy.",
+            "blocked_inputs": "Ad hoc hydrate-present labels from stability screen, resistivity alone, or manual sweet-spot rank.",
+            "reason": "Stability and high resistivity are not direct hydrate labels.",
+            "implementation_status": "policy_pending",
+        },
+        {
+            "guardrail_id": "LG-05",
+            "pipeline_stage": "public_exports",
+            "rule": "Public GitHub/Streamlit exports may show schemas, target roles, counts, and guardrails, but not approved target rows.",
+            "target_headers_covered": target_headers,
+            "allowed_inputs": "Public-safe summaries and empty/schema-level target registry.",
+            "blocked_inputs": "Approved target values, restricted well identifiers, fitted model results, and final metrics.",
+            "reason": "Approved well-log/core data belongs only in the authorized runtime environment.",
+            "implementation_status": "active_public_boundary",
+        },
+    ]
+    return pd.DataFrame(rows, columns=PUBLIC_ML_LEAKAGE_GUARDRAIL_COLUMNS)
+
+
 def load_public_ml_feature_scaffold(project_root: Path) -> pd.DataFrame:
     path = default_public_ml_feature_scaffold_path(project_root)
     if not path.exists():
@@ -2337,6 +2548,20 @@ def load_public_ml_feature_dictionary(project_root: Path) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
+def load_public_ml_target_registry(project_root: Path) -> pd.DataFrame:
+    path = default_public_ml_target_registry_path(project_root)
+    if not path.exists():
+        return pd.DataFrame(columns=PUBLIC_ML_TARGET_REGISTRY_COLUMNS)
+    return pd.read_csv(path)
+
+
+def load_public_ml_leakage_guardrails(project_root: Path) -> pd.DataFrame:
+    path = default_public_ml_leakage_guardrails_path(project_root)
+    if not path.exists():
+        return pd.DataFrame(columns=PUBLIC_ML_LEAKAGE_GUARDRAIL_COLUMNS)
+    return pd.read_csv(path)
+
+
 def write_public_ml_feature_products(project_root: Path) -> tuple[Path, Path, Path]:
     product_dir = default_stability_products_dir(project_root)
     product_dir.mkdir(parents=True, exist_ok=True)
@@ -2352,6 +2577,19 @@ def write_public_ml_feature_products(project_root: Path) -> tuple[Path, Path, Pa
     summary.to_csv(summary_path, index=False)
     dictionary.to_csv(dictionary_path, index=False)
     return scaffold_path, summary_path, dictionary_path
+
+
+def write_public_ml_target_registry_products(project_root: Path) -> tuple[Path, Path]:
+    product_dir = default_stability_products_dir(project_root)
+    product_dir.mkdir(parents=True, exist_ok=True)
+
+    registry = public_ml_target_registry_frame()
+    guardrails = public_ml_leakage_guardrails_frame()
+    registry_path = default_public_ml_target_registry_path(project_root)
+    guardrails_path = default_public_ml_leakage_guardrails_path(project_root)
+    registry.to_csv(registry_path, index=False)
+    guardrails.to_csv(guardrails_path, index=False)
+    return registry_path, guardrails_path
 
 
 def representative_temperature_profiles(inventory: pd.DataFrame) -> pd.DataFrame:

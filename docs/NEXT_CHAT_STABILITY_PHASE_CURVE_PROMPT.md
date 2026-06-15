@@ -166,14 +166,27 @@ rows. The `Analyze Hydrates` page has a `Public ML Readiness` tab for this
 real public feature scaffold. Treat stability as a physics-derived feature and
 coverage/readiness signal only, not a model label.
 
+Current public target registry:
+`data/public_stability_products/public_ml_target_registry_2026-06-15.csv` and
+`public_ml_leakage_guardrails_2026-06-15.csv` codify the existing base-file
+decision that all saturation/ground-truth header families are target-only.
+`Sgh`, `S_h`, `Sh`, `NMR_SAT`, `Hydrate Saturation`, `Swr`, `S_wr`, and
+interpreted phase labels are targets, calibration references, or outputs, not
+input predictors. The `Analyze Hydrates` page has a `Target Registry &
+Leakage` tab. Do not reopen this as an undecided target question unless the
+actual workbook/formulas contradict the screenshot-based base file.
+
 Next task:
-Continue from the public ML-readiness layer. Good next options are:
+Continue from the target registry into approved-data schema mapping. Good next
+options are:
 1. QA the hosted Streamlit `Analyze Hydrates -> Public ML Readiness` panel.
-2. Add mentor-facing screenshots/figures from the public ML feature scaffold.
-3. Build an approved-data target registry plan that maps screenshot target
-   fields (`Sgh`, `S_h`, `Sh`, `NMR_SAT`) to occurrence/saturation roles without
-   exposing raw rows.
-4. Improve source coverage in OSL: refine temperature matches, add better
+2. QA the hosted `Analyze Hydrates -> Target Registry & Leakage` panel.
+3. Build the approved-data schema mapping plan: preserve original mnemonics,
+   map measured inputs versus target-only columns, define unit checks, and
+   prepare future runtime validation without exposing approved rows.
+4. Add mentor-facing screenshots/figures from the public ML feature scaffold
+   and target registry.
+5. Improve source coverage in OSL: refine temperature matches, add better
    permafrost/base controls if public and cited, digitize/model approved
    phase-curve sensitivities, then rerun the same guarded writer and compare
    counts.

@@ -198,6 +198,12 @@ classification and saturation regression.
   rows, and `0` validated occurrence/saturation labels or training-ready rows.
   These products are feature engineering and readiness context only, not model
   labels or predictions.
+- `data/public_stability_products/public_ml_target_registry_2026-06-15.csv`
+  and `public_ml_leakage_guardrails_2026-06-15.csv` now codify the existing
+  base-file decision that all saturation/ground-truth header families are
+  target-only. `Sgh`, `S_h`, `Sh`, `NMR_SAT`, `Hydrate Saturation`, `Swr`,
+  `S_wr`, and interpreted phase labels are targets, calibration references, or
+  outputs, not input predictors. No approved target rows are committed.
 - Three Excel header references were reviewed from the user's email. The images
   are not stored in Git or shown on the website; their public-safe schema
   derivative is maintained in `docs/WELL_LOG_REQUIREMENTS_MAP.md`.

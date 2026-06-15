@@ -125,6 +125,20 @@ saturation labels. It is not training data and must not be used as a hydrate
 present/absent label, saturation target, producibility result, or sweet-spot
 ranking.
 
+`public_ml_target_registry_2026-06-15.csv`
+
+`public_ml_leakage_guardrails_2026-06-15.csv`
+
+These public schema/policy products preserve the workbook/screenshot target
+headers and lock the target-only rule. `Sgh`, `S_h`, `Sh`, `NMR_SAT`,
+`Hydrate Saturation`, `Swr`, `S_wr`, and interpreted phase labels are targets,
+calibration references, or outputs, not input predictors. They remain
+header/schema evidence only in the public repo: no approved target rows are
+committed. The leakage guardrails require the saturation/label family to stay
+out of the feature matrix, require whole-well splitting before model fitting,
+and block ad hoc occurrence labels from stability, resistivity alone, or final
+rankings.
+
 `stability_website_product_spec_2026-06-14.csv`
 
 This table defines the intended final website shape for the public stability

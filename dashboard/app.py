@@ -31,6 +31,8 @@ from dashboard.stability_products import (
     default_g10015_inventory_path,
     default_public_ml_feature_dictionary_path,
     default_public_ml_feature_scaffold_path,
+    default_public_ml_leakage_guardrails_path,
+    default_public_ml_target_registry_path,
     default_stability_input_scaffold_path,
     default_stability_screen_path,
     default_well_context_path,
@@ -40,11 +42,15 @@ from dashboard.stability_products import (
     load_public_ml_feature_dictionary,
     load_public_ml_feature_scaffold,
     load_public_ml_feature_scaffold_summary,
+    load_public_ml_leakage_guardrails,
+    load_public_ml_target_registry,
     load_public_well_stability_context,
     load_stability_input_scaffold,
     load_stability_screen,
     load_stability_temperature_model,
     public_ml_feature_scaffold_summary_frame,
+    public_ml_leakage_guardrails_frame,
+    public_ml_target_registry_frame,
     stability_input_capability_matrix_frame,
     stability_osl_pull_triggers_frame,
     stability_parameter_readiness_frame,
@@ -1043,6 +1049,16 @@ def cached_public_ml_feature_scaffold_summary(project_root: str) -> pd.DataFrame
 @st.cache_data
 def cached_public_ml_feature_dictionary(project_root: str) -> pd.DataFrame:
     return load_public_ml_feature_dictionary(Path(project_root))
+
+
+@st.cache_data
+def cached_public_ml_target_registry(project_root: str) -> pd.DataFrame:
+    return load_public_ml_target_registry(Path(project_root))
+
+
+@st.cache_data
+def cached_public_ml_leakage_guardrails(project_root: str) -> pd.DataFrame:
+    return load_public_ml_leakage_guardrails(Path(project_root))
 
 
 @st.cache_data
@@ -4094,6 +4110,55 @@ def render_public_ml_readiness() -> None:
     )
 
 
+def render_public_ml_target_registry() -> None:
+    st.subheader("Target Registry & Leakage Guardrail")
+    registry = cached_public_ml_target_registry(str(PROJECT_ROOT))
+    guardrails = cached_public_ml_leakage_guardrails(str(PROJECT_ROOT))
+
+    if registry.empty:
+        registry = public_ml_target_registry_frame()
+    if guardrails.empty:
+        guardrails = public_ml_leakage_guardrails_frame()
+
+    target_headers = registry["original_header"].tolist()
+    cols = st.columns(4)
+    cols[0].metric("Target headers", f"{len(target_headers):,}")
+    cols[1].metric(
+        "Hydrate saturation targets",
+        f"{int(registry['canonical_target_family'].eq('hydrate_saturation').sum()):,}",
+    )
+    cols[2].metric("Leakage rules", f"{len(guardrails):,}")
+    cols[3].metric("Public target rows", "0")
+
+    st.warning(
+        "The saturation family is already treated as target-only: "
+        "`Sgh`, `S_h`, `Sh`, `NMR_SAT`, `Hydrate Saturation`, `Swr`, and `S_wr` "
+        "must stay out of the input feature matrix unless a workbook formula proves a non-leaking role."
+    )
+
+    st.markdown("##### Target-only header registry")
+    st.dataframe(registry, use_container_width=True, hide_index=True)
+
+    st.markdown("##### Leakage guardrails")
+    st.dataframe(guardrails, use_container_width=True, hide_index=True)
+
+    cols = st.columns(2)
+    cols[0].download_button(
+        "Download target registry CSV",
+        csv_bytes(registry),
+        default_public_ml_target_registry_path(PROJECT_ROOT).name,
+        "text/csv",
+        key="download_public_ml_target_registry",
+    )
+    cols[1].download_button(
+        "Download leakage guardrails CSV",
+        csv_bytes(guardrails),
+        default_public_ml_leakage_guardrails_path(PROJECT_ROOT).name,
+        "text/csv",
+        key="download_public_ml_leakage_guardrails",
+    )
+
+
 def render_analyze_hydrates() -> None:
     st.markdown('<div class="atlas-kicker">Synthetic decision workspace</div>', unsafe_allow_html=True)
     st.title("Analyze Hydrates")
@@ -4118,6 +4183,7 @@ def render_analyze_hydrates() -> None:
     tabs = st.tabs(
         [
             "Public ML Readiness",
+            "Target Registry & Leakage",
             "Interval Review",
             "Runtime Readiness",
             "Methods & Evidence",
@@ -4126,8 +4192,10 @@ def render_analyze_hydrates() -> None:
     with tabs[0]:
         render_public_ml_readiness()
     with tabs[1]:
-        render_interval_review(logs, intervals)
+        render_public_ml_target_registry()
     with tabs[2]:
+        render_interval_review(logs, intervals)
+    with tabs[3]:
         col1, col2 = st.columns(2)
         with col1:
             render_processing_sketch(
@@ -4146,7 +4214,7 @@ def render_analyze_hydrates() -> None:
                 height=280,
             )
         render_runtime_readiness(logs)
-    with tabs[3]:
+    with tabs[4]:
         render_ml_visual_architecture()
         render_source_anchors()
         with st.expander("Header and track blueprint", expanded=True):

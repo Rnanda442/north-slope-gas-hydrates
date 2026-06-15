@@ -24,6 +24,9 @@ def test_sweet_spot_page_renders() -> None:
 
     assert not app.exception
     assert app.title[0].value == "Analyze Hydrates"
+    tab_labels = [tab.label for tab in app.tabs]
+    assert "Public ML Readiness" in tab_labels
+    assert "Target Registry & Leakage" in tab_labels
     assert [metric.label for metric in app.metric[:4]] == [
         "Feature rows",
         "Temperature matched",

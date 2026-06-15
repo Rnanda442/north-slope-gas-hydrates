@@ -557,6 +557,14 @@ Fresh-chat handoff as of 2026-06-15:
   `0` validated hydrate occurrence/saturation labels or training-ready rows.
   The `Analyze Hydrates` page now has a Public ML Readiness tab for this real
   public feature scaffold, while synthetic interval review remains separate.
+- The public target registry now exists:
+  `data/public_stability_products/public_ml_target_registry_2026-06-15.csv`
+  and `public_ml_leakage_guardrails_2026-06-15.csv`. It preserves the original
+  target headers and codifies the existing rule that `Sgh`, `S_h`, `Sh`,
+  `NMR_SAT`, `Hydrate Saturation`, `Swr`, `S_wr`, and interpreted phase labels
+  are target/calibration/output fields, not input predictors. The
+  `Analyze Hydrates` page now has a Target Registry & Leakage tab for this
+  guardrail.
   Next scientific task: keep improving source coverage in OSL and treat any
   future phase-curve/composition variants as cited scenarios. Do not label the
   current screen as hydrate proof, saturation, producibility, or a sweet-spot

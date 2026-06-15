@@ -24,8 +24,10 @@ from dashboard.stability_products import (
     default_g10015_profile_points_path,
     default_g10015_profile_points_summary_path,
     default_public_ml_feature_dictionary_path,
+    default_public_ml_leakage_guardrails_path,
     default_public_ml_feature_scaffold_path,
     default_public_ml_feature_scaffold_summary_path,
+    default_public_ml_target_registry_path,
     default_phase_curve_path,
     default_phase_curve_scenario_catalog_path,
     default_stability_screen_path,
@@ -47,6 +49,8 @@ from dashboard.stability_products import (
     g10015_temperature_profile_points_summary_frame,
     public_ml_feature_dictionary_frame,
     public_ml_feature_scaffold_summary_frame,
+    public_ml_leakage_guardrails_frame,
+    public_ml_target_registry_frame,
     stability_input_capability_matrix_frame,
     stability_condition_grid_from_profile,
     stability_osl_pull_triggers_frame,
@@ -63,6 +67,7 @@ from dashboard.stability_products import (
     temperature_inventory_summary_frame,
     write_public_stability_products,
     write_public_ml_feature_products,
+    write_public_ml_target_registry_products,
     write_g10015_temperature_profile_points_product,
     write_stability_screen_product,
     write_stability_temperature_model_product,
@@ -1096,6 +1101,50 @@ def test_write_public_ml_feature_products_creates_scaffold_dictionary_and_summar
     assert scaffold["allowed_ml_use"].eq("feature_engineering_and_coverage_readiness_only").all()
 
 
+def test_public_ml_target_registry_marks_saturation_family_as_targets() -> None:
+    registry = public_ml_target_registry_frame()
+    guardrails = public_ml_leakage_guardrails_frame()
+
+    expected_targets = {
+        "Sgh",
+        "S_h",
+        "Sh",
+        "NMR_SAT",
+        "Hydrate Saturation",
+        "Swr",
+        "S_wr",
+    }
+    assert expected_targets.issubset(set(registry["original_header"]))
+    saturation_rows = registry[registry["original_header"].isin(expected_targets)]
+    assert saturation_rows["prohibited_use"].str.contains("input feature").all()
+    assert saturation_rows["leakage_policy"].str.contains(
+        "exclude|exclude_until",
+        regex=True,
+    ).all()
+    assert registry.loc[
+        registry["original_header"] == "NMR_SAT",
+        "notes",
+    ].iloc[0] == "NMRPHI can be an input if measured; NMR_SAT is target-only."
+    assert guardrails["blocked_inputs"].str.contains("Sgh").any()
+    assert guardrails["rule"].str.contains("Do not derive predictor features").any()
+
+
+def test_write_public_ml_target_registry_products_creates_public_policy_csvs(
+    tmp_path,
+) -> None:
+    registry_path, guardrails_path = write_public_ml_target_registry_products(tmp_path)
+
+    assert registry_path == default_public_ml_target_registry_path(tmp_path)
+    assert guardrails_path == default_public_ml_leakage_guardrails_path(tmp_path)
+    assert registry_path.exists()
+    assert guardrails_path.exists()
+    registry = pd.read_csv(registry_path)
+    guardrails = pd.read_csv(guardrails_path)
+    assert "Sgh" in registry["original_header"].tolist()
+    assert "Hydrate Saturation" in registry["original_header"].tolist()
+    assert guardrails["guardrail_id"].tolist() == ["LG-01", "LG-02", "LG-03", "LG-04", "LG-05"]
+
+
 def test_committed_stability_screen_preserves_guardrails() -> None:
     project_root = Path(__file__).resolve().parents[1]
     screen = pd.read_csv(default_stability_screen_path(project_root))
@@ -1157,6 +1206,27 @@ def test_committed_public_ml_feature_scaffold_preserves_label_guardrails() -> No
     assert features["ml_training_readiness"].eq(
         "not_training_ready_no_validated_hydrate_labels"
     ).all()
+
+
+def test_committed_public_ml_target_registry_preserves_target_only_rule() -> None:
+    project_root = Path(__file__).resolve().parents[1]
+    registry = pd.read_csv(default_public_ml_target_registry_path(project_root))
+    guardrails = pd.read_csv(default_public_ml_leakage_guardrails_path(project_root))
+
+    expected_targets = {
+        "Sgh",
+        "S_h",
+        "Sh",
+        "NMR_SAT",
+        "Hydrate Saturation",
+        "Swr",
+        "S_wr",
+        "interpreted phase label",
+    }
+    assert set(registry["original_header"]) == expected_targets
+    assert registry["prohibited_use"].str.contains("input feature|predictor", regex=True).all()
+    assert guardrails["guardrail_id"].tolist() == ["LG-01", "LG-02", "LG-03", "LG-04", "LG-05"]
+    assert guardrails["blocked_inputs"].str.contains("Sgh").any()
 
 
 def test_public_stability_product_runner_has_help() -> None:
