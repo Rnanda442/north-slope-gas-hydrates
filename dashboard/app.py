@@ -28,6 +28,7 @@ from dashboard.stability_sources import (
     stability_source_status_frame,
 )
 from dashboard.stability_products import (
+    default_approved_schema_coverage_matrix_path,
     default_g10015_inventory_path,
     default_public_ml_feature_dictionary_path,
     default_public_ml_feature_scaffold_path,
@@ -36,6 +37,7 @@ from dashboard.stability_products import (
     default_stability_input_scaffold_path,
     default_stability_screen_path,
     default_well_context_path,
+    load_approved_schema_coverage_matrix,
     load_g10015_temperature_inventory,
     load_g10015_temperature_profile_points_product,
     load_methane_phase_curve,
@@ -1059,6 +1061,11 @@ def cached_public_ml_target_registry(project_root: str) -> pd.DataFrame:
 @st.cache_data
 def cached_public_ml_leakage_guardrails(project_root: str) -> pd.DataFrame:
     return load_public_ml_leakage_guardrails(Path(project_root))
+
+
+@st.cache_data
+def cached_approved_schema_coverage_matrix(project_root: str) -> pd.DataFrame:
+    return load_approved_schema_coverage_matrix(Path(project_root))
 
 
 @st.cache_data
@@ -4110,6 +4117,130 @@ def render_public_ml_readiness() -> None:
     )
 
 
+def render_schema_coverage_architecture() -> None:
+    st.subheader("Schema Coverage & Architecture")
+    matrix = cached_approved_schema_coverage_matrix(str(PROJECT_ROOT))
+
+    if matrix.empty:
+        st.info("The approved-data schema coverage matrix has not been generated yet.")
+        return
+
+    target_like = matrix["role"].isin(["target_only", "calibration_reference"])
+    required_like = matrix["required_for_model"].fillna("").str.contains(
+        "required|target",
+        case=False,
+        regex=True,
+    )
+    available_like = matrix["available_in_current_subset"].fillna("").str.startswith("yes")
+
+    cols = st.columns(4)
+    cols[0].metric("Available datasets", "~3 / 71")
+    cols[1].metric("Schema rows", f"{len(matrix):,}")
+    cols[2].metric("Target/calibration rows", f"{int(target_like.sum()):,}")
+    cols[3].metric("Model training", "Not started")
+
+    st.warning(
+        "This is schema-level coverage only. It preserves original headers and "
+        "roles, separates target-only saturation fields, and does not include "
+        "approved well-log rows, trained models, predictions, or performance metrics."
+    )
+
+    role_counts = (
+        matrix["role"]
+        .fillna("unresolved")
+        .value_counts()
+        .rename_axis("role")
+        .reset_index(name="headers")
+    )
+    role_figure = go.Figure(
+        go.Bar(
+            x=role_counts["headers"],
+            y=role_counts["role"],
+            orientation="h",
+            marker={"color": "#0f766e"},
+            hovertemplate="%{y}<br>Headers: %{x}<extra></extra>",
+        )
+    )
+    role_figure.update_layout(
+        title="Header Roles In The Public-Safe Schema Matrix",
+        xaxis_title="Header rows",
+        yaxis_title="",
+        height=340,
+        margin={"l": 20, "r": 20, "t": 50, "b": 20},
+    )
+    st.plotly_chart(role_figure, use_container_width=True)
+
+    architecture = pd.DataFrame(
+        [
+            {
+                "Stage": "Available subset and screenshots",
+                "Feature path": "Use visible headers to design schema and architecture.",
+                "Target path": "No approved target rows are exposed.",
+            },
+            {
+                "Stage": "Schema preservation",
+                "Feature path": "Keep original sheet/file names and headers, then add canonical aliases as metadata.",
+                "Target path": "Keep original saturation and phase-label headers visible.",
+            },
+            {
+                "Stage": "Role classification",
+                "Feature path": "Measured inputs, derived features, QC fields, context features, and unresolved fields are separated.",
+                "Target path": "`Sgh`, `S_h`, `Sh`, `NMR_SAT`, hydrate-saturation fields, `Swr`, `S_wr`, and phase labels are target/calibration only.",
+            },
+            {
+                "Stage": "Unit and QC layer",
+                "Feature path": "Normalize depth, density, velocity/slowness, porosity, resistivity, and caliper status.",
+                "Target path": "Confirm target units as fraction or percent before labels are used.",
+            },
+            {
+                "Stage": "Leakage barrier",
+                "Feature path": "Build feature matrix only from approved measured, derived, QC, and optional context fields.",
+                "Target path": "Bypass feature matrix and go only to training labels or validation overlays.",
+            },
+            {
+                "Stage": "Model and validation",
+                "Feature path": "Use whole-well split, baselines, tree/boosting, and ANN/Keras only after approved coverage expands.",
+                "Target path": "Validate saturation regression and later occurrence classification by held-out wells.",
+            },
+        ]
+    )
+    st.markdown("##### Architecture path")
+    st.dataframe(architecture, use_container_width=True, hide_index=True)
+
+    st.markdown("##### Schema matrix preview")
+    preview_columns = [
+        "sheet_or_dataset_name",
+        "original_header",
+        "canonical_alias",
+        "role",
+        "feature_family",
+        "required_for_model",
+        "available_in_current_subset",
+        "leakage_risk",
+        "unresolved_question",
+    ]
+    st.dataframe(
+        matrix[[column for column in preview_columns if column in matrix.columns]],
+        use_container_width=True,
+        hide_index=True,
+    )
+
+    with st.expander("Coverage checks", expanded=False):
+        st.dataframe(role_counts, use_container_width=True, hide_index=True)
+        st.write(
+            f"Required or target-like schema rows currently visible: {int((required_like & available_like).sum()):,}. "
+            "This supports architecture design, not final training or metrics."
+        )
+
+    st.download_button(
+        "Download schema coverage matrix CSV",
+        csv_bytes(matrix),
+        default_approved_schema_coverage_matrix_path(PROJECT_ROOT).name,
+        "text/csv",
+        key="download_approved_schema_coverage_matrix",
+    )
+
+
 def render_public_ml_target_registry() -> None:
     st.subheader("Target Registry & Leakage Guardrail")
     registry = cached_public_ml_target_registry(str(PROJECT_ROOT))
@@ -4183,6 +4314,7 @@ def render_analyze_hydrates() -> None:
     tabs = st.tabs(
         [
             "Public ML Readiness",
+            "Schema Coverage & Architecture",
             "Target Registry & Leakage",
             "Interval Review",
             "Runtime Readiness",
@@ -4192,10 +4324,12 @@ def render_analyze_hydrates() -> None:
     with tabs[0]:
         render_public_ml_readiness()
     with tabs[1]:
-        render_public_ml_target_registry()
+        render_schema_coverage_architecture()
     with tabs[2]:
-        render_interval_review(logs, intervals)
+        render_public_ml_target_registry()
     with tabs[3]:
+        render_interval_review(logs, intervals)
+    with tabs[4]:
         col1, col2 = st.columns(2)
         with col1:
             render_processing_sketch(
@@ -4214,7 +4348,7 @@ def render_analyze_hydrates() -> None:
                 height=280,
             )
         render_runtime_readiness(logs)
-    with tabs[4]:
+    with tabs[5]:
         render_ml_visual_architecture()
         render_source_anchors()
         with st.expander("Header and track blueprint", expanded=True):

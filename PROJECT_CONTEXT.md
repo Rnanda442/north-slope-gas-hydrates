@@ -62,6 +62,12 @@ classification, saturation regression, validation, and public-safe exports. The
 2026-06-15 pipeline status Word brief remains the plain-language review draft
 for explaining where the project stands now and how the approved-data ML
 pipeline should reach occurrence classification and saturation regression.
+The non-stability ML/schema readiness baseline is now
+`docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md` and
+`data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv`.
+Only about 3 of the expected 71 datasets are currently available, which is
+enough for schema and architecture design but not final training, performance
+metrics, or hydrate prediction claims.
 
 ## Current State
 
@@ -210,6 +216,18 @@ pipeline should reach occurrence classification and saturation regression.
   target-only. `Sgh`, `S_h`, `Sh`, `NMR_SAT`, `Hydrate Saturation`, `Swr`,
   `S_wr`, and interpreted phase labels are targets, calibration references, or
   outputs, not input predictors. No approved target rows are committed.
+- `docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md` and
+  `data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv`
+  now provide a public-safe schema coverage and model architecture layer
+  outside the stability screen. The matrix preserves original headers, maps
+  canonical roles as metadata, separates measured inputs, derived features,
+  QC/alignment fields, target-only fields, calibration/reference fields, and
+  unresolved fields, and keeps the workflow results-free until broader
+  approved-data coverage exists.
+- The `Analyze Hydrates` page now includes a `Schema Coverage & Architecture`
+  tab that shows the about-3-of-71 coverage status, role counts, target-only
+  separation, and architecture path without exposing approved rows or model
+  metrics.
 - Three Excel header references were reviewed from the user's email. The images
   are not stored in Git or shown on the website; their public-safe schema
   derivative is maintained in `docs/WELL_LOG_REQUIREMENTS_MAP.md`.
@@ -308,6 +326,10 @@ It must not load or expose authorized well-log or core data.
 - `docs/PIPELINE_STATUS_AND_ML_WORKFLOW_BRIEF.md`: Word-ready status and
   forward workflow narrative for the current project position, stability
   guardrail, source-backed evidence tiers, and future approved-data ML pipeline
+- `docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`:
+  non-stability ML/schema readiness plan for preserving approved-data headers,
+  mapping roles, blocking target leakage, and designing whole-well validation
+  before final training
 - `docs/PROJECT_IMPROVEMENT_STRATEGY.md`: principles and phased improvement
   strategy for keeping product changes aligned with the scientific goal
 - `docs/PROJECT_VISION_GOALS_AND_NEXT_STEPS.md`: email-derived project vision,
@@ -572,3 +594,8 @@ blockers, and next activities in the architecture/activity map.
   9-slide PPTX that keeps slides 1-2 locked and uses the map plus zoom-ins for
   slides 3-9, and a Word companion explaining the same workflow without
   claiming hydrate proof, saturation, validated ML results, or sweet spots.
+- 2026-06-15: Added a public-safe approved-data schema coverage and model
+  architecture layer outside the stability screen, including a schema matrix,
+  an Analyze Hydrates tab, mentor-facing language, and target-leakage controls
+  that keep saturation/phase labels out of the feature matrix until approved
+  training and validation are possible.

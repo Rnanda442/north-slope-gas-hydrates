@@ -10,6 +10,7 @@ import pandas as pd
 from shapely.geometry import Point, Polygon
 
 from dashboard.stability_products import (
+    APPROVED_SCHEMA_COVERAGE_MATRIX_COLUMNS,
     PHASE_CURVE_ALLOWED_USE,
     PHASE_CURVE_GAS_COMPOSITION_ASSUMPTION,
     PHASE_CURVE_ID,
@@ -23,6 +24,7 @@ from dashboard.stability_products import (
     build_stability_temperature_model,
     default_g10015_profile_points_path,
     default_g10015_profile_points_summary_path,
+    default_approved_schema_coverage_matrix_path,
     default_public_ml_feature_dictionary_path,
     default_public_ml_leakage_guardrails_path,
     default_public_ml_feature_scaffold_path,
@@ -40,6 +42,7 @@ from dashboard.stability_products import (
     hydrostatic_pressure_mpa_absolute,
     hydrostatic_pressure_mpa_gauge,
     load_arctic_slope_public_wells,
+    load_approved_schema_coverage_matrix,
     load_g10015_temperature_profile_points,
     load_phase_curve,
     load_phase_curve_scenario_catalog,
@@ -1227,6 +1230,70 @@ def test_committed_public_ml_target_registry_preserves_target_only_rule() -> Non
     assert registry["prohibited_use"].str.contains("input feature|predictor", regex=True).all()
     assert guardrails["guardrail_id"].tolist() == ["LG-01", "LG-02", "LG-03", "LG-04", "LG-05"]
     assert guardrails["blocked_inputs"].str.contains("Sgh").any()
+
+
+def test_committed_approved_schema_coverage_matrix_preserves_roles_and_leakage() -> None:
+    project_root = Path(__file__).resolve().parents[1]
+    matrix = load_approved_schema_coverage_matrix(project_root)
+
+    expected_headers = {
+        "DEPTH",
+        "True Depth",
+        "Depth_ft",
+        "DEPT",
+        "Rho_b",
+        "RHOB",
+        "Density_gpcc",
+        "Phi_porosity",
+        "phi_den",
+        "DPHI",
+        "NMRPHI",
+        "phi_nmr",
+        "caliper",
+        "CAL1",
+        "differential caliper",
+        "Rt",
+        "RES",
+        "AO90",
+        "GR",
+        "Vs",
+        "VS1",
+        "Vp",
+        "VELP",
+        "Ratio Vp/Vs",
+        "impedance",
+        "Sgh",
+        "S_h",
+        "Sh",
+        "NMR_SAT",
+        "Hydrate Saturation",
+        "Swr",
+        "S_wr",
+        "interpreted phase labels",
+    }
+    expected_roles = {
+        "measured_input",
+        "derived_feature",
+        "qc_field",
+        "target_only",
+        "calibration_reference",
+        "context_feature",
+        "unresolved",
+    }
+
+    assert default_approved_schema_coverage_matrix_path(project_root).exists()
+    assert matrix.columns.tolist() == APPROVED_SCHEMA_COVERAGE_MATRIX_COLUMNS
+    assert expected_headers.issubset(set(matrix["original_header"]))
+    assert expected_roles.issubset(set(matrix["role"]))
+    assert {"well_name", "target_value", "raw_value"}.isdisjoint(matrix.columns)
+
+    target_rows = matrix[matrix["role"].isin(["target_only", "calibration_reference"])]
+    assert target_rows["leakage_risk"].eq("high").all()
+    assert target_rows["prohibited_use"].str.contains(
+        "predictor|feature matrix|input",
+        case=False,
+        regex=True,
+    ).all()
 
 
 def test_public_stability_product_runner_has_help() -> None:

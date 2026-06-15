@@ -139,6 +139,12 @@ out of the feature matrix, require whole-well splitting before model fitting,
 and block ad hoc occurrence labels from stability, resistivity alone, or final
 rankings.
 
+The broader non-stability schema coverage matrix now lives under
+`data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv`. It
+records measured inputs, derived features, QC/alignment fields, target-only
+fields, calibration/reference fields, context fields, and unresolved headers at
+schema level only. It is not a raw-data table and not a trained-model product.
+
 `stability_website_product_spec_2026-06-14.csv`
 
 This table defines the intended final website shape for the public stability

@@ -15,6 +15,7 @@ from dashboard.stability_sources import (
 
 
 PRODUCT_DIR_NAME = "public_stability_products"
+PUBLIC_ML_PRODUCTS_DIR_NAME = "public_ml_products"
 WELL_CONTEXT_FILE_NAME = "north_slope_well_stability_context_2026-06-14.csv"
 WELL_CONTEXT_SUMMARY_FILE_NAME = "north_slope_well_stability_context_summary_2026-06-14.csv"
 G10015_INVENTORY_FILE_NAME = "g10015_temperature_profile_inventory_2026-06-14.csv"
@@ -40,6 +41,9 @@ PUBLIC_ML_FEATURE_SCAFFOLD_SUMMARY_FILE_NAME = "public_ml_feature_scaffold_summa
 PUBLIC_ML_FEATURE_DICTIONARY_FILE_NAME = "public_ml_feature_dictionary_2026-06-15.csv"
 PUBLIC_ML_TARGET_REGISTRY_FILE_NAME = "public_ml_target_registry_2026-06-15.csv"
 PUBLIC_ML_LEAKAGE_GUARDRAILS_FILE_NAME = "public_ml_leakage_guardrails_2026-06-15.csv"
+APPROVED_SCHEMA_COVERAGE_MATRIX_FILE_NAME = (
+    "approved_schema_coverage_matrix_2026-06-15.csv"
+)
 PHASE_CURVE_FILE_NAME = "phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv"
 PHASE_CURVE_SCENARIO_CATALOG_FILE_NAME = "phase_curve_scenario_catalog_2026-06-14.csv"
 PHASE_CURVE_ID = "methane_5ppt_sir2008_csmhyd_digitized_v1"
@@ -390,6 +394,24 @@ PUBLIC_ML_LEAKAGE_GUARDRAIL_COLUMNS = [
     "implementation_status",
 ]
 
+APPROVED_SCHEMA_COVERAGE_MATRIX_COLUMNS = [
+    "source_reference",
+    "sheet_or_dataset_name",
+    "original_header",
+    "canonical_alias",
+    "role",
+    "feature_family",
+    "unit_status",
+    "required_for_model",
+    "available_in_current_subset",
+    "expected_in_future_71_dataset_collection",
+    "leakage_risk",
+    "allowed_use",
+    "prohibited_use",
+    "unresolved_question",
+    "notes",
+]
+
 WELL_CONTEXT_COLUMNS = [
     "object_id",
     "permit_number",
@@ -421,6 +443,10 @@ WELL_CONTEXT_COLUMNS = [
 
 def default_stability_products_dir(project_root: Path) -> Path:
     return project_root / "data" / PRODUCT_DIR_NAME
+
+
+def default_public_ml_products_dir(project_root: Path) -> Path:
+    return project_root / "data" / PUBLIC_ML_PRODUCTS_DIR_NAME
 
 
 def default_well_context_path(project_root: Path) -> Path:
@@ -501,6 +527,10 @@ def default_public_ml_target_registry_path(project_root: Path) -> Path:
 
 def default_public_ml_leakage_guardrails_path(project_root: Path) -> Path:
     return default_stability_products_dir(project_root) / PUBLIC_ML_LEAKAGE_GUARDRAILS_FILE_NAME
+
+
+def default_approved_schema_coverage_matrix_path(project_root: Path) -> Path:
+    return default_public_ml_products_dir(project_root) / APPROVED_SCHEMA_COVERAGE_MATRIX_FILE_NAME
 
 
 def default_phase_curve_path(project_root: Path) -> Path:
@@ -2559,6 +2589,13 @@ def load_public_ml_leakage_guardrails(project_root: Path) -> pd.DataFrame:
     path = default_public_ml_leakage_guardrails_path(project_root)
     if not path.exists():
         return pd.DataFrame(columns=PUBLIC_ML_LEAKAGE_GUARDRAIL_COLUMNS)
+    return pd.read_csv(path)
+
+
+def load_approved_schema_coverage_matrix(project_root: Path) -> pd.DataFrame:
+    path = default_approved_schema_coverage_matrix_path(project_root)
+    if not path.exists():
+        return pd.DataFrame(columns=APPROVED_SCHEMA_COVERAGE_MATRIX_COLUMNS)
     return pd.read_csv(path)
 
 

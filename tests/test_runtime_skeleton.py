@@ -128,6 +128,8 @@ def test_log_scaffold_renders_source_driven_runtime_readiness() -> None:
 
     assert not app.exception
     assert app.title[0].value == "Analyze Hydrates"
+    subheaders = [subheader.value for subheader in app.subheader]
+    assert "Schema Coverage & Architecture" in subheaders
     metric_labels = [metric.label for metric in app.metric]
     assert "Input status" in metric_labels
     assert "Ready outputs" in metric_labels

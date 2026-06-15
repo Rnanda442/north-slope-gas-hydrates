@@ -71,7 +71,7 @@ The public website must never load authorized runtime data.
 
 | Component | Main location | Current state | Next outcome |
 |---|---|---|---|
-| Public atlas | `dashboard/app.py` | Four-page Processing-style visual redesign implemented with legacy route aliases; Explore North Slope exposes the guarded stability screen, and Analyze Hydrates now includes Public ML Readiness, Target Registry & Leakage, and the synthetic ML visual architecture section | Polish visuals and keep public/synthetic data boundary verified during deployment |
+| Public atlas | `dashboard/app.py` | Four-page Processing-style visual redesign implemented with legacy route aliases; Explore North Slope exposes the guarded stability screen, and Analyze Hydrates now includes Public ML Readiness, Schema Coverage & Architecture, Target Registry & Leakage, and the synthetic ML visual architecture section | Polish visuals and keep public/synthetic data boundary verified during deployment |
 | Website entry point | `streamlit_app.py` | Public deployment verified | Keep the hosted app synchronized with `main` |
 | Synthetic well-log engine | `dashboard/well_log_engine.py` | Working scaffold | Align with Excel design |
 | Authorized runtime | `dashboard/runtime/` | Source-driven readiness and grouped-well split scaffold implemented | Complete workbook-derived input mapping and model evaluation |
@@ -80,6 +80,7 @@ The public website must never load authorized runtime data.
 | Manuscript | `docs/project_blueprints/` | Two drafts recovered; the local research-overview Word deliverable was rebuilt on 2026-06-13 from the science-to-ML ladder, baseline source ledger, source-backed parameter movements, screening-envelope language, target leakage rules, model ladder, and validation plan; a 2026-06-15 pipeline status and forward workflow Word brief now exists for mentor/project review | Review the pipeline brief and rebuilt local DOCX, then calibrate claims against workbook formulas, approved labels, and recoverable range provenance before any results-bearing revision |
 | Presentation | Current Drive baseline is the public-safe 2026-06-13 science-to-ML 9-slide raster-panel revision; the first 2026-06-15 stability/ML remake draft was rejected by user review as too disconnected from the whole project. The active local replacement is the diagram-first 9-slide draft at `docs/project_blueprints/FULL_WORKFLOW_ML_DIAGRAM_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`, generated from `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`; it preserves Gmail authority slides 1-2 and makes slide 3 the full connected project ML workflow map. | In progress | Review the diagram-first deck and Word companion, then decide whether to upload/replace the Drive deck while keeping Word and slides synchronized without unsupported results claims |
 | Mentor and deliverable communication | `docs/MENTOR_STATUS_UPDATE_DRAFT.md`, `docs/WEEKDAY_PROGRESS_REPORT_TEMPLATE.md`, `docs/DELIVERABLE_REFRESH_PLAN_STABILITY_AND_ML.md`, `docs/SLIDE_REMAKE_STORYBOARD_STABILITY_AND_ML.md`, `docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md`, `docs/PIPELINE_STATUS_AND_ML_WORKFLOW_BRIEF.md` | Drafted public-safe stability-screen status language, mentor questions, weekday reporting template, a diagram-first refresh plan, a superseded first slide storyboard, the new full project workflow map, and Word-ready status/diagram briefs | Review the full workflow map first, then use it as the anchor for Word, slides, and mentor explanation |
+| Approved-data schema and ML architecture | `docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`, `data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv` | New public-safe schema/methodology layer records expected approved-data header families, preserves original headers, separates measured inputs, derived features, QC/alignment fields, calibration/reference fields, target-only saturation fields, and unresolved fields, and defines a leakage-safe whole-well model architecture while only about 3 of 71 datasets are currently available | Use this plan as the non-stability ML readiness baseline before approved-runtime loading, training, metrics, or occurrence/saturation claims |
 | Excel design | Header screenshots recovered; workbook missing | Partial | Confirm formulas, units, and mnemonics from the workbook |
 | Source library | Index recovered; 2026-06-13 stability source bundle documented, uploaded locally in OpenScienceLab, connected to a Structural Explorer source panel, paired with a committed public snapshot fallback, extended with public Arctic Slope well-context, G10015 temperature-inventory, sampled G10015 profile points, stability input scaffold, guarded stability screen, public ML feature scaffold, target registry, and leakage guardrail products; the hydrate ML/physics intake also records downloaded OSTI PDFs, official source-page backups, Google Drive PDF references, and a needs-PDF manifest | In progress | Use OpenScienceLab as the heavy-data workbench, commit only derived public-safe stability products, digitize/georeference OM-222 if no ready GIS derivative is found, and continue recovering institution-accessible/public sources |
 | Git history | Connected and synchronized with GitHub | Complete | Preserve the normal commit-and-push workflow |
@@ -93,7 +94,7 @@ The public website must never load authorized runtime data.
 | W3 | Extract Excel requirements | In progress | Confirm the three-header-reference map against workbook formulas, units, tool mnemonics, and alignment logic; generated samples remain synthetic only | Full workbook recovery | Approved requirements map is complete |
 | W4 | Gap analysis | Waiting | Compare spreadsheet requirements with the current engine and runtime package | W3 | Missing and existing capabilities are listed |
 | W5 | Implement well-log scaffold | In progress | Runtime Readiness, source-derived QC, target contracts, and grouped-well split planning are implemented and exposed as the website `Log Scaffold` page; next add workbook-derived mapping and baseline evaluation | W3, W4 | Requirements are implemented with tests |
-| W6 | Website integration and QA | In progress | Four-page navigation, legacy aliases, Processing-style public/synthetic visual sections, consolidated Explore/Analyze/Project Plan pages, ML architecture sketches, stability snapshot fallback, public well stability-context metrics, G10015 temperature-inventory metrics, stability input scaffold, guarded screen visuals, Public ML Readiness, and Target Registry & Leakage are implemented; website work is limited to public delivery products from the OSL workbench | W5 for final workflow | Hosted deployment shows the four-page visual workflow with responsive QA and no data-boundary regression |
+| W6 | Website integration and QA | In progress | Four-page navigation, legacy aliases, Processing-style public/synthetic visual sections, consolidated Explore/Analyze/Project Plan pages, ML architecture sketches, stability snapshot fallback, public well stability-context metrics, G10015 temperature-inventory metrics, stability input scaffold, guarded screen visuals, Public ML Readiness, Schema Coverage & Architecture, and Target Registry & Leakage are implemented; website work is limited to public delivery products from the OSL workbench | W5 for final workflow | Hosted deployment shows the four-page visual workflow with responsive QA and no data-boundary regression |
 | W7 | Scientific alignment | Partial | Use `docs/SCIENCE_TO_ML_LOGIC_LADDER.md`, `docs/ML_PIPELINE_BASELINE_SOURCE_LEDGER.md`, and the stability calculation docs to reconcile hydrate habits, parameter tiers, parameter movement patterns, screening-envelope ranges, equations, guardrails, model options, and interpretation rules across code, manuscript, and presentation | W1, W3, W5 | No material scientific contradictions remain |
 | W8 | Git and project stabilization | Complete | Keep local `main` synchronized with `origin/main` and preserve focused commits | None | Clean history, remote, and documented workflow |
 | W9 | Authorized-data execution | Future | Configure approved runtime and run real-data validation only in the authorized environment | W5, authorization | Reproducible authorized outputs exist |
@@ -101,6 +102,7 @@ The public website must never load authorized runtime data.
 | W11 | Stability-screen communication | In progress | Use the mentor update, weekday template, deliverable refresh plan, and full workflow diagram to describe OpenScienceLab as the heavy-data workbench, GitHub/Streamlit as the public delivery surface, and the current stability workflow as an admissibility screen only | W7, W9, W10 | Mentor-facing language and refresh diagrams are approved without claiming hydrate proof, saturation, or sweet-spot ranking |
 | W12 | Public ML feature scaffold | Ready | `public_ml_feature_scaffold_2026-06-15.csv`, summary, dictionary, and the Analyze Hydrates Public ML Readiness panel now expose real public feature coverage while keeping occurrence/saturation labels unavailable | W7, W11 | Mentor can see which public features exist, which rows are constrained, and why no public row is training-ready yet |
 | W13 | Target registry and leakage barrier | Ready | `public_ml_target_registry_2026-06-15.csv`, `public_ml_leakage_guardrails_2026-06-15.csv`, and the Analyze Hydrates Target Registry & Leakage panel codify that saturation/ground-truth headers are target-only | W3, W7, W12 | Saturation and interpreted-label columns are visibly separated from input features before approved-data schema mapping begins |
+| W14 | Approved-data schema coverage and model architecture | Ready | `APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`, the public ML schema coverage matrix, and the Analyze Hydrates Schema Coverage & Architecture tab now show how the future approved workflow will map original headers to roles, block target leakage, and validate by whole well | W3, W7, W13 | Mentor can see a clear ML/schema/methodology contribution outside the stability screen, with no final training or metrics claimed |
 
 Status vocabulary: `Ready`, `In progress`, `Waiting`, `Blocked`, `Partial`,
 `Complete`, or `Future`.
@@ -131,7 +133,13 @@ replacement. Treat the earlier
 `docs/project_blueprints/STABILITY_ML_REMAKE_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`
 as superseded provenance unless the user explicitly asks to revive it. The
 project will prioritize scientific traceability and runtime readiness over
-adding disconnected pages or opaque classification features.
+adding disconnected pages or opaque classification features. For the
+non-stability ML layer, use
+`docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md` and
+`data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv` as
+the current schema-readiness baseline: only about 3 of 71 datasets are
+available, which supports architecture design but not final training or
+metrics.
 
 ### Priority 1: Confirm Inputs and Targets
 
@@ -182,9 +190,12 @@ and approved-data figures become available.
 4. Build the well-log requirements map.
 5. Perform the code-to-requirements gap analysis.
 6. Extend the implemented Runtime Readiness and grouped-well split scaffolds with workbook-derived rules and baseline models.
-7. Review the stability-screen communication drafts and reconcile open count,
+7. Use the approved-data schema coverage matrix to resolve target authority,
+   saturation units, sheet/source identity, and blind-validation wells before
+   final model training.
+8. Review the stability-screen communication drafts and reconcile open count,
    phase-curve, confidence-threshold, and approved-validation-field decisions.
-8. Review the 2026-06-15 pipeline status Word brief, the 2026-06-15
+9. Review the 2026-06-15 pipeline status Word brief, the 2026-06-15
    diagram-first workflow slide/Word companion, and the 2026-06-13
    local Word/PPT rebuild against
    `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md`,
@@ -194,11 +205,11 @@ and approved-data figures become available.
    `docs/deliverable_revision_base_2026_06_12/`, so source claims,
    hydrate-system framing, parameter tiers, baseline pipeline choices, ML
    explanation, format rules, and visual language stay synchronized.
-9. Keep the Word and PowerPoint deliverables synchronized as workbook formulas,
+10. Keep the Word and PowerPoint deliverables synchronized as workbook formulas,
    approved labels, and final figures become available.
-10. Polish and deploy the implemented four-page Processing-style website redesign.
-11. Run complete website visual QA.
-12. Keep the architecture tracker, tests, commits, and hosted deployment synchronized.
+11. Polish and deploy the implemented four-page Processing-style website redesign.
+12. Run complete website visual QA.
+13. Keep the architecture tracker, tests, commits, and hosted deployment synchronized.
 
 ## Key Decisions
 
@@ -218,6 +229,11 @@ and approved-data figures become available.
   option ledger for how the pipeline should treat inputs, feature engineering,
   parameter movement patterns, target leakage, guardrails, model choices,
   validation, and outputs.
+- `docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md` and the
+  public ML schema coverage matrix are the current non-stability ML/schema
+  readiness baseline. They support architecture design from visible headers and
+  screenshots, not final training, performance metrics, or hydrate prediction
+  claims.
 - Stability-screen communication must say stability-admissibility only. It
   must not claim hydrate proof, saturation, final stability results, or
   sweet-spot ranking before approved-data validation.
@@ -304,3 +320,4 @@ and approved-data figures become available.
 | 2026-06-15 | Generated the local stability/ML slide remake | Added a reproducible slide builder that preserves Gmail authority slides 1-2 by embedded-image hash, generated new full-slide raster panels for slides 3-9, rebuilt a separate local nine-slide PPTX, verified the PowerPoint structure, and visually checked the public/OSL bridge, stability-products status, readiness, and mentor-decision slides without claiming hydrate proof, saturation, sweet spots, or validated ML results |
 | 2026-06-15 | Drafted the pipeline status Word brief | Added a Word-ready Markdown source and reproducible DOCX that explain the current project status, public/OSL boundary, guarded stability-admissibility layer, source-backed evidence tiers, leakage-safe ML pipeline, open decisions, and path toward approved-data occurrence classification plus saturation regression |
 | 2026-06-15 | Replaced the slide direction with one full workflow map | User review rejected the first stability/ML remake as not representing the whole project. Added `docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md`, a full connected workflow PNG, a diagram-first nine-slide PPTX with slides 1-2 preserved and slide 3 as the main map, and a Word companion for explaining the public/OSL, stability, feature, leakage, occurrence, saturation, validation, and export path without unsupported result claims. Imported the replacement deck and Word companion to Google Drive as native Slides/Docs for review. |
+| 2026-06-15 | Added the approved-data schema coverage and model architecture layer | Created `docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`, `data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv`, and an Analyze Hydrates Schema Coverage & Architecture tab so the mentor can see a clear ML/schema/methodology contribution outside the stability screen. The layer uses the currently visible subset, about 3 of 71 datasets, for architecture design only and keeps target-only saturation fields out of the feature matrix. |

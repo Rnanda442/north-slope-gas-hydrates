@@ -33,6 +33,12 @@ stability-admissibility, not hydrate proof, saturation, or sweet-spot ranking.
 Next, I need to reconcile the public well-count label and confirm the official
 phase-curve baseline before the Word document and slide deck are refreshed.
 
+## 2026-06-15 Progress Line
+
+Built the public-safe ML schema and target-leakage architecture so the approved
+well-log workflow can separate measured inputs from saturation targets before
+model training.
+
 ## Language Guardrails
 
 - Say `stability-admissibility screen`, not final hydrate stability result.

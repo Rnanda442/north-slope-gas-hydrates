@@ -57,6 +57,24 @@ a guarded stability-screen writer. I am keeping the language conservative:
 this is a stability-admissibility screen only, not hydrate proof, saturation
 estimation, or sweet-spot ranking.
 
+## Outside-Stability ML/Schema Update
+
+Outside the stability screen, I have been building the ML data architecture
+needed for the approved well-log workflow. I organized the project headers into
+measured inputs, derived features, QC fields, calibration/reference fields, and
+target-only saturation fields; locked a leakage barrier so `Sgh`, `S_h`, `Sh`,
+`NMR_SAT`, hydrate-saturation fields, `Swr`, `S_wr`, and interpreted phase
+labels cannot enter the feature matrix; and designed a whole-well validation
+pipeline for future occurrence classification and saturation regression.
+Because only a subset of the expected 71 datasets is currently available, the
+work is framed as schema and model-architecture readiness rather than final
+training or performance reporting.
+
+Public-safe artifacts for this layer are now:
+
+- `docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`
+- `data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv`
+
 ## Mentor Questions For Future Decisions
 
 1. Should the official baseline remain 100% methane plus 5 ppt salinity?
@@ -72,6 +90,17 @@ estimation, or sweet-spot ranking.
    occurrence and saturation validation?
 7. For the final ML workflow, should occurrence classification and saturation
    regression be presented as two linked outputs?
+
+## Additional ML/Schema Mentor Questions
+
+1. Which of `Sgh`, `S_h`, `Sh`, or `NMR_SAT` should be treated as the
+   authoritative saturation target when multiple exist?
+2. Are saturation values fractions or percentages in each sheet?
+3. Should occurrence labels be derived from saturation thresholds, interpreted
+   phase labels, or mentor-reviewed intervals?
+4. Are `MTE`, `IGS`, `MTE_refined`, and `IGS_refined` separate wells, separate
+   processing stages, or separate source datasets?
+5. Which wells should be held out for blind validation?
 
 ## Internal Verification Notes
 

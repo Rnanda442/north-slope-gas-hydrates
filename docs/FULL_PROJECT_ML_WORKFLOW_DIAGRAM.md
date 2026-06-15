@@ -46,6 +46,13 @@ Word companion:
 docs/project_blueprints/North_Slope_Gas_Hydrate_Full_ML_Workflow_Diagram_2026-06-15.docx
 ```
 
+Approved-data schema architecture plan and matrix:
+
+```text
+docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md
+data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv
+```
+
 Reproducible builder:
 
 ```text
@@ -67,8 +74,11 @@ flowchart LR
         S1["Stability inputs<br/>depth basis<br/>hydrostatic pressure<br/>temperature model<br/>methane 5 ppt phase curve"]
         S2["Stability branch<br/>T_model <= T_eq(P_abs)<br/>calculated / no interval / blocked<br/>admissibility only"]
         A1["Approved inputs later<br/>LAS / CSV logs<br/>core and NMR<br/>workbook labels<br/>headers, units, mnemonics"]
-        F1["Preprocess and features<br/>unit normalization<br/>depth alignment<br/>caliper/QC/missingness<br/>measured logs and derived elastic features"]
-        L1["Target registry and leakage barrier<br/>S_h, Sgh, NMR_SAT, phase labels, and final ranks<br/>targets or validation only, not predictors"]
+        SC1["Schema coverage<br/>about 3 of 71 datasets available now<br/>headers/screenshots define expected field families"]
+        SC2["Role and unit controls<br/>measured inputs / derived features<br/>QC / calibration / unresolved fields"]
+        T1["Target-only saturation and phase fields<br/>Sgh, S_h, Sh, NMR_SAT<br/>Hydrate Saturation, Swr, S_wr, phase labels"]
+        L1["Target registry and leakage barrier<br/>target-only fields bypass feature matrix"]
+        F1["Feature matrix<br/>unit-normalized measured logs<br/>valid derived elastic features<br/>optional stability/context features only"]
         M1["Modeling path<br/>complete-well or compartment split<br/>train-only preprocessing<br/>physics/simple baselines<br/>tree or ANN after controls pass"]
         C1["Occurrence classifier<br/>probability and calibration"]
         R1["Saturation regressor<br/>S_h estimate and residual review"]
@@ -78,9 +88,14 @@ flowchart LR
     P1 --> S1
     S1 --> S2
     S2 --> F1
-    A1 --> F1
-    F1 --> L1
-    L1 --> M1
+    A1 --> SC1
+    SC1 --> SC2
+    SC2 --> L1
+    SC2 --> T1
+    L1 --> F1
+    T1 -. labels and validation overlays only .-> M1
+    T1 -. validation overlays only .-> O1
+    F1 --> M1
     M1 --> C1
     M1 --> R1
     C1 --> O1
@@ -106,6 +121,12 @@ The leakage barrier keeps answer-like fields outside the predictor table.
 `S_h`, `Sgh`, `NMR_SAT`, phase labels, interpreted saturation, and final ranks
 are targets, calibration references, validation overlays, or outputs unless
 proven to be independent measured inputs.
+
+The approved-data schema coverage step is a methodology contribution outside
+the stability screen. It uses the currently visible subset, about 3 of the
+expected 71 datasets, plus header screenshots to decide the pipeline structure:
+preserve original headers, assign roles, normalize units, keep QC/alignment
+fields separate, and route target-only fields around the feature matrix.
 
 The final ML workflow should show two linked outputs:
 
