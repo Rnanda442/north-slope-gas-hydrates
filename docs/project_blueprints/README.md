@@ -29,6 +29,21 @@ wireline machine-learning project.
   - The 2026-06-13 rebuild was imported to the connected Google Drive account
     as
     [SCIENCE-TO-ML North Slope Gas Hydrate Research Overview 2026-06-13](https://docs.google.com/document/d/1Ft0wgKV3p8HK1F7X4_WYVAp1jOtBYuCntdRP-Z84e5k).
+- `North_Slope_Gas_Hydrate_ML_Pipeline_Status_And_Forward_Workflow_2026-06-15.docx`
+  - Word-ready pipeline status brief generated from
+    `docs/PIPELINE_STATUS_AND_ML_WORKFLOW_BRIEF.md`.
+  - Explains where the project stands now, why the stability screen is an
+    admissibility layer, how the public GitHub/Streamlit surface and
+    OpenScienceLab workbench connect, and how the later approved-data ML
+    workflow should move from headers/units/QC into occurrence classification,
+    saturation regression, uncertainty, QC, mimic, and review outputs.
+  - Uses the current source-backed project base: `SCIENCE_TO_ML_LOGIC_LADDER`,
+    `ML_PIPELINE_BASELINE_SOURCE_LEDGER`, `STABILITY_CALCULATION_PLAN`,
+    `WELL_LOG_REQUIREMENTS_MAP`, `ML_CITATION_PACKET_FOR_DELIVERABLES`, and
+    the runtime skeleton brief.
+  - Public-safe planning brief only. It does not contain approved log/core
+    rows, trained model results, hydrate proof, saturation results, or
+    sweet-spot ranking.
 - `North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`
   - Prior tracked 9-slide visual companion deck rebuilt on 2026-06-11 from the latest
     Drive review feedback and imported to Drive as
@@ -111,6 +126,9 @@ wireline machine-learning project.
     overwrite the visual-first ML deck. The legacy PPTX helper remains in the
     file for reference, but the current deck should be rebuilt with
     `build_ml_revamp_powerpoint.py`.
+- `build_pipeline_status_word_brief.py`
+  - Reproducible builder for the 2026-06-15 pipeline status and forward
+    workflow Word brief.
 
 ## Direction
 

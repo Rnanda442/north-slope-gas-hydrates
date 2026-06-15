@@ -52,7 +52,10 @@ OpenScienceLab workbench, public GitHub/Streamlit delivery surface, and
 stability-admissibility guardrail aligned. The local 2026-06-15 slide-remake
 draft preserves the current Gmail deck's first two slides and rebuilds slides
 3-9 around the public/OSL workflow, guarded stability screen, readiness labels,
-and later approved-data ML path.
+and later approved-data ML path. The 2026-06-15 pipeline status Word brief is
+the current plain-language review draft for explaining where the project stands
+now and how the approved-data ML pipeline should reach occurrence
+classification and saturation regression.
 
 ## Current State
 
@@ -281,6 +284,9 @@ It must not load or expose authorized well-log or core data.
   update template
 - `docs/DELIVERABLE_REFRESH_PLAN_STABILITY_AND_ML.md`: planned Word and
   nine-slide deck refresh diagrams for the stability and future ML workflow
+- `docs/PIPELINE_STATUS_AND_ML_WORKFLOW_BRIEF.md`: Word-ready status and
+  forward workflow narrative for the current project position, stability
+  guardrail, source-backed evidence tiers, and future approved-data ML pipeline
 - `docs/PROJECT_IMPROVEMENT_STRATEGY.md`: principles and phased improvement
   strategy for keeping product changes aligned with the scientific goal
 - `docs/PROJECT_VISION_GOALS_AND_NEXT_STEPS.md`: email-derived project vision,
@@ -536,3 +542,7 @@ blockers, and next activities in the architecture/activity map.
   nine-slide deck, shifting the visual story toward public/OSL workflow,
   stability-screen readiness, data-confidence labels, and guarded future ML
   outputs.
+- 2026-06-15: Added a Word-ready pipeline status and forward workflow brief
+  explaining the current project status, public/runtime boundary, guarded
+  stability-admissibility layer, and leakage-safe ML path toward occurrence
+  classification and saturation regression.

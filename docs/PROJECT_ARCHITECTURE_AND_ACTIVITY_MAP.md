@@ -77,9 +77,9 @@ The public website must never load authorized runtime data.
 | Authorized runtime | `dashboard/runtime/` | Source-driven readiness and grouped-well split scaffold implemented | Complete workbook-derived input mapping and model evaluation |
 | Well-log tests | `tests/` | 23 project tests passing | Expand with workbook-derived unit, label, and alignment cases |
 | GIS pipeline | notebooks and `03_data_final/` | Recovered | Validate only when GIS changes are needed |
-| Manuscript | `docs/project_blueprints/` | Two drafts recovered; the local research-overview Word deliverable was rebuilt on 2026-06-13 from the science-to-ML ladder, baseline source ledger, source-backed parameter movements, screening-envelope language, target leakage rules, model ladder, and validation plan | Review the rebuilt local DOCX, then calibrate claims against workbook formulas, approved labels, and recoverable range provenance before any results-bearing revision |
+| Manuscript | `docs/project_blueprints/` | Two drafts recovered; the local research-overview Word deliverable was rebuilt on 2026-06-13 from the science-to-ML ladder, baseline source ledger, source-backed parameter movements, screening-envelope language, target leakage rules, model ladder, and validation plan; a 2026-06-15 pipeline status and forward workflow Word brief now exists for mentor/project review | Review the pipeline brief and rebuilt local DOCX, then calibrate claims against workbook formulas, approved labels, and recoverable range provenance before any results-bearing revision |
 | Presentation | Current Drive baseline is the public-safe 2026-06-13 science-to-ML 9-slide raster-panel revision; a separate local 2026-06-15 stability/ML remake draft now exists at `docs/project_blueprints/STABILITY_ML_REMAKE_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`, preserving Gmail authority slides 1-2 and regenerating slides 3-9 from `docs/project_blueprints/build_stability_ml_slide_remake.py` | In progress | Review the local stability/ML remake, decide whether to replace or adapt the Drive deck, then keep Word and slides synchronized without adding unsupported results claims |
-| Mentor and deliverable communication | `docs/MENTOR_STATUS_UPDATE_DRAFT.md`, `docs/WEEKDAY_PROGRESS_REPORT_TEMPLATE.md`, `docs/DELIVERABLE_REFRESH_PLAN_STABILITY_AND_ML.md`, `docs/SLIDE_REMAKE_STORYBOARD_STABILITY_AND_ML.md` | Drafted public-safe stability-screen status language, mentor questions, weekday reporting template, Word/PPT refresh diagrams, and a slide-by-slide visual remake storyboard | Review with mentor, then feed approved language and storyboard into the Word and slide builders |
+| Mentor and deliverable communication | `docs/MENTOR_STATUS_UPDATE_DRAFT.md`, `docs/WEEKDAY_PROGRESS_REPORT_TEMPLATE.md`, `docs/DELIVERABLE_REFRESH_PLAN_STABILITY_AND_ML.md`, `docs/SLIDE_REMAKE_STORYBOARD_STABILITY_AND_ML.md`, `docs/PIPELINE_STATUS_AND_ML_WORKFLOW_BRIEF.md` | Drafted public-safe stability-screen status language, mentor questions, weekday reporting template, Word/PPT refresh diagrams, a slide-by-slide visual remake storyboard, and a Word-ready pipeline status brief | Review with mentor, then feed approved language and storyboard into the Word and slide builders |
 | Excel design | Header screenshots recovered; workbook missing | Partial | Confirm formulas, units, and mnemonics from the workbook |
 | Source library | Index recovered; 2026-06-13 stability source bundle documented, uploaded locally in OpenScienceLab, connected to a Structural Explorer source panel, paired with a committed public snapshot fallback, extended with public Arctic Slope well-context, G10015 temperature-inventory, and stability input scaffold products; the hydrate ML/physics intake also records downloaded OSTI PDFs, official source-page backups, Google Drive PDF references, and a needs-PDF manifest | In progress | Use OpenScienceLab as the heavy-data workbench, commit only derived public-safe stability products, digitize/georeference OM-222 if no ready GIS derivative is found, and continue recovering institution-accessible/public sources |
 | Git history | Connected and synchronized with GitHub | Complete | Preserve the normal commit-and-push workflow |
@@ -119,6 +119,9 @@ stability-screen communication pass, use
 `docs/WEEKDAY_PROGRESS_REPORT_TEMPLATE.md`, and
 `docs/DELIVERABLE_REFRESH_PLAN_STABILITY_AND_ML.md` to keep the mentor update,
 weekday reporting, and planned Word/PPT refresh aligned. Use
+`docs/PIPELINE_STATUS_AND_ML_WORKFLOW_BRIEF.md` as the plain-language review
+base for where the project stands now and how the future approved-data ML
+pipeline reaches occurrence classification and saturation regression. Use
 `docs/SLIDE_REMAKE_STORYBOARD_STABILITY_AND_ML.md` and the local
 `docs/project_blueprints/STABILITY_ML_REMAKE_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`
 draft for the next slide-review pass before any Drive replacement. The project will
@@ -176,7 +179,8 @@ and approved-data figures become available.
 6. Extend the implemented Runtime Readiness and grouped-well split scaffolds with workbook-derived rules and baseline models.
 7. Review the stability-screen communication drafts and reconcile open count,
    phase-curve, confidence-threshold, and approved-validation-field decisions.
-8. Review the 2026-06-15 local stability/ML slide remake and the 2026-06-13
+8. Review the 2026-06-15 pipeline status Word brief, the 2026-06-15 local
+   stability/ML slide remake, and the 2026-06-13
    local Word/PPT rebuild against
    `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md`,
    `docs/SCIENCE_TO_ML_LOGIC_LADDER.md`,
@@ -293,3 +297,4 @@ and approved-data figures become available.
 | 2026-06-15 | Drafted stability-screen communication materials | Added mentor status language, future mentor questions, a weekday reporting template, and a Word/PPT refresh plan that frame OpenScienceLab as the heavy-data workbench, GitHub/Streamlit as the public delivery surface, and the current workflow as stability-admissibility only |
 | 2026-06-15 | Planned the creative slide remake | Inspected the current nine-slide Gmail deck, confirmed each slide is a full-slide raster panel, and added a slide-by-slide storyboard that shifts the deck from parameter cards to a clear public/OSL, stability-screen, readiness, and guarded-ML visual story |
 | 2026-06-15 | Generated the local stability/ML slide remake | Added a reproducible slide builder that preserves Gmail authority slides 1-2 by embedded-image hash, generated new full-slide raster panels for slides 3-9, rebuilt a separate local nine-slide PPTX, verified the PowerPoint structure, and visually checked the public/OSL bridge, stability-products status, readiness, and mentor-decision slides without claiming hydrate proof, saturation, sweet spots, or validated ML results |
+| 2026-06-15 | Drafted the pipeline status Word brief | Added a Word-ready Markdown source and reproducible DOCX that explain the current project status, public/OSL boundary, guarded stability-admissibility layer, source-backed evidence tiers, leakage-safe ML pipeline, open decisions, and path toward approved-data occurrence classification plus saturation regression |
