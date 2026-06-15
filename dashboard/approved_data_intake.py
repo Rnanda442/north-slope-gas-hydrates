@@ -13,6 +13,20 @@ APPROVED_DATA_INTAKE_VALIDATION_SCHEMA_FILE_NAME = (
     "approved_data_intake_validation_schema_2026-06-15.csv"
 )
 FIRST_MODEL_OUTPUT_SCHEMA_FILE_NAME = "first_model_output_schema_2026-06-15.csv"
+APPROVED_DATA_SOURCE_COLUMN_REGISTRY_TEMPLATE_FILE_NAME = (
+    "approved_data_source_column_registry_template_2026-06-15.csv"
+)
+APPROVED_DATA_WELL_DEPTH_INDEX_TEMPLATE_FILE_NAME = (
+    "approved_data_well_depth_index_template_2026-06-15.csv"
+)
+APPROVED_DATA_X_ALLOWED_CANDIDATE_TEMPLATE_FILE_NAME = (
+    "approved_data_x_allowed_candidate_template_2026-06-15.csv"
+)
+APPROVED_DATA_Y_TARGET_REGISTRY_TEMPLATE_FILE_NAME = (
+    "approved_data_y_target_registry_template_2026-06-15.csv"
+)
+FIRST_MODEL_OUTPUT_SCHEMA_TEMPLATE_FILE_NAME = "first_model_output_schema_template_2026-06-15.csv"
+VARIABLE_FINGERPRINT_TEMPLATE_FILE_NAME = "variable_fingerprint_template_2026-06-15.csv"
 
 EXPECTED_ROLES = {
     "predictor",
@@ -104,6 +118,22 @@ STABILITY_CONTEXT_ALIASES = {
     "stability_mask",
     "stability_admissibility_status",
 }
+CALIPER_ALIASES = {
+    "caliper",
+    "cal1",
+    "differential caliper",
+    "differential_caliper",
+}
+MISSING_LOG_ADAPTER_ALIASES = {
+    "missing-log adapter flag",
+    "missing_log_adapter_flag",
+    "vp missing-log adapter",
+    "vp_missing_log_adapter",
+    "rhob missing-log adapter",
+    "rhob_missing_log_adapter",
+}
+VP_ALIASES = {"vp", "velp", "compressional velocity", "compressional_velocity"}
+RHOB_ALIASES = {"rhob", "rho_b", "density_gpcc", "bulk density", "bulk_density"}
 
 
 def default_public_ml_products_dir(project_root: Path) -> Path:
@@ -124,6 +154,30 @@ def default_approved_data_intake_validation_schema_path(project_root: Path) -> P
 
 def default_first_model_output_schema_path(project_root: Path) -> Path:
     return default_public_ml_products_dir(project_root) / FIRST_MODEL_OUTPUT_SCHEMA_FILE_NAME
+
+
+def default_approved_data_source_column_registry_template_path(project_root: Path) -> Path:
+    return default_public_ml_products_dir(project_root) / APPROVED_DATA_SOURCE_COLUMN_REGISTRY_TEMPLATE_FILE_NAME
+
+
+def default_approved_data_well_depth_index_template_path(project_root: Path) -> Path:
+    return default_public_ml_products_dir(project_root) / APPROVED_DATA_WELL_DEPTH_INDEX_TEMPLATE_FILE_NAME
+
+
+def default_approved_data_x_allowed_candidate_template_path(project_root: Path) -> Path:
+    return default_public_ml_products_dir(project_root) / APPROVED_DATA_X_ALLOWED_CANDIDATE_TEMPLATE_FILE_NAME
+
+
+def default_approved_data_y_target_registry_template_path(project_root: Path) -> Path:
+    return default_public_ml_products_dir(project_root) / APPROVED_DATA_Y_TARGET_REGISTRY_TEMPLATE_FILE_NAME
+
+
+def default_first_model_output_schema_template_path(project_root: Path) -> Path:
+    return default_public_ml_products_dir(project_root) / FIRST_MODEL_OUTPUT_SCHEMA_TEMPLATE_FILE_NAME
+
+
+def default_variable_fingerprint_template_path(project_root: Path) -> Path:
+    return default_public_ml_products_dir(project_root) / VARIABLE_FINGERPRINT_TEMPLATE_FILE_NAME
 
 
 def normalize_header(header: object) -> str:
@@ -149,6 +203,12 @@ def load_approved_data_field_role_table(project_root: Path) -> pd.DataFrame:
         if column not in table.columns:
             table[column] = ""
     return table[FIELD_ROLE_COLUMNS]
+
+
+def load_field_role_table(project_root: Path) -> pd.DataFrame:
+    """Compatibility wrapper for the V5.1 intake contract naming."""
+
+    return load_approved_data_field_role_table(project_root)
 
 
 def load_public_ml_template(path: Path) -> pd.DataFrame:
@@ -230,6 +290,403 @@ def _saturation_rows(rows: pd.DataFrame) -> pd.DataFrame:
         names.str.contains("saturation")
         | headers.str.contains("sgh|s_h|^sh$|nmr_sat|hydrate saturation|swr|s_wr", regex=True)
     ].copy()
+
+
+def _role_headers(rows: pd.DataFrame, role: str) -> list[str]:
+    if rows.empty or "role" not in rows.columns:
+        return []
+    return rows.loc[rows["role"].eq(role), "source_column"].tolist()
+
+
+def _metadata_has(metadata: dict[str, object] | None, required_keys: Iterable[str]) -> bool:
+    if not metadata:
+        return False
+    normalized = {_compact_header(key): value for key, value in metadata.items()}
+    return all(bool(normalized.get(_compact_header(key))) for key in required_keys)
+
+
+def build_variable_fingerprints(field_role_table: pd.DataFrame) -> pd.DataFrame:
+    """Build public-safe per-header fingerprints from the field-role table."""
+
+    if field_role_table.empty:
+        return pd.DataFrame(
+            columns=[
+                "original_header",
+                "unit",
+                "normalized",
+                "normalized_name",
+                "role",
+                "allowed_in_feature_matrix",
+                "leakage_risk",
+                "unresolved_mentor_question",
+                "source_dataset",
+                "caveats",
+            ]
+        )
+
+    rows = []
+    for _, row in field_role_table.iterrows():
+        role = str(row.get("role", "")).strip()
+        original_header = str(row.get("original_header", "")).strip()
+        normalized_name = str(row.get("normalized_name", "")).strip()
+        unit = str(row.get("unit", "")).strip()
+        required_for_model = str(row.get("required_for_model", "")).strip()
+        caveats = str(row.get("caveats", "")).strip()
+        original_key = normalize_header(original_header)
+
+        target_like = role in {"target_only", "calibration_reference"}
+        unresolved_like = role == "unresolved" or "blocked_until" in required_for_model
+        depth_like = original_key in {normalize_header(alias) for alias in DEPTH_ALIASES}
+        stability_like = original_key in {normalize_header(alias) for alias in STABILITY_CONTEXT_ALIASES}
+
+        allowed_in_feature_matrix = role in {"predictor", "derived_feature", "QC", "context"}
+        if target_like or unresolved_like:
+            allowed_in_feature_matrix = False
+
+        leakage_risk = "high" if target_like else "medium" if unresolved_like else "low"
+        if stability_like:
+            leakage_risk = "low_when_context_only"
+        if depth_like:
+            leakage_risk = "mentor_review_if_used_as_predictor"
+
+        mentor_question = ""
+        caveat_text = f"{required_for_model} {caveats}".lower()
+        if unresolved_like:
+            mentor_question = "Resolve header meaning or processing stage before model use."
+        elif target_like:
+            mentor_question = "Confirm target authority, unit convention, and validation use."
+        elif depth_like:
+            mentor_question = "Confirm whether depth is alignment/context only or allowed as a predictor."
+        elif "caliper" in original_key:
+            mentor_question = "Confirm caliper coverage before washout filtering."
+
+        rows.append(
+            {
+                "original_header": original_header,
+                "unit": unit,
+                "normalized": bool(normalized_name),
+                "normalized_name": normalized_name,
+                "role": role,
+                "allowed_in_feature_matrix": allowed_in_feature_matrix,
+                "leakage_risk": leakage_risk,
+                "unresolved_mentor_question": mentor_question,
+                "source_dataset": row.get("source_dataset", ""),
+                "caveats": caveats,
+            }
+        )
+
+    return pd.DataFrame(rows)
+
+
+def classify_source_headers(headers: Iterable[str] | pd.DataFrame, field_role_table: pd.DataFrame) -> dict[str, object]:
+    source_headers = _headers_from_source(headers)
+    rows, unknown_headers = _field_rows_for_headers(source_headers, field_role_table)
+    unresolved_rows = rows[rows["role"].eq("unresolved")].copy() if not rows.empty else rows
+    calibration_rows = rows[rows["role"].eq("calibration_reference")].copy() if not rows.empty else rows
+
+    return {
+        "recognized_headers": rows,
+        "unknown_headers": unknown_headers,
+        "predictor_headers": _role_headers(rows, "predictor"),
+        "derived_feature_headers": _role_headers(rows, "derived_feature"),
+        "qc_headers": _role_headers(rows, "QC"),
+        "context_headers": _role_headers(rows, "context"),
+        "target_only_headers": _role_headers(rows, "target_only"),
+        "calibration_reference_headers": calibration_rows["source_column"].tolist() if not calibration_rows.empty else [],
+        "unresolved_headers": unresolved_rows["source_column"].tolist() if not unresolved_rows.empty else [],
+    }
+
+
+def validate_x_allowed(headers: Iterable[str] | pd.DataFrame, field_role_table: pd.DataFrame) -> dict[str, object]:
+    classification = classify_source_headers(headers, field_role_table)
+    rows: pd.DataFrame = classification["recognized_headers"]
+    blocked_rows = (
+        rows[rows["role"].isin(["target_only", "calibration_reference", "unresolved"])].copy()
+        if not rows.empty
+        else rows
+    )
+    leakage_rows = (
+        rows[rows["role"].isin(["target_only", "calibration_reference"])].copy()
+        if not rows.empty
+        else rows
+    )
+    stability_target_misuse = [
+        header
+        for header in classification["target_only_headers"]
+        if normalize_header(header) in {normalize_header(alias) for alias in STABILITY_CONTEXT_ALIASES}
+    ]
+    leakage_flags = []
+    leakage_flags.extend(f"target_only_in_x_allowed:{header}" for header in leakage_rows["source_column"].tolist())
+    leakage_flags.extend(f"stability_target_misuse:{header}" for header in stability_target_misuse)
+    leakage_flags.extend(f"unknown_x_allowed_header:{header}" for header in classification["unknown_headers"])
+    leakage_flags.extend(
+        f"unresolved_x_allowed_header:{header}" for header in classification["unresolved_headers"]
+    )
+
+    allowed_rows = (
+        rows[rows["role"].isin(["predictor", "derived_feature", "QC", "context"])].copy()
+        if not rows.empty
+        else rows
+    )
+    return {
+        "valid": not leakage_flags,
+        "allowed_headers": allowed_rows["source_column"].tolist() if not allowed_rows.empty else [],
+        "blocked_headers": blocked_rows["source_column"].tolist() if not blocked_rows.empty else [],
+        "unknown_headers": classification["unknown_headers"],
+        "leakage_flags": leakage_flags,
+    }
+
+
+def validate_target_only_separation(headers: Iterable[str] | pd.DataFrame, field_role_table: pd.DataFrame) -> dict[str, object]:
+    x_report = validate_x_allowed(headers, field_role_table)
+    target_like = [
+        flag.split(":", 1)[1]
+        for flag in x_report["leakage_flags"]
+        if flag.startswith("target_only_in_x_allowed:")
+    ]
+    return {
+        "valid": not target_like,
+        "target_only_fields_in_x_allowed": target_like,
+        "leakage_flags": x_report["leakage_flags"],
+    }
+
+
+def validate_minimum_predictor_coverage(headers: Iterable[str] | pd.DataFrame, field_role_table: pd.DataFrame) -> dict[str, object]:
+    source_headers = _headers_from_source(headers)
+    recognized, _unknown_headers = _field_rows_for_headers(source_headers, field_role_table)
+    header_keys = {normalize_header(column) for column in source_headers} | {
+        _compact_header(column) for column in source_headers
+    }
+    has_depth = _has_any(header_keys, DEPTH_ALIASES)
+    has_lithology = _has_any(header_keys, LITHOLOGY_ALIASES)
+    has_density_or_porosity = _has_any(header_keys, DENSITY_OR_POROSITY_ALIASES)
+    has_hydrate_response = _has_any(header_keys, HYDRATE_RESPONSE_ALIASES)
+    ready = has_depth and (has_lithology or has_density_or_porosity) and has_hydrate_response
+    missing_required_fields = []
+    if not has_depth:
+        missing_required_fields.append("depth_basis")
+    if not (has_lithology or has_density_or_porosity):
+        missing_required_fields.append("lithology_or_reservoir_curve")
+    if not has_hydrate_response:
+        missing_required_fields.append("hydrate_response_curve_family")
+
+    return {
+        "has_depth": has_depth,
+        "has_lithology_or_reservoir_curve": has_lithology or has_density_or_porosity,
+        "has_density_or_porosity_basis": has_density_or_porosity,
+        "has_hydrate_response_curve_family": has_hydrate_response,
+        "predictor_like_headers": int(recognized["role"].isin(["predictor", "derived_feature"]).sum())
+        if not recognized.empty
+        else 0,
+        "missing_required_fields": missing_required_fields,
+        "ready": ready,
+    }
+
+
+def validate_occurrence_target_authority(
+    headers: Iterable[str] | pd.DataFrame,
+    field_role_table: pd.DataFrame | dict[str, object] | None = None,
+    metadata: dict[str, object] | None = None,
+    project_root: Path | None = None,
+) -> dict[str, object]:
+    if isinstance(field_role_table, dict) and metadata is None:
+        metadata = field_role_table
+        field_role_table = None
+    if field_role_table is None:
+        if project_root is None:
+            project_root = Path(__file__).resolve().parents[1]
+        field_role_table = load_field_role_table(project_root)
+    rows, _unknown_headers = _field_rows_for_headers(_headers_from_source(headers), field_role_table)
+    occurrence_fields = _occurrence_rows(rows)["source_column"].tolist()
+    required_metadata = [
+        "occurrence_evidence_source",
+        "occurrence_confidence",
+        "occurrence_interval_policy",
+    ]
+    metadata_ready = _metadata_has(metadata, required_metadata)
+    return {
+        "target_fields": occurrence_fields,
+        "authority_present": bool(occurrence_fields) and metadata_ready,
+        "required_metadata": required_metadata,
+        "missing_metadata": []
+        if metadata_ready
+        else [key for key in required_metadata if not _metadata_has(metadata, [key])],
+        "blocked_reason": ""
+        if bool(occurrence_fields) and metadata_ready
+        else "occurrence_target_requires_source_confidence_interval_policy",
+    }
+
+
+def validate_saturation_target_authority(
+    headers: Iterable[str] | pd.DataFrame,
+    field_role_table: pd.DataFrame | dict[str, object] | None = None,
+    metadata: dict[str, object] | None = None,
+    project_root: Path | None = None,
+) -> dict[str, object]:
+    if isinstance(field_role_table, dict) and metadata is None:
+        metadata = field_role_table
+        field_role_table = None
+    if field_role_table is None:
+        if project_root is None:
+            project_root = Path(__file__).resolve().parents[1]
+        field_role_table = load_field_role_table(project_root)
+    rows, _unknown_headers = _field_rows_for_headers(_headers_from_source(headers), field_role_table)
+    saturation_fields = _saturation_rows(rows)["source_column"].tolist()
+    authoritative_field = str((metadata or {}).get("authoritative_saturation_field", "")).strip()
+    unit_convention = str((metadata or {}).get("saturation_unit_convention", "")).strip().lower()
+    authority_ready = authoritative_field in saturation_fields and unit_convention in {"fraction", "percent"}
+    return {
+        "target_fields": saturation_fields,
+        "authority_present": bool(saturation_fields) and authority_ready,
+        "authoritative_field": authoritative_field,
+        "unit_convention": unit_convention,
+        "blocked_reason": ""
+        if bool(saturation_fields) and authority_ready
+        else "saturation_target_requires_authoritative_field_and_fraction_or_percent_policy",
+    }
+
+
+def validate_caliper_gate(headers: Iterable[str] | pd.DataFrame) -> dict[str, object]:
+    header_keys = {normalize_header(column) for column in _headers_from_source(headers)} | {
+        _compact_header(column) for column in _headers_from_source(headers)
+    }
+    has_caliper = _has_any(header_keys, CALIPER_ALIASES)
+    return {
+        "has_caliper_coverage": has_caliper,
+        "washout_qc_filter_allowed": has_caliper,
+        "missing_qc_flag_required": not has_caliper,
+        "status": "caliper_coverage_available_for_washout_qc"
+        if has_caliper
+        else "caliper_missing_create_missing_qc_flag_not_filter",
+    }
+
+
+def validate_missing_log_strategy(
+    headers: Iterable[str] | pd.DataFrame,
+    allow_missing_log_adapters: bool = False,
+) -> dict[str, object]:
+    header_keys = {normalize_header(column) for column in _headers_from_source(headers)} | {
+        _compact_header(column) for column in _headers_from_source(headers)
+    }
+    has_vp = _has_any(header_keys, VP_ALIASES)
+    has_rhob = _has_any(header_keys, RHOB_ALIASES)
+    missing_optimal_logs = []
+    if not has_vp:
+        missing_optimal_logs.append("Vp")
+    if not has_rhob:
+        missing_optimal_logs.append("RHOB")
+    blocked_reasons = []
+    if missing_optimal_logs and not allow_missing_log_adapters:
+        blocked_reasons.append("missing_log_adapter_blocked_until_mentor_approval")
+    return {
+        "missing_optimal_logs": missing_optimal_logs,
+        "alternate_log_combinations_required": bool(missing_optimal_logs),
+        "missing_log_adapter_allowed": bool(missing_optimal_logs) and allow_missing_log_adapters,
+        "validation_required": bool(missing_optimal_logs) and allow_missing_log_adapters,
+        "blocked_reasons": blocked_reasons,
+    }
+
+
+def build_intake_readiness_report(
+    headers: Iterable[str] | pd.DataFrame,
+    field_role_table: pd.DataFrame,
+    options: dict[str, object] | None = None,
+) -> dict[str, object]:
+    options = options or {}
+    metadata = options.get("metadata")
+    source_headers = _headers_from_source(headers)
+    classification = classify_source_headers(source_headers, field_role_table)
+    x_allowed_headers = options.get("x_allowed_headers")
+    if x_allowed_headers is None:
+        x_allowed_headers = (
+            classification["predictor_headers"]
+            + classification["derived_feature_headers"]
+            + classification["qc_headers"]
+            + classification["context_headers"]
+        )
+    x_report = validate_x_allowed(x_allowed_headers, field_role_table)
+    target_report = validate_target_only_separation(x_allowed_headers, field_role_table)
+    coverage = validate_minimum_predictor_coverage(source_headers, field_role_table)
+    occurrence = validate_occurrence_target_authority(source_headers, field_role_table, metadata=metadata)
+    saturation = validate_saturation_target_authority(source_headers, field_role_table, metadata=metadata)
+    caliper = validate_caliper_gate(source_headers)
+    missing_logs = validate_missing_log_strategy(
+        source_headers,
+        allow_missing_log_adapters=bool(options.get("allow_missing_log_adapters", False)),
+    )
+
+    approved_rows_available = bool(options.get("approved_rows_available", False))
+    split_policy_confirmed = bool(options.get("split_policy_confirmed", False))
+    validation_plan_confirmed = bool(options.get("validation_plan_confirmed", False))
+    public_release_review_complete = bool(options.get("public_release_review_complete", False))
+
+    missing_required_fields = list(coverage["missing_required_fields"])
+    blocked_reasons = []
+    blocked_reasons.extend(f"missing_required_field:{field}" for field in missing_required_fields)
+    blocked_reasons.extend(f"unknown_header:{header}" for header in classification["unknown_headers"])
+    blocked_reasons.extend(f"unresolved_header:{header}" for header in classification["unresolved_headers"])
+    blocked_reasons.extend(x_report["leakage_flags"])
+    if classification["target_only_headers"] and not occurrence["authority_present"] and not saturation["authority_present"]:
+        blocked_reasons.append("target_authority_not_confirmed")
+    if occurrence["target_fields"] and not occurrence["authority_present"]:
+        blocked_reasons.append(occurrence["blocked_reason"])
+    if saturation["target_fields"] and not saturation["authority_present"]:
+        blocked_reasons.append(saturation["blocked_reason"])
+    if not approved_rows_available:
+        blocked_reasons.append("approved_rows_not_loaded_public_safe_validator")
+    if not split_policy_confirmed:
+        blocked_reasons.append("whole_well_compartment_or_geographic_split_policy_required")
+    if not validation_plan_confirmed:
+        blocked_reasons.append("validation_plan_required_before_training")
+    blocked_reasons.extend(missing_logs["blocked_reasons"])
+
+    mentor_questions = [
+        "Which saturation field is authoritative: Sgh, S_h, Sh, or NMR_SAT?",
+        "Should occurrence use source-style classes, saturation thresholds, or mentor-reviewed intervals?",
+        "Are MTE/IGS separate wells and are *_refined processing stages in the workbook?",
+        "Do we have enough caliper coverage to apply washout filtering?",
+        "Which wells become blind validation after full recovery?",
+        "Are missing-log adapters allowed, or should missing curves simply block that feature set?",
+    ]
+    if caliper["missing_qc_flag_required"]:
+        mentor_questions.append("Caliper is absent in this header set; should the runtime carry a missing-QC flag?")
+
+    ready_for_schema_design = bool(len(classification["recognized_headers"]))
+    ready_for_training = (
+        ready_for_schema_design
+        and bool(coverage["ready"])
+        and approved_rows_available
+        and split_policy_confirmed
+        and validation_plan_confirmed
+        and not x_report["leakage_flags"]
+        and not classification["unresolved_headers"]
+        and (occurrence["authority_present"] or saturation["authority_present"])
+        and not missing_logs["blocked_reasons"]
+    )
+    ready_for_public_release = ready_for_training and public_release_review_complete
+
+    return {
+        "recognized_headers": classification["recognized_headers"],
+        "unknown_headers": classification["unknown_headers"],
+        "predictor_headers": classification["predictor_headers"],
+        "derived_feature_headers": classification["derived_feature_headers"],
+        "qc_headers": classification["qc_headers"],
+        "context_headers": classification["context_headers"],
+        "target_only_headers": classification["target_only_headers"],
+        "unresolved_headers": classification["unresolved_headers"],
+        "leakage_flags": x_report["leakage_flags"],
+        "missing_required_fields": missing_required_fields,
+        "blocked_reasons": sorted(dict.fromkeys(blocked_reasons)),
+        "mentor_questions": mentor_questions,
+        "minimum_predictor_coverage": coverage,
+        "occurrence_target_authority": occurrence,
+        "saturation_target_authority": saturation,
+        "caliper_gate": caliper,
+        "missing_log_strategy": missing_logs,
+        "ready_for_schema_design": ready_for_schema_design,
+        "ready_for_training": ready_for_training,
+        "ready_for_public_release": ready_for_public_release,
+    }
 
 
 def validate_approved_data_intake(

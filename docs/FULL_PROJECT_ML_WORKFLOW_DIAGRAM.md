@@ -163,6 +163,54 @@ flowchart LR
     R1 --> O1
 ```
 
+## Current ML Architecture Decisions And Open Mentor Questions
+
+### A. Ready to encode now
+
+- Keep slide 3 as the readable V5 overview. V5.1 implementation details belong
+  in slide zoom-ins, the expanded poster, the Word companion, the website
+  readiness panel, and the intake-validator docs.
+- Train two linked outputs in the approved runtime: occurrence classification
+  and saturation regression. Stability remains context/admissibility only and
+  does not create either label.
+- Numeric predictors should get train-only 0-1 scaling after the split. Depth
+  remains the alignment/context axis unless mentor approves depth as an input
+  predictor. Units must remain visible beside original headers.
+- The variable fingerprint contract is now part of the runtime handoff:
+  original header, unit, normalized name, role, allowed-in-feature-matrix flag,
+  leakage risk, and unresolved mentor question.
+- Feature entry requires source, unit, QC, and leakage checks for measured
+  logs and derived features such as `GR` shale/clean-sand proxy, density
+  porosity, resistivity transforms, `Vp`, `Vs`, `Vp/Vs`, impedance, elastic
+  attributes, NMR-density separation, and equation-list features.
+- Caliper coverage comes first. If `caliper`, `CAL1`, or differential caliper
+  coverage is insufficient, use a missing-QC flag instead of applying a washout
+  filter.
+- Baselines come before tree/boosting models, and ANN/Keras comes after those
+  controls. Chong et al. 2024 / USGS supports ANN hydrate occurrence classes
+  and saturation prediction as an external ML pattern, not as North Slope model
+  performance: <https://pubs.usgs.gov/publication/70250169>.
+- Well-MTE is the Mt. Elbert Stratigraphic Test Well and Well-IGS is the Ignik
+  Sikumi Test Well; both are Eileen Gas Hydrate Trend case-study wells. Keep
+  `MTE_refined` and `IGS_refined` as blue workbook-stage questions until
+  metadata confirms them: <https://www.osti.gov/servlets/purl/1893637>.
+- Missing-log adapters for `Vp` or `RHOB` are optional and validation-required.
+  Naim et al. 2023 / MDPI supports the idea in marine hydrate settings, but it
+  does not automatically validate North Slope permafrost use:
+  <https://www.mdpi.com/1996-1073/16/23/7709>.
+
+### B. Blue mentor questions
+
+- Which saturation field is authoritative: `Sgh`, `S_h`, `Sh`, or `NMR_SAT`?
+- Should occurrence use source-style classes, saturation thresholds, or
+  mentor-reviewed intervals?
+- Are `MTE`/`IGS` separate wells and are `*_refined` processing stages in the
+  workbook?
+- Do we have enough caliper coverage to apply washout filtering?
+- Which wells become blind validation after full recovery?
+- Are missing-log adapters allowed, or should missing curves simply block that
+  feature set?
+
 ## How To Explain The Diagram
 
 The left side is now source and schema control rather than a public

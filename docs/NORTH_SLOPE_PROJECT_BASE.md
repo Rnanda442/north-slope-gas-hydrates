@@ -114,11 +114,66 @@ The public repo should not contain:
 - `data/public_ml_products/approved_data_intake_template_2026-06-15.csv`
 - `data/public_ml_products/approved_data_intake_validation_schema_2026-06-15.csv`
 - `data/public_ml_products/first_model_output_schema_2026-06-15.csv`
+- `data/public_ml_products/approved_data_source_column_registry_template_2026-06-15.csv`
+- `data/public_ml_products/approved_data_well_depth_index_template_2026-06-15.csv`
+- `data/public_ml_products/approved_data_x_allowed_candidate_template_2026-06-15.csv`
+- `data/public_ml_products/approved_data_y_target_registry_template_2026-06-15.csv`
+- `data/public_ml_products/first_model_output_schema_template_2026-06-15.csv`
+- `data/public_ml_products/variable_fingerprint_template_2026-06-15.csv`
 
 These are the active public-safe readiness artifacts after the V5 diagram
 package. They define and now test the field roles, approved-data intake
 contract, first model experiment shape, runtime templates, and mentor decisions
 without exposing approved rows or claiming occurrence/saturation results.
+
+## Current ML Architecture Decisions And Open Mentor Questions
+
+### A. Ready to encode now
+
+- The approved-runtime skeleton should train two linked but separate outputs:
+  occurrence classification and saturation regression.
+- Occurrence is target/validation evidence, not a stability-screen
+  measurement. Evidence may come from core/pressure-core observations,
+  NMR/core-derived saturation, validated log interpretation, or documented
+  seismic indicators.
+- Numeric predictors get train-only 0-1 scaling after the whole-well,
+  compartment, or geographic split. Depth remains the alignment/context axis
+  unless mentor approves it as a predictor. Units must stay visible above or
+  beside original headers.
+- Every variable must carry a fingerprint: original header, unit, normalized
+  name, role, allowed-in-feature-matrix flag, leakage risk, and unresolved
+  mentor question.
+- Caliper coverage comes first. Use `caliper`, `CAL1`, or differential caliper
+  for washout QC when coverage is sufficient; otherwise create a missing-QC
+  flag rather than filtering.
+- Candidate features include `GR` shale/clean-sand proxy, density porosity,
+  resistivity transforms, `Vp`, `Vs`, `Vp/Vs`, impedance, elastic attributes,
+  NMR-density separation, and equation-list features only after source, unit,
+  QC, and leakage checks pass.
+- Model order is baselines first, tree/boosting second, and ANN/Keras third.
+  Chong et al. 2024 / USGS is the external hydrate ML anchor for ANN occurrence
+  classes and saturation prediction:
+  <https://pubs.usgs.gov/publication/70250169>.
+- Well-MTE means Mt. Elbert Stratigraphic Test Well and Well-IGS means Ignik
+  Sikumi Test Well; both are Eileen Gas Hydrate Trend case-study wells. Keep
+  `MTE_refined` and `IGS_refined` as workbook-stage questions until metadata
+  confirms them: <https://www.osti.gov/servlets/purl/1893637>.
+- Missing-log adapters for `Vp` or `RHOB` remain optional and
+  validation-required. MDPI/Naim et al. supports the concept in marine hydrate
+  settings but not automatic North Slope permafrost transfer:
+  <https://www.mdpi.com/1996-1073/16/23/7709>.
+
+### B. Blue mentor questions
+
+- Which saturation field is authoritative: `Sgh`, `S_h`, `Sh`, or `NMR_SAT`?
+- Should occurrence use source-style classes, saturation thresholds, or
+  mentor-reviewed intervals?
+- Are `MTE`/`IGS` separate wells and are `*_refined` processing stages in the
+  workbook?
+- Do we have enough caliper coverage to apply washout filtering?
+- Which wells become blind validation after full recovery?
+- Are missing-log adapters allowed, or should missing curves simply block that
+  feature set?
 
 ### Other Word Drafts
 

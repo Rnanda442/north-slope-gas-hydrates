@@ -11,7 +11,7 @@ import plotly.graph_objects as go
 import streamlit as st
 import streamlit.components.v1 as components
 
-from dashboard.approved_data_intake import intake_validator_contract_frame
+from dashboard.approved_data_intake import build_variable_fingerprints, intake_validator_contract_frame
 from dashboard.processing_visuals import render_processing_sketch
 from dashboard.runtime.feature_engineering import add_standard_features
 from dashboard.runtime.schemas import (
@@ -167,6 +167,42 @@ FIRST_MODEL_OUTPUT_SCHEMA = (
     / "data"
     / "public_ml_products"
     / "first_model_output_schema_2026-06-15.csv"
+)
+APPROVED_DATA_SOURCE_COLUMN_REGISTRY_TEMPLATE = (
+    PROJECT_ROOT
+    / "data"
+    / "public_ml_products"
+    / "approved_data_source_column_registry_template_2026-06-15.csv"
+)
+APPROVED_DATA_WELL_DEPTH_INDEX_TEMPLATE = (
+    PROJECT_ROOT
+    / "data"
+    / "public_ml_products"
+    / "approved_data_well_depth_index_template_2026-06-15.csv"
+)
+APPROVED_DATA_X_ALLOWED_CANDIDATE_TEMPLATE = (
+    PROJECT_ROOT
+    / "data"
+    / "public_ml_products"
+    / "approved_data_x_allowed_candidate_template_2026-06-15.csv"
+)
+APPROVED_DATA_Y_TARGET_REGISTRY_TEMPLATE = (
+    PROJECT_ROOT
+    / "data"
+    / "public_ml_products"
+    / "approved_data_y_target_registry_template_2026-06-15.csv"
+)
+FIRST_MODEL_OUTPUT_SCHEMA_TEMPLATE = (
+    PROJECT_ROOT
+    / "data"
+    / "public_ml_products"
+    / "first_model_output_schema_template_2026-06-15.csv"
+)
+VARIABLE_FINGERPRINT_TEMPLATE = (
+    PROJECT_ROOT
+    / "data"
+    / "public_ml_products"
+    / "variable_fingerprint_template_2026-06-15.csv"
 )
 IGNORED_DIRS = {
     ".git",
@@ -4635,6 +4671,117 @@ def render_schema_coverage_architecture() -> None:
     st.dataframe(required_column_families, use_container_width=True, hide_index=True)
     st.dataframe(intake_validator_contract_frame(), use_container_width=True, hide_index=True)
 
+    st.markdown("##### Variable Fingerprint And Intake Validator")
+    st.caption(
+        "Every header gets a public-safe fingerprint before it can enter the "
+        "approved runtime: original name, unit, normalized name, role, feature "
+        "permission, leakage risk, and unresolved mentor question."
+    )
+    st.markdown(
+        """
+- **X_allowed rule:** measured logs, derived features, QC fields, and approved context only.
+- **Y-only target rule:** `Sgh`, `S_h`, `Sh`, `NMR_SAT`, Hydrate Saturation, `Swr`, phase labels, and occurrence labels never enter `X_allowed`.
+- **Caliper coverage first:** use caliper washout QC only when `caliper`, `CAL1`, or differential caliper coverage exists; otherwise carry a missing-QC flag.
+- **Missing-log adapter:** optional and validation-required for missing `Vp` or `RHOB`; default is blocked until mentor approval.
+- **Occurrence/saturation tasks:** occurrence classification and saturation regression are linked but separate tasks.
+"""
+    )
+    fingerprint_fields = pd.DataFrame(
+        [
+            {
+                "Fingerprint field": "original_header",
+                "Purpose": "Preserve the exact source header or mnemonic.",
+            },
+            {
+                "Fingerprint field": "unit",
+                "Purpose": "Keep units visible beside the source header and normalized name.",
+            },
+            {
+                "Fingerprint field": "normalized",
+                "Purpose": "Records whether a canonical project name exists.",
+            },
+            {
+                "Fingerprint field": "role",
+                "Purpose": "measured input, derived feature, QC, context, target, calibration, or unresolved.",
+            },
+            {
+                "Fingerprint field": "allowed_in_feature_matrix",
+                "Purpose": "True only for approved predictor, derived, QC, or context fields.",
+            },
+            {
+                "Fingerprint field": "leakage_risk",
+                "Purpose": "Flags target-only, calibration, unresolved, or depth-as-predictor risk.",
+            },
+            {
+                "Fingerprint field": "unresolved_mentor_question",
+                "Purpose": "Keeps blue/open questions visible before training.",
+            },
+        ]
+    )
+    st.dataframe(fingerprint_fields, use_container_width=True, hide_index=True)
+
+    if not field_roles.empty:
+        fingerprints = build_variable_fingerprints(field_roles)
+        field_role_counts = (
+            fingerprints["role"]
+            .fillna("unresolved")
+            .value_counts()
+            .rename_axis("role")
+            .reset_index(name="field_role_rows")
+        )
+        st.dataframe(field_role_counts, use_container_width=True, hide_index=True)
+        st.dataframe(
+            fingerprints[
+                [
+                    "original_header",
+                    "unit",
+                    "normalized_name",
+                    "role",
+                    "allowed_in_feature_matrix",
+                    "leakage_risk",
+                    "unresolved_mentor_question",
+                ]
+            ].head(30),
+            use_container_width=True,
+            hide_index=True,
+        )
+
+    validator_decisions = pd.DataFrame(
+        [
+            {
+                "Decision box": "X_allowed rule",
+                "Current rule": "Measured logs, derived features, QC fields, and approved context may enter X_allowed after fingerprint and unit checks.",
+                "Open point": "Depth stays the alignment/context axis unless mentor approves predictor use.",
+            },
+            {
+                "Decision box": "Y-only target rule",
+                "Current rule": "Sgh, S_h, Sh, NMR_SAT, Hydrate Saturation, Swr, phase labels, and occurrence labels never enter X_allowed.",
+                "Open point": "Mentor must choose official target authority and unit convention.",
+            },
+            {
+                "Decision box": "Caliper coverage first",
+                "Current rule": "Use caliper/CAL1/differential caliper for washout QC when coverage exists.",
+                "Open point": "If coverage is not enough, create a missing-QC flag instead of filtering rows.",
+            },
+            {
+                "Decision box": "Missing-log adapter",
+                "Current rule": "Default is blocked unless explicitly approved.",
+                "Open point": "Vp/RHOB adapter models are optional and validation-required for North Slope use.",
+            },
+            {
+                "Decision box": "Occurrence evidence",
+                "Current rule": "Occurrence is target/validation evidence from core, pressure-core, NMR/core-derived saturation, validated log interpretation, or documented seismic indicators.",
+                "Open point": "Stability does not measure occurrence.",
+            },
+            {
+                "Decision box": "Saturation task",
+                "Current rule": "Saturation regression is linked to but separate from occurrence classification.",
+                "Open point": "Choose authoritative saturation field and fraction/percent convention.",
+            },
+        ]
+    )
+    st.dataframe(validator_decisions, use_container_width=True, hide_index=True)
+
     template_specs = [
         (
             "Approved-data intake template",
@@ -4654,6 +4801,42 @@ def render_schema_coverage_architecture() -> None:
             "future occurrence, saturation, uncertainty, reason flag, and release fields",
             "download_first_model_output_schema",
         ),
+        (
+            "Source column registry template",
+            APPROVED_DATA_SOURCE_COLUMN_REGISTRY_TEMPLATE,
+            "header-level source registry with role, unit, dtype, and caveat columns",
+            "download_approved_data_source_column_registry_template",
+        ),
+        (
+            "Well-depth index template",
+            APPROVED_DATA_WELL_DEPTH_INDEX_TEMPLATE,
+            "runtime well/depth alignment, split group, and release-status columns",
+            "download_approved_data_well_depth_index_template",
+        ),
+        (
+            "X_allowed candidate template",
+            APPROVED_DATA_X_ALLOWED_CANDIDATE_TEMPLATE,
+            "predictor, derived-feature, QC, and context placeholders with no Y-only columns",
+            "download_approved_data_x_allowed_candidate_template",
+        ),
+        (
+            "Y target registry template",
+            APPROVED_DATA_Y_TARGET_REGISTRY_TEMPLATE,
+            "occurrence and saturation target authority, source evidence, and caveat columns",
+            "download_approved_data_y_target_registry_template",
+        ),
+        (
+            "First model output template",
+            FIRST_MODEL_OUTPUT_SCHEMA_TEMPLATE,
+            "future occurrence, saturation, uncertainty, reason flag, and release fields",
+            "download_first_model_output_schema_template",
+        ),
+        (
+            "Variable fingerprint template",
+            VARIABLE_FINGERPRINT_TEMPLATE,
+            "per-variable role, unit, leakage, feature-permission, and mentor-question fields",
+            "download_variable_fingerprint_template",
+        ),
     ]
     st.markdown("##### Public-safe runtime templates")
     st.dataframe(
@@ -4671,17 +4854,18 @@ def render_schema_coverage_architecture() -> None:
         use_container_width=True,
         hide_index=True,
     )
-    for column, (label, path, _purpose, key) in zip(st.columns(3), template_specs):
-        if path.exists():
-            column.download_button(
-                f"Download {label}",
-                path.read_bytes(),
-                path.name,
-                "text/csv",
-                key=key,
-            )
-        else:
-            column.button(f"Download {label}", disabled=True, key=f"{key}_missing")
+    for offset in range(0, len(template_specs), 3):
+        for column, (label, path, _purpose, key) in zip(st.columns(3), template_specs[offset : offset + 3]):
+            if path.exists():
+                column.download_button(
+                    f"Download {label}",
+                    path.read_bytes(),
+                    path.name,
+                    "text/csv",
+                    key=key,
+                )
+            else:
+                column.button(f"Download {label}", disabled=True, key=f"{key}_missing")
 
     role_counts = (
         matrix["role"]

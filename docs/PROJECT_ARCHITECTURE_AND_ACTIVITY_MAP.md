@@ -67,6 +67,52 @@ flowchart TD
 
 The public website must never load authorized runtime data.
 
+## Current ML Architecture Decisions And Open Mentor Questions
+
+### A. Ready to encode now
+
+- The approved-runtime skeleton now treats hydrate occurrence classification
+  and saturation regression as linked but separate outputs.
+- Occurrence is target/validation evidence from approved sources such as
+  core/pressure-core observations, NMR/core-derived saturation, validated log
+  interpretation, or documented seismic indicators. Stability is context only.
+- Numeric predictors get train-only 0-1 scaling after a whole-well,
+  compartment, or geographic split. Depth stays the alignment/context axis
+  unless mentor approves predictor use. Units remain visible beside original
+  headers.
+- Every source variable gets a fingerprint: original header, unit, normalized
+  name, role, feature-matrix permission, leakage risk, and unresolved mentor
+  question.
+- Caliper coverage is checked before washout filtering. Missing caliper creates
+  a missing-QC flag rather than an automatic filter.
+- Candidate features include `GR`, density porosity, resistivity transforms,
+  `Vp`, `Vs`, `Vp/Vs`, impedance, elastic attributes, NMR-density separation,
+  and equation-list features only after source, unit, QC, and leakage checks.
+- Model order is baselines first, tree/boosting second, and ANN/Keras third.
+  Chong et al. 2024 / USGS is the external hydrate ML anchor for occurrence
+  classes and saturation prediction:
+  <https://pubs.usgs.gov/publication/70250169>.
+- Well-MTE is the Mt. Elbert Stratigraphic Test Well and Well-IGS is the Ignik
+  Sikumi Test Well; both are Eileen Gas Hydrate Trend case-study wells. Keep
+  `MTE_refined` and `IGS_refined` as blue questions until workbook metadata
+  confirms raw/refined stages: <https://www.osti.gov/servlets/purl/1893637>.
+- Missing-log adapters for `Vp` or `RHOB` are optional and validation-required.
+  The MDPI/Naim et al. marine hydrate result supports the idea but not
+  automatic North Slope transfer:
+  <https://www.mdpi.com/1996-1073/16/23/7709>.
+
+### B. Blue mentor questions
+
+- Which saturation field is authoritative: `Sgh`, `S_h`, `Sh`, or `NMR_SAT`?
+- Should occurrence use source-style classes, saturation thresholds, or
+  mentor-reviewed intervals?
+- Are `MTE`/`IGS` separate wells and are `*_refined` processing stages in the
+  workbook?
+- Do we have enough caliper coverage to apply washout filtering?
+- Which wells become blind validation after full recovery?
+- Are missing-log adapters allowed, or should missing curves simply block that
+  feature set?
+
 ## Component Map
 
 | Component | Main location | Current state | Next outcome |
@@ -80,7 +126,7 @@ The public website must never load authorized runtime data.
 | Manuscript | `docs/project_blueprints/` | Two drafts recovered; the local research-overview Word deliverable was rebuilt on 2026-06-13 from the science-to-ML ladder, baseline source ledger, source-backed parameter movements, screening-envelope language, target leakage rules, model ladder, and validation plan; a 2026-06-15 pipeline status and forward workflow Word brief now exists for mentor/project review | Review the pipeline brief and rebuilt local DOCX, then calibrate claims against workbook formulas, approved labels, and recoverable range provenance before any results-bearing revision |
 | Presentation | Current Drive baseline is the public-safe 2026-06-13 science-to-ML 9-slide raster-panel revision. The first 2026-06-15 stability/ML remake draft was rejected as disconnected. The targeted Gmail-style final-presentation track remains `docs/project_blueprints/North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`, rebuilt from `docs/project_blueprints/build_ml_revamp_powerpoint.py`. The active V5 workflow package for mentor review is `docs/project_blueprints/FULL_WORKFLOW_ML_DIAGRAM_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`, regenerated from `docs/project_blueprints/build_full_workflow_diagram_deliverables.py` with slide 3 as the readable overview and slides 4-9 as detail zooms. | In progress | Review the V5 workflow package for mentor communication and keep it separate from any later Gmail-style final-presentation replacement |
 | Mentor and deliverable communication | `docs/MENTOR_STATUS_UPDATE_DRAFT.md`, `docs/WEEKDAY_PROGRESS_REPORT_TEMPLATE.md`, `docs/MENTOR_PROJECT_STATUS_PACKAGE_V5_WORKFLOW_2026-06-15.md`, `docs/DELIVERABLE_REFRESH_PLAN_STABILITY_AND_ML.md`, `docs/SLIDE_REMAKE_STORYBOARD_STABILITY_AND_ML.md`, `docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md`, `docs/PIPELINE_STATUS_AND_ML_WORKFLOW_BRIEF.md` | Drafted public-safe stability-screen status language, mentor questions, weekday reporting template, a diagram-first refresh plan, a superseded first slide storyboard, the full project workflow map, Word-ready status/diagram briefs, and a compact V5 mentor status package. The current V5 completion pass now separates the slide-sized workflow summary, detailed expanded poster-scale architecture map, and ML runtime detail while carrying source counts, stability equations, feature/QC/context families, target-only labels, validation controls, public-safe output rules, and mentor decisions. | Review the revised V5 workflow visuals and mentor package first, then use them as the anchor for Word, slides, and mentor explanation |
-| Approved-data schema and ML architecture | `dashboard/approved_data_intake.py`, `docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`, `data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv`, `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`, `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`, `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md` | Public-safe methodology layer records expected approved-data header families, preserves original headers, separates measured inputs, derived features, QC/alignment fields, calibration/reference fields, target-only saturation fields, and unresolved fields, and now includes a tested metadata-only intake validator plus schema-only runtime templates while only about 3 of 71 datasets are visible for schema design | Use this plan and validator as the non-stability ML readiness baseline before approved-runtime loading, training, metrics, or occurrence/saturation claims |
+| Approved-data schema and ML architecture | `dashboard/approved_data_intake.py`, `docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`, `data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv`, `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`, `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`, `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md` | Public-safe methodology layer records expected approved-data header families, preserves original headers, separates measured inputs, derived features, QC/alignment fields, calibration/reference fields, target-only saturation fields, and unresolved fields, and now includes V5.1 variable fingerprints, explicit intake readiness functions, synthetic tests, and schema-only runtime templates while only about 3 of 71 datasets are visible for schema design | Use this plan and validator as the non-stability ML readiness baseline before approved-runtime loading, training, metrics, or occurrence/saturation claims |
 | Excel design | Header screenshots recovered; workbook missing | Partial | Confirm formulas, units, and mnemonics from the workbook |
 | Source library | Index recovered; 2026-06-13 stability source bundle documented, uploaded locally in OpenScienceLab, connected to a Structural Explorer source panel, paired with a committed public snapshot fallback, extended with public Arctic Slope well-context, G10015 temperature-inventory, sampled G10015 profile points, stability input scaffold, guarded stability screen, public ML feature scaffold, target registry, and leakage guardrail products; the hydrate ML/physics intake also records downloaded OSTI PDFs, official source-page backups, Google Drive PDF references, and a needs-PDF manifest | In progress | Use OpenScienceLab as the heavy-data workbench, commit only derived public-safe stability products, digitize/georeference OM-222 if no ready GIS derivative is found, and continue recovering institution-accessible/public sources |
 | Git history | Connected and synchronized with GitHub | Complete | Preserve the normal commit-and-push workflow |
@@ -102,7 +148,7 @@ The public website must never load authorized runtime data.
 | W11 | Stability-screen communication | In progress | Use the mentor update, weekday template, V5 mentor status package, deliverable refresh plan, and completed V5 workflow package to describe OpenScienceLab as the heavy-data workbench, GitHub/Streamlit as the public delivery surface, and the current stability workflow as an admissibility screen only | W7, W9, W10 | Mentor-facing language and refresh diagrams are approved without claiming hydrate proof, saturation, or sweet-spot ranking |
 | W12 | Public ML feature scaffold | Ready | `public_ml_feature_scaffold_2026-06-15.csv`, summary, dictionary, and the Analyze Hydrates Public ML Readiness panel now expose real public feature coverage while keeping occurrence/saturation labels unavailable | W7, W11 | Mentor can see which public features exist, which rows are constrained, and why no public row is training-ready yet |
 | W13 | Target registry and leakage barrier | Ready | `public_ml_target_registry_2026-06-15.csv`, `public_ml_leakage_guardrails_2026-06-15.csv`, and the Analyze Hydrates Target Registry & Leakage panel codify that saturation/ground-truth headers are target-only | W3, W7, W12 | Saturation and interpreted-label columns are visibly separated from input features before approved-data schema mapping begins |
-| W14 | Approved-data schema coverage and model architecture | Ready | `APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`, the public ML schema coverage matrix, the field-role table, the minimum intake spec, the first model experiment plan, `dashboard/approved_data_intake.py`, synthetic validator tests, public-safe runtime templates, and the Analyze Hydrates Schema Coverage & Architecture tab now show how the future approved workflow will map original headers to roles, block target leakage, separate occurrence classification from saturation regression, and validate by whole well before training | W3, W7, W13 | Mentor can see a tested ML/schema/intake contribution outside the stability screen, with no final training or metrics claimed |
+| W14 | Approved-data schema coverage and model architecture | Ready | `APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`, the public ML schema coverage matrix, the field-role table, the minimum intake spec, the first model experiment plan, `dashboard/approved_data_intake.py`, synthetic validator tests, public-safe runtime templates, and the Analyze Hydrates Schema Coverage & Architecture tab now show the variable-fingerprint contract, X_allowed/Y-only separation, caliper-first QC, missing-log adapter decision, separate occurrence/saturation tasks, and validation-before-training rules | W3, W7, W13 | Mentor can see a tested ML/schema/intake contribution outside the stability screen, with no final training or metrics claimed |
 
 Status vocabulary: `Ready`, `In progress`, `Waiting`, `Blocked`, `Partial`,
 `Complete`, or `Future`.
@@ -353,3 +399,4 @@ and approved-data figures become available.
 | 2026-06-15 | Imported the V5 completion package to Drive | Created native Google Slides and Docs copies named with `V5 COMPLETION`, verified Drive metadata, checked representative imported slide thumbnails, and read back the Google Doc structure so the mentor-facing package can be reviewed outside the repo. |
 | 2026-06-15 | Added the approved-data intake and first model planning layer | Created a public-safe field-role table, minimum approved-data intake spec, first model experiment plan, mentor decision request packet, and Schema Coverage website readiness tables. The package separates occurrence classification from saturation regression, keeps target labels out of `X_allowed`, and does not expose approved rows or claim trained ML results. |
 | 2026-06-15 | Operationalized the approved-data intake contract | Added `dashboard/approved_data_intake.py`, synthetic validator tests, schema-only intake and output templates, and Schema Coverage website downloads so future approved-runtime builders can see required columns, predictor versus target roles, blocked reasons, template outputs, and leakage controls without exposing approved rows. |
+| 2026-06-15 | Added the V5.1 variable-fingerprint skeleton | Added explicit variable-fingerprint logic, intake readiness functions, caliper and missing-log decision checks, public-safe template files, Schema Coverage decision boxes, and source-backed mentor questions while preserving the V5 diagram package and avoiding approved-data rows or model-result claims. |

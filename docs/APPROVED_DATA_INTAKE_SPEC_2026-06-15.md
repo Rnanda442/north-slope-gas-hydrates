@@ -31,6 +31,52 @@ Public GitHub and Streamlit must not show:
 - occurrence probabilities, saturation predictions, or sweet-spot rankings from
   approved data.
 
+## Current ML Architecture Decisions And Open Mentor Questions
+
+### A. Ready to encode now
+
+- Train two linked but separate outputs: occurrence classification and
+  saturation regression. Occurrence is a target/validation label, not something
+  measured by the stability screen.
+- Use train-only 0-1 scaling for numeric predictors after the validation split.
+  Depth stays the well/depth alignment and context axis, not automatically a
+  normalized predictor. Units must stay visible beside original headers.
+- Use a variable fingerprint before model entry: original header, unit,
+  normalized name, role, allowed-in-feature-matrix flag, leakage risk, and any
+  unresolved mentor question.
+- Apply caliper coverage first. If enough `caliper`, `CAL1`, or differential
+  caliper exists, use it for washout QC; otherwise create a missing-QC flag,
+  not an automatic filter.
+- Allow measured and derived features only after fingerprint, unit, leakage,
+  and source checks: `GR`, density porosity, resistivity transforms, `Vp`,
+  `Vs`, `Vp/Vs`, impedance, elastic attributes, NMR-density separation, and
+  equation-list features.
+- Model order is baselines first, tree/boosting second, and ANN/Keras third.
+  Chong et al. 2024 supports ANN-style hydrate occurrence classes and
+  saturation prediction as an external ML anchor:
+  <https://pubs.usgs.gov/publication/70250169>.
+- Treat Well-MTE as the Mt. Elbert Stratigraphic Test Well and Well-IGS as the
+  Ignik Sikumi Test Well, both North Slope / Eileen Gas Hydrate Trend case
+  study wells. Keep `MTE_refined` and `IGS_refined` as workbook-structure
+  questions until metadata confirms raw/refined stages:
+  <https://www.osti.gov/servlets/purl/1893637>.
+- Keep missing-log adapters as optional and validation-required. The MDPI
+  missing `Vp`/`RHOB` work is relevant background, but it does not automatically
+  validate North Slope permafrost use:
+  <https://www.mdpi.com/1996-1073/16/23/7709>.
+
+### B. Blue mentor questions
+
+- Which saturation field is authoritative: `Sgh`, `S_h`, `Sh`, or `NMR_SAT`?
+- Should occurrence use source-style classes, saturation thresholds, or
+  mentor-reviewed intervals?
+- Are `MTE`/`IGS` separate wells and are `*_refined` processing stages in the
+  workbook?
+- Do we have enough caliper coverage to apply washout filtering?
+- Which wells become blind validation after full recovery?
+- Are missing-log adapters allowed, or should missing curves simply block that
+  feature set?
+
 ## Field Role Table
 
 The public-safe field-role table is:
@@ -180,6 +226,12 @@ runtime:
 data/public_ml_products/approved_data_intake_template_2026-06-15.csv
 data/public_ml_products/approved_data_intake_validation_schema_2026-06-15.csv
 data/public_ml_products/first_model_output_schema_2026-06-15.csv
+data/public_ml_products/approved_data_source_column_registry_template_2026-06-15.csv
+data/public_ml_products/approved_data_well_depth_index_template_2026-06-15.csv
+data/public_ml_products/approved_data_x_allowed_candidate_template_2026-06-15.csv
+data/public_ml_products/approved_data_y_target_registry_template_2026-06-15.csv
+data/public_ml_products/first_model_output_schema_template_2026-06-15.csv
+data/public_ml_products/variable_fingerprint_template_2026-06-15.csv
 ```
 
 These templates define expected table columns, validation checks, blocked

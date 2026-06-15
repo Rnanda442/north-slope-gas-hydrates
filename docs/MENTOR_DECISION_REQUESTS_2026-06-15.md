@@ -45,6 +45,50 @@ interpretation, or documented seismic indicators. Each label needs a source,
 well/depth interval, confidence flag, and caveat before it can train or validate
 an occurrence classifier.
 
+Chong et al. 2024 / USGS is useful as an external ML anchor because it uses ANN
+models for hydrate occurrence classes and saturation prediction, but it is not
+North Slope field truth: <https://pubs.usgs.gov/publication/70250169>.
+
+## Current ML Architecture Decisions And Open Mentor Questions
+
+### A. Ready to encode now
+
+- The first model skeleton should keep occurrence classification and saturation
+  regression as linked but separate tasks.
+- Numeric predictors should be scaled 0-1 using train-only statistics after a
+  whole-well, compartment, or geographic split. Depth remains the
+  alignment/context axis unless approved as a predictor.
+- Every variable should carry a fingerprint: original header, unit, normalized
+  name, role, allowed-in-feature-matrix status, leakage risk, and unresolved
+  mentor question.
+- `GR`, density porosity, resistivity transforms, `Vp`, `Vs`, `Vp/Vs`,
+  impedance, elastic attributes, NMR-density separation, and equation-list
+  features can be candidate features only after source, unit, QC, and leakage
+  checks pass.
+- Caliper coverage should be checked before any washout filtering. Missing
+  caliper should create a missing-QC flag, not silent filtering.
+- Model progression should be baselines first, tree/boosting second, and
+  ANN/Keras third.
+- Well-MTE means Mt. Elbert Stratigraphic Test Well and Well-IGS means Ignik
+  Sikumi Test Well; both are North Slope / Eileen Gas Hydrate Trend case-study
+  wells. `MTE_refined` and `IGS_refined` stay open until workbook metadata
+  confirms processing stages: <https://www.osti.gov/servlets/purl/1893637>.
+- Missing-log adapters for `Vp` or `RHOB` are optional and validation-required;
+  the marine hydrate MDPI example supports the concept but not automatic North
+  Slope transfer: <https://www.mdpi.com/1996-1073/16/23/7709>.
+
+### B. Blue mentor questions
+
+- Which saturation field is authoritative: `Sgh`, `S_h`, `Sh`, or `NMR_SAT`?
+- Should occurrence use source-style classes, saturation thresholds, or
+  mentor-reviewed intervals?
+- Are `MTE`/`IGS` separate wells and are `*_refined` processing stages in the
+  workbook?
+- Do we have enough caliper coverage to apply washout filtering?
+- Which wells become blind validation after full recovery?
+- Are missing-log adapters allowed, or should missing curves simply block that
+  feature set?
+
 ## Decisions Needed
 
 1. Phase-curve policy: should official public stability remain methane 5 ppt

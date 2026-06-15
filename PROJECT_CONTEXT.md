@@ -81,7 +81,10 @@ The intake contract is now operationalized in
 `tests/test_approved_data_intake.py` and schema-only public templates under
 `data/public_ml_products/approved_data_intake_template_2026-06-15.csv`,
 `approved_data_intake_validation_schema_2026-06-15.csv`, and
-`first_model_output_schema_2026-06-15.csv`.
+`first_model_output_schema_2026-06-15.csv`. The V5.1 skeleton adds explicit
+variable-fingerprint templates, source-column registry, well-depth index,
+`X_allowed`, `Y_target_registry`, and first-output schema templates under the
+same public-safe folder.
 
 The active workflow-diagram package is now the V5 completion pass under
 `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/`.
@@ -94,6 +97,45 @@ site points to these under Analyze Hydrates > Schema Coverage & Architecture,
 and the V5 PPTX plus Word companion are regenerated from
 `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`. Do not
 reopen OSL unless a source/product rebuild is actually needed.
+
+## Current ML Architecture Decisions And Open Mentor Questions
+
+### A. Ready to encode now
+
+- Keep occurrence classification and saturation regression linked but separate.
+- Occurrence is target/validation evidence from approved sources, not stability
+  proof. Stability remains methane 5 ppt admissibility/context only.
+- Numeric predictors use train-only 0-1 scaling after a whole-well,
+  compartment, or geographic split. Depth is the alignment/context axis unless
+  mentor approves predictor use, and units stay visible with original headers.
+- Every variable needs a fingerprint: original header, unit, normalized name,
+  role, feature-matrix permission, leakage risk, and unresolved mentor question.
+- Caliper coverage is checked before washout filtering. Missing caliper creates
+  a missing-QC flag rather than automatic row filtering.
+- Candidate features are allowed only after source, unit, QC, and leakage
+  checks: `GR`, density porosity, resistivity transforms, `Vp`, `Vs`, `Vp/Vs`,
+  impedance, elastic attributes, NMR-density separation, and equation features.
+- Model order is baselines first, tree/boosting second, ANN/Keras third.
+  Chong et al. 2024 / USGS is an external hydrate ML anchor for occurrence
+  classes and saturation prediction: <https://pubs.usgs.gov/publication/70250169>.
+- Well-MTE is Mt. Elbert Stratigraphic Test Well and Well-IGS is Ignik Sikumi
+  Test Well; `MTE_refined` and `IGS_refined` remain workbook-stage questions:
+  <https://www.osti.gov/servlets/purl/1893637>.
+- Missing-log adapters for `Vp` or `RHOB` are optional and
+  validation-required; the MDPI marine hydrate example is background, not North
+  Slope validation: <https://www.mdpi.com/1996-1073/16/23/7709>.
+
+### B. Blue mentor questions
+
+- Which saturation field is authoritative: `Sgh`, `S_h`, `Sh`, or `NMR_SAT`?
+- Should occurrence use source-style classes, saturation thresholds, or
+  mentor-reviewed intervals?
+- Are `MTE`/`IGS` separate wells and are `*_refined` processing stages in the
+  workbook?
+- Do we have enough caliper coverage to apply washout filtering?
+- Which wells become blind validation after full recovery?
+- Are missing-log adapters allowed, or should missing curves simply block that
+  feature set?
 
 ## Current State
 

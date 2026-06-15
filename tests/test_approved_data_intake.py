@@ -6,8 +6,15 @@ import pandas as pd
 
 from dashboard.approved_data_intake import (
     EXPECTED_ROLES,
+    build_intake_readiness_report,
+    build_variable_fingerprints,
     intake_validation_report_frame,
+    load_field_role_table,
     load_approved_data_field_role_table,
+    validate_caliper_gate,
+    validate_missing_log_strategy,
+    validate_saturation_target_authority,
+    validate_x_allowed,
     validate_approved_data_intake,
 )
 
@@ -16,7 +23,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_field_role_table_loads_expected_roles():
-    table = load_approved_data_field_role_table(PROJECT_ROOT)
+    table = load_field_role_table(PROJECT_ROOT)
 
     assert not table.empty
     assert set(table["role"]).issubset(EXPECTED_ROLES)
@@ -49,13 +56,39 @@ def test_missing_depth_blocks_intake():
 
 def test_target_only_fields_are_rejected_from_x_allowed():
     report = validate_approved_data_intake(
-        ["DEPTH", "GR", "RHOB", "Rt", "Sgh", "Sh", "NMR_SAT", "Hydrate Saturation"],
+        [
+            "DEPTH",
+            "GR",
+            "RHOB",
+            "Rt",
+            "Sgh",
+            "S_h",
+            "Sh",
+            "NMR_SAT",
+            "Hydrate Saturation",
+            "Swr",
+            "interpreted phase label",
+        ],
         project_root=PROJECT_ROOT,
-        x_allowed_columns=["DEPTH", "GR", "Sgh", "Hydrate Saturation"],
+        x_allowed_columns=[
+            "DEPTH",
+            "GR",
+            "Sgh",
+            "S_h",
+            "Hydrate Saturation",
+            "Swr",
+            "interpreted phase label",
+        ],
     )
 
     assert report["target_leakage_risk"] is True
-    assert set(report["target_leakage_fields"]) == {"Sgh", "Hydrate Saturation"}
+    assert set(report["target_leakage_fields"]) == {
+        "Sgh",
+        "S_h",
+        "Hydrate Saturation",
+        "Swr",
+        "interpreted phase label",
+    }
     assert "target_leakage_risk_in_x_allowed" in report["blocked_reasons"]
 
 
@@ -146,3 +179,113 @@ def test_validation_report_frame_is_compact_and_public_safe():
 
     assert list(frame.columns) == ["check", "value", "meaning"]
     assert "training_ready" in set(frame["check"])
+
+
+def test_variable_fingerprint_contract_marks_targets_and_unresolved_fields():
+    table = load_approved_data_field_role_table(PROJECT_ROOT)
+    fingerprints = build_variable_fingerprints(table)
+
+    assert {
+        "original_header",
+        "unit",
+        "normalized",
+        "role",
+        "allowed_in_feature_matrix",
+        "leakage_risk",
+        "unresolved_mentor_question",
+    }.issubset(fingerprints.columns)
+    sgh = fingerprints[fingerprints["original_header"].eq("Sgh")].iloc[0]
+    ao90 = fingerprints[fingerprints["original_header"].eq("AO90")].iloc[0]
+    assert bool(sgh["allowed_in_feature_matrix"]) is False
+    assert sgh["leakage_risk"] == "high"
+    assert bool(ao90["allowed_in_feature_matrix"]) is False
+    assert ao90["role"] == "unresolved"
+
+
+def test_validate_x_allowed_blocks_target_calibration_unresolved_and_unknown():
+    table = load_approved_data_field_role_table(PROJECT_ROOT)
+    report = validate_x_allowed(["DEPTH", "GR", "Sgh", "Swr", "AO90", "mystery"], table)
+
+    assert report["valid"] is False
+    assert "Sgh" in report["blocked_headers"]
+    assert "Swr" in report["blocked_headers"]
+    assert "AO90" in report["blocked_headers"]
+    assert "mystery" in report["unknown_headers"]
+    assert any(flag.startswith("target_only_in_x_allowed:Sgh") for flag in report["leakage_flags"])
+
+
+def test_new_readiness_report_keeps_schema_design_separate_from_training():
+    table = load_approved_data_field_role_table(PROJECT_ROOT)
+    report = build_intake_readiness_report(
+        ["DEPTH", "GR", "RHOB", "Rt", "core hydrate observation", "Sh"],
+        table,
+        options={
+            "metadata": {
+                "occurrence_evidence_source": "core",
+                "occurrence_confidence": "mentor_reviewed",
+                "occurrence_interval_policy": "well_depth_interval",
+                "authoritative_saturation_field": "Sh",
+                "saturation_unit_convention": "fraction",
+            },
+            "split_policy_confirmed": True,
+            "validation_plan_confirmed": True,
+        },
+    )
+
+    assert report["ready_for_schema_design"] is True
+    assert report["ready_for_training"] is False
+    assert "approved_rows_not_loaded_public_safe_validator" in report["blocked_reasons"]
+    assert report["occurrence_target_authority"]["authority_present"] is True
+    assert report["saturation_target_authority"]["authority_present"] is True
+
+
+def test_caliper_missing_warns_without_auto_filtering():
+    missing = validate_caliper_gate(["DEPTH", "GR", "RHOB", "Rt"])
+    present = validate_caliper_gate(["DEPTH", "GR", "RHOB", "Rt", "CAL1"])
+
+    assert missing["missing_qc_flag_required"] is True
+    assert missing["washout_qc_filter_allowed"] is False
+    assert present["has_caliper_coverage"] is True
+    assert present["washout_qc_filter_allowed"] is True
+
+
+def test_missing_log_adapter_requires_explicit_option():
+    blocked = validate_missing_log_strategy(["DEPTH", "GR", "Rt"], allow_missing_log_adapters=False)
+    allowed = validate_missing_log_strategy(["DEPTH", "GR", "Rt"], allow_missing_log_adapters=True)
+
+    assert set(blocked["missing_optimal_logs"]) == {"Vp", "RHOB"}
+    assert "missing_log_adapter_blocked_until_mentor_approval" in blocked["blocked_reasons"]
+    assert allowed["missing_log_adapter_allowed"] is True
+    assert allowed["validation_required"] is True
+
+
+def test_new_saturation_authority_requires_authoritative_field_and_unit():
+    table = load_approved_data_field_role_table(PROJECT_ROOT)
+    blocked = validate_saturation_target_authority(["DEPTH", "GR", "Sh"], table)
+    ready = validate_saturation_target_authority(
+        ["DEPTH", "GR", "Sh"],
+        table,
+        metadata={"authoritative_saturation_field": "Sh", "saturation_unit_convention": "percent"},
+    )
+
+    assert blocked["authority_present"] is False
+    assert ready["authority_present"] is True
+
+
+def test_split_and_validation_policy_required_before_training_readiness():
+    table = load_approved_data_field_role_table(PROJECT_ROOT)
+    report = build_intake_readiness_report(
+        ["DEPTH", "GR", "RHOB", "Rt", "Sh"],
+        table,
+        options={
+            "metadata": {
+                "authoritative_saturation_field": "Sh",
+                "saturation_unit_convention": "fraction",
+            },
+            "approved_rows_available": True,
+        },
+    )
+
+    assert report["ready_for_training"] is False
+    assert "whole_well_compartment_or_geographic_split_policy_required" in report["blocked_reasons"]
+    assert "validation_plan_required_before_training" in report["blocked_reasons"]
