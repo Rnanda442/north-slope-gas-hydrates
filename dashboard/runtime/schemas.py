@@ -19,6 +19,10 @@ OPTIONAL_LOG_COLUMNS = (
     "neutron_porosity_vv",
     "dt_us_ft",
     "dts_us_ft",
+    "vp_km_s",
+    "vs_km_s",
+    "vp_m_s",
+    "vs_m_s",
     "nmr_porosity_vv",
     "caliper_in",
     "temperature_c",
@@ -80,6 +84,29 @@ PROJECT_COHORT_ASSUMPTIONS = {
     "Feature strategy": "Normalized multivariable logs and physics-derived features; transformations fit on training wells only and weights learned or calibrated, not assumed",
 }
 
+TARGET_ONLY_COLUMN_ALIASES = {
+    "hydrate_saturation": (
+        "Sgh",
+        "S_h",
+        "Sh",
+        "NMR_SAT",
+        "Hydrate Saturation",
+        "hydrate_saturation_vv",
+    ),
+    "irreducible_or_residual_water_saturation": (
+        "Swr",
+        "S_wr",
+        "irreducible_water_saturation_vv",
+    ),
+    "phase_or_occurrence_label": (
+        "interpreted phase label",
+        "phase_label",
+        "hydrate_phase",
+        "hydrate_occurrence_label",
+        "runtime_phase_label",
+    ),
+}
+
 
 @dataclass(frozen=True)
 class RuntimeConfig:
@@ -94,20 +121,28 @@ class RuntimeConfig:
 
 def default_curve_aliases() -> dict[str, tuple[str, ...]]:
     return {
-        "well_alias": ("well_alias", "WELL", "WELL_NAME", "UWI", "API"),
+        "well_alias": ("well_alias", "WELL", "WELL_NAME", "Well Name", "UWI", "API"),
         "depth_m": ("depth_m", "DEPTH_M", "DEPTH", "MD", "MD_M", "TVD", "TVD_M"),
-        "gr_api": ("gr_api", "GR", "GAMMA", "GAMMA_RAY"),
-        "rt_ohm_m": ("rt_ohm_m", "RT", "ILD", "RDEP", "RES_DEEP"),
-        "rhob_g_cc": ("rhob_g_cc", "RHOB", "DEN", "DENSITY"),
-        "density_porosity_vv": ("density_porosity_vv", "DPHI", "PHID", "DEN_POR"),
-        "neutron_porosity_vv": ("neutron_porosity_vv", "NPHI", "TNPH", "NEUTRON_POR"),
+        "gr_api": ("gr_api", "GR", "GAMMA", "GAMMA_RAY", "Gamma Ray"),
+        "rt_ohm_m": ("rt_ohm_m", "RT", "ILD", "RDEP", "RES", "RES_DEEP", "Deep formation resistivity"),
+        "rhob_g_cc": ("rhob_g_cc", "RHOB", "DEN", "DENSITY", "Rho_b", "Density_gcpcc", "Density_gpcc"),
+        "density_porosity_vv": ("density_porosity_vv", "DPHI", "PHID", "DEN_POR", "Phi_porosity", "phi_den"),
+        "neutron_porosity_vv": ("neutron_porosity_vv", "NPHI", "TNPH", "NEUTRON_POR", "phi_neut"),
         "dt_us_ft": ("dt_us_ft", "DT", "DTC", "AC"),
         "dts_us_ft": ("dts_us_ft", "DTS", "DTSM"),
-        "nmr_porosity_vv": ("nmr_porosity_vv", "NMRPHI", "TCMR", "CMRP"),
-        "caliper_in": ("caliper_in", "CALI", "CALIPER"),
+        "vp_km_s": ("vp_km_s", "VP_KM_S"),
+        "vs_km_s": ("vs_km_s", "VS_KM_S"),
+        "vp_m_s": ("vp_m_s", "Vp", "VP", "VELP", "VP_M_S"),
+        "vs_m_s": ("vs_m_s", "Vs", "VS", "VS1", "VELS", "VS_M_S"),
+        "nmr_porosity_vv": ("nmr_porosity_vv", "NMRPHI", "TCMR", "CMRP", "phi_nmr"),
+        "caliper_in": ("caliper_in", "CALI", "CALIPER", "caliper", "CAL1"),
         "temperature_c": ("temperature_c", "TEMP", "TEMPERATURE_C"),
         "pressure_mpa": ("pressure_mpa", "PRESSURE", "PRESSURE_MPA", "PP_MPA"),
     }
+
+
+def target_only_column_aliases() -> dict[str, tuple[str, ...]]:
+    return TARGET_ONLY_COLUMN_ALIASES
 
 
 @dataclass(frozen=True)

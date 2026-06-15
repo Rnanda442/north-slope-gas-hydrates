@@ -16,6 +16,10 @@ def add_standard_features(logs: pd.DataFrame) -> pd.DataFrame:
         features["vp_km_s"] = 304.8 / features["dt_us_ft"]
     if "dts_us_ft" in features and "vs_km_s" not in features:
         features["vs_km_s"] = 304.8 / features["dts_us_ft"]
+    if "vp_m_s" in features and "vp_km_s" not in features:
+        features["vp_km_s"] = features["vp_m_s"] / 1000.0
+    if "vs_m_s" in features and "vs_km_s" not in features:
+        features["vs_km_s"] = features["vs_m_s"] / 1000.0
     if {"vp_km_s", "vs_km_s"}.issubset(features.columns):
         features["vp_vs_ratio"] = features["vp_km_s"] / features["vs_km_s"]
     if {"rhob_g_cc", "vs_km_s"}.issubset(features.columns):

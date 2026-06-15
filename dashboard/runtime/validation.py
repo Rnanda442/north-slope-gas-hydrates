@@ -8,6 +8,7 @@ from dashboard.runtime.schemas import (
     REQUIRED_LOG_COLUMNS,
     RuntimeReadinessReport,
     ValidationIssue,
+    target_only_column_aliases,
 )
 
 
@@ -16,8 +17,14 @@ RANGE_CHECKS = {
     "gr_api": (0, 300),
     "rt_ohm_m": (0.01, 100000),
     "rhob_g_cc": (1.0, 3.2),
+    "density_porosity_vv": (0, 0.7),
+    "neutron_porosity_vv": (0, 0.7),
     "dt_us_ft": (30, 250),
     "dts_us_ft": (50, 500),
+    "vp_km_s": (1.0, 8.0),
+    "vs_km_s": (0.3, 5.0),
+    "vp_m_s": (1000, 8000),
+    "vs_m_s": (300, 5000),
     "nmr_porosity_vv": (0, 0.7),
     "caliper_in": (4, 24),
     "temperature_c": (-30, 120),
@@ -25,11 +32,38 @@ RANGE_CHECKS = {
 }
 
 
+def _normalize_header_name(column: str) -> str:
+    return "".join(character for character in column.lower() if character.isalnum())
+
+
+def _target_only_lookup() -> dict[str, tuple[str, str]]:
+    lookup: dict[str, tuple[str, str]] = {}
+    for family, aliases in target_only_column_aliases().items():
+        for alias in aliases:
+            lookup[_normalize_header_name(alias)] = (family, alias)
+    return lookup
+
+
 def validate_log_table(logs: pd.DataFrame) -> RuntimeReadinessReport:
     issues: list[ValidationIssue] = []
     for column in REQUIRED_LOG_COLUMNS:
         if column not in logs.columns:
             issues.append(ValidationIssue("error", column, "Missing required log column."))
+
+    target_lookup = _target_only_lookup()
+    for column in logs.columns:
+        family_match = target_lookup.get(_normalize_header_name(str(column)))
+        if family_match is None:
+            continue
+        family, matched_alias = family_match
+        issues.append(
+            ValidationIssue(
+                "error",
+                str(column),
+                "Target-only or calibration column detected in log inputs "
+                f"({family}; matched {matched_alias}). Keep it out of the feature matrix.",
+            )
+        )
 
     if logs.empty:
         issues.append(ValidationIssue("error", "table", "No log rows were loaded."))
@@ -100,6 +134,10 @@ def curve_coverage_frame(logs: pd.DataFrame) -> pd.DataFrame:
         "neutron_porosity_vv": "Porosity and lithology cross-check",
         "dt_us_ft": "Compressional velocity",
         "dts_us_ft": "Shear velocity and gas/hydrate discrimination",
+        "vp_km_s": "Supplied compressional velocity",
+        "vs_km_s": "Supplied shear velocity",
+        "vp_m_s": "Supplied compressional velocity converted during feature engineering",
+        "vs_m_s": "Supplied shear velocity converted during feature engineering",
         "nmr_porosity_vv": "Preferred saturation target support",
         "caliper_in": "Washout and bad-hole QC",
         "temperature_c": "Stability context",

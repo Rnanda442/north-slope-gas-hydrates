@@ -42,6 +42,56 @@ def test_curve_alias_standardization_keeps_doe_shaped_inputs_canonical() -> None
     assert standardized.loc[0, "well_alias"] == "DOE-WELL-A"
 
 
+def test_header_aliases_support_direct_velocity_inputs_without_target_leakage() -> None:
+    raw = pd.DataFrame(
+        {
+            "Well Name": ["MTE-01", "MTE-01"],
+            "DEPTH": [620.0, 621.0],
+            "GR": [42.0, 44.0],
+            "RES": [38.0, 41.0],
+            "Rho_b": [2.12, 2.10],
+            "Phi_porosity": [0.27, 0.28],
+            "NMRPHI": [0.19, 0.20],
+            "Vp": [3250.0, 3300.0],
+            "Vs": [1750.0, 1780.0],
+            "CAL1": [8.5, 8.6],
+        }
+    )
+
+    logs = standardize_curve_columns(raw)
+    report = validate_log_table(logs)
+    features = add_standard_features(logs)
+
+    assert report.is_ready
+    assert {"vp_m_s", "vs_m_s", "nmr_porosity_vv"}.issubset(logs.columns)
+    assert features["vp_km_s"].iloc[0] == 3.25
+    assert features["vs_km_s"].iloc[0] == 1.75
+    assert features["vp_vs_ratio"].notna().all()
+
+
+def test_target_only_saturation_headers_block_log_input_readiness() -> None:
+    raw = pd.DataFrame(
+        {
+            "WELL": ["MTE-01", "MTE-01"],
+            "DEPTH": [620.0, 621.0],
+            "GR": [42.0, 44.0],
+            "RT": [38.0, 41.0],
+            "RHOB": [2.12, 2.10],
+            "NMRPHI": [0.19, 0.20],
+            "Sgh": [0.35, 0.37],
+            "NMR_SAT": [0.33, 0.36],
+        }
+    )
+
+    logs = standardize_curve_columns(raw)
+    report = validate_log_table(logs)
+    issue_columns = {issue.column for issue in report.issues if issue.severity == "error"}
+
+    assert not report.is_ready
+    assert {"Sgh", "NMR_SAT"}.issubset(issue_columns)
+    assert "NMRPHI" not in issue_columns
+
+
 def test_approved_csv_runtime_path_loads_and_validates(tmp_path) -> None:
     csv_path = tmp_path / "approved_shape.csv"
     pd.DataFrame(
