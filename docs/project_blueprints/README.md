@@ -125,6 +125,9 @@ wireline machine-learning project.
     ML flowchart with all inputs, stability logic, feature engineering,
     leakage barrier, occurrence classification, saturation regression,
     validation, and public-safe exports connected.
+  - Current slide 3 / website static export uses the V3 split-node workflow
+    map: five lanes, smaller boxes, clearer equation cards, and separate
+    solid predictor/context arrows versus dashed target-only arrows.
   - Slides 1 and 2 are preserved exactly from the current Gmail authority deck.
     Slide 3 is the full workflow map. Slides 4-9 zoom into inputs/boundary,
     stability, feature engineering, leakage/modeling, outputs/validation, and

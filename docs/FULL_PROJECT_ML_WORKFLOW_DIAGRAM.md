@@ -34,7 +34,8 @@ Main flowchart image:
 docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/full_project_ml_workflow_flowchart.png
 ```
 
-Expanded static flowchart image for website review and mentor discussion:
+Expanded V3 split-node flowchart image for website review and mentor
+discussion:
 
 ```text
 docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/full_project_ml_workflow_flowchart_expanded.png
@@ -142,6 +143,12 @@ lithology/reservoir equations, density porosity, velocity conversion,
 acoustic impedance, lambda-rho, mu-rho, NMR-density separation, and any
 Archie-style saturation baseline are feature or check producers. They do not
 create proof by themselves.
+
+The current V3 static export splits the workflow into many small boxes rather
+than a few dense boxes. It uses five lanes: sources/schema, stability context,
+feature engineering, leakage-safe ML, and validation/exports. Solid arrows show
+allowed source, context, feature, and model flow. Dashed red arrows show
+target-only labels and validation overlays that bypass the predictor matrix.
 
 The stability branch feeds the ML workflow as context, a mask, a confidence
 label, or a reason flag. It is not a hydrate occurrence label and not a
