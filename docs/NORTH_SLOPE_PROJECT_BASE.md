@@ -537,10 +537,11 @@ Fresh-chat handoff as of 2026-06-14:
   hydrate proof, saturation, sweet spots, or validated ML results.
 - The public app now exposes the guarded baseline screen with summary counts,
   status/confidence breakdowns, calculated interval rows, blocked/no-interval
-  sample rows, and a CSV download. Next scientific task: keep improving source
-  coverage in OSL and treat any future phase-curve/composition variants as
-  cited scenarios. Do not label the current screen as hydrate proof, saturation,
-  producibility, or a sweet-spot ranking.
+  sample rows, a 2D well-status map, a calculated interval depth chart, and a
+  CSV download. Next scientific task: keep improving source coverage in OSL and
+  treat any future phase-curve/composition variants as cited scenarios. Do not
+  label the current screen as hydrate proof, saturation, producibility, or a
+  sweet-spot ranking.
 
 ## Equations To Preserve
 

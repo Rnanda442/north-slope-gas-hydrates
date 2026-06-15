@@ -450,3 +450,6 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-14: Exposed the guarded stability screen in the public Structural
   Explorer with summary metrics, status/confidence counts, calculated interval
   preview, blocked/no-interval sample, and download.
+- 2026-06-14: Added visual stability-screen views to the Structural Explorer:
+  a 2D well-status map and a calculated interval depth chart that explain the
+  22 baseline intervals without implying hydrate proof.

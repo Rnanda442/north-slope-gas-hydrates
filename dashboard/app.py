@@ -121,6 +121,51 @@ STRUCTURAL_SCENES = {
     / "north_slope_master_analysis_scene_full_no_simplify.html",
 }
 MASTER_3D = PROJECT_ROOT / "03_data_final" / "master_layers" / "north_slope_master_3d_surfaces.parquet"
+
+STABILITY_SCREEN_STATUS_STYLES = {
+    "calculated": {
+        "label": "Calculated screen interval",
+        "color": "#2563eb",
+        "size": 11,
+        "opacity": 0.92,
+    },
+    "calculated_no_stable_interval": {
+        "label": "Calculated, no stable interval",
+        "color": "#111827",
+        "size": 9,
+        "opacity": 0.82,
+    },
+    "blocked_phase_curve_range_insufficient": {
+        "label": "Blocked: phase curve range",
+        "color": "#d97706",
+        "size": 7,
+        "opacity": 0.72,
+    },
+    "blocked_missing_temperature_profile": {
+        "label": "Blocked: missing temperature profile",
+        "color": "#94a3b8",
+        "size": 5,
+        "opacity": 0.42,
+    },
+    "blocked_missing_depth": {
+        "label": "Blocked: missing depth",
+        "color": "#64748b",
+        "size": 6,
+        "opacity": 0.55,
+    },
+    "outside_au_context": {
+        "label": "Outside public AU context",
+        "color": "#7c3aed",
+        "size": 6,
+        "opacity": 0.58,
+    },
+}
+
+STABILITY_SCREEN_CONFIDENCE_COLORS = {
+    "high_source_control": "#2563eb",
+    "medium_source_control": "#0891b2",
+    "low_source_control": "#d97706",
+}
 MASTER_2D = PROJECT_ROOT / "03_data_final" / "master_layers" / "north_slope_master_2d_layers.parquet"
 STRUCTURAL_HORIZONS = ["NStopo", "NSLCU", "NSshublik", "NSbasement"]
 CONTEXT_OVERLAYS = [
@@ -1808,6 +1853,189 @@ def render_stability_input_scaffold_product() -> None:
     )
 
 
+def build_stability_screen_map(screen: pd.DataFrame) -> go.Figure:
+    map_frame = screen.copy()
+    map_frame["lat"] = pd.to_numeric(map_frame.get("lat"), errors="coerce")
+    map_frame["lon"] = pd.to_numeric(map_frame.get("lon"), errors="coerce")
+    map_frame["stability_top_m"] = pd.to_numeric(
+        map_frame.get("stability_top_m"), errors="coerce"
+    )
+    map_frame["stability_base_m"] = pd.to_numeric(
+        map_frame.get("stability_base_m"), errors="coerce"
+    )
+    map_frame["stability_thickness_m"] = pd.to_numeric(
+        map_frame.get("stability_thickness_m"), errors="coerce"
+    )
+    map_frame["tvd_m"] = pd.to_numeric(map_frame.get("tvd_m"), errors="coerce")
+    map_frame = map_frame.dropna(subset=["lat", "lon"])
+
+    figure = go.Figure()
+    if map_frame.empty:
+        figure.update_layout(
+            height=520,
+            margin={"l": 0, "r": 0, "t": 24, "b": 0},
+            annotations=[
+                {
+                    "text": "No latitude/longitude values available for the screen.",
+                    "xref": "paper",
+                    "yref": "paper",
+                    "x": 0.5,
+                    "y": 0.5,
+                    "showarrow": False,
+                }
+            ],
+        )
+        return figure
+
+    center_lat = float(map_frame["lat"].median())
+    center_lon = float(map_frame["lon"].median())
+    statuses = list(STABILITY_SCREEN_STATUS_STYLES)
+    extra_statuses = [
+        status
+        for status in sorted(map_frame["stability_result_status"].dropna().unique())
+        if status not in STABILITY_SCREEN_STATUS_STYLES
+    ]
+    for status in statuses + extra_statuses:
+        style = STABILITY_SCREEN_STATUS_STYLES.get(
+            status,
+            {
+                "label": status,
+                "color": "#475569",
+                "size": 6,
+                "opacity": 0.55,
+            },
+        )
+        subset = map_frame[map_frame["stability_result_status"].eq(status)].copy()
+        if subset.empty:
+            continue
+        hover_text = (
+            "<b>"
+            + subset["well_name"].fillna("Unnamed well").astype(str)
+            + "</b><br>Status: "
+            + subset["stability_result_status"].fillna("missing").astype(str)
+            + "<br>Confidence: "
+            + subset["stability_confidence"].fillna("missing").astype(str)
+            + "<br>TVD: "
+            + subset["tvd_m"].round(1).astype(str)
+            + " m<br>Top/Base: "
+            + subset["stability_top_m"].round(1).astype(str)
+            + " / "
+            + subset["stability_base_m"].round(1).astype(str)
+            + " m<br>Thickness: "
+            + subset["stability_thickness_m"].round(1).astype(str)
+            + " m"
+        )
+        figure.add_trace(
+            go.Scattermapbox(
+                lat=subset["lat"],
+                lon=subset["lon"],
+                mode="markers",
+                name=style["label"],
+                marker={
+                    "size": style["size"],
+                    "color": style["color"],
+                    "opacity": style["opacity"],
+                },
+                text=hover_text,
+                hovertemplate="%{text}<extra></extra>",
+            )
+        )
+
+    figure.update_layout(
+        height=560,
+        margin={"l": 0, "r": 0, "t": 30, "b": 0},
+        legend={
+            "orientation": "h",
+            "yanchor": "bottom",
+            "y": 1.01,
+            "xanchor": "left",
+            "x": 0,
+        },
+        mapbox={
+            "style": "open-street-map",
+            "center": {"lat": center_lat, "lon": center_lon},
+            "zoom": 4.0,
+        },
+    )
+    return figure
+
+
+def build_stability_interval_depth_figure(screen: pd.DataFrame) -> go.Figure:
+    intervals = screen[screen["stability_result_status"].eq("calculated")].copy()
+    for column in ["stability_top_m", "stability_base_m", "stability_thickness_m"]:
+        intervals[column] = pd.to_numeric(intervals[column], errors="coerce")
+    intervals = intervals.dropna(
+        subset=["well_name", "stability_top_m", "stability_base_m", "stability_thickness_m"]
+    )
+
+    figure = go.Figure()
+    if intervals.empty:
+        figure.update_layout(
+            height=420,
+            margin={"l": 0, "r": 0, "t": 24, "b": 0},
+            annotations=[
+                {
+                    "text": "No calculated intervals are available in this screen run.",
+                    "xref": "paper",
+                    "yref": "paper",
+                    "x": 0.5,
+                    "y": 0.5,
+                    "showarrow": False,
+                }
+            ],
+        )
+        return figure
+
+    intervals = intervals.sort_values(
+        ["stability_top_m", "stability_base_m", "well_name"],
+        ascending=[True, True, True],
+    ).head(30)
+    y_labels = [
+        f"{row.well_name} ({str(row.stability_confidence).replace('_source_control', '')})"
+        for row in intervals.itertuples()
+    ]
+    colors = [
+        STABILITY_SCREEN_CONFIDENCE_COLORS.get(confidence, "#64748b")
+        for confidence in intervals["stability_confidence"]
+    ]
+    figure.add_trace(
+        go.Bar(
+            x=intervals["stability_thickness_m"],
+            y=y_labels,
+            base=intervals["stability_top_m"],
+            orientation="h",
+            marker={"color": colors, "line": {"color": "white", "width": 0.5}},
+            customdata=intervals[
+                [
+                    "stability_top_m",
+                    "stability_base_m",
+                    "stability_thickness_m",
+                    "temperature_profile_code",
+                    "caveat_codes",
+                ]
+            ],
+            hovertemplate=(
+                "<b>%{y}</b><br>Top: %{customdata[0]:.1f} m"
+                "<br>Base: %{customdata[1]:.1f} m"
+                "<br>Thickness: %{customdata[2]:.1f} m"
+                "<br>Temperature profile: %{customdata[3]}"
+                "<br>Caveats: %{customdata[4]}<extra></extra>"
+            ),
+            name="Calculated interval",
+        )
+    )
+    figure.update_layout(
+        height=max(420, 28 * len(intervals) + 120),
+        margin={"l": 220, "r": 24, "t": 24, "b": 48},
+        xaxis_title="Depth interval in meters (top to base)",
+        yaxis_title="",
+        bargap=0.32,
+        showlegend=False,
+    )
+    figure.update_xaxes(rangemode="tozero")
+    return figure
+
+
 def render_guarded_stability_screen_product() -> None:
     screen_path = default_stability_screen_path(PROJECT_ROOT)
     screen = cached_stability_screen(str(PROJECT_ROOT))
@@ -1841,6 +2069,18 @@ def render_guarded_stability_screen_product() -> None:
         stability_screen_summary_frame(screen),
         use_container_width=True,
         hide_index=True,
+    )
+
+    st.markdown("##### 2D Screen Status Map")
+    st.caption(
+        "Point colors show calculation status only. Blue means the baseline "
+        "screen could calculate an interval for that well; it does not mean "
+        "hydrate was detected."
+    )
+    st.plotly_chart(
+        build_stability_screen_map(screen),
+        use_container_width=True,
+        config={"displayModeBar": True, "responsive": True},
     )
 
     status_counts = (
@@ -1884,6 +2124,17 @@ def render_guarded_stability_screen_product() -> None:
         screen.loc[~calculated, display_columns]
         .sort_values(["stability_result_status", "well_name"], ascending=[True, True])
         .head(30)
+    )
+
+    st.markdown("##### Calculated Interval Depth View")
+    st.caption(
+        "The 22 calculated rows are plotted as top-to-base screen intervals. "
+        "These are baseline admissibility intervals, not confirmed hydrate zones."
+    )
+    st.plotly_chart(
+        build_stability_interval_depth_figure(screen),
+        use_container_width=True,
+        config={"displayModeBar": True, "responsive": True},
     )
 
     st.markdown("##### Calculated Interval Rows")

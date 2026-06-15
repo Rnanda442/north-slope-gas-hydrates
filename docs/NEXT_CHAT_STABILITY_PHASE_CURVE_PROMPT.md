@@ -136,8 +136,9 @@ Current website state:
 The public Structural Explorer now exposes the guarded screen as a baseline
 methane 5 ppt stability-admissibility screen, with summary counts,
 status/confidence breakdowns, calculated interval preview, blocked/no-interval
-sample, and CSV download. Do not call it hydrate proof, saturation,
-producibility, or a sweet-spot ranking.
+sample, a 2D well-status map, a calculated interval depth chart, and CSV
+download. Do not call it hydrate proof, saturation, producibility, or a
+sweet-spot ranking.
 
 Next task:
 Run visual QA/deployment checks for the public app and continue improving the
