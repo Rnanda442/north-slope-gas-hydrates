@@ -363,102 +363,103 @@ PARAMS = [
 
 
 def slide_03(root: Path, out: Path) -> None:
-    img = new_slide("Parameters: Well-Log Scaffold", "Each symbol shows what is measured, the normalized model range, and why it enters the pipeline.")
+    img = new_slide("Science-to-ML Parameter Ladder", "The model follows geoscience logic before it sees feature weights.")
     d = ImageDraw.Draw(img)
-    for idx, (sym, name, measures, role, rng, color) in enumerate(PARAMS):
-        row, col = divmod(idx, 3)
-        x = 80 + col * 600
-        y = 170 + row * 230
-        card(d, (x, y, x + 520, y + 175), fill=WHITE)
-        d.rounded_rectangle((x + 22, y + 25, x + 118, y + 120), radius=20, fill=(235, 247, 249), outline=(186, 219, 225), width=2)
-        draw_text(d, (x + 70, y + 55), sym, 27, color, True, anchor="ma")
-        draw_text(d, (x + 145, y + 26), name, 24, NAVY, True)
-        draw_text(d, (x + 145, y + 65), f"Measures: {measures}", 18, INK, width=335)
-        draw_text(d, (x + 145, y + 112), f"ML use: {role}", 17, MUTED, width=335)
-        gauge(d, (x + 145, y + 145, x + 475, y + 160), rng[0], rng[1], color)
-    card(d, (1120, 855, 1780, 975), fill=(249, 244, 244), outline=RED)
-    draw_text(d, (1150, 875), "Locked target fields", 25, RED, True)
-    draw_text(d, (1150, 915), "S_h, Sgh, NMR_SAT, phase labels, and final rankings supervise or score models. They stay out of the input table to prevent target leakage.", 18, INK, width=570)
-    footer(img, "Sources: WELL_LOG_REQUIREMENTS_MAP; dashboard/well_log_engine.py; dashboard/runtime/feature_engineering.py; Lee & Collett 2011; Haines et al. 2022.")
+    tiers = [
+        ("1", "Stability context", "Can hydrate exist here?", "depth | pressure | temperature | permafrost | overburden", "mask or context feature", TEAL),
+        ("2", "Reservoir quality", "Can the rock host pore-filling hydrate?", "GR | porosity | density | lithology | caliper QC | core quality", "sand/reservoir gate", GREEN),
+        ("3", "Hydrate response", "Do logs behave like hydrate-bearing sediment?", "Rt | Vp | Vs | Vp/Vs | AI | lambda-rho | mu-rho | NMR/core targets", "model evidence block", AMBER),
+    ]
+    for i, (num, title, question, params, role, color) in enumerate(tiers):
+        y = 190 + i * 225
+        card(d, (92, y, 1768, y + 166), fill=WHITE, outline=(198, 218, 224), radius=24)
+        d.ellipse((124, y + 39, 212, y + 127), fill=color, outline=WHITE, width=4)
+        draw_text(d, (168, y + 62), num, 34, WHITE, True, anchor="ma")
+        draw_text(d, (248, y + 26), title, 32, NAVY, True)
+        draw_text(d, (248, y + 78), question, 22, INK, True, width=520)
+        draw_text(d, (880, y + 32), params, 24, color, True, width=720)
+        d.rounded_rectangle((1330, y + 98, 1718, y + 136), radius=12, fill=(235, 247, 249), outline=(188, 215, 221), width=2)
+        draw_text(d, (1524, y + 106), role, 18, NAVY, True, anchor="ma")
+        if i < len(tiers) - 1:
+            arrow(d, (930, y + 172), (930, y + 216), fill=TEAL, width=5)
+
+    draw_text(d, (105, 870), "Repeated grammar", 24, NAVY, True)
+    draw_text(
+        d,
+        (105, 910),
+        "parameter -> physical reason -> hydrate signal -> false positives -> ML role",
+        25,
+        TEAL,
+        True,
+        width=940,
+    )
+    card(d, (1210, 850, 1765, 966), fill=(249, 244, 244), outline=RED)
+    draw_text(d, (1240, 875), "Target leakage lock", 23, RED, True)
+    draw_text(d, (1240, 914), "S_h, Sgh, NMR_SAT, phase labels, and final rankings score models; they do not enter predictors.", 17, INK, width=470)
+    footer(img, "Sources: SCIENCE_TO_ML_LOGIC_LADDER; ML_PIPELINE_BASELINE_SOURCE_LEDGER; WELL_LOG_REQUIREMENTS_MAP; Chong et al. 2022.")
     save(img, out)
 
 
 def slide_04(root: Path, out: Path) -> None:
-    img = new_slide("ML Methodology: Architecture", "Every parameter passes shared gates before equations, features, split policy, models, and review outputs.", dark=True)
+    img = new_slide("ML Architecture: Raw Headers to Validated Outputs", "A leakage-safe pipeline that turns source-backed physics into two model heads.", dark=True)
     d = ImageDraw.Draw(img)
-    x0 = 70
-    draw_text(d, (x0, 180), "Log inputs", 26, ICE, True)
-    inputs = ["GR", "Rt", "RHOB", "\u03c6_NMR", "Vp", "Vs", "CAL", "Core"]
-    for i, sym in enumerate(inputs):
-        y = 230 + i * 66
-        d.rounded_rectangle((x0, y, x0 + 125, y + 45), radius=10, fill=(20, 73, 88), outline=ICE, width=2)
-        draw_text(d, (x0 + 62, y + 10), sym, 22, WHITE, True, anchor="ma")
-        d.line((x0 + 125, y + 22, 225, y + 22), fill=(118, 153, 164), width=3)
-    d.line((225, 252, 225, 635), fill=(118, 153, 164), width=5)
-    draw_text(d, (238, 635), "all curves pass the shared gate stack", 15, (191, 218, 224), width=180)
-    gates = [
-        ("1", "Units + source", "all curves carry source mnemonic and unit", TEAL),
-        ("2", "Depth alignment", "same interval before features are calculated", BLUE),
-        ("3", "Borehole QC", "caliper/missing/outlier flags gate reliability", RED),
-        ("4", "Reservoir/stability screen", "sand + P-T admissibility before hydrate review", GREEN),
-        ("5", "Leakage lock", "targets never become predictors", AMBER),
-    ]
-    gx = 285
-    for i, (num, title, body, color) in enumerate(gates):
-        y = 190 + i * 115
-        card(d, (gx, y, gx + 350, y + 84), fill=(18, 56, 70), outline=(76, 121, 136))
-        d.ellipse((gx + 18, y + 22, gx + 58, y + 62), fill=color)
-        draw_text(d, (gx + 38, y + 31), num, 20, WHITE, True, anchor="ma")
-        draw_text(d, (gx + 75, y + 16), title, 22, ICE, True)
-        draw_text(d, (gx + 75, y + 47), body, 15, (210, 231, 236), width=245)
-        arrow(d, (225, y + 42), (gx, y + 42), fill=(118, 153, 164), width=3)
-    eqx = 720
-    card(d, (eqx, 190, eqx + 360, 580), fill=(17, 58, 64), outline=(75, 129, 137))
-    draw_text(d, (eqx + 30, 215), "Feature equations", 27, ICE, True)
-    eqs = [
-        ("Vsh", "(GR-GRclean)/(GRshale-GRclean)"),
-        ("\u03c6_D", "(\u03c1ma-RHOB)/(\u03c1ma-\u03c1f)"),
-        ("Vp, Vs", "304.8 / DT, 304.8 / DTS"),
-        ("AI", "RHOB x Vp"),
-        ("\u03bb\u03c1, \u03bc\u03c1", "RHOB(Vp^2-2Vs^2), RHOB x Vs^2"),
-        ("S_h proxy", "(\u03c6_D-\u03c6_NMR)/\u03c6_D"),
-    ]
-    for i, (lhs, rhs) in enumerate(eqs):
-        y = 270 + i * 45
-        draw_text(d, (eqx + 35, y), lhs, 21, WHITE, True)
-        draw_text(d, (eqx + 145, y), rhs, 17, (191, 218, 224), width=190)
-    arrow(d, (gx + 350, 442), (eqx, 380), fill=(118, 153, 164), width=4)
     stages = [
-        ("Feature table", "measured + derived; train-fit scaling"),
-        ("Split policy", "held-out wells; no random depth rows"),
-        ("Model ladder", "rules -> Logit/Ridge -> RF/GBM -> Keras ANN"),
-        ("Outputs", "phase, S_h, probability, reason codes"),
+        ("Raw headers", "preserve mnemonics\nunits and roles", TEAL),
+        ("Unit map", "feet/meters\ng/cc or kg/m3\nvelocity/slowness", BLUE),
+        ("Depth align", "logs, NMR,\ncore, labels", GREEN),
+        ("QC gates", "caliper status\nmissingness\noutliers", RED),
+        ("Features", "Rt log\nVp/Vs, AI\nlambda-rho\nmu-rho", AMBER),
+        ("Context", "stability\nsand gate\noverburden", PURPLE),
+        ("Leakage lock", "S_h/Sgh/NMR_SAT\nlabels only", RED),
+        ("Well split", "train-only prep\ncomplete-well holdout", BLUE),
     ]
-    sx = 1160
-    for i, (title, body) in enumerate(stages):
-        y = 185 + i * 140
-        card(d, (sx, y, sx + 420, y + 95), fill=(22, 56, 69), outline=(74, 122, 136))
-        draw_text(d, (sx + 24, y + 20), title, 25, ICE if i < 3 else AMBER, True)
-        draw_text(d, (sx + 24, y + 55), body, 17, WHITE, width=360)
-        if i:
-            arrow(d, (sx + 210, y - 44), (sx + 210, y), fill=(118, 153, 164), width=4)
-    arrow(d, (eqx + 360, 380), (sx, 230), fill=(118, 153, 164), width=4)
-    d.rounded_rectangle((350, 895, 1550, 930), radius=12, fill=RED)
-    draw_text(d, (950, 940), "Target leakage barrier: S_h, Sgh, NMR_SAT and final labels score/supervise models only.", 23, ICE, True, anchor="ma")
-    footer(img, "Sources: Classification Methods Draft; dashboard/runtime/feature_engineering.py; WELL_LOG_REQUIREMENTS_MAP; Chong et al. 2022.", dark=True)
+    x = 72
+    y = 200
+    box_w = 210
+    for i, (title, body, color) in enumerate(stages):
+        bx = x + i * 225
+        card(d, (bx, y, bx + box_w, y + 128), fill=(18, 56, 70), outline=(76, 121, 136), radius=18)
+        d.rounded_rectangle((bx, y, bx + box_w, y + 12), radius=6, fill=color)
+        draw_text(d, (bx + 18, y + 28), title, 23, ICE if color != RED else WHITE, True, width=170)
+        draw_text(d, (bx + 18, y + 70), body, 16, (210, 231, 236), width=170)
+        if i < len(stages) - 1:
+            arrow(d, (bx + box_w + 6, y + 64), (bx + 222, y + 64), fill=(118, 153, 164), width=4)
+
+    branch_y = 520
+    card(d, (180, branch_y, 690, branch_y + 190), fill=(17, 58, 64), outline=(75, 129, 137))
+    draw_text(d, (220, branch_y + 30), "Occurrence classifier", 31, ICE, True)
+    draw_text(d, (220, branch_y + 84), "hydrate-supportive | no hydrate | mimic risk | expert review", 21, WHITE, width=410)
+    draw_text(d, (220, branch_y + 138), "Output: probability + reason flags", 20, AMBER, True)
+
+    card(d, (760, branch_y, 1270, branch_y + 190), fill=(17, 58, 64), outline=(75, 129, 137))
+    draw_text(d, (800, branch_y + 30), "Saturation regressor", 31, ICE, True)
+    draw_text(d, (800, branch_y + 84), "continuous S_h/Sgh estimate where context and labels allow", 21, WHITE, width=410)
+    draw_text(d, (800, branch_y + 138), "Output: saturation + uncertainty", 20, AMBER, True)
+
+    card(d, (1340, branch_y, 1760, branch_y + 190), fill=(34, 54, 69), outline=(91, 125, 137))
+    draw_text(d, (1374, branch_y + 30), "Validation", 31, ICE, True)
+    draw_text(d, (1374, branch_y + 84), "complete wells, calibration, residuals, QC/mimic review", 21, WHITE, width=335)
+    draw_text(d, (1374, branch_y + 138), "No fake metrics", 20, RED, True)
+    arrow(d, (950, 328), (435, branch_y), fill=(118, 153, 164), width=4)
+    arrow(d, (950, 328), (1015, branch_y), fill=(118, 153, 164), width=4)
+    arrow(d, (1270, branch_y + 150), (1340, branch_y + 150), fill=(118, 153, 164), width=4)
+
+    d.rounded_rectangle((245, 850, 1675, 904), radius=14, fill=RED)
+    draw_text(d, (960, 862), "Guardrail: the model learns from measured and derived features; target-derived columns stay below the leakage barrier.", 24, WHITE, True, anchor="ma")
+    footer(img, "Sources: ML_PIPELINE_BASELINE_SOURCE_LEDGER; Chong et al. 2022; Chong et al. 2024; WELL_LOG_REQUIREMENTS_MAP; runtime skeleton.", dark=True)
     save(img, out)
 
 
 def slide_05(root: Path, out: Path) -> None:
-    img = new_slide("ML Methodology: Why These Parameters", "Normalized behavior panels show the range the model reviews and why each pattern is not a label by itself.")
+    img = new_slide("Parameter Movements: Hydrate and Its Mimics", "The useful signal is how a hydrate pocket changes the local log response inside its setting.")
     d = ImageDraw.Draw(img)
     panels = [
-        ("Clean sand", "low GR + usable porosity, but no hydrate proof", GREEN, [("GR", [0.25, 0.22, 0.26, 0.18], AMBER), ("phi", [0.55, 0.62, 0.60, 0.66], GREEN), ("Rt", [0.25, 0.30, 0.28, 0.32], RED)]),
-        ("Hydrate in sand", "Rt high + NMR-density gap + stiffness", TEAL, [("Rt", [0.38, 0.78, 0.88, 0.76], RED), ("NMR", [0.62, 0.30, 0.25, 0.34], BLUE), ("Vp", [0.45, 0.70, 0.78, 0.72], PURPLE)]),
-        ("Shale", "high GR and bound water can mimic porosity", AMBER, [("GR", [0.72, 0.78, 0.82, 0.74], AMBER), ("phi", [0.58, 0.52, 0.55, 0.53], GREEN), ("Rt", [0.30, 0.34, 0.29, 0.36], RED)]),
-        ("Free gas", "Rt may rise while Vp softens", RED, [("Rt", [0.40, 0.68, 0.76, 0.65], RED), ("Vp", [0.62, 0.28, 0.24, 0.32], BLUE), ("Vs", [0.48, 0.50, 0.52, 0.49], PURPLE)]),
-        ("Ice/cement", "stiff and resistive, but not necessarily hydrate", PURPLE, [("Rt", [0.45, 0.80, 0.84, 0.78], RED), ("Vp", [0.52, 0.78, 0.82, 0.76], BLUE), ("GR", [0.30, 0.27, 0.25, 0.28], AMBER)]),
-        ("Bad hole", "washout corrupts density, sonic, NMR, Rt", RED, [("CAL", [0.20, 0.30, 0.92, 0.86], RED), ("RHOB", [0.54, 0.50, 0.22, 0.24], GREEN), ("Vp", [0.55, 0.53, 0.30, 0.34], BLUE)]),
+        ("Hydrate in clean sand", "Rt up + Vp/Vs support + Vs/mu-rho up", TEAL, [("Rt", [0.34, 0.72, 0.86, 0.80, 0.38], RED), ("Vs", [0.42, 0.62, 0.76, 0.70, 0.45], PURPLE), ("NMR", [0.62, 0.35, 0.25, 0.32, 0.58], BLUE)]),
+        ("Water sand", "low GR + porosity, but Rt and stiffness moderate", GREEN, [("GR", [0.25, 0.22, 0.26, 0.18, 0.24], AMBER), ("phi", [0.58, 0.62, 0.60, 0.66, 0.61], GREEN), ("Rt", [0.25, 0.30, 0.28, 0.32, 0.27], RED)]),
+        ("Free gas", "Rt can rise while Vp softens and Vs does not stiffen", RED, [("Rt", [0.40, 0.68, 0.76, 0.65, 0.42], RED), ("Vp", [0.62, 0.28, 0.24, 0.32, 0.58], BLUE), ("Vs", [0.48, 0.50, 0.52, 0.49, 0.51], PURPLE)]),
+        ("Ice / frozen sediment", "Rt very high and velocities high; needs depth/P-T context", PURPLE, [("Rt", [0.52, 0.86, 0.92, 0.84, 0.60], RED), ("Vp", [0.58, 0.76, 0.82, 0.78, 0.62], BLUE), ("Vs", [0.55, 0.74, 0.80, 0.77, 0.60], PURPLE)]),
+        ("Tight / cemented rock", "resistive and stiff but pore volume is low", SHALE, [("Rt", [0.45, 0.78, 0.82, 0.75, 0.48], RED), ("Vp", [0.55, 0.80, 0.84, 0.78, 0.57], BLUE), ("phi", [0.42, 0.20, 0.16, 0.22, 0.40], GREEN)]),
+        ("Shale / bad hole", "high GR or washout can corrupt the feature table", AMBER, [("GR", [0.70, 0.78, 0.82, 0.74, 0.76], AMBER), ("CAL", [0.25, 0.30, 0.90, 0.88, 0.32], RED), ("RHOB", [0.54, 0.50, 0.22, 0.24, 0.48], GREEN)]),
     ]
     for i, (title, subtitle, color, curves) in enumerate(panels):
         row, col = divmod(i, 3)
@@ -471,59 +472,67 @@ def slide_05(root: Path, out: Path) -> None:
         d.rounded_rectangle((x + 150, y + 102, x + 375, y + 124), radius=10, fill=(198, 231, 221))
         draw_text(d, (x + 24, y + 132), "normalized range 0-1", 14, MUTED)
         mini_logs(d, x + 28, y + 158, 132, 82, curves)
-    draw_text(d, (960, 990), "Rule: the model learns evidence patterns after lithology, P-T context, borehole QC, and competing explanations are checked.", 23, NAVY, True, anchor="ma")
-    footer(img, "Sources: parameter matrix; Haines et al. 2022; Lee & Collett 2011; dashboard/well_log_engine.py normalized ranges.")
+    draw_text(d, (960, 875), "Guardrail: classify hydrate-supportive, mimic risk, poor quality, or out-of-domain. Do not declare hydrate from one curve.", 23, NAVY, True, anchor="ma")
+    footer(img, "Sources: ML_PIPELINE_BASELINE_SOURCE_LEDGER; SCIENCE_TO_ML_LOGIC_LADDER; Lee and Collett 2011; Haines et al. 2022; Aung et al. 2026.")
     save(img, out)
 
 
 def slide_06(root: Path, out: Path) -> None:
-    img = new_slide("Geomechanical Feature Sketch", "Use source-backed equations to test stiffness, stress, and gas-versus-hydrate ambiguity.")
+    img = new_slide("Feature Equations and Screening Envelopes", "Derived features help separate rigidity, gas response, and false positives.")
     d = ImageDraw.Draw(img)
-    card(d, (90, 180, 620, 740), fill=WHITE)
-    draw_text(d, (120, 205), "Inputs", 30, NAVY, True)
-    inputs = [("RHOB", "bulk density"), ("Vp", "P-wave velocity"), ("Vs", "S-wave velocity"), ("Rt", "electrical support"), ("GR", "lithology"), ("CAL", "borehole QC")]
-    for i, (sym, label) in enumerate(inputs):
-        y = 265 + i * 70
-        d.rounded_rectangle((125, y, 220, y + 46), radius=12, fill=(234, 247, 249), outline=(184, 218, 224), width=2)
-        draw_text(d, (172, y + 11), sym, 22, TEAL if i < 3 else AMBER, True, anchor="ma")
-        draw_text(d, (245, y + 12), label, 20, INK, width=280)
-    rock = [(770, 245), (1065, 245), (1190, 430), (1065, 615), (770, 615), (645, 430)]
-    d.polygon(rock, fill=(218, 226, 219), outline=(135, 158, 150))
-    for i in range(34):
-        px = 720 + (i % 7) * 60
-        py = 310 + (i // 7) * 50
-        d.ellipse((px, py, px + 23, py + 15), fill=(187, 211, 215), outline=(155, 181, 186))
-    for y, color, label in [(350, BLUE, "P wave"), (505, PURPLE, "S wave")]:
-        d.line((585, y, 725, y), fill=color, width=6)
-        arrow(d, (725, y), (790, y), fill=color, width=5)
-        draw_text(d, (585, y - 32), label, 18, color, True)
-    card(d, (1250, 175, 1800, 710), fill=WHITE)
-    draw_text(d, (1280, 205), "Equations used", 30, NAVY, True)
+    card(d, (85, 178, 655, 755), fill=WHITE)
+    draw_text(d, (120, 208), "Unit-safe equations", 30, NAVY, True)
     eqs = [
-        "Vp = 304.8 / DT",
-        "Vs = 304.8 / DTS",
-        "AI = RHOB x Vp",
-        "\u03bc\u03c1 = RHOB x Vs^2",
-        "\u03bb\u03c1 = RHOB x (Vp^2 - 2Vs^2)",
-        "G = RHOB x Vs^2",
-        "K = RHOB x (Vp^2 - 4Vs^2/3)",
-        "\u03bd = (Vp^2 - 2Vs^2) / [2(Vp^2 - Vs^2)]",
-        "\u03c3_eff = \u03c3_v - \u03b1Pp",
+        ("Vp", "1 / DT"),
+        ("Vs", "1 / DTS"),
+        ("AI", "rho * Vp"),
+        ("G or mu", "rho * Vs^2"),
+        ("K", "rho * (Vp^2 - 4/3 Vs^2)"),
+        ("E", "9KG / (3K + G)"),
+        ("nu", "(3K - 2G) / 2(3K + G)"),
+        ("lambda-rho", "(K - 2/3G) * rho"),
+        ("mu-rho", "G * rho"),
     ]
-    for i, eq in enumerate(eqs):
-        draw_text(d, (1290, 260 + i * 45), eq, 20, INK, True if i < 5 else False, width=470)
-    checks = [
-        ("hydrate-supportive", GREEN),
-        ("free gas", RED),
-        ("ice/cement", PURPLE),
-        ("stress context", BLUE),
-        ("bad hole", RED),
+    for i, (lhs, rhs) in enumerate(eqs):
+        y = 268 + i * 48
+        d.rounded_rectangle((122, y, 282, y + 34), radius=9, fill=(234, 247, 249), outline=(184, 218, 224), width=2)
+        draw_text(d, (202, y + 7), lhs, 18, TEAL if i < 5 else PURPLE, True, anchor="ma")
+        draw_text(d, (310, y + 6), rhs, 18, INK, True, width=295)
+
+    card(d, (720, 178, 1245, 755), fill=WHITE)
+    draw_text(d, (755, 208), "Hydrate screening envelopes", 30, NAVY, True)
+    ranges = [
+        ("Rt", "10-100+ ohm-m", RED),
+        ("Vp", "2.5-4.0 km/s", BLUE),
+        ("Vs", "1.0-2.5 km/s", PURPLE),
+        ("Vp/Vs", "1.6-2.4 broad", TEAL),
+        ("mu-rho", "10-55 GPa*g/cc", GREEN),
+        ("lambda-rho", "12-55 GPa*g/cc", AMBER),
+        ("phi", "0.20-0.35", GREEN),
     ]
-    for i, (label, color) in enumerate(checks):
-        x = 190 + i * 320
-        d.rounded_rectangle((x, 820, x + 250, 875), radius=14, fill=color)
-        draw_text(d, (x + 125, 836), label, 18, WHITE, True, anchor="ma")
-    footer(img, "Sources: dashboard/well_log_engine.py equation groups; dashboard/runtime/feature_engineering.py; WELL_LOG_REQUIREMENTS_MAP; manuscript equation/range docs.")
+    for i, (name, rng, color) in enumerate(ranges):
+        y = 280 + i * 60
+        draw_text(d, (765, y), name, 22, color, True)
+        d.rounded_rectangle((930, y + 4, 1185, y + 26), radius=8, fill=(229, 238, 241), outline=None)
+        d.rounded_rectangle((980, y + 4, 1135, y + 26), radius=8, fill=color, outline=None)
+        draw_text(d, (765, y + 30), rng, 15, MUTED, width=380)
+
+    card(d, (1315, 178, 1815, 755), fill=WHITE)
+    draw_text(d, (1350, 208), "How ML uses them", 30, NAVY, True)
+    uses = [
+        ("Rigidity", "Vs, G, and mu-rho separate hydrate-like frame stiffening from free gas."),
+        ("Mimics", "Ice, cement, carbonate, tight rock, and compaction can also be stiff."),
+        ("Crossplots", "Broad ranges screen; tighter Vp/Vs 1.4-1.6 is only a hypothesis."),
+        ("Provenance", "Derived features cannot be cleaner than their source curves."),
+    ]
+    for i, (title, body) in enumerate(uses):
+        y = 286 + i * 100
+        draw_text(d, (1350, y), title, 22, TEAL if i != 1 else RED, True)
+        draw_text(d, (1350, y + 32), body, 17, INK, width=395)
+
+    d.rounded_rectangle((210, 850, 1710, 908), radius=16, fill=(249, 244, 244), outline=AMBER, width=3)
+    draw_text(d, (960, 864), "Ranges guide QC and crossplots. Final cutoffs must be calibrated against approved Sgh/NMR/core labels.", 24, NAVY, True, anchor="ma")
+    footer(img, "Sources: SCIENCE_TO_ML_LOGIC_LADDER; ML_PIPELINE_BASELINE_SOURCE_LEDGER; Cook and Waite 2018; Haines et al. 2022.")
     save(img, out)
 
 
@@ -561,54 +570,68 @@ def slide_07(root: Path, out: Path) -> None:
 
 def slide_08(root: Path, out: Path) -> None:
     assets = root / "docs" / "project_blueprints" / "presentation_assets"
-    img = new_slide("Results and Discussion Plan", "Final results need figures that explain evidence agreement, uncertainty, and review flags.")
+    img = new_slide("Results Plan: Separate the Outputs", "The deliverable should show decision evidence, not fake accuracy metrics.")
     d = ImageDraw.Draw(img)
-    paste_image(img, assets / "synthetic_well_log_panel.png", (80, 180, 680, 565), cover=True)
-    paste_image(img, assets / "sweet_spot_ranking.png", (120, 610, 660, 820), cover=True)
+    paste_image(img, assets / "synthetic_well_log_panel.png", (70, 180, 650, 540), cover=True)
+    draw_text(d, (110, 570), "Planned approved-data log panel", 22, NAVY, True)
+    paste_image(img, assets / "sweet_spot_ranking.png", (90, 650, 650, 850), cover=True)
     outputs = [
-        ("Gate table", "QC, stability, reservoir, phase evidence", TEAL),
-        ("Model figures", "confusion, calibration, residuals", BLUE),
-        ("Interval output", "class probability + S_h", GREEN),
-        ("Review flags", "bad hole, shale, gas, out-of-distribution", RED),
-        ("Discussion lens", "why an interval passed, failed, or stayed expert review", AMBER),
+        ("Occurrence probability", "classifier output; not saturation or proof", TEAL),
+        ("Saturation estimate", "continuous S_h/Sgh where labels and context support it", GREEN),
+        ("Uncertainty", "model confidence plus feature and target confidence", BLUE),
+        ("QC status", "caliper, missingness, depth match, outliers", RED),
+        ("Mimic flags", "gas, ice, tight rock, shale, bad hole, missing feature", AMBER),
+        ("Producibility context", "NMR/core/permeability review; not occurrence label", PURPLE),
     ]
     for i, (title, body, color) in enumerate(outputs):
-        x = 780 + (i % 2) * 470
-        y = 185 + (i // 2) * 190
-        w = 420 if i < 4 else 890
-        card(d, (x, y, x + w, y + 130), fill=WHITE)
-        d.rounded_rectangle((x + 22, y + 35, x + 78, y + 91), radius=14, fill=(235, 247, 249), outline=(186, 219, 225), width=2)
-        draw_text(d, (x + 50, y + 49), str(i + 1), 24, color, True, anchor="ma")
-        draw_text(d, (x + 100, y + 28), title, 24, color, True)
-        draw_text(d, (x + 100, y + 65), body, 18, INK, width=w - 130)
-        if i in (0, 1, 2, 3):
-            arrow(d, (x + w // 2, y + 130), (x + w // 2, y + 170), fill=(136, 163, 174), width=3)
-    footer(img, "Sources: Classification Methods Draft; Chong et al. 2022; dashboard/well_log_engine.py; public/synthetic project figures.")
+        x = 760 + (i % 2) * 505
+        y = 180 + (i // 2) * 178
+        card(d, (x, y, x + 455, y + 128), fill=WHITE)
+        d.rounded_rectangle((x + 24, y + 36, x + 82, y + 94), radius=16, fill=(235, 247, 249), outline=(186, 219, 225), width=2)
+        draw_text(d, (x + 53, y + 50), str(i + 1), 24, color, True, anchor="ma")
+        draw_text(d, (x + 110, y + 26), title, 24, color, True)
+        draw_text(d, (x + 110, y + 64), body, 17, INK, width=300)
+
+    card(d, (760, 720, 1720, 870), fill=(249, 244, 244), outline=AMBER)
+    draw_text(d, (800, 746), "Discussion lens", 25, NAVY, True)
+    draw_text(
+        d,
+        (800, 790),
+        "For every interval: what evidence agreed, what looked like a mimic, which QC checks passed, and what data remain unresolved?",
+        18,
+        INK,
+        width=850,
+    )
+    footer(img, "Sources: ML_PIPELINE_BASELINE_SOURCE_LEDGER; runtime skeleton; Chong et al. 2024; Yoneda et al. 2026; public/synthetic scaffold figures.")
     save(img, out)
 
 
 def slide_09(root: Path, out: Path) -> None:
-    img = new_slide("Conclusion", "The workflow is strongest when occurrence, saturation, uncertainty, and producibility stay separated.")
+    img = new_slide("Conclusion", "The workflow is defensible because the science controls the ML, not the other way around.")
     d = ImageDraw.Draw(img)
     center = (960, 465)
-    d.ellipse((720, 245, 1200, 685), fill=(231, 243, 245), outline=(158, 205, 212), width=4)
-    draw_text(d, (960, 365), "Explainable hydrate prediction", 38, NAVY, True, anchor="ma")
-    draw_text(d, (960, 430), "public context + approved logs + equations + validation", 22, MUTED, width=430, align="center")
+    d.ellipse((700, 245, 1220, 690), fill=(231, 243, 245), outline=(158, 205, 212), width=4)
+    draw_text(d, (960, 344), "Science-to-ML ladder", 38, NAVY, True, anchor="ma")
+    draw_text(d, (735, 412), "existence context -> host rock -> hydrate response -> leakage-safe model -> review output", 22, MUTED, width=450, align="center")
     nodes = [
-        ((210, 260), "Science", "separate occurrence and saturation", TEAL),
-        ((1365, 260), "ML", "transparent features and reason codes", GREEN),
-        ((210, 650), "Energy", "rank sweet spots, not labels only", AMBER),
-        ((1365, 650), "Next", "confirm workbook labels and runtime figures", RED),
+        ((185, 245), "Science", "hydrate system defined before parameters", TEAL),
+        ((1375, 245), "ML", "separate classifier and saturation regressor", GREEN),
+        ((185, 655), "Guardrails", "mimics, bad hole, and target leakage stay visible", AMBER),
+        ((1375, 655), "Next", "recover workbook, targets, and approved validation", RED),
     ]
     for (x, y), title, body, color in nodes:
-        card(d, (x, y, x + 360, y + 135), fill=WHITE)
+        card(d, (x, y, x + 360, y + 145), fill=WHITE)
         d.ellipse((x + 22, y + 38, x + 80, y + 96), fill=(235, 247, 249), outline=(186, 219, 225), width=2)
         draw_text(d, (x + 51, y + 51), title[0], 24, color, True, anchor="ma")
         draw_text(d, (x + 105, y + 32), title, 25, color, True)
-        draw_text(d, (x + 105, y + 69), body, 18, INK, width=220)
+        draw_text(d, (x + 105, y + 70), body, 18, INK, width=220)
         arrow(d, (x + (360 if x < center[0] else 0), y + 68), (center[0] + (-240 if x < center[0] else 240), center[1]), fill=(148, 171, 180), width=4)
-    draw_text(d, (960, 820), "Final message: predict hydrate occurrence and saturation only when source, target provenance, validation, and uncertainty all stay traceable.", 27, NAVY, True, anchor="ma")
-    footer(img, "Sources: USGS/DOE/NETL; Chong et al. 2022; Haines et al. 2022; WELL_LOG_REQUIREMENTS_MAP; runtime equation docs.")
+    d.ellipse((700, 245, 1220, 690), fill=(231, 243, 245), outline=(158, 205, 212), width=4)
+    draw_text(d, (960, 344), "Science-to-ML ladder", 38, NAVY, True, anchor="ma")
+    draw_text(d, (735, 412), "existence context -> host rock -> hydrate response -> leakage-safe model -> review output", 22, MUTED, width=450, align="center")
+    card(d, (205, 785, 1715, 875), fill=(249, 244, 244), outline=TEAL)
+    draw_text(d, (245, 807), "Final message: predict occurrence and saturation only when source role, physical response, target provenance, validation, and uncertainty all stay traceable.", 22, NAVY, True, width=1420, align="center")
+    footer(img, "Sources: USGS/DOE/NETL; Chong et al. 2022; Aung et al. 2026; Yoneda et al. 2026; ML pipeline baseline source ledger.")
     save(img, out)
 
 

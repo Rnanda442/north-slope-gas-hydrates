@@ -69,9 +69,22 @@ Required shape:
 
 - Filled abstract.
 - Filled introduction.
+- Science-to-ML logic ladder from
+  `docs/SCIENCE_TO_ML_LOGIC_LADDER.md`: define the North Slope
+  pore-filling sand-hydrate system, separate hydrate habits, then move through
+  stability context, reservoir quality, and hydrate response.
+- Baseline pipeline choices from
+  `docs/ML_PIPELINE_BASELINE_SOURCE_LEDGER.md`: preserve headers and units,
+  align depth, handle QC with or without exact caliper thresholds, compute
+  measured and derived physics features, separate targets through a leakage
+  barrier, choose the model ladder, validate by complete wells, and define
+  occurrence, saturation, uncertainty, QC, and review outputs.
 - Source/evidence tier section.
 - Parameter section using a repeated grammar:
-  `measures`, `hydrate use`, `false positives`, `ML role`, `source basis`.
+  `physical reason`, `hydrate signal`, `false positives`, `ML role`,
+  `source basis`.
+- Screening ranges labeled as working envelopes for feature engineering,
+  crossplots, and QC, not final DOE cutoffs.
 - Methodology section:
   approved logs/core -> schema/unit mapping -> depth alignment -> QC gates ->
   feature equations -> target registry -> train-only preprocessing ->
@@ -144,6 +157,11 @@ Avoid for now:
 These rules should stay consistent across the Word document, slides, website,
 and runtime skeleton:
 
+- The main DOE interpretation target is pore-filling methane hydrate in
+  sand-rich permafrost-associated reservoirs on the Alaska North Slope.
+- Fracture/vein hydrate and massive/nodular hydrate should be acknowledged as
+  different habits, but they are not the cleanest fit for the project's
+  sand-reservoir log and ML workflow.
 - Gas-hydrate stability is necessary but not proof.
 - Occurrence, saturation, reservoir quality, producibility, and uncertainty are
   separate concepts.
@@ -233,9 +251,12 @@ Proceed to Word/PPT changes only when:
 
 Do the next work in this order:
 
-1. User reviews and edits this file.
-2. Update the Word builder and DOCX.
-3. Rebuild the slide panels and PPTX.
-4. Upload/replace Drive deliverables only after local verification.
-5. Update website/app skeleton only for consistency with the final approved
+1. Use `docs/SCIENCE_TO_ML_LOGIC_LADDER.md` as the science/ML spine.
+2. Use `docs/ML_PIPELINE_BASELINE_SOURCE_LEDGER.md` as the source-backed
+   decision ledger for pipeline options and guardrails.
+3. User reviews and edits this file.
+4. Update the Word builder and DOCX.
+5. Rebuild the slide panels and PPTX.
+6. Upload/replace Drive deliverables only after local verification.
+7. Update website/app skeleton only for consistency with the final approved
    Word/PPT direction.

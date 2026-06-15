@@ -43,18 +43,39 @@ def test_markdown_table_parses_workstreams() -> None:
 
 
 def test_project_roadmap_page_renders() -> None:
+    content = architecture_content()
+    workstreams = markdown_table(markdown_section(content, "Workstream Activity Map"))
+    statuses = workstreams["Status"].astype(str)
+    expected_metrics = [
+        ("Workstreams", str(len(workstreams))),
+        (
+            "Active",
+            str(
+                int(
+                    statuses.str.startswith("In progress").sum()
+                    + statuses.str.startswith("Partial").sum()
+                )
+            ),
+        ),
+        (
+            "Waiting / blocked",
+            str(
+                int(
+                    statuses.str.startswith("Waiting").sum()
+                    + statuses.str.startswith("Blocked").sum()
+                )
+            ),
+        ),
+        ("Complete", str(int(statuses.str.startswith("Complete").sum()))),
+    ]
+
     app = AppTest.from_file("streamlit_app.py", default_timeout=30)
     app.query_params["page"] = "Project Plan"
     app.run(timeout=30)
 
     assert not app.exception
     assert app.title[0].value == "Project Plan"
-    assert [(metric.label, metric.value) for metric in app.metric[:4]] == [
-        ("Workstreams", "10"),
-        ("Active", "7"),
-        ("Waiting / blocked", "1"),
-        ("Complete", "1"),
-    ]
+    assert [(metric.label, metric.value) for metric in app.metric[:4]] == expected_metrics
     assert len(app.dataframe) == 2
 
 

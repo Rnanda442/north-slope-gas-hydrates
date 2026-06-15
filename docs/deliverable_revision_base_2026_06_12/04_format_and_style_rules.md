@@ -18,6 +18,11 @@ Created: 2026-06-12
 - The introduction should explain what gas hydrates are, why the North Slope
   matters, why logs/core are needed, and why ML is useful but must be
   physically constrained.
+- Define the project hydrate system before listing parameters: pore-filling
+  methane hydrate in sand-rich permafrost-associated North Slope reservoirs is
+  the main DOE workflow target.
+- Briefly distinguish pore-filling, fracture/vein, and massive/nodular hydrate
+  habits so readers understand why the ML logic is tuned to sand reservoirs.
 - Avoid numbered topic lists in the introduction.
 - Later sections can remain scaffolded until real approved data and final
   outputs exist.
@@ -27,9 +32,21 @@ Created: 2026-06-12
   - comparative ML methods;
   - project synthesis and equation notes;
   - general ML methodology notes.
-- Parameter sections should use one repeated grammar:
-  `measures`, `hydrate use`, `false positives`, `ML role`, `source basis`.
+- Parameter sections should use the science-to-ML ladder in
+  `docs/SCIENCE_TO_ML_LOGIC_LADDER.md`:
+  stability context -> reservoir quality -> hydrate response -> ML features.
+- Pipeline and model-choice sections should use
+  `docs/ML_PIPELINE_BASELINE_SOURCE_LEDGER.md` for the recommended baseline
+  choices, optional future choices, benefits, issues, guardrails, validation
+  controls, and output definitions.
+- For each parameter family, use one repeated grammar:
+  `physical reason`, `hydrate signal`, `false positives`, `ML role`,
+  `source basis`.
+- Numeric ranges should be labeled as first-pass screening envelopes used for
+  QC, feature engineering, and crossplots, not final thresholds.
 - The Word doc should explain why each model and validation choice is made.
+- The Word doc should describe options in prose. Use dense tables only when
+  they make the source logic clearer than paragraphs.
 - Results should be described as planned output types until approved-data
   validation exists.
 
@@ -73,6 +90,9 @@ Created: 2026-06-12
   treated as continuous truth.
 - Public map context screens where interpretation is plausible; direct logs and
   core decide interval-scale evidence.
+- Do not present a flat parameter list. Explain the ladder:
+  can hydrate exist, can the rock host it, and do the logs show hydrate-like
+  electrical and mechanical response?
 
 ## ML Rules
 
@@ -93,6 +113,8 @@ Created: 2026-06-12
   same way as privacy-controlled multivariable log features.
 - Use baseline models for comparison, then advanced models only after leakage,
   validation, and calibration controls are explicit.
+- Treat sequence models and missing-log adapters as optional future paths unless
+  the approved data inventory proves they are needed and validation-safe.
 - Do not show model metrics as project results until approved-data validation
   has actually happened.
 - Use Chong et al. (2022) as the direct gas-hydrate/well-log ML anchor.

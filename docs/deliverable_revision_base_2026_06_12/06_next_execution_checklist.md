@@ -7,6 +7,8 @@ Use this checklist before rebuilding the Word document or slide deck.
 ## Before Editing Deliverables
 
 - Read this revision base directory.
+- Read `docs/SCIENCE_TO_ML_LOGIC_LADDER.md`.
+- Read `docs/ML_PIPELINE_BASELINE_SOURCE_LEDGER.md`.
 - Read `docs/ML_SOURCE_COVERAGE_AND_DELIVERABLE_REVISION_PLAN.md`.
 - Read `docs/SWEET_SPOT_SOURCE_MATRIX.md`.
 - Read `docs/WELL_LOG_REQUIREMENTS_MAP.md`.
@@ -26,6 +28,10 @@ Use this checklist before rebuilding the Word document or slide deck.
 - Keep comparative ML sources clearly labeled as method support.
 - Keep project synthesis and ML notes clearly labeled as planning/methodology
   support.
+- Use the baseline source ledger to distinguish recommended choices from
+  optional future choices, especially for caliper QC, derived elastic features,
+  Archie baselines, NMR/core target use, missing-log adapters, and sequence
+  models.
 
 ## Word Document Tasks
 
@@ -33,7 +39,12 @@ Use this checklist before rebuilding the Word document or slide deck.
 - Fill the Abstract and Introduction in paragraph form.
 - Add a source-coverage/evidence-tier section.
 - Rebuild the parameter section using repeated grammar:
-  `measures`, `hydrate use`, `false positives`, `ML role`, `source basis`.
+  `physical reason`, `hydrate signal`, `false positives`, `ML role`,
+  `source basis`.
+- Add the three-tier parameter structure:
+  stability context, reservoir quality, hydrate response.
+- Label all numeric ranges as working screening envelopes for QC, feature
+  engineering, and crossplots, not final cutoffs.
 - Strengthen the methodology section around:
   - approved data intake;
   - unit and alias mapping;
@@ -44,6 +55,10 @@ Use this checklist before rebuilding the Word document or slide deck.
   - train-only preprocessing;
   - complete-well validation;
   - occurrence, saturation, uncertainty, and review outputs.
+- Explain model options as a ladder: physics/rule baseline, simple supervised
+  baseline, tree-based tabular model, ANN/MLP, optional LSTM only if complete
+  depth sequences support it, and optional missing-log adapter only with
+  provenance flags.
 - Move website material to a short app/runtime-skeleton note or remove it from
   the main narrative.
 - Keep results as planned output placeholders until approved-data validation is
@@ -56,10 +71,12 @@ Use this checklist before rebuilding the Word document or slide deck.
 - Keep exactly nine slides.
 - Preserve slide 1 as title/about-me.
 - Keep slide 2 source-backed and methane-hydrate focused.
-- Rebuild slide 3 around parameter icon/symbol cards.
-- Rebuild slide 4 as a detailed connected ML architecture.
+- Rebuild slide 3 around the three-tier science-to-ML parameter ladder.
+- Rebuild slide 4 as raw headers -> QC/features/context -> classifier and
+  regressor -> validation architecture.
 - Rebuild slide 5 around physical behavior panels and false positives.
-- Rebuild slide 6 around equations and geomechanics symbol clarity.
+- Rebuild slide 6 around equations, geomechanics, broad screening envelopes,
+  and crossplot hypotheses.
 - Keep slide 7 as screening/context, not proof.
 - Keep slide 8 as future outputs and error-review logic, not fake metrics.
 - Keep slide 9 as conclusion plus next approved-data tasks.

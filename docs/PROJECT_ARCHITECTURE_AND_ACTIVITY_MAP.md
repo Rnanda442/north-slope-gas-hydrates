@@ -1,6 +1,6 @@
 # Project Architecture and Activity Map
 
-Last updated: 2026-06-12
+Last updated: 2026-06-15
 
 ## Purpose
 
@@ -77,10 +77,11 @@ The public website must never load authorized runtime data.
 | Authorized runtime | `dashboard/runtime/` | Source-driven readiness and grouped-well split scaffold implemented | Complete workbook-derived input mapping and model evaluation |
 | Well-log tests | `tests/` | 23 project tests passing | Expand with workbook-derived unit, label, and alignment cases |
 | GIS pipeline | notebooks and `03_data_final/` | Recovered | Validate only when GIS changes are needed |
-| Manuscript | `docs/project_blueprints/` | Two drafts recovered; research-overview Word deliverable aligned with the ML parameter, masking, target-leakage, normalization, overburden-context, and complete-well validation logic | Reconcile with equations and final workflow after approved labels are confirmed |
-| Presentation | Current baseline is the public-safe Gmail visual-feedback 9-slide revision rebuilt from `docs/project_blueprints/build_ml_revamp_powerpoint.py` and imported to Drive as `GMAIL VISUAL REVISION 9-SLIDE North Slope Gas Hydrate Slides 2026-06-11`; slide 2 now uses the approved SEM-first, source-backed gas-hydrate redraw with corrected chemistry symbology, P-T stability gate, and North Slope context. The deliverable base in `docs/deliverable_revision_base_2026_06_12/` now consolidates source coverage, email rules, current audits, format rules, and slide/Word alignment for the next pass. | In progress | Align the deck with workbook formulas, approved-data figures, and final Word text when available |
+| Manuscript | `docs/project_blueprints/` | Two drafts recovered; the local research-overview Word deliverable was rebuilt on 2026-06-13 from the science-to-ML ladder, baseline source ledger, source-backed parameter movements, screening-envelope language, target leakage rules, model ladder, and validation plan | Review the rebuilt local DOCX, then calibrate claims against workbook formulas, approved labels, and recoverable range provenance before any results-bearing revision |
+| Presentation | Current Drive baseline is the public-safe 2026-06-13 science-to-ML 9-slide raster-panel revision; a separate local 2026-06-15 stability/ML remake draft now exists at `docs/project_blueprints/STABILITY_ML_REMAKE_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`, preserving Gmail authority slides 1-2 and regenerating slides 3-9 from `docs/project_blueprints/build_stability_ml_slide_remake.py` | In progress | Review the local stability/ML remake, decide whether to replace or adapt the Drive deck, then keep Word and slides synchronized without adding unsupported results claims |
+| Mentor and deliverable communication | `docs/MENTOR_STATUS_UPDATE_DRAFT.md`, `docs/WEEKDAY_PROGRESS_REPORT_TEMPLATE.md`, `docs/DELIVERABLE_REFRESH_PLAN_STABILITY_AND_ML.md`, `docs/SLIDE_REMAKE_STORYBOARD_STABILITY_AND_ML.md` | Drafted public-safe stability-screen status language, mentor questions, weekday reporting template, Word/PPT refresh diagrams, and a slide-by-slide visual remake storyboard | Review with mentor, then feed approved language and storyboard into the Word and slide builders |
 | Excel design | Header screenshots recovered; workbook missing | Partial | Confirm formulas, units, and mnemonics from the workbook |
-| Source library | Index recovered; 2026-06-13 stability source bundle documented, uploaded locally in OpenScienceLab, connected to a Structural Explorer source panel, paired with a committed public snapshot fallback, and extended with public Arctic Slope well-context, G10015 temperature-inventory, and stability input scaffold products | In progress | Use OpenScienceLab as the heavy-data workbench, then commit only derived public-safe stability products and digitize/georeference OM-222 if no ready GIS derivative is found |
+| Source library | Index recovered; 2026-06-13 stability source bundle documented, uploaded locally in OpenScienceLab, connected to a Structural Explorer source panel, paired with a committed public snapshot fallback, extended with public Arctic Slope well-context, G10015 temperature-inventory, and stability input scaffold products; the hydrate ML/physics intake also records downloaded OSTI PDFs, official source-page backups, Google Drive PDF references, and a needs-PDF manifest | In progress | Use OpenScienceLab as the heavy-data workbench, commit only derived public-safe stability products, digitize/georeference OM-222 if no ready GIS derivative is found, and continue recovering institution-accessible/public sources |
 | Git history | Connected and synchronized with GitHub | Complete | Preserve the normal commit-and-push workflow |
 
 ## Workstream Activity Map
@@ -93,10 +94,11 @@ The public website must never load authorized runtime data.
 | W4 | Gap analysis | Waiting | Compare spreadsheet requirements with the current engine and runtime package | W3 | Missing and existing capabilities are listed |
 | W5 | Implement well-log scaffold | In progress | Runtime Readiness, source-derived QC, target contracts, and grouped-well split planning are implemented and exposed as the website `Log Scaffold` page; next add workbook-derived mapping and baseline evaluation | W3, W4 | Requirements are implemented with tests |
 | W6 | Website integration and QA | In progress | Four-page navigation, legacy aliases, Processing-style public/synthetic visual sections, consolidated Explore/Analyze/Project Plan pages, ML architecture sketches, stability snapshot fallback, public well stability-context metrics, G10015 temperature-inventory metrics, stability input scaffold, and stability pipeline readiness are implemented; website work is limited to public delivery products from the OSL workbench | W5 for final workflow | Hosted deployment shows the four-page visual workflow with responsive QA and no data-boundary regression |
-| W7 | Scientific alignment | Partial | Reconcile equations and interpretation rules across code, manuscript, and presentation | W1, W3, W5 | No material scientific contradictions remain |
+| W7 | Scientific alignment | Partial | Use `docs/SCIENCE_TO_ML_LOGIC_LADDER.md`, `docs/ML_PIPELINE_BASELINE_SOURCE_LEDGER.md`, and the stability calculation docs to reconcile hydrate habits, parameter tiers, parameter movement patterns, screening-envelope ranges, equations, guardrails, model options, and interpretation rules across code, manuscript, and presentation | W1, W3, W5 | No material scientific contradictions remain |
 | W8 | Git and project stabilization | Complete | Keep local `main` synchronized with `origin/main` and preserve focused commits | None | Clean history, remote, and documented workflow |
 | W9 | Authorized-data execution | Future | Configure approved runtime and run real-data validation only in the authorized environment | W5, authorization | Reproducible authorized outputs exist |
-| W10 | Word and PowerPoint deliverables | In progress | First review `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md`, then use `docs/ML_CITATION_PACKET_FOR_DELIVERABLES.md` and `docs/deliverable_revision_base_2026_06_12/` as the controlling source and format base for the next Word/PPT revision. Update the Word builder before the slide builder | W3, W5, W7 | Both deliverables use the verified workflow, figures, terminology, and validation plan |
+| W10 | Word and PowerPoint deliverables | In progress | Review the 2026-06-15 local stability/ML remake beside the 2026-06-13 native Google Docs/Slides imports, then decide what becomes the next official Word/PPT refresh | W3, W5, W7 | Both deliverables use the verified workflow, figures, terminology, parameter tiers, screening-envelope language, guarded model options, validation plan, and no unsupported results claims |
+| W11 | Stability-screen communication | In progress | Use the mentor update, weekday template, deliverable refresh plan, and generated local slide-remake draft to describe OpenScienceLab as the heavy-data workbench, GitHub/Streamlit as the public delivery surface, and the current stability workflow as an admissibility screen only | W7, W9, W10 | Mentor-facing language and refresh diagrams are approved without claiming hydrate proof, saturation, or sweet-spot ranking |
 
 Status vocabulary: `Ready`, `In progress`, `Waiting`, `Blocked`, `Partial`,
 `Complete`, or `Future`.
@@ -104,10 +106,22 @@ Status vocabulary: `Ready`, `In progress`, `Waiting`, `Blocked`, `Partial`,
 ## Current Priority
 
 Improvement decisions should follow
-`docs/PROJECT_IMPROVEMENT_STRATEGY.md`. Before the next major Word,
-PowerPoint, or website edit, review
-`docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md` so the goal, audience,
-deliverable order, and public-data boundary are explicit. The project will
+`docs/PROJECT_IMPROVEMENT_STRATEGY.md`. For the next Word, PowerPoint, or
+website edit, review `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md` and
+`docs/SCIENCE_TO_ML_LOGIC_LADDER.md`, then use
+`docs/ML_PIPELINE_BASELINE_SOURCE_LEDGER.md` so the goal, audience,
+deliverable order, science-to-ML narrative, parameter tiers, source-backed
+pipeline choices, model guardrails, and public-data boundary stay explicit. The
+2026-06-13 Word/PPT rebuild is now the working deliverable base and has been
+imported to Google Drive as native Docs/Slides files for review. For the
+stability-screen communication pass, use
+`docs/MENTOR_STATUS_UPDATE_DRAFT.md`,
+`docs/WEEKDAY_PROGRESS_REPORT_TEMPLATE.md`, and
+`docs/DELIVERABLE_REFRESH_PLAN_STABILITY_AND_ML.md` to keep the mentor update,
+weekday reporting, and planned Word/PPT refresh aligned. Use
+`docs/SLIDE_REMAKE_STORYBOARD_STABILITY_AND_ML.md` and the local
+`docs/project_blueprints/STABILITY_ML_REMAKE_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`
+draft for the next slide-review pass before any Drive replacement. The project will
 prioritize scientific traceability and runtime readiness over adding
 disconnected pages or opaque classification features.
 
@@ -160,16 +174,22 @@ and approved-data figures become available.
 4. Build the well-log requirements map.
 5. Perform the code-to-requirements gap analysis.
 6. Extend the implemented Runtime Readiness and grouped-well split scaffolds with workbook-derived rules and baseline models.
-7. Review `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md`, then use
-   `docs/ML_CITATION_PACKET_FOR_DELIVERABLES.md` and
-   `docs/deliverable_revision_base_2026_06_12/` to revise the Word document
-   first, then the nine-slide deck, so source claims, ML pipeline explanation,
-   format rules, and visual language stay synchronized.
-8. Keep the Word and PowerPoint deliverables synchronized as workbook formulas,
+7. Review the stability-screen communication drafts and reconcile open count,
+   phase-curve, confidence-threshold, and approved-validation-field decisions.
+8. Review the 2026-06-15 local stability/ML slide remake and the 2026-06-13
+   local Word/PPT rebuild against
+   `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md`,
+   `docs/SCIENCE_TO_ML_LOGIC_LADDER.md`,
+   `docs/ML_PIPELINE_BASELINE_SOURCE_LEDGER.md`,
+   `docs/ML_CITATION_PACKET_FOR_DELIVERABLES.md`, and
+   `docs/deliverable_revision_base_2026_06_12/`, so source claims,
+   hydrate-system framing, parameter tiers, baseline pipeline choices, ML
+   explanation, format rules, and visual language stay synchronized.
+9. Keep the Word and PowerPoint deliverables synchronized as workbook formulas,
    approved labels, and final figures become available.
-9. Polish and deploy the implemented four-page Processing-style website redesign.
-10. Run complete website visual QA.
-11. Keep the architecture tracker, tests, commits, and hosted deployment synchronized.
+10. Polish and deploy the implemented four-page Processing-style website redesign.
+11. Run complete website visual QA.
+12. Keep the architecture tracker, tests, commits, and hosted deployment synchronized.
 
 ## Key Decisions
 
@@ -181,6 +201,17 @@ and approved-data figures become available.
 - Real approved data remains in the authorized runtime environment.
 - `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md` is the editable goal-lock draft
   for the next Word/PPT/website pass.
+- `docs/SCIENCE_TO_ML_LOGIC_LADDER.md` is the current spine for the next
+  Word/PPT pass: define the hydrate system first, use three parameter tiers,
+  label numeric ranges as screening envelopes, and route targets through a
+  leakage barrier.
+- `docs/ML_PIPELINE_BASELINE_SOURCE_LEDGER.md` is the current source-backed
+  option ledger for how the pipeline should treat inputs, feature engineering,
+  parameter movement patterns, target leakage, guardrails, model choices,
+  validation, and outputs.
+- Stability-screen communication must say stability-admissibility only. It
+  must not claim hydrate proof, saturation, final stability results, or
+  sweet-spot ranking before approved-data validation.
 
 ## Important Activity Log
 
@@ -232,6 +263,12 @@ and approved-data figures become available.
 | 2026-06-12 | Added the project direction review lock | Added `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md` so the user can revise the shared goal, audience, deliverable order, science/ML rules, data boundary, open decisions, and acceptance criteria before further Word, PowerPoint, or website edits |
 | 2026-06-12 | Verified the comparative ML citation packet | Added `docs/ML_CITATION_PACKET_FOR_DELIVERABLES.md` with ready-to-cite Chong et al. (2022), Singh et al. (2021), and Chong et al. (2024) entries, allowed Word/slide language, and guardrails against using comparative sources as North Slope field truth |
 | 2026-06-13 | Connected the stability source bundle to the Structural Explorer | Added `dashboard/stability_sources.py`, GeoPandas-backed parsing for NSIDC GGD223 permafrost-depth controls and USGS hydrate assessment-unit GeoJSON, a Structural Explorer source-status/map panel, source-library scan exclusions, and tests for parser/UI behavior |
+| 2026-06-13 | Captured the science-to-ML logic ladder | Added `docs/SCIENCE_TO_ML_LOGIC_LADDER.md` with hydrate habits, three parameter tiers, screening-envelope ranges, equations, and ML pipeline language; wired it into the deliverable revision base and project direction tracker while marking the user-reported range DOCX files as pending local recovery |
+| 2026-06-13 | Retrieved hydrate ML and physics source files | Added `references/hydrate-ml-physics-sources/2026-06-13/` with downloaded OSTI PDFs for Singh et al. (2021) and Chong et al. (2024), official source-page backups for Lee and Collett (2011), Cook and Waite (2018), and Chong et al. (2024), plus a manifest identifying sources still needing user-provided or institutional PDFs |
+| 2026-06-13 | Registered five Google Drive source PDFs | Recorded user-uploaded Drive PDFs for Aung et al. (2026), Yoneda et al. (2026), Tian et al. (2023), Li and Liu (2020), and Naim et al. (2023) in `references/hydrate-ml-physics-sources/2026-06-13/google_drive_uploaded_sources_2026_06_13.md` and updated the source manifest/source registry |
+| 2026-06-13 | Created the baseline ML pipeline source ledger | Added `docs/ML_PIPELINE_BASELINE_SOURCE_LEDGER.md` to preserve source-backed claims, pipeline options, benefits, issues, parameter movement patterns, screening ranges, target leakage rules, model choices, validation controls, and Word/PPT implications before rebuilding deliverables |
+| 2026-06-13 | Rebuilt the local Word and PowerPoint deliverables | Regenerated the research-overview DOCX and exactly 9-slide PPTX from the science-to-ML ladder and baseline source ledger; kept the deliverables public-safe, results-free, and local-only pending review |
+| 2026-06-13 | Uploaded the science-to-ML deliverables to Google Drive | Imported the rebuilt DOCX/PPTX as native Google Docs/Slides files named `SCIENCE-TO-ML North Slope Gas Hydrate Research Overview 2026-06-13` and `SCIENCE-TO-ML 9-SLIDE North Slope Gas Hydrate Slides 2026-06-13`; connector readback verified native MIME types, document text, 9-slide structure, and all nine slide thumbnails |
 | 2026-06-14 | Locked the OpenScienceLab-to-website stability workflow | Recorded that OpenScienceLab is the heavy-data workbench for raw bundles and parsing, while GitHub/Streamlit receives only compact public-safe derived outputs; added the public stability snapshot fallback so the website can render GGD223 controls and USGS hydrate AUs without relying on fragile OpenScienceLab proxy links |
 | 2026-06-14 | Built the public well and temperature stability-context products | Added `dashboard/stability_products.py` and `data/public_stability_products/` to join public Alaska DNR Arctic Slope wells with nearest GGD223 permafrost-depth controls and USGS hydrate AU membership, plus a compact G10015 processed temperature-log inventory; Structural Explorer now shows summary metrics, preview tables, and CSV downloads while clearly labeling the products as context rather than hydrate proof |
 | 2026-06-14 | Added stability pipeline readiness guardrail | Added a Structural Explorer readiness table that separates ready public inputs from partial/planned inputs, keeping pressure assumptions, hydrate phase curve, and final stability top/base/thickness calculation marked as unfinished |
@@ -253,3 +290,6 @@ and approved-data figures become available.
 | 2026-06-14 | Added blank-row and proxy-temperature diagnostics | Added website tabs explaining blank-row causes, G10015/GGD223 coordinate crosswalk coverage, nearest located G10015 control distance, proxy-candidate tiers, source anchors, diagnostic CSV export, and regression tests while keeping proxy tiers out of the baseline calculation |
 | 2026-06-14 | Added selected-well temperature/phase audit plot | Added a Structural Explorer plot for a selected well showing the methane 5 ppt phase boundary, OSL modeled temperature key-depth line, permafrost/TVD references, and screen top/base markers where available, clearly labeled as an audit plot rather than the full raw G10015 profile |
 | 2026-06-14 | Prepared the sampled G10015 profile export | Added an OSL pipeline writer for `g10015_temperature_profile_points_sampled_2026-06-14.csv`, keeping the public product capped/sampled for website curve visualization and separate from stability proof or calibrated geothermal modeling |
+| 2026-06-15 | Drafted stability-screen communication materials | Added mentor status language, future mentor questions, a weekday reporting template, and a Word/PPT refresh plan that frame OpenScienceLab as the heavy-data workbench, GitHub/Streamlit as the public delivery surface, and the current workflow as stability-admissibility only |
+| 2026-06-15 | Planned the creative slide remake | Inspected the current nine-slide Gmail deck, confirmed each slide is a full-slide raster panel, and added a slide-by-slide storyboard that shifts the deck from parameter cards to a clear public/OSL, stability-screen, readiness, and guarded-ML visual story |
+| 2026-06-15 | Generated the local stability/ML slide remake | Added a reproducible slide builder that preserves Gmail authority slides 1-2 by embedded-image hash, generated new full-slide raster panels for slides 3-9, rebuilt a separate local nine-slide PPTX, verified the PowerPoint structure, and visually checked the public/OSL bridge, stability-products status, readiness, and mentor-decision slides without claiming hydrate proof, saturation, sweet spots, or validated ML results |

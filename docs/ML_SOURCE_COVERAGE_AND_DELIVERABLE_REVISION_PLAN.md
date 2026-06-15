@@ -55,12 +55,22 @@ anchored to North Slope sources such as Lee and Collett (2011), Haines et al.
 
 Use `docs/ML_CITATION_PACKET_FOR_DELIVERABLES.md` for the ready-to-cite ML
 source strings, slide/Word language, and comparative-source guardrails.
+Use `docs/ML_PIPELINE_BASELINE_SOURCE_LEDGER.md` for the baseline decisions
+that translate those sources into pipeline choices, feature-engineering
+options, guardrails, model ladder, validation, and outputs.
 
 ### Already Local and Usable
 
 - `references/ml-sources/2026-06-11/s10596-022-10151-9.pdf`
   - Direct ML anchor for gas-hydrate saturation prediction in permafrost
     settings, including Alaska North Slope and Mallik.
+- `references/hydrate-ml-physics-sources/2026-06-13/`
+  - Follow-up source-intake folder with downloaded OSTI PDFs for Singh et al.
+    (2021) and Chong et al. (2024), official source-page backups for Lee and
+    Collett (2011), Cook and Waite (2018), and Chong et al. (2024), Google
+    Drive PDF references for Aung et al. (2026), Yoneda et al. (2026), Tian et
+    al. (2023), Li and Liu (2020), and Naim et al. (2023), and a manifest of
+    remaining sources that need user-provided or institutional PDFs.
 - `references/ml-sources/2026-06-11/ML_Project_Reference_and_CreditScoreV4_Case_Notes.docx`
   - General ML workflow controls: baseline-first modeling, leakage-safe
     preprocessing, validation design, data-quality checks, calibration, and
@@ -72,6 +82,11 @@ source strings, slide/Word language, and comparative-source guardrails.
 - `docs/WELL_LOG_REQUIREMENTS_MAP.md`
   - Header roles, target-leakage rules, unresolved target questions, and
     synthetic-data boundary.
+- `docs/ML_PIPELINE_BASELINE_SOURCE_LEDGER.md`
+  - Source-backed project-synthesis ledger for what the pipeline should claim,
+    which options are baseline versus optional, how hydrate and mimic scenarios
+    move the parameters, and what each choice means for Word/PPT and runtime
+    design.
 - `docs/project_blueprints/ml_parameter_effect_tree.csv`
   - Parameter family, physical meaning, caveat, and ML role matrix.
 - `docs/ML_VISUAL_ARCHITECTURE_PLAN.md`
@@ -116,11 +131,18 @@ not like speaker notes for the slides.
    - This prevents a reviewer from thinking all sources have the same evidence
      weight.
 
-4. Parameters
-   - Rebuild around the parameter families from
-     `ml_parameter_effect_tree.csv`.
+4. Hydrate System and Parameters
+   - Use `docs/SCIENCE_TO_ML_LOGIC_LADDER.md` as the spine.
+   - Define the DOE target system first: pore-filling methane hydrate in
+     sand-rich permafrost-associated North Slope reservoirs.
+   - Briefly separate pore-filling, fracture/vein, and massive/nodular hydrate
+     habits.
+   - Rebuild parameter families around three tiers: stability context,
+     reservoir quality, and hydrate response.
    - For every family, use the same grammar:
-     `measures`, `hydrate use`, `caveats`, `ML role`, `source basis`.
+     `physical reason`, `hydrate signal`, `caveats`, `ML role`,
+     `source basis`.
+   - Use numeric ranges as screening envelopes, not hard thresholds.
 
 5. Methodology
    - Show the flow:
@@ -128,6 +150,9 @@ not like speaker notes for the slides.
      -> feature engineering -> target registry -> train-only preprocessing ->
      model ladder -> validation -> outputs.
    - Define all symbols used in equations.
+   - Use the baseline ledger to explain why the first implementation should be
+     baseline-first and leakage-safe before adding optional sequence or
+     missing-log adapters.
 
 6. ML Framework
    - Place Chong et al. as the direct permafrost ANN analogue.
@@ -163,10 +188,10 @@ source discipline and ML clarity.
 |---|---|---|
 | 1 | Title/about me | Keep concise; do not add technical burden |
 | 2 | Gas hydrate definition | Already redrawn; keep SEM-first visual and source-backed P-T/stability message |
-| 3 | Parameters | Make each symbol/icon trace to a source family; use short labels and consistent grammar |
-| 4 | ML architecture | Make the pipeline explicit: approved logs -> QC gates -> equations -> feature table -> target registry -> split -> model ladder -> outputs |
-| 5 | Why parameters | Tie each behavior panel to a physical reason and a false-positive condition |
-| 6 | Geomechanics | Define `AI`, `Vp/Vs`, `mu-rho`, `lambda-rho`, and what each can and cannot prove |
+| 3 | Parameters | Teach the three-tier ladder: stability context, reservoir quality, hydrate response; each symbol/icon traces to a source family |
+| 4 | ML architecture | Make the pipeline explicit: raw headers -> preserved mnemonics/units -> unit conversion -> caliper/washout QC -> equations/features -> stability/reservoir context -> target registry -> classifier/regressor -> validation |
+| 5 | Why parameters | Tie each behavior panel to a physical reason, hydrate signal, false-positive condition, and model role |
+| 6 | Geomechanics | Define `AI`, `Vp/Vs`, `mu-rho`, `lambda-rho`, broad screening envelopes, tighter crossplot hypotheses, and what each can and cannot prove |
 | 7 | Map context | Say the map is screening/context; do not imply hydrate confirmation from public GIS |
 | 8 | Results/discussion | Show future output slots and error-review flags, not fake model results |
 | 9 | Conclusion | End with source-backed workflow value and next data tasks: workbook, targets, approved validation |

@@ -1,0 +1,933 @@
+
+
+<!DOCTYPE html>
+<html xmlns:mml="https://www.w3.org/1998/Math/MathML" xmlns:xlink="https://www.w3.org/1999/xlink" xmlns:ali="https://www.niso.org/schemas/ali/1.0/" xmlns:xi="https://www.w3.org/2001/XInclude" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" lang="en">
+    <head lang="en">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Start SAS Google Tag Manager --> 
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f); })(window,document,'script','dataLayer','GTM-TVTCHDP');</script>
+        <!-- End SAS Google Tag Manager -->
+    
+        <!-- START USGS DAP Google Tag Manager -->
+        <!-- USE REQUIRED script for all public applications
+        IMPORTANT: REMOVE this script for any logged in pages and/or internal applications  -->
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-TKQR8KP');</script>
+        <!-- END USGS DAP Google Tag Manager --> 
+
+        
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="title" content="USGS Publications Warehouse">
+    <meta name="keywords" content>
+    <meta name="format-detection" content="telephone=no">
+    
+    <title>Archie’s saturation exponent for natural gas hydrate in coarse-grained reservoirs</title>
+    <meta NAME="title" content="Archie’s saturation exponent for natural gas hydrate in coarse-grained reservoirs" />
+    <meta name="description" content="Accurately quantifying the amount of naturally occurring gas hydrate in marine and permafrost environments is important for assessing its resource potential and understanding the role of gas hydrate in the global carbon cycle. Electrical resistivity well logs are often used to calculate gas hydrate saturations, Sh, using Archie&#39;s equation. Archie&#39;s equation, in turn, relies on an empirical saturation parameter, n. Though n = 1.9 has been measured for ice‐bearing sands and is widely used within the hydrate community, it is highly questionable if this n value is appropriate for hydrate‐bearing sands. In this work, we calibrate n for hydrate‐bearing sands from the Canadian permafrost gas hydrate research well, Mallik 5L‐38, by establishing an independent downhole Sh profile based on compressional‐wave velocity log data. Using the independently determined Sh profile and colocated electrical resistivity and bulk density logs, Archie&#39;s saturation equation is solved for n, and uncertainty is tracked throughout the iterative process. In addition to the Mallik 5L‐38 well, we also apply this method to..." />
+    <META NAME="abstract" CONTENT="Accurately quantifying the amount of naturally occurring gas hydrate in marine and permafrost environments is important for assessing its resource potential and understanding the role of gas hydrate in the global carbon cycle. Electrical resistivity well logs are often used to calculate gas hydrate saturations, Sh, using Archie&#39;s equation. Archie&#39;s equation, in turn, relies on an empirical saturation parameter, n. Though n = 1.9 has been measured for ice‐bearing sands and is widely used within the hydrate community, it is highly questionable if this n value is appropriate for hydrate‐bearing sands. In this work, we calibrate n for hydrate‐bearing sands from the Canadian permafrost gas hydrate research well, Mallik 5L‐38, by establishing an independent downhole Sh profile based on compressional‐wave velocity log data. Using the independently determined Sh profile and colocated electrical resistivity and bulk density logs, Archie&#39;s saturation equation is solved for n, and uncertainty is tracked throughout the iterative process. In addition to the Mallik 5L‐38 well, we also apply this method to two marine, coarse‐grained reservoirs from the northern Gulf of Mexico Gas Hydrate Joint Industry Project: Walker Ridge 313‐H and Green Canyon 955‐H. All locations yield similar results, each suggesting n ≈ 2.5 ± 0.5. Thus, for the coarse‐grained hydrate bearing (Sh &gt; 0.4) of greatest interest as potential energy resources, we suggest that n = 2.5 ± 0.5 should be applied in Archie&#39;s equation for either marine or permafrost gas hydrate settings if independent estimates of n are not available." />
+    <meta NAME="author" content="Ann E. Cook"/><meta NAME="author" content="William F. Waite"/>
+    <meta name = "revised" content="2018-04-27T16:37:31"/>
+    <meta name = "created" content="2018-03-26T00:00:00"/>
+    <meta name = "date" content="2018"/>
+  <!-- meta tags for google scholar indexing and zotero/mendeley parsing -->
+    <meta name="citation_title" content="Archie’s saturation exponent for natural gas hydrate in coarse-grained reservoirs" />
+    <meta name="citation_publication_date" content="2018" />
+    <meta name="citation_date" content="2018" />
+    <meta name="citation_online_date" content="2018-03-26T00:00:00" />
+    <meta NAME="citation_author" content="Ann E. Cook"/><meta NAME="citation_author" content="William F. Waite"/>
+    
+    
+    
+    <meta name="citation_journal_title" content="Journal of Geophysical Research B: Solid Earth" />
+    <meta name="citation_volume" content="123" />
+    <meta name="citation_issue" content="3" />
+    <meta name="citation_issn" content="" />
+    
+    <meta name="citation_firstpage" content="2069" />
+    <meta name="citation_lastpage" content="2089" />
+    
+        
+        
+        
+    
+    <meta name="citation_doi" content="10.1002/2017JB015138" />
+    
+
+    
+        
+    
+        
+
+       <link rel="stylesheet" href="https://pubs.usgs.gov/static/vendor/academicons/css/academicons.css">
+    
+    
+    
+        
+
+
+
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [ ['^','^'], ["\\(","\\)"] ],
+    displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+    processEscapes: true
+  },
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process',
+    menuOptions: {
+      settings: {
+        zoom: 'Click',
+        zscale: '200%'
+      }
+    },
+    enableAssistiveMml: true,
+    enableEnrichment: true,
+    sre: {
+      speech: 'deep',         // or 'shallow', or 'deep'
+      domain: 'mathspeak',    // speech rules domain
+      style: 'default',       // speech rules style
+      locale: 'en'            // the language to use (en, fr, es, de, it)
+    },
+    enrichError: (doc, math, err) => doc.enrichError(doc, math, err),  // function to call if enrichment fails
+    enableExplorer: true,
+    a11y: {
+      infoType: true,                   // show semantic type on mouse hovering
+      infoRole: true,                   // show semantic role on mouse hovering
+      infoPrefix: true,                 // show speech prefixes on mouse hovering
+    }
+  }
+};
+</script>
+
+
+<script id="MathJax-script" async
+src="https://pubs.usgs.gov/static/vendor/MathJax/es5/tex-mml-svg.js"></script>
+    
+
+
+
+
+        <title>USGS Publications Warehouse</title>
+
+        
+        
+    
+        
+
+       <link rel="stylesheet" href="https://pubs.usgs.gov/static/vendor/academicons/css/academicons.css">
+    
+
+        <!--[if gt IE 8]><!-->
+        <script src="https://pubs.usgs.gov/static/vendor/polyfill.js"></script>
+        <script>
+            if (!String.prototype.startsWith) {
+                String.prototype.startsWith = function(search, pos) {
+                    return this.substr(!pos || pos < 0 ? 0 : +pos, search.length) === search;
+                };
+            }
+        </script>
+        <!--<![endif]-->
+        <script src="https://pubs.usgs.gov/static/vendor/system.js" defer></script>
+        <script defer>
+        window.addEventListener('load', () => {
+            SystemJS.import("https://pubs.usgs.gov/static/scripts/common.js");
+        });
+    </script>
+
+        
+    <link rel="stylesheet" href="https://pubs.usgs.gov/static/pubs_base.a243eca3.css" type="text/css" />
+    <link rel="shortcut icon" href="https://pubs.usgs.gov/static/images/pubswh/favicon.72b5542e.ico"/>
+    <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="USGS Pubs"/>
+    <link rel="unapi-server" type="application/xml" title="unAPI" href="/unapi" />
+    <link rel="alternate" type="application/rss+xml" title="USGS Publications Warehouse RSS Feed" href="https://pubs.usgs.gov/pubs-services/publication/rss"/>
+    <script>
+        var CONFIG = {
+            lookupUrl: 'https://pubs.usgs.gov/pubs-services/lookup/',
+            requestArgs: JSON.parse('{}') <!-- set to True if only one value per key is desired -->
+        }
+    </script>
+
+    </head>
+    <body>
+        <!-- Start SAS Google Tag Manager (noscript) --> 
+            <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TVTCHDP" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <!-- End SAS Google Tag Manager (noscript) -->
+    
+        
+        
+    <a class="usa-skipnav" href="#main-content">Skip to main content</a>
+
+    <section class="usa-banner maxw-full" aria-label="Official government website">
+        <div class="usa-accordion">
+            <header class="usa-banner__header">
+                <div class="usa-banner__inner content-container">
+                    <div class="grid-col-auto">
+                        <img class="usa-banner__header-flag" src="https://pubs.usgs.gov/static/img/us_flag_small.be327dc2.png" alt="U.S. flag">
+                    </div>
+                    <div class="grid-col-fill tablet:grid-col-auto">
+                        <p class="usa-banner__header-text">An official website of the United States government</p>
+                        <p class="usa-banner__header-action" aria-hidden="true">Here’s how you know</p>
+                    </div>
+                    <button class="usa-accordion__button usa-banner__button"
+                            aria-expanded="false" aria-controls="gov-banner">
+                        <span class="usa-banner__button-text">Here’s how you know</span>
+                    </button>
+                </div>
+            </header>
+            <div class="usa-banner__content usa-accordion__content" id="gov-banner">
+                <div class="grid-row grid-gap-lg">
+                    <div class="usa-banner__guidance tablet:grid-col-6">
+                        <img class="usa-banner__icon usa-media-block__img" src="https://pubs.usgs.gov/static/img/icon-dot-gov.42b4ac46.svg"
+                             alt="Dot gov">
+                        <div class="usa-media-block__body">
+                            <p>
+                                <strong>Official websites use .gov</strong>
+                                <br/>
+                                A <strong>.gov</strong> website belongs to an official government organization in the
+                                United States.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="usa-banner__guidance tablet:grid-col-6">
+                        <img class="usa-banner__icon usa-media-block__img" src="https://pubs.usgs.gov/static/img/icon-https.73abd866.svg"
+                             alt="Https">
+                        <div class="usa-media-block__body">
+                            <p>
+                                <strong>Secure .gov websites use HTTPS</strong>
+                                <br/>
+                                A <strong>lock</strong> (
+                                <span class="icon-lock">
+                                    <svg xmlns="https://www.w3.org/2000/svg" width="52" height="64" viewBox="0 0 52 64" class="usa-banner__lock-image" role="img" aria-labelledby="banner-lock-title banner-lock-description"><title id="banner-lock-title">Lock</title><desc id="banner-lock-description">A locked padlock</desc><path fill="#000000" fill-rule="evenodd" d="M26 0c10.493 0 19 8.507 19 19v9h3a4 4 0 0 1 4 4v28a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V32a4 4 0 0 1 4-4h3v-9C7 8.507 15.507 0 26 0zm0 8c-5.979 0-10.843 4.77-10.996 10.712L15 19v9h22v-9c0-6.075-4.925-11-11-11z"/></svg>
+                                </span>
+                                ) or <strong>https://</strong> means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="usa-overlay"></div>
+
+    <header class="usa-header usa-header--extended usgs-header site-header" role="banner">
+        <div class="usgs-header-container">
+            <div class="usa-navbar">
+                <div class="usa-logo" id="extended-logo">
+                    <a href="https://www.usgs.gov" accesskey="1" title="Home" aria-label="Home">
+                        <img alt="USGS Home" src="https://pubs.usgs.gov/static/img/USGS_logo.356d51b9.svg"></img>
+                    </a>
+                    
+                </div>
+                <button class="usa-menu-btn">Menu</button>
+            </div>
+        </div>
+
+        
+            <nav role="navigation" class="usa-nav">
+                <div>
+                    <button class="usa-nav__close"><img src="https://pubs.usgs.gov/static/img/close.fe3f13f6.svg" alt="close"></button>
+                    <ul class="usa-nav__primary usa-accordion">
+                        <li class="usa-nav__primary-item">
+                            <a class="usa-nav__link" href="/">USGS Publications Warehouse</a>
+                        </li>
+                        <li class="usa-nav__primary-item">
+                            <button class="usa-accordion__button usa-nav__link"
+                                    aria-expanded="false"
+                                    aria-controls="explore-section">
+                                <span>Explore</span>
+                            </button>
+                            <ul id="explore-section" class="usa-nav__submenu">
+                                <li class="usa-nav__submenu-item">
+                                 <a href="/newpubs">Explore recent publications by USGS authors</a>
+                                </li>
+                                <li class="usa-nav__submenu-item">
+                                    <a href="/browse/">
+                                        Browse all of Pubs Warehouse by publication type and year
+                                    </a>
+                                </li>
+                           </ul>
+                        </li>
+                        <li class="usa-nav__primary-item">
+                            <button class="usa-accordion__button usa-nav__link"
+                                    aria-expanded="false"
+                                    aria-controls="documentation-section">
+                                <span>Documentation</span>
+                            </button>
+                            <ul id="documentation-section" class="usa-nav__submenu">
+                                <li class="usa-nav__submenu-item">
+                                    <a href="/documentation/about">About</a>
+                                </li>
+                                <li class="usa-nav__submenu-item">
+                                    <a href="/documentation/faq">FAQs</a>
+                                </li>
+                                <li class="usa-nav__submenu-item">
+                                  <a href="/documentation/web_service_documentation">Web service documentation</a>
+                                </li>
+                                <li class="usa-nav__submenu-item">
+                                  <a href="/documentation/other_resources">Other resources</a>
+                                </li>
+                                <li class="usa-nav__submenu-item">
+                                    <a href="/documentation/usgs_series">
+                                        Descriptions of US Geological Survey Report Series
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="usa-nav__primary-item">
+                            <a class="usa-nav__link" href="/contact">Contact</a>
+                        </li>
+                        <li class="usa-nav__primary-item">
+                            <a class="usa-nav__link" href="https://www.usgs.gov/information-policies-and-instructions/liability#future-ips">Disclaimer</a>
+                        </li>
+                        
+                    </ul>
+                    <div class="usa-nav__secondary">
+                        <form class="usa-search usa-search--small" action="/search" method="get">
+                            <div role="search">
+                                <label class="usa-sr-only" for="extended-search-field-small">Search</label>
+                                <input class="usa-input" id="extended-search-field-small" type="search" name="q">
+                                <button class="usa-button" type="submit">
+                                    <span class="usa-sr-only">Search</span>
+                                </button>
+                            </div>
+                        <input type="hidden" name="__ncforminfo" value="5sLQWydG45Bz8kDD3KSEtFeXH-2pXLhYu9Rl6ip4mB6hlSf5j45tMOgf6aWs8MKoI9w-zZKC3OH6R5-CoB21pU7Zia7BHmR1"/></form>
+                    </div>
+                </div>
+            </nav>
+        
+    </header>
+
+
+
+        <main id="main-content">
+            
+    
+
+    <div class="usa-prose">
+        
+    <main role ="main" id="publication-container" >
+        <!-- <script type="text/javascript">console.log('PUBSWH-369');</script> -->
+        <article itemscope itemtype="https://schema.org/ScholarlyArticle">
+            
+                <abbr class="unapi-id" title="https://pubs.usgs.gov/publication/70196200">
+                    <!-- avoid empty --></abbr>
+            
+
+            
+
+            <div class="publication-header-container">
+                <div class="pubs-thumbnail">
+                    
+                        <a class="usa-link"
+                           title="Go to Publisher Index Page (via DOI) for more information"
+                           href="https://doi.org/10.1002/2017JB015138">
+                
+                
+                    <img id="thumbnail"
+                         src="/imgsizer/_?f=PNG&amp;u=https%3A%2F%2Fpubs.usgs.gov%2Fthumbnails%2Foutside_thumb.jpg&amp;w=200&amp;s=b&#39;ihp0o0q4hehHFQ3q6utWptgyF5M&#39;"
+                         alt="thumbnail"/>
+                
+            </a>
+                    
+                </div>
+                <div class="publication-header-info-container">
+                    
+                    <div class="publication-header-titles">
+                        <h3 class="publication-title" itemprop="name" style="margin-block-end: unset;">Archie’s saturation exponent for natural gas hydrate in coarse-grained reservoirs</h3>
+
+                        
+                            <div class="series-title" style="margin-block-end: unset;">Journal of Geophysical Research B: Solid Earth
+                                </div>
+                        
+
+                        
+
+                        
+
+                        
+                    </div>
+
+                    
+                    
+
+                    <section id="contributors"><div>
+                                <span class="list-title">By: </span><span class="contributor" itemprop="author"
+                              itemtype="https://schema.org/Person">Ann E. Cook</span>&nbsp;and&nbsp;<span class="contributor" itemprop="author"
+                              itemtype="https://schema.org/Person">William F. Waite</span><a href="https://orcid.org/0000-0002-9436-4109" aria-label="ORC Id"><i class="ai ai-orcid"></i></a>
+                            </div>
+                        </section>
+                    <section>
+                        
+                        <div class="doi-container"><a itemprop="sameAs"
+                                                      class="usa-link"
+                                                      href="https://doi.org/10.1002/2017JB015138"
+                                                      onclick="GA.trackGAEvent('Downloads', 'DOI', 'https://dx.doi.org/10.1002/2017JB015138')">
+                            https://doi.org/10.1002/2017JB015138</a>
+                        </div>
+                        
+                        <!-- <div id="doi-twitter-container">
+
+                            <a href="https://twitter.com/share"
+                               class="twitter-share-button"
+                               data-text="USGS Pub"
+                               data-via="USGS_Pubs"
+                               data-dnt="true">Tweet</a>
+                            <script>!function(d, s, id) {
+                                var js, fjs = d.getElementsByTagName(s)[0],
+                                    p = /^https:/.test(d.location) ? 'http' : 'https';
+                                if (!d.getElementById(id)) {
+                                    js = d.createElement(s);
+                                    js.id = id;
+                                    js.src = p + '://platform.twitter.com/widgets.js';
+                                    fjs.parentNode.insertBefore(js, fjs);
+                                }
+                            }(document, 'script', 'twitter-wjs');</script>
+                        </div> -->
+                        <div id="metrics" class="pub-metrics">
+                            <p style="font-weight: bold;font-size: larger;margin-top: 0.25em;margin-bottom: 0.125em;">Metrics</p>
+                            
+                                
+                            
+                            
+                                
+                                    
+                                        <div id="crossref" >
+                                            <div style="display: flex">Cited by <a hidden id="modal-button" aria-controls="citations"  id="crossref-cited-by-count" style="font-weight: bold;padding-right: 0.25em;padding-left: 0.25em;">115</a> publications in Crossref</div>
+                                        </div>
+                                    
+                                
+                            
+                            <a href="/metrics/publication/70196200/" style="padding-top: 0.25em;">Web analytics dashboard</a>
+                            <a href="/documentation/faq#WhatMetricsAreAvailableForPublicationsInThePublicationsWarehouse" style="font-size:smaller;padding-top: 0.25em;display:flex;justify-content: center;">Metrics definitions</a>
+                        </div>
+
+                    </section>
+                </div>
+            </div>
+            
+            
+ 
+
+           
+
+            <section>
+                
+            </section>
+
+
+            <section id="disclaimer">
+                
+            </section>
+
+            
+            <section id="suggested">
+
+                
+                
+
+                
+                
+
+                
+                
+                <h4>Links</h4>
+                <ul class="usa-list">
+                        <li style="max-width: 100%;">More information: <a class="usa-link Index_Page" href="https://doi.org/10.1002/2017JB015138" target="_blank"
+                       onclick="GA.trackGAEvent('Downloads', 'Index Page', 'https://doi.org/10.1002/2017JB015138')"
+                       title=" Index Page">
+                        <strong>Publisher Index Page (via DOI)</strong></a></li>
+                    
+                    
+                    
+
+
+                    
+                    
+                        
+                        
+                        
+                    
+                        
+                        
+                        
+                    
+                        
+                        
+                        
+                    
+                    
+                    
+                    
+
+                    
+                    
+                    
+                        
+                        
+
+                        
+                        
+                            
+                            
+                        
+
+                        
+                        
+                            
+                            
+                            
+                        
+
+                        
+                        
+                            
+                            
+                        
+                    
+                    
+                    
+                
+                    
+                    
+                    
+                        
+                        <li>Open Access Version:  
+                            
+                                <a class="usa-link OPEN_ACCESS_PUBLISHER" href="https://doi.org/10.1002/2017jb015138">Publisher Index Page <i class="ai ai-open-access"></i></a>
+                            
+                        </li>
+                    
+                    
+                    <li>Download citation as: <a class="usa-link RIS"
+                            href="/publication/70196200?mimetype=ris">RIS</a>
+                        |
+                        <a class="usa-link DUBLIN_CORE" href="/publication/70196200?mimetype=dublincore">Dublin
+                            Core</a></li>
+                </ul>
+            </section>
+            
+                
+                    <section itemprop="description" id="abstract">
+                        <h4 id="abstract_head">Abstract</h4>
+                        <div>
+                            <div class="abstract-contents">
+
+                                <p><span>Accurately quantifying the amount of naturally occurring gas hydrate in marine and permafrost environments is important for assessing its resource potential and understanding the role of gas hydrate in the global carbon cycle. Electrical resistivity well logs are often used to calculate gas hydrate saturations,&nbsp;</span><i>S</i><sub><i>h</i></sub><span>, using Archie's equation. Archie's equation, in turn, relies on an empirical saturation parameter,<span>&nbsp;</span></span><i>n</i><span>. Though<span>&nbsp;</span></span><i>n</i><span>&nbsp;=&nbsp;1.9 has been measured for ice‐bearing sands and is widely used within the hydrate community, it is highly questionable if this<span>&nbsp;</span></span><i>n</i><span><span>&nbsp;</span>value is appropriate for hydrate‐bearing sands. In this work, we calibrate<span>&nbsp;</span></span><i>n</i><span><span>&nbsp;</span>for hydrate‐bearing sands from the Canadian permafrost gas hydrate research well, Mallik 5L‐38, by establishing an independent downhole<span>&nbsp;</span></span><i>S</i><sub><i>h</i></sub><span><span>&nbsp;</span>profile based on compressional‐wave velocity log data. Using the independently determined<span>&nbsp;</span></span><i>S</i><sub><i>h</i></sub><span><span>&nbsp;</span>profile and colocated electrical resistivity and bulk density logs, Archie's saturation equation is solved for<span>&nbsp;</span></span><i>n,</i><span><span>&nbsp;</span>and uncertainty is tracked throughout the iterative process. In addition to the Mallik 5L‐38 well, we also apply this method to two marine, coarse‐grained reservoirs from the northern Gulf of Mexico Gas Hydrate Joint Industry Project: Walker Ridge 313‐H and Green Canyon 955‐H. All locations yield similar results, each suggesting<span>&nbsp;</span></span><i>n</i><span>&nbsp;≈&nbsp;2.5&nbsp;±&nbsp;0.5. Thus, for the coarse‐grained hydrate bearing (</span><i>S</i><sub><i>h</i></sub><span>&nbsp;&gt;&nbsp;0.4) of greatest interest as potential energy resources, we suggest that<span>&nbsp;</span></span><i>n</i><span>&nbsp;=&nbsp;2.5&nbsp;±&nbsp;0.5 should be applied in Archie's equation for either marine or permafrost gas hydrate settings if independent estimates of<span>&nbsp;</span></span><i>n</i><span><span>&nbsp;</span>are not available.</span></p>
+                            </div>
+                        </div>
+                    </section>
+                
+                
+                
+                    
+                
+            
+            
+            
+            
+                <section>
+                    <h4>Suggested Citation</h4>
+                    <p id="suggested-citation">Cook, A.E., and Waite, W., 2018, Archie’s saturation exponent for natural gas hydrate in coarse-grained reservoirs: Journal of Geophysical Research B: Solid Earth, v. 123, no. 3, p. 2069-2089, https://doi.org/10.1002/2017JB015138.</p>
+                    
+                    
+                </section>
+            
+
+            <section id="details">
+                <table class="usa-table usa-table--borderless">
+                    <tbody>
+                    
+                        <tr>
+                            <th scope="row">Publication type</th>
+                            <td>Article</td>
+                        </tr>
+                    
+                        <tr>
+                            <th scope="row">Publication Subtype</th>
+                            <td>Journal Article</td>
+                        </tr>
+                    
+                        <tr>
+                            <th scope="row">Title</th>
+                            <td>Archie’s saturation exponent for natural gas hydrate in coarse-grained reservoirs</td>
+                        </tr>
+                    
+                        <tr>
+                            <th scope="row">Series title</th>
+                            <td>Journal of Geophysical Research B: Solid Earth</td>
+                        </tr>
+                    
+                        <tr>
+                            <th scope="row">DOI</th>
+                            <td>10.1002/2017JB015138</td>
+                        </tr>
+                    
+                        <tr>
+                            <th scope="row">Volume</th>
+                            <td>123</td>
+                        </tr>
+                    
+                        <tr>
+                            <th scope="row">Issue</th>
+                            <td>3</td>
+                        </tr>
+                    
+                        <tr>
+                            <th scope="row">Publication Date</th>
+                            <td>March 11, 2018</td>
+                        </tr>
+                    
+                        <tr>
+                            <th scope="row">Year Published</th>
+                            <td>2018</td>
+                        </tr>
+                    
+                        <tr>
+                            <th scope="row">Language</th>
+                            <td>English</td>
+                        </tr>
+                    
+                        <tr>
+                            <th scope="row">Publisher</th>
+                            <td>AGU</td>
+                        </tr>
+                    
+                        <tr>
+                            <th scope="row">Contributing office(s)</th>
+                            <td>Woods Hole Coastal and Marine Science Center</td>
+                        </tr>
+                    
+                        <tr>
+                            <th scope="row">Description</th>
+                            <td>21 p.</td>
+                        </tr>
+                    
+                        <tr>
+                            <th scope="row">First page</th>
+                            <td>2069</td>
+                        </tr>
+                    
+                        <tr>
+                            <th scope="row">Last page</th>
+                            <td>2089</td>
+                        </tr>
+                    
+                    </tbody>
+                    <caption>Additional publication details</caption>
+                </table>
+            </section>
+            
+            
+            <aside>
+                <i>*Disclaimer: English is the official language and authoritative version of all federal information.</i>
+            </aside>
+        </article>
+    </main>
+
+    
+        <div class="usa-modal usa-modal--lg" id="citations">
+            <div style="display:flex;justify-content: flex-end;padding-top: 0.5em;">
+                <button type="button" class="usa-button" aria-label="Close this window" data-close-modal style="background-color: unset;color:black">
+                    X
+                </button>
+            </div>
+            <div class="usa-modal__content">
+                <div class="usa-modal__main">
+                    
+                    <div id="modal_list_loading_indicator" hidden>Loading...</div>
+                    <div id="modal_list" class="citation-modal-list"></div>
+                    <div class="usa-modal__footer"></div>
+                </div>
+            </div>
+        </div>
+    
+    
+    
+    <script type="application/javascript" defer>
+
+        // returns true if the element or one of its parents has the class classname
+        function hasSomeParentTheClass(element, classname) {
+            if (element.className.split(' ').indexOf(classname)>=0) return true;
+            return element.parentElement && hasSomeParentTheClass(element.parentElement, classname);
+        }
+    
+        let modal_has_been_opened = false;
+    
+        const p = new Promise((resolve, reject) => {
+            window.addEventListener('load', (event) => {
+    
+                document.addEventListener("pubswh-page-loaded", (event) => {
+                    console.log('Event "pubswh-page-loaded" received: ', event.detail);
+                    let modal_button = document.getElementById("modal-button");
+                    if (modal_button){
+                        modal_button.hidden=false;
+                    }
+                });
+    
+                let postLoadActionSummary = [];
+    
+                // section-508 compliance
+                var mjx_assistive_mml = document.getElementsByTagName("mjx-assistive-mml");
+                for (var i = 0; i < mjx_assistive_mml.length; i++){
+                    mjx_assistive_mml[i].role = "math";
+                    mjx_assistive_mml[i].aria_label = "";
+                    
+                    postLoadActionSummary.push("Completed 508 operation [role=math, aria_label=''] on [mjx_assistive_mml] element ");
+                }
+    
+                // section-508 compliance
+                var mjx_container = document.getElementsByTagName("mjx-container");
+                for (var i = 0; i < mjx_container.length; i++){
+                    mjx_container[i].role = "math";
+                    mjx_container[i].aria_label = "";
+                    
+                    postLoadActionSummary.push("Completed 508 operation [role=math, aria_label=''] on [mjx_container] element: ");
+                }
+    
+                //section 508 compliance -- hide cells without 'headers' attribute. 
+                var y = Array.from(document.getElementsByTagName("td")).filter(e => e.headers == "")
+                for (var i = 0; i < y.length; i++){
+    
+                    y[i]['aria-hidden'] = "true";
+                    postLoadActionSummary.push("assigned headers attribute: " + y[i].headers);
+                }
+    
+                // sticky headers on tables
+                // For each table on the page,...
+                //      - Create Fixed Header
+                //      - Top and bottom scroll
+                var table_panels = document.getElementsByClassName("table-wrap");
+                for (var i = 0; i < table_panels.length; i++)
+                {
+                    // tables to skip 
+                    var x = hasSomeParentTheClass(table_panels[i], 'conversion-factors');
+                    if (!x){
+                        // assuming the first child element of the table is the anchor with id.
+                        var id = table_panels[i].firstChild.id;
+                        try
+                        {
+                            var table_scroll_container = table_panels[i].querySelector('.table-scroll-container');
+    
+                            // this should filter out tables used for formatting
+                            var table_pdf = table_panels[i].querySelector('.table-pdf');
+                            if (table_pdf != null)
+                            {
+                                var original_thead = table_scroll_container.getElementsByClassName('table-pdf')[0].getElementsByTagName('thead')[0];
+                                // filter out tables without thead
+                                if (original_thead != null)
+                                {
+                                    // if width of table is less than the width of the container, expand 
+                                    if (table_pdf.offsetWidth < table_scroll_container.offsetWidth){
+                                        table_pdf.width = table_scroll_container.offsetWidth;
+                                    }
+    
+                                    // container for cloned header which will stick to the top
+                                    var fixed_header_wrapper = table_panels[i].querySelector('.fixed-header-wrapper');
+                                    var fixed_header_div = fixed_header_wrapper.querySelector('.fixed-header');
+                                    
+                                    // create cloned header
+                                    var table_cloned = table_pdf.cloneNode(true);
+                                    table_cloned.removeChild(table_cloned.getElementsByTagName('tbody')[0]);
+                                    table_cloned.style['margin-bottom'] = '0rem';
+    
+                                    // attach cloned header to container
+                                    fixed_header_div.appendChild(table_cloned);
+                                    // set width of container to width of table (will match scrollbars)
+                                    fixed_header_div.style.width = table_pdf.offsetWidth + 'px';
+    
+                                    // hide original header
+                                    original_thead.style['visibility'] = 'collapse';
+    
+                                    // set original header aria-hidden
+                                    original_thead.ariaHidden = true;
+    
+                                    // go through the th's in the new fixed header, modify their ID to enforce uniqueness, and set aria-hidden to prevent further problems.
+                                    Array.from(table_cloned.getElementsByTagName('th')).forEach((el) => {
+                                        el.id = el.id + "_COLLAPSED";
+                                        el.ariaHidden = true;
+                                        //console.log("Modified ID of " + el.id.toString());
+                                    });
+    
+                                    // set width of cloned header to match width of table
+                                    table_cloned.style.width = 'inherit';
+    
+                                    // prevents vertical scrollbar from appearing when header is collapsed
+                                    table_scroll_container.style['overflow-y'] = 'hidden';
+    
+                                    original_thead.style.display = 'none;';
+    
+                                    // set event listeners to synchronize scrolling from top and bottom
+                                    if (fixed_header_wrapper != null && table_scroll_container != null){
+                                        // sync top scroll bar to bottom
+                                        fixed_header_wrapper.onscroll = function(e) {
+                                            e.target.parentElement.querySelector('.table-scroll-container').scrollLeft = e.target.scrollLeft;
+                                        };
+                                        // sync bottom scroll bar to top
+                                        table_scroll_container.onscroll = function(e) {
+                                            e.target.parentElement.querySelector('.fixed-header-wrapper').scrollLeft = e.target.scrollLeft;
+                                        };
+                                    }
+                                    
+                                    postLoadActionSummary.push("Completed Fixed Header operation");
+    
+                                }
+                            }
+                        }catch(error){
+                            console.log("problem with table id: " + id);
+                            console.log(error);
+                            reject(error);
+                        }
+                    }
+                }
+    
+               
+                
+                
+                
+                let modal_button = document.getElementById("modal-button");
+                modal_button.addEventListener("click", (event) => {
+                    // console.log(modal_has_been_opened);
+    
+                    if (modal_has_been_opened === false) {
+                        const p = new Promise((resolve, reject) => {
+                        
+                            let loading_indicator = document.getElementById("modal_list_loading_indicator");
+                            loading_indicator.hidden = false;
+    
+    
+                            let data = [{"citing_doi": "10.1021/acs.jpca.8b12335", "type": "journal_article"}, {"citing_doi": "10.1016/j.marpetgeo.2018.08.001", "type": "journal_article"}, {"citing_doi": "10.1190/INT-2018-0212.1", "type": "journal_article"}, {"citing_doi": "10.1007/s13131-021-1972-2", "type": "journal_article"}, {"citing_doi": "10.1093/gji/ggaf470", "type": "journal_article"}, {"citing_doi": "10.1038/s41598-022-07184-6", "type": "journal_article"}, {"citing_doi": "10.1021/acs.energyfuels.5c01466", "type": "journal_article"}, {"citing_doi": "10.1016/j.marpetgeo.2020.104340", "type": "journal_article"}, {"citing_doi": "10.1021/acs.energyfuels.4c05798", "type": "journal_article"}, {"citing_doi": "10.1016/j.marpetgeo.2019.104036", "type": "journal_article"}, {"citing_doi": "10.1016/j.marpetgeo.2020.104676", "type": "journal_article"}, {"citing_doi": "10.1016/j.petrol.2020.107872", "type": "journal_article"}, {"citing_doi": "10.1306/05272120051", "type": "journal_article"}, {"citing_doi": "10.1016/j.egyr.2021.06.091", "type": "journal_article"}, {"citing_doi": "10.1016/j.jgsce.2024.205501", "type": "journal_article"}, {"citing_doi": "10.1016/j.marpetgeo.2018.07.006", "type": "journal_article"}, {"citing_doi": "10.1029/2018JB016574", "type": "journal_article"}, {"citing_doi": "10.1016/j.gsf.2023.101540", "type": "journal_article"}, {"citing_doi": "10.3390/jmse11010034", "type": "journal_article"}, {"citing_doi": "10.1016/j.marpetgeo.2018.09.005", "type": "journal_article"}, {"citing_doi": "10.1016/j.jngse.2021.104145", "type": "journal_article"}, {"citing_doi": "10.1016/j.marpetgeo.2018.10.020", "type": "journal_article"}, {"citing_doi": "10.1029/2019JB018186", "type": "journal_article"}, {"citing_doi": "10.1111/1755-6724.14932", "type": "journal_article"}, {"citing_doi": "10.1029/2023JB027123", "type": "journal_article"}, {"citing_doi": "10.1029/2018JB015855", "type": "journal_article"}, {"citing_doi": "10.1029/2020GL088474", "type": "journal_article"}, {"citing_doi": "10.1029/2019GC008405", "type": "journal_article"}, {"citing_doi": "10.1029/2018GC007710", "type": "journal_article"}, {"citing_doi": "10.1016/j.geoen.2022.211356", "type": "journal_article"}, {"citing_doi": "10.1007/s11001-024-09546-3", "type": "journal_article"}, {"citing_doi": "10.1016/j.marpetgeo.2023.106370", "type": "journal_article"}, {"citing_doi": "10.1016/j.uncres.2022.09.003", "type": "journal_article"}, {"citing_doi": "10.1190/geo2024-0430.1", "type": "journal_article"}, {"citing_doi": "10.1016/j.jgsce.2024.205267", "type": "journal_article"}, {"citing_doi": "10.1029/2019GL084703", "type": "journal_article"}, {"citing_doi": "10.1177/1687814020908981", "type": "journal_article"}, {"citing_doi": "10.1016/j.marpetgeo.2025.107347", "type": "journal_article"}, {"citing_doi": "10.3390/pr14081303", "type": "journal_article"}, {"citing_doi": "10.1007/s10596-020-10004-3", "type": "journal_article"}, {"citing_doi": "10.1306/02262019036", "type": "journal_article"}, {"citing_doi": "10.1016/j.epsl.2019.115843", "type": "journal_article"}, {"citing_doi": "10.1016/j.marpetgeo.2021.105397", "type": "journal_article"}, {"citing_doi": "10.1016/j.marpetgeo.2022.105698", "type": "journal_article"}, {"citing_doi": "10.1021/acs.energyfuels.1c04100", "type": "journal_article"}, {"citing_doi": "10.1016/j.marpetgeo.2025.107458", "type": "journal_article"}, {"citing_doi": "10.1016/B978-0-323-85465-8.00013-3", "type": "book_content"}, {"citing_doi": "10.1016/j.marpetgeo.2020.104572", "type": "journal_article"}, {"citing_doi": "10.1016/j.jngse.2019.103109", "type": "journal_article"}, {"citing_doi": "10.1016/j.jconhyd.2022.104003", "type": "journal_article"}, {"citing_doi": "10.1016/j.petrol.2018.08.079", "type": "journal_article"}, {"citing_doi": "10.3390/jmse13112078", "type": "journal_article"}, {"citing_doi": "10.1002/vzj2.20340", "type": "journal_article"}, {"citing_doi": "10.1021/acs.energyfuels.2c01720", "type": "journal_article"}, {"citing_doi": "10.2118/202477-PA", "type": "journal_article"}, {"citing_doi": "10.1016/j.energy.2023.127674", "type": "journal_article"}, {"citing_doi": "10.1016/B978-0-323-85465-8.00010-8", "type": "book_content"}, {"citing_doi": "10.1016/j.petrol.2021.109539", "type": "journal_article"}, {"citing_doi": "10.1190/geo2021-0682.1", "type": "journal_article"}, {"citing_doi": "10.1007/s11001-023-09524-1", "type": "journal_article"}, {"citing_doi": "10.3389/feart.2021.603363", "type": "journal_article"}, {"citing_doi": "10.1016/j.ijggc.2021.103343", "type": "journal_article"}, {"citing_doi": "10.1016/j.fuel.2020.117378", "type": "journal_article"}, {"citing_doi": "10.1007/978-3-030-81186-0_6", "type": "book_content"}, {"citing_doi": "10.1007/s11053-022-10045-8", "type": "journal_article"}, {"citing_doi": "10.1016/j.fuel.2023.129906", "type": "journal_article"}, {"citing_doi": "10.1111/bre.70082", "type": "journal_article"}, {"citing_doi": "10.1016/j.jngse.2022.104540", "type": "journal_article"}, {"citing_doi": "10.1016/j.jgsce.2023.205052", "type": "journal_article"}, {"citing_doi": "10.1016/j.marpetgeo.2020.104751", "type": "journal_article"}, {"citing_doi": "10.1016/j.jngse.2021.104279", "type": "journal_article"}, {"citing_doi": "10.3390/en15103537", "type": "journal_article"}, {"citing_doi": "10.1093/gji/ggaf492", "type": "journal_article"}, {"citing_doi": "10.1016/j.geoen.2023.211953", "type": "journal_article"}, {"citing_doi": "10.1016/j.apenergy.2021.118397", "type": "journal_article"}, {"citing_doi": "10.1029/2019JB018364", "type": "journal_article"}, {"citing_doi": "10.3390/jmse11061169", "type": "journal_article"}, {"citing_doi": "10.1051/e3sconf/202014605002", "type": "journal_article"}, {"citing_doi": "10.2523/IPTC-23634-MS", "type": "conference_paper"}, {"citing_doi": "10.1016/j.fuel.2021.122185", "type": "journal_article"}, {"citing_doi": "10.3390/jmse10010111", "type": "journal_article"}, {"citing_doi": "10.1016/j.ces.2020.115576", "type": "journal_article"}, {"citing_doi": "10.1093/gji/ggaf448", "type": "journal_article"}, {"citing_doi": "10.1016/j.marpetgeo.2020.104551", "type": "journal_article"}, {"citing_doi": "10.1016/j.fuel.2024.130889", "type": "journal_article"}, {"citing_doi": "10.3390/jmse12030472", "type": "journal_article"}, {"citing_doi": "10.1016/j.marpetgeo.2018.07.026", "type": "journal_article"}, {"citing_doi": "10.1111/1755-6724.14960", "type": "journal_article"}, {"citing_doi": "10.1029/2019JB017949", "type": "journal_article"}, {"citing_doi": "10.1306/04272120204", "type": "journal_article"}, {"citing_doi": "10.1111/iar.12502", "type": "journal_article"}, {"citing_doi": "10.1190/geo2024-0314.1", "type": "journal_article"}, {"citing_doi": "10.1111/1365-2478.13402", "type": "journal_article"}, {"citing_doi": "10.1016/B978-0-12-818565-0.00003-3", "type": "book_content"}, {"citing_doi": "10.1190/geo2021-0349.1", "type": "journal_article"}, {"citing_doi": "10.1190/GEO-2024-0791", "type": "journal_article"}, {"citing_doi": "10.1007/s11802-023-5492-x", "type": "journal_article"}, {"citing_doi": "10.1021/acs.energyfuels.3c03371", "type": "journal_article"}, {"citing_doi": "10.1007/978-3-030-81186-0_5", "type": "book_content"}, {"citing_doi": "10.1016/j.marpetgeo.2020.104650", "type": "journal_article"}, {"citing_doi": "10.1021/acs.energyfuels.1c03171", "type": "journal_article"}, {"citing_doi": "10.1306/05222018269", "type": "journal_article"}, {"citing_doi": "10.1016/j.energy.2021.121137", "type": "journal_article"}, {"citing_doi": "10.1190/geo2021-0018.1", "type": "journal_article"}, {"citing_doi": "10.1016/j.cej.2026.177286", "type": "journal_article"}, {"citing_doi": "10.1016/j.marpetgeo.2019.104146", "type": "journal_article"}, {"citing_doi": "10.1039/C8CS00989A", "type": "journal_article"}, {"citing_doi": "10.1016/j.marpetgeo.2021.105330", "type": "journal_article"}, {"citing_doi": "10.1016/j.epsl.2023.117993", "type": "journal_article"}, {"citing_doi": "10.1007/s13146-024-00982-1", "type": "journal_article"}, {"citing_doi": "10.1029/2024GL112200", "type": "journal_article"}, {"citing_doi": "10.1016/j.petrol.2020.107642", "type": "journal_article"}, {"citing_doi": "10.1016/j.egyr.2021.07.014", "type": "journal_article"}, {"citing_doi": "10.1016/j.geoen.2024.212798", "type": "journal_article"}, {"citing_doi": "10.1016/j.marpetgeo.2019.104166", "type": "journal_article"}];
+                            // console.log(data);
+                            fetch('/get_citation_data', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json', 
+                                },
+                                body: JSON.stringify(data), 
+                            })
+                            .then(response => {
+                                
+                                if (!response.ok) throw new Error('Network response was not ok');
+                                return response.json(); 
+                            })
+                            .then(data => {  
+                                let data_response = data.response;
+                                let modal_list = document.getElementById('modal_list');
+                                
+                                for (let i = 0; i < data_response.length; i++){
+                                    
+                                    let newDiv = document.createElement("div");
+    
+                                    newDiv.textContent = data_response[i].formatted_citation;
+                                    newDiv.className = "citation-modal-list-element";
+                                    
+                                    modal_list.appendChild(newDiv);
+                                }
+                                
+                                modal_has_been_opened = true;
+                                loading_indicator.hidden = true;
+                                
+                            })
+                            .catch(error => console.error('Fetch error:', error))
+                            .finally(() => {});
+    
+                        }).then((event) => {
+                            
+                            resolve();
+                        }).catch((error) => {
+                            console.error(error.message); 
+                        }).finally(() => {});
+                    }
+                });
+                
+                
+                var event = new CustomEvent("pubswh-page-loaded", 
+                { 
+                    
+                    "detail": {
+                        "message": "post-load actions completed.",
+                        "summary": postLoadActionSummary
+                         }
+                });
+                resolve(event);
+                
+                
+            });
+        }).then((event) => {
+            document.dispatchEvent(event);
+        })
+        .catch((error) => {
+            console.error(error.message); 
+        })
+        .finally(() => {
+            
+        });
+    
+    </script>
+
+
+    </div>
+
+
+        </main>
+        <footer class="usa-footer" role="contentinfo">
+    <nav class="usa-footer-primary-section" aria-label="Footer Navigation">
+        <div class="usgs-footer-nav">
+            <a class="usgs-footer-link" href="https://www.doi.gov/privacy">DOI Privacy Policy</a> |
+            <a class="usgs-footer-link" href="https://www.usgs.gov/policies-and-notices">Legal</a> |
+            <a class="usgs-footer-link" href="https://www.usgs.gov/accessibility-and-us-geological-survey">Accessibility</a> |
+            <a class="usgs-footer-link" href="https://www.usgs.gov/sitemap.html">Site Map</a> |
+            <a class="usgs-footer-link" href="https://answers.usgs.gov/">Contact USGS</a>
+        </div>
+        <div class="usgs-footer-nav">
+            <a class="usgs-footer-link" href="https://www.doi.gov/">U.S. Department of the Interior</a> |
+            <a class="usgs-footer-link" href="https://www.doioig.gov/">DOI Inspector General</a> |
+            <a class="usgs-footer-link" href="https://www.whitehouse.gov/">White House</a> |
+            <a class="usgs-footer-link" href="https://www.whitehouse.gov/omb/management/egov/">E-gov</a> |
+            <a class="usgs-footer-link" href="https://www.doi.gov/pmb/eeo/no-fear-act">No Fear Act</a> |
+            <a class="usgs-footer-link" href="https://www.usgs.gov/about/organization/science-support/foia">FOIA</a>
+        </div>
+    </nav>
+</footer>
+        
+    <script defer>
+        window.addEventListener('load', () => {
+            SystemJS.import("https://pubs.usgs.gov/static/scripts/pubswh_plugins.js");
+        });
+    </script>
+    <!-- <script async type="application/javascript"
+            src="https://www2.usgs.gov/scripts/analytics/usgs-analytics.js"></script> -->
+
+   
+
+
+   <script>
+       var GA = {};
+       (function (i, s, o, g, r, a, m) {
+           i['GoogleAnalyticsObject'] = r;
+           i[r] = i[r] || function () {
+                   (i[r].q = i[r].q || []).push(arguments)
+               }, i[r].l = 1 * new Date();
+           a = s.createElement(o),
+               m = s.getElementsByTagName(o)[0];
+           a.async = 1;
+           a.src = g;
+           m.parentNode.insertBefore(a, m)
+       })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+       ga('create', 'UA-10113280-1', 'auto');
+       ga('send', 'pageview');
+
+       GA.trackGAEvent = function (category, actions, labels, values) {
+           ga('send', 'event', category, actions, labels, values);
+       };
+   </script>
+
+    </body>
+</html>

@@ -133,6 +133,12 @@ Latest working direction:
 - First make a clear plan based on goals and sources.
 - Make sure the ML source coverage is complete enough to explain the pipeline
   and science.
+- Use a science-to-ML logic ladder instead of a flat parameter list:
+  define the North Slope pore-filling sand-hydrate system, separate hydrate
+  habits, then explain stability context, reservoir quality, hydrate response,
+  and ML roles.
+- Treat numeric ranges as first-pass screening envelopes for feature
+  engineering, crossplots, and QC, not final cutoffs.
 - Look at the slides, the Word document, and the format necessities from past
   emails.
 - Forget the website for now except for apps/runtime skeletons and visuals that

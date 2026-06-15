@@ -13,22 +13,22 @@ wireline machine-learning project.
   - Focuses on measured variables, derived equations, staged classification,
     machine-learning design, expected outputs, and results/discussion structure.
 - `North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.docx`
-  - Research-paper-style overview reintegrated on 2026-06-10 from the updated
-    Gmail-sent DOE copy.
-  - Frames gas hydrates as an energy-resource characterization and energy-security
-    project, with the current public scaffold clearly marked as header-derived
-    synthetic records from three Excel header/schema references.
-  - Current version fills the abstract and introduction, then expands Parameters,
-    Methodology, Machine-Learning Framework, Error and Validation, and Discussion
-    with the same parameter signal, masking, target-leakage, normalization,
-    complete-well validation, and overburden-context logic used in the rebuilt
-    ML architecture deck. The 2026-06-11 local refresh also adds the recovered
-    ML-source specifics: Chong et al.'s five-well ANN saturation workflow,
-    approved-data feature-table controls, train-only preprocessing, model
-    ladder, calibration, residual review, and data-quality/drift checks.
-    Results-bearing claims remain placeholders until approved-data execution.
+  - Research-paper-style overview rebuilt locally on 2026-06-13 from the
+    science-to-ML ladder and baseline source ledger.
+  - Frames the project as a DOE-style workflow for pore-filling gas hydrate in
+    sand-rich North Slope permafrost reservoirs, then separates stability
+    context, reservoir quality, and hydrate response before defining the ML
+    pipeline.
+  - Current version emphasizes physical reasons for each parameter, hydrate and
+    mimic movement patterns, screening envelopes rather than hard thresholds,
+    target leakage controls, occurrence classification, saturation regression,
+    validation, and output discipline. Results-bearing claims remain
+    placeholders until approved-data execution.
   - Imported to the connected Google Drive account on 2026-06-11 as
     [ENRICHED ML PIPELINE North Slope Gas Hydrate Research Overview 2026-06-11](https://docs.google.com/document/d/1V3kZuu4euP6IhHwfnwscAh7RxDAqWMNu2tEf7wC_pW4).
+  - The 2026-06-13 rebuild was imported to the connected Google Drive account
+    as
+    [SCIENCE-TO-ML North Slope Gas Hydrate Research Overview 2026-06-13](https://docs.google.com/document/d/1Ft0wgKV3p8HK1F7X4_WYVAp1jOtBYuCntdRP-Z84e5k).
 - `North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`
   - Prior tracked 9-slide visual companion deck rebuilt on 2026-06-11 from the latest
     Drive review feedback and imported to Drive as
@@ -44,8 +44,19 @@ wireline machine-learning project.
   - The 2026-06-11 local refresh keeps exactly 9 slides and enriches the
     parameter, ML architecture, model-rationale, and results/discussion slides
     using the recovered Gmail ML sources in `references/ml-sources/2026-06-11/`.
+  - The related 2026-06-13 local 9-slide visual companion deck was rebuilt from
+    `build_ml_revamp_powerpoint.py` and the Processing-style raster slide asset
+    generator.
+  - That version keeps exactly 9 full-slide raster panels and reframes the
+    story around hydrate-system definition, parameter tiers, hydrate/mimic
+    signal movement, derived elastic features, screening envelopes, target
+    leakage, occurrence classification, saturation regression, uncertainty, and
+    validation.
   - Imported to the connected Google Drive account on 2026-06-11 as
     [ENRICHED 9-SLIDE ML PIPELINE North Slope Gas Hydrate Slides 2026-06-11](https://docs.google.com/presentation/d/1jazq9ZLc6G9DlM2n6QZq9rKsjDcBuw-3KrTZb4-kzJ0).
+  - The 2026-06-13 rebuild was imported to the connected Google Drive account
+    as
+    [SCIENCE-TO-ML 9-SLIDE North Slope Gas Hydrate Slides 2026-06-13](https://docs.google.com/presentation/d/1GztudvOcJnZh28lAflNp6ZH2fMPhRgtTJgXX9ufPW24).
   - The deck remains public-safe: it uses public sources, equation/header
     references, and conceptual/sample visuals only, not real approved well rows
     or trained model outputs.
@@ -59,6 +70,27 @@ wireline machine-learning project.
   - Use this deck as the starting point for slide review and edits. Treat the
     older tracked PPTX and builder outputs as context/provenance unless the user
     explicitly chooses to rebuild from the script.
+- `STABILITY_ML_REMAKE_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`
+  - Local first-draft remake of the current nine-slide deck for the stability
+    and guarded-ML communication pass.
+  - Built from
+    `docs/project_blueprints/build_stability_ml_slide_remake.py` as nine active
+    full-slide `1600 x 900` raster panels under
+    `presentation_assets/stability_ml_remake_2026_06_15/`.
+  - Preserves slides 1 and 2 from the current Gmail authority deck exactly; the
+    builder verifies their embedded-image hashes after rebuilding.
+  - Reframes slides 3-9 around the public GitHub/Streamlit delivery surface,
+    the OpenScienceLab heavy-data workbench, the methane 5 ppt stability
+    screen, data-readiness/confidence gates, and later approved-data occurrence
+    classification plus saturation regression.
+  - Uses public stability-product counts only: 8,084 scaffold wells, 184
+    G10015 profiles across 24 well codes, 16,168 temperature key-depth rows,
+    919 calculated key depths, 387 extrapolated key depths, 15,249 blocked key
+    depths, 22 baseline admissibility intervals, and 8,054 blocked screen
+    rows.
+  - This is a review draft, not a Drive-published final deck. It must keep the
+    guardrail that the current result is stability-admissibility only, not
+    hydrate proof, saturation, sweet-spot ranking, or validated ML output.
 - `build_ml_revamp_powerpoint.py`
   - Reproducible builder for the current 9-slide visual-first ML parameter
     architecture PowerPoint.

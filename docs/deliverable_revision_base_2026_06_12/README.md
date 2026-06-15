@@ -40,6 +40,8 @@ Gmail message `19eba86da8752830`, subject `New pressy`, sent 2026-06-12
 | `04_format_and_style_rules.md` | Word, slide, science, ML, and data-boundary rules |
 | `05_slide_word_alignment_matrix.md` | Slide-by-slide plan tied to matching Word sections |
 | `06_next_execution_checklist.md` | Ordered checklist for the next rebuild |
+| `../SCIENCE_TO_ML_LOGIC_LADDER.md` | Science-to-ML spine for hydrate system definition, parameter tiers, screening envelopes, equations, and ML workflow |
+| `../ML_PIPELINE_BASELINE_SOURCE_LEDGER.md` | Source-backed ledger for baseline pipeline choices, parameter movement patterns, screening ranges, guardrails, model options, validation, outputs, and Word-document implications |
 
 ## Non-Negotiables
 
@@ -50,6 +52,15 @@ Gmail message `19eba86da8752830`, subject `New pressy`, sent 2026-06-12
 - Use correct parameter symbols and pair each symbol with a plain-language name.
 - Explain parameters through visuals: measured property, hydrate interpretation,
   false positives, and ML role.
+- Build the parameter story as a science-to-ML ladder: hydrate system,
+  hydrate habit, stability context, reservoir quality, hydrate response, and
+  only then ML features.
+- Label numeric ranges as screening envelopes for QC, feature engineering, and
+  crossplots, not final cutoffs.
+- Use the baseline source ledger to choose pipeline steps and model options:
+  preserve headers and units, align depth, QC intervals, compute physics
+  features, separate targets through a leakage barrier, then train occurrence
+  and saturation heads with complete-well validation.
 - Treat the Word document as the detailed source-backed explanation. Treat the
   slides as visual communication.
 - Do not insert approved well-log rows, core rows, restricted well identifiers,

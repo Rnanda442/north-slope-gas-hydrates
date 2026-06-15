@@ -32,12 +32,14 @@ Use sources by evidence tier:
 | New changes and instructions | Gmail message `19eb2f4c157c062b` | Website deprioritization, parameter visuals, ML architecture rules |
 | ML sources email | Gmail message `19eb8291ad5c05c9` | ML source attachments and integration instruction |
 | PowerPoint visual feedback | Gmail message `19eb912268782bbc` | Processing visuals, slide 2 redesign, parameter/architecture issues |
+| Science-to-ML ladder direction | User chat on 2026-06-13 | Hydrate-system-first narrative, three parameter tiers, screening-envelope language, numeric working ranges, equations, and ML pipeline spine |
 
 ## Direct ML Sources
 
 | Source | Location | Role |
 |---|---|---|
 | Chong et al. (2022), local PDF `s10596-022-10151-9.pdf` | `references/ml-sources/2026-06-11/` | Direct gas-hydrate ANN/well-log workflow anchor for permafrost-associated settings, feature families, NMR-density saturation target concept, QC/outlier screening, normalization, validation language |
+| Hydrate ML and physics source intake | `references/hydrate-ml-physics-sources/2026-06-13/` | Public-source intake folder with downloaded Singh et al. (2021) and Chong et al. (2024) OSTI PDFs, official source-page backups, Google Drive PDF references for five user-uploaded papers, and a needs-PDF manifest for remaining hydrate ML and physics sources |
 | `ML_Project_Reference_and_CreditScoreV4_Case_Notes.docx` | `references/ml-sources/2026-06-11/` | General ML controls: baseline-first modeling, leakage-safe preprocessing, train-only transforms, validation design, data quality, calibration, monitoring |
 
 ## Comparative ML Sources To Add Or Cite
@@ -50,8 +52,11 @@ in `docs/ML_CITATION_PACKET_FOR_DELIVERABLES.md`.
 
 | Source | Current status | Use |
 |---|---|---|
-| Singh et al. (2021), `Prediction of gas hydrate saturation using machine learning and optimal set of well-logs`, DOI `10.1007/s10596-020-10004-3` | Verified in `docs/ML_CITATION_PACKET_FOR_DELIVERABLES.md` | Comparative ML saturation prediction and feature-set rationale |
-| Chong et al. (2024), `Machine learning application to assess occurrence and saturations of methane hydrate in marine deposits offshore India`, DOI `10.1190/int-2023-0056.1` | Verified in `docs/ML_CITATION_PACKET_FOR_DELIVERABLES.md` | Comparative occurrence plus saturation prediction and balanced-accuracy framing |
+| Singh et al. (2021), `Prediction of gas hydrate saturation using machine learning and optimal set of well-logs`, DOI `10.1007/s10596-020-10004-3` | Downloaded from OSTI into `references/hydrate-ml-physics-sources/2026-06-13/`; verified in `docs/ML_CITATION_PACKET_FOR_DELIVERABLES.md` | Comparative ML saturation prediction and feature-set rationale |
+| Chong et al. (2024), `Machine learning application to assess occurrence and saturations of methane hydrate in marine deposits offshore India`, DOI `10.1190/int-2023-0056.1` | Downloaded from OSTI into `references/hydrate-ml-physics-sources/2026-06-13/`; verified in `docs/ML_CITATION_PACKET_FOR_DELIVERABLES.md` | Comparative occurrence plus saturation prediction and balanced-accuracy framing |
+| Tian et al. (2023), `A Comparative Study of Machine Learning Methods for Gas Hydrate Identification`, DOI `10.1016/j.geoen.2023.211564` | User-uploaded Drive PDF recorded in `references/hydrate-ml-physics-sources/2026-06-13/google_drive_uploaded_sources_2026_06_13.md` | Comparative hydrate/non-hydrate classification model comparison |
+| Li and Liu (2020), `Research on the Estimate of Gas Hydrate Saturation Based on LSTM Recurrent Neural Network`, DOI `10.3390/en13246536` | User-uploaded Drive PDF recorded in `references/hydrate-ml-physics-sources/2026-06-13/google_drive_uploaded_sources_2026_06_13.md` | Comparative sequence/deep-learning saturation source |
+| Naim, Cook, and Moortgat (2023), `Estimating Compressional Velocity and Bulk Density Logs in Marine Gas Hydrates Using Machine Learning`, DOI `10.3390/en16237709` | User-uploaded Drive PDF recorded in `references/hydrate-ml-physics-sources/2026-06-13/google_drive_uploaded_sources_2026_06_13.md` | Comparative missing-log and feature-completeness source |
 
 ## Primary North Slope Hydrate Science
 
@@ -73,6 +78,8 @@ response, and North Slope interpretation:
 | Zyrianova et al. (2024) | Eileen-trend compartmentalization, partial fill, water contacts |
 | Lewis and Collett (2013) | Brookian well-log correlation and hydrate occurrence |
 | Helmold and LePain (2023) | Nanushuk reservoir quality, depositional texture, burial controls |
+| Aung et al. (2026) | Current ANS production-test LWD acquisition, QC, log suite, resistivity/sonic/NMR interpretation, and completion-selection workflow |
+| Yoneda et al. (2026) | ANS HYDRATE 02 NMR T2, pressure-core permeability, reservoir/seal behavior, and producibility calibration |
 
 ## Slide 2 Gas Hydrate Definition and Context Sources
 
@@ -95,6 +102,9 @@ Source manifest:
 
 | Source | Location | Use |
 |---|---|---|
+| Science-to-ML logic ladder | `docs/SCIENCE_TO_ML_LOGIC_LADDER.md` | Current spine for hydrate system definition, hydrate habits, parameter tiers, screening envelopes, equations, and ML pipeline language |
+| ML pipeline baseline source ledger | `docs/ML_PIPELINE_BASELINE_SOURCE_LEDGER.md` | Project-synthesis ledger for baseline pipeline claims, input preservation, QC choices, feature-engineering options, parameter movement patterns, target leakage, guardrails, model choices, validation, outputs, and Word/PPT implications |
+| June 13 hydrate ML/physics source manifest | `references/hydrate-ml-physics-sources/2026-06-13/source_manifest.csv` | Retrieval status and source roles for additional ML, log-physics, Archie, North Slope, and hydrate-habit papers |
 | USGS gamma log image | `https://www.usgs.gov/media/images/geophysical-logs-gamma-logs` | `GR` lithology/reservoir-gate visual |
 | USGS caliper log image | `https://www.usgs.gov/media/images/geophysical-logs-caliper` | `CAL` bad-hole/QC visual |
 | USGS fluid-resistivity image | `https://www.usgs.gov/media/images/geophysical-logs-fluid-resistivity-log` | `R_t` resistivity visual |
@@ -105,6 +115,21 @@ Source manifest:
 | Runtime feature engineering | `dashboard/runtime/feature_engineering.py` | Implemented equation names and feature roles |
 | Well-log requirements map | `docs/WELL_LOG_REQUIREMENTS_MAP.md` | Symbols, roles, target-leakage boundary |
 | Parameter/effect tree | `docs/project_blueprints/ml_parameter_effect_tree.csv` | Icon families, caveats, model roles |
+
+## Pending Range And Equation Source Docs
+
+The user reported these files as the source of the working numeric screening
+ranges and equation material. They were not present at the stated paths on this
+machine during the 2026-06-13 verification check, so public deliverables should
+label their numeric ranges as project-synthesis screening envelopes until the
+files are recovered and classified.
+
+| User-reported source | Reported path | Current local status | Use before recovery |
+|---|---|---|---|
+| Hydrate property ranges full suite | `C:/Users/gargi/Downloads/hydrate_property_ranges_full_suite.docx` | Not present at stated path | Working screening ranges only |
+| Lambda-density P-T overburden ranges | `C:/Users/gargi/Downloads/lambda_density_pt_overburden_ranges.docx` | Not present at stated path | Crossplot hypothesis and P-T/overburden envelopes only |
+| Hydrate wireline equation map | `C:/Users/gargi/Downloads/hydrate_wireline_equation_map.docx` | Not present at stated path | Equation checklist only; verify units before implementation |
+| North Slope overburden framework | `C:/Users/gargi/Downloads/north_slope_overburden_framework_field_oriented.docx` | Not present at stated path | Overburden context only; verify before calculations |
 
 ## Parameter Families To Carry Through Slides And Word
 

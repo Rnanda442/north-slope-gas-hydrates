@@ -2,6 +2,8 @@
 
 Created: 2026-06-12
 
+Last audited: 2026-06-13 after the local science-to-ML rebuild.
+
 ## PowerPoint Audit
 
 Local file:
@@ -22,6 +24,9 @@ Current structure:
 - The older tracked `North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`
   remains useful as provenance and builder output, but it is not the first deck
   to revise.
+- The related 2026-06-13 science-to-ML local deck uses one full-slide raster
+  panel per slide and remains useful for transferring the latest stability,
+  parameter-tier, and leakage-safe ML explanation into the next visual refresh.
 
 Implementation implication:
 
@@ -34,7 +39,15 @@ Implementation implication:
   `docs/project_blueprints/build_ml_revamp_powerpoint.py`.
 
 Current Drive slide deck reference:
-`https://docs.google.com/presentation/d/1irTOw1wSGSMkQmUrHp33XPKykfgHNjbQANKyDkbv3H4/edit`
+`https://docs.google.com/presentation/d/1GztudvOcJnZh28lAflNp6ZH2fMPhRgtTJgXX9ufPW24`
+
+Drive status:
+
+- The 2026-06-13 rebuild was imported as a native Google Slides deck named
+  `SCIENCE-TO-ML 9-SLIDE North Slope Gas Hydrate Slides 2026-06-13`.
+- Connector readback verified the native Slides MIME type, 9-slide structure,
+  one full-slide image per slide, and fresh 1600x900 thumbnails for all nine
+  slides.
 
 Current risk:
 
@@ -47,24 +60,31 @@ Current risk:
 Local file:
 `docs/project_blueprints/North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.docx`
 
+Current Drive document reference:
+`https://docs.google.com/document/d/1Ft0wgKV3p8HK1F7X4_WYVAp1jOtBYuCntdRP-Z84e5k`
+
 Current structure:
 
-- 173 inspected paragraphs.
-- Main early sections include title, subtitle, boundary/source notes, Abstract,
-  Introduction, conceptual hydrate-reservoir sketch, approved-data processing
-  sketch, website visual workflow, Parameters, and a parameter/masking matrix.
+- 67 inspected paragraphs.
+- 10 inspected tables.
+- Main sections are Abstract, Project Claim and Source Boundary, Hydrate System
+  First, Parameters as Physical Evidence, Parameter Movement Patterns, Feature
+  Engineering and Screening Envelopes, Target Registry and Leakage Barrier, ML
+  Pipeline and Model Ladder, Validation and Outputs, Open Decisions Before
+  Results Claims, Deliverable Implications, and References.
 
 Implementation implication:
 
-- The document already has a useful research-overview scaffold, but it still
-  contains a website visual workflow section that should be deprioritized for
-  this pass.
-- The next revision should emphasize:
-  - gas-hydrate science and North Slope context;
-  - source coverage and evidence tiers;
-  - parameter meanings, symbols, equations, and caveats;
-  - approved-data ML pipeline and validation design;
-  - output placeholders without fake results.
+- The current document is no longer a broad website/process overview; it is the
+  source-backed science-to-ML logic base for review.
+- The next revision should refine wording, citations, and visual placement
+  rather than reintroducing a flat parameter-list structure.
+- Approved-data results, trained-model metrics, and final cutoffs remain out of
+  scope until the workbook, labels, and calibration targets are confirmed.
+- The 2026-06-13 rebuild was imported as a native Google Doc named
+  `SCIENCE-TO-ML North Slope Gas Hydrate Research Overview 2026-06-13`.
+- Connector readback verified native Docs MIME type and the expected
+  science-to-ML heading/content structure.
 - The Word builder is
   `docs/project_blueprints/build_research_overview_deliverables.py`.
 
@@ -72,6 +92,8 @@ Implementation implication:
 
 | File | Role for next pass |
 |---|---|
+| `docs/SCIENCE_TO_ML_LOGIC_LADDER.md` | Current hydrate-system-first narrative, parameter tiers, screening ranges, equations, and ML workflow spine |
+| `docs/ML_PIPELINE_BASELINE_SOURCE_LEDGER.md` | Current source-backed decision ledger for pipeline options, benefits, issues, parameter movement patterns, guardrails, model choices, validation, outputs, and Word-document implications |
 | `docs/ML_SOURCE_COVERAGE_AND_DELIVERABLE_REVISION_PLAN.md` | Current source gate for ML and science coverage |
 | `docs/NINE_SLIDE_POWERPOINT_REVISION_WORKFLOW.md` | Prior nine-slide deck workflow |
 | `docs/ML_PARAMETER_TREE_AND_DECK_REVAMP_PLAN.md` | Parameter and deck visual rationale |
