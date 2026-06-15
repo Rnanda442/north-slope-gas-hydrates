@@ -148,9 +148,21 @@ proxy tiers to fill top/base/thickness unless the mentor approves a separately
 versioned sensitivity screen.
 
 Next task:
-Continue improving the source-backed stability story for the mentor-facing
-document and slides, using the new blank/proxy diagnostics to explain why many
-rows are blank.
+Run the new sampled G10015 profile export in OSL, then continue improving the
+source-backed stability story for the mentor-facing document and slides. OSL
+command:
+
+```bash
+cd ~/north-slope-gas-hydrates
+git pull origin main
+python 01_pipeline/build_public_stability_products.py
+git status --short
+```
+
+Review and commit the new public derived files:
+`g10015_temperature_profile_points_sampled_2026-06-14.csv` and
+`g10015_temperature_profile_points_sampled_summary_2026-06-14.csv`. Do not
+commit `data/source_library/`.
 
 Future OSL work should improve source coverage rather than create the first
 screen from scratch: refine temperature matches, add better permafrost/base

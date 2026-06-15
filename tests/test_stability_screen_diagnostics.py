@@ -58,14 +58,26 @@ def test_selected_well_phase_audit_figure_uses_public_temperature_and_phase_prod
     temperature_model = load_stability_temperature_model(project_root)
     phase_curve = load_methane_phase_curve(project_root)
     calculated_row = screen[screen["stability_result_status"].eq("calculated")].iloc[0]
+    profile_points = temperature_model[
+        temperature_model["object_id"].eq(calculated_row["object_id"])
+    ][["temperature_profile_file", "temperature_profile_code", "depth_m", "temperature_model_c"]].rename(
+        columns={
+            "temperature_profile_file": "file_name",
+            "temperature_profile_code": "well_code",
+            "temperature_model_c": "temperature_c",
+        }
+    )
+    profile_points["sample_method"] = "test_sampled_points"
 
     figure = build_selected_well_phase_audit_figure(
         calculated_row,
         temperature_model,
         phase_curve,
+        profile_points,
     )
 
     trace_names = {trace.name for trace in figure.data}
     assert "Methane 5 ppt phase boundary" in trace_names
+    assert "Sampled measured G10015 profile" in trace_names
     assert "OSL modeled temperature key depths" in trace_names
     assert "Screen top/base" in trace_names

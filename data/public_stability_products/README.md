@@ -24,8 +24,18 @@ pressure-temperature stability-zone calculation.
 
 This table summarizes public NSIDC G10015 processed borehole temperature logs.
 It stores per-file metadata, depth/temperature ranges, deepest temperature, and
-a rough deepest-window temperature-gradient context estimate. It does not store
-the raw profile rows and does not replace a calibrated geothermal model.
+a rough deepest-window temperature-gradient context estimate. It does not
+replace a calibrated geothermal model.
+
+`g10015_temperature_profile_points_sampled_2026-06-14.csv`
+
+`g10015_temperature_profile_points_sampled_summary_2026-06-14.csv`
+
+These OpenScienceLab-derived products are prepared for the next rebuild. They
+export sampled measured G10015 depth/temperature points, up to 160 points per
+profile, for website temperature-curve visualization. They are public G10015
+curve context only, not a stability result, saturation result, or calibrated
+geothermal model.
 
 `stability_input_scaffold_2026-06-14.csv`
 
@@ -130,13 +140,14 @@ rows. They separate high, medium, low, blocked, and outside-AU source control.
 They do not label hydrate occurrence, saturation, reservoir quality, or sweet
 spots.
 
-The OSL rebuild pipeline is now prepared to write
+The OSL rebuild pipeline is now prepared to write the sampled G10015 profile
+points product plus
 `stability_temperature_model_2026-06-14.csv` and
 `stability_temperature_model_summary_2026-06-14.csv` when the full source
-bundle contains raw G10015 processed profile `.txt` files. This product is one
-row per scaffold well per key modeled depth, currently nearest permafrost
-control depth and well depth. It remains a temperature-input product only and
-keeps top/base/thickness uncalculated.
+bundle contains raw G10015 processed profile `.txt` files. The temperature
+model product is one row per scaffold well per key modeled depth, currently
+nearest permafrost control depth and well depth. It remains a temperature-input
+product only and keeps top/base/thickness uncalculated.
 
 G10015 source profiles can contain duplicate depth rows. The public parser now
 averages temperature values at repeated depths before interpolation so a single

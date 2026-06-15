@@ -10,7 +10,9 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from dashboard.stability_products import (
+    g10015_temperature_profile_points_summary_frame,
     load_g10015_temperature_inventory,
+    load_g10015_temperature_profile_points_product,
     load_public_well_stability_context,
     load_stability_input_scaffold,
     load_stability_screen,
@@ -20,6 +22,7 @@ from dashboard.stability_products import (
     stability_input_scaffold_summary_frame,
     stability_temperature_model_summary_frame,
     temperature_inventory_summary_frame,
+    write_g10015_temperature_profile_points_product,
     write_public_stability_products,
     write_stability_screen_product,
     write_stability_temperature_model_product,
@@ -74,21 +77,27 @@ def main() -> None:
     print(f"Source metrics: {stability_bundle_metrics(source_root)}")
 
     outputs = write_public_stability_products(project_root, source_root)
+    profile_points_outputs = write_g10015_temperature_profile_points_product(project_root, source_root)
     temperature_model_outputs = write_stability_temperature_model_product(project_root, source_root)
     stability_screen_outputs = write_stability_screen_product(project_root, source_root)
     print("\n## Written outputs")
-    for output in outputs + temperature_model_outputs + stability_screen_outputs:
+    for output in outputs + profile_points_outputs + temperature_model_outputs + stability_screen_outputs:
         if output is not None:
             print(output)
 
     well_context = load_public_well_stability_context(project_root)
     temperature_inventory = load_g10015_temperature_inventory(project_root)
+    profile_points = load_g10015_temperature_profile_points_product(project_root)
     scaffold = load_stability_input_scaffold(project_root)
     temperature_model = load_stability_temperature_model(project_root)
     stability_screen = load_stability_screen(project_root)
 
     print_frame("Well Context Summary", stability_context_summary_frame(well_context))
     print_frame("G10015 Temperature Inventory Summary", temperature_inventory_summary_frame(temperature_inventory))
+    print_frame(
+        "G10015 Sampled Temperature Profile Points Summary",
+        g10015_temperature_profile_points_summary_frame(profile_points),
+    )
     print_frame("Stability Input Scaffold Summary", stability_input_scaffold_summary_frame(scaffold))
     print_frame("Stability Temperature Model Summary", stability_temperature_model_summary_frame(temperature_model))
     print_frame("Stability Screen Summary", stability_screen_summary_frame(stability_screen))

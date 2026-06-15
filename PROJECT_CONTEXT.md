@@ -462,3 +462,7 @@ blockers, and next activities in the architecture/activity map.
   committed methane 5 ppt phase boundary, OSL temperature key-depth product,
   and screen top/base markers where available. It is explicitly not the full
   raw measured G10015 temperature profile.
+- 2026-06-14: Prepared the OSL sampled G10015 profile-point export. The next
+  OSL rebuild should write
+  `g10015_temperature_profile_points_sampled_2026-06-14.csv` and its summary,
+  enabling measured G10015 curve traces in the selected-well audit plot.

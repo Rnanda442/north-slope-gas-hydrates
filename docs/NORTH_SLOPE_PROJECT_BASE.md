@@ -547,6 +547,11 @@ Fresh-chat handoff as of 2026-06-14:
   plot using the committed methane 5 ppt phase boundary, OSL temperature
   key-depth product, and screen top/base markers where available; it is not the
   full raw measured G10015 profile.
+  The code is now prepared to export
+  `g10015_temperature_profile_points_sampled_2026-06-14.csv` from OSL. After
+  OSL runs `python 01_pipeline/build_public_stability_products.py`, that sampled
+  public profile product will add measured G10015 curve traces to the selected
+  well audit plot.
   Next scientific task: keep improving source coverage in OSL and treat any
   future phase-curve/composition variants as cited scenarios. Do not label the
   current screen as hydrate proof, saturation, producibility, or a sweet-spot

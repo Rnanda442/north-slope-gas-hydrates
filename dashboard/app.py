@@ -33,6 +33,7 @@ from dashboard.stability_products import (
     default_stability_screen_path,
     default_well_context_path,
     load_g10015_temperature_inventory,
+    load_g10015_temperature_profile_points_product,
     load_methane_phase_curve,
     load_public_well_stability_context,
     load_stability_input_scaffold,
@@ -1016,6 +1017,11 @@ def cached_public_well_stability_context(project_root: str) -> pd.DataFrame:
 @st.cache_data
 def cached_g10015_temperature_inventory(project_root: str) -> pd.DataFrame:
     return load_g10015_temperature_inventory(Path(project_root))
+
+
+@st.cache_data
+def cached_g10015_temperature_profile_points(project_root: str) -> pd.DataFrame:
+    return load_g10015_temperature_profile_points_product(Path(project_root))
 
 
 @st.cache_data
@@ -2145,6 +2151,7 @@ def build_selected_well_phase_audit_figure(
     screen_row: pd.Series,
     temperature_model: pd.DataFrame,
     phase_curve: pd.DataFrame,
+    profile_points: pd.DataFrame | None = None,
 ) -> go.Figure:
     figure = go.Figure()
     well_name = str(screen_row.get("well_name", "Selected well"))
@@ -2170,6 +2177,48 @@ def build_selected_well_phase_audit_figure(
                 hovertemplate=(
                     "Phase boundary<br>Depth: %{y:.1f} m"
                     "<br>Equilibrium T: %{x:.2f} C<extra></extra>"
+                ),
+            )
+        )
+
+    selected_profile_file = screen_row.get("temperature_profile_file")
+    selected_profile_code = screen_row.get("temperature_profile_code")
+    sampled_profile = pd.DataFrame()
+    if profile_points is not None and not profile_points.empty:
+        profile_frame = profile_points.copy()
+        if pd.notna(selected_profile_file) and "file_name" in profile_frame.columns:
+            sampled_profile = profile_frame[profile_frame["file_name"].eq(selected_profile_file)]
+        if (
+            sampled_profile.empty
+            and pd.notna(selected_profile_code)
+            and "well_code" in profile_frame.columns
+        ):
+            sampled_profile = profile_frame[profile_frame["well_code"].eq(selected_profile_code)]
+        sampled_profile["depth_m"] = pd.to_numeric(
+            sampled_profile.get("depth_m"),
+            errors="coerce",
+        )
+        sampled_profile["temperature_c"] = pd.to_numeric(
+            sampled_profile.get("temperature_c"),
+            errors="coerce",
+        )
+        sampled_profile = sampled_profile.dropna(
+            subset=["depth_m", "temperature_c"],
+        ).sort_values("depth_m")
+    if not sampled_profile.empty:
+        figure.add_trace(
+            go.Scatter(
+                x=sampled_profile["temperature_c"],
+                y=sampled_profile["depth_m"],
+                mode="lines",
+                name="Sampled measured G10015 profile",
+                line={"color": "#16a34a", "width": 3},
+                customdata=sampled_profile[["file_name", "sample_method"]],
+                hovertemplate=(
+                    "Sampled measured profile<br>Depth: %{y:.1f} m"
+                    "<br>Temperature: %{x:.2f} C"
+                    "<br>File: %{customdata[0]}"
+                    "<br>Sampling: %{customdata[1]}<extra></extra>"
                 ),
             )
         )
@@ -2259,7 +2308,7 @@ def build_selected_well_phase_audit_figure(
             annotation_position="right",
         )
 
-    if curve.empty and model.empty and not screen_points:
+    if curve.empty and model.empty and sampled_profile.empty and not screen_points:
         figure.update_layout(
             annotations=[
                 {
@@ -2274,7 +2323,11 @@ def build_selected_well_phase_audit_figure(
         )
 
     max_depth_candidates = []
-    for frame, depth_column in [(curve, "source_depth_m"), (model, "depth_m")]:
+    for frame, depth_column in [
+        (curve, "source_depth_m"),
+        (sampled_profile, "depth_m"),
+        (model, "depth_m"),
+    ]:
         if not frame.empty:
             max_depth_candidates.append(float(frame[depth_column].max()))
     max_depth_candidates.extend(float(depth) for depth in plotted_depths if pd.notna(depth))
@@ -2765,6 +2818,7 @@ def render_guarded_stability_screen_product() -> None:
     proxy_summary = temperature_proxy_tier_summary_frame(proxy_audit)
     temperature_model = cached_stability_temperature_model(str(PROJECT_ROOT))
     phase_curve = cached_methane_phase_curve(str(PROJECT_ROOT))
+    sampled_profile_points = cached_g10015_temperature_profile_points(str(PROJECT_ROOT))
 
     status_tab, blanks_tab, temperature_tab, intervals_tab, tables_tab = st.tabs(
         [
@@ -2868,10 +2922,15 @@ Source anchors: [NSIDC G10015](https://nsidc.org/data/g10015/versions/1),
         st.markdown("##### Selected Well Temperature/Phase Audit")
         st.caption(
             "This plot uses committed public products: the methane 5 ppt phase "
-            "boundary, OSL modeled temperature at key depths, and screen "
-            "top/base markers where available. It is not the full raw measured "
-            "G10015 profile."
+            "boundary, sampled measured G10015 profile points when exported, "
+            "OSL modeled temperature at key depths, and screen top/base "
+            "markers where available."
         )
+        if sampled_profile_points.empty:
+            st.info(
+                "The sampled measured G10015 profile export is not committed yet. "
+                "Run the public stability rebuild in OSL to add full curve traces."
+            )
         selection_source = screen.copy()
         selection_source["selection_priority"] = selection_source[
             "stability_result_status"
@@ -2907,6 +2966,7 @@ Source anchors: [NSIDC G10015](https://nsidc.org/data/g10015/versions/1),
                 selected_row,
                 temperature_model,
                 phase_curve,
+                sampled_profile_points,
             ),
             use_container_width=True,
             config={"displayModeBar": True, "responsive": True},

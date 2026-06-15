@@ -19,6 +19,10 @@ WELL_CONTEXT_FILE_NAME = "north_slope_well_stability_context_2026-06-14.csv"
 WELL_CONTEXT_SUMMARY_FILE_NAME = "north_slope_well_stability_context_summary_2026-06-14.csv"
 G10015_INVENTORY_FILE_NAME = "g10015_temperature_profile_inventory_2026-06-14.csv"
 G10015_SUMMARY_FILE_NAME = "g10015_temperature_profile_summary_2026-06-14.csv"
+G10015_PROFILE_POINTS_FILE_NAME = "g10015_temperature_profile_points_sampled_2026-06-14.csv"
+G10015_PROFILE_POINTS_SUMMARY_FILE_NAME = (
+    "g10015_temperature_profile_points_sampled_summary_2026-06-14.csv"
+)
 STABILITY_INPUT_SCAFFOLD_FILE_NAME = "stability_input_scaffold_2026-06-14.csv"
 STABILITY_INPUT_SCAFFOLD_SUMMARY_FILE_NAME = "stability_input_scaffold_summary_2026-06-14.csv"
 STABILITY_INPUT_CAPABILITY_MATRIX_FILE_NAME = "stability_input_capability_matrix_2026-06-14.csv"
@@ -184,6 +188,22 @@ STABILITY_TEMPERATURE_MODEL_PRODUCT_COLUMNS = [
     "stability_top_base_thickness_status",
 ]
 
+G10015_PROFILE_POINTS_PRODUCT_COLUMNS = [
+    "well_code",
+    "well_name",
+    "file_name",
+    "profile_file_name",
+    "log_date",
+    "depth_m",
+    "temperature_c",
+    "point_index",
+    "source_sample_count",
+    "sampled_point_count",
+    "sample_method",
+    "profile_point_role",
+    "public_product_role",
+]
+
 STABILITY_SCREEN_COLUMNS = [
     "screen_run_id",
     "screen_version",
@@ -299,6 +319,14 @@ def default_g10015_inventory_path(project_root: Path) -> Path:
 
 def default_g10015_summary_path(project_root: Path) -> Path:
     return default_stability_products_dir(project_root) / G10015_SUMMARY_FILE_NAME
+
+
+def default_g10015_profile_points_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / G10015_PROFILE_POINTS_FILE_NAME
+
+
+def default_g10015_profile_points_summary_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / G10015_PROFILE_POINTS_SUMMARY_FILE_NAME
 
 
 def default_stability_input_scaffold_path(project_root: Path) -> Path:
@@ -1253,6 +1281,110 @@ def build_g10015_temperature_inventory(source_root: Path) -> pd.DataFrame:
     return inventory.sort_values(["well_code", "log_date", "file_name"]).reset_index(drop=True)
 
 
+def sample_g10015_temperature_profile_points(
+    profile_points: pd.DataFrame,
+    max_points: int = 160,
+) -> tuple[pd.DataFrame, str]:
+    if profile_points.empty:
+        return profile_points.copy(), "empty_profile"
+    if max_points <= 1:
+        raise ValueError("max_points must be greater than 1.")
+
+    points = profile_points.sort_values("depth_m").reset_index(drop=True)
+    if len(points) <= max_points:
+        return points.copy(), "all_points"
+
+    selected = np.unique(np.round(np.linspace(0, len(points) - 1, max_points)).astype(int))
+    sampled = points.iloc[selected].copy().reset_index(drop=True)
+    return sampled, f"evenly_sampled_max_{max_points}_points"
+
+
+def build_g10015_temperature_profile_points_product(
+    source_root: Path,
+    max_points_per_profile: int = 160,
+) -> pd.DataFrame:
+    profile_dir = Path(source_root) / G10015_RELATIVE_PATH
+    if not profile_dir.exists():
+        return pd.DataFrame(columns=G10015_PROFILE_POINTS_PRODUCT_COLUMNS)
+
+    rows: list[dict[str, object]] = []
+    for path in sorted(profile_dir.glob("*.txt")):
+        metadata = parse_g10015_temperature_profile(path)
+        profile_points = load_g10015_temperature_profile_points(path)
+        if profile_points.empty:
+            continue
+        sampled, sample_method = sample_g10015_temperature_profile_points(
+            profile_points,
+            max_points=max_points_per_profile,
+        )
+        sampled_point_count = len(sampled)
+        for point_index, row in enumerate(sampled.itertuples(index=False), start=1):
+            rows.append(
+                {
+                    "well_code": metadata.get("well_code"),
+                    "well_name": metadata.get("well_name"),
+                    "file_name": metadata.get("file_name"),
+                    "profile_file_name": metadata.get("profile_file_name"),
+                    "log_date": metadata.get("log_date"),
+                    "depth_m": float(row.depth_m),
+                    "temperature_c": float(row.temperature_c),
+                    "point_index": point_index,
+                    "source_sample_count": int(metadata.get("sample_count", len(profile_points))),
+                    "sampled_point_count": sampled_point_count,
+                    "sample_method": sample_method,
+                    "profile_point_role": "sampled_measured_g10015_profile_point",
+                    "public_product_role": "temperature_curve_visualization_only_not_stability_result",
+                }
+            )
+
+    if not rows:
+        return pd.DataFrame(columns=G10015_PROFILE_POINTS_PRODUCT_COLUMNS)
+    frame = pd.DataFrame(rows, columns=G10015_PROFILE_POINTS_PRODUCT_COLUMNS)
+    return frame.sort_values(["well_code", "log_date", "file_name", "depth_m"]).reset_index(
+        drop=True
+    )
+
+
+def g10015_temperature_profile_points_summary_frame(points: pd.DataFrame) -> pd.DataFrame:
+    if points.empty:
+        return pd.DataFrame(columns=["metric", "value", "meaning"])
+
+    source_counts = pd.to_numeric(points["source_sample_count"], errors="coerce")
+    sampled_counts = (
+        points.groupby("file_name")["sampled_point_count"].max()
+        if "file_name" in points.columns
+        else pd.Series(dtype=float)
+    )
+    rows = [
+        {
+            "metric": "Sampled profile rows",
+            "value": int(len(points)),
+            "meaning": "Rows exported for public website temperature-curve visualization.",
+        },
+        {
+            "metric": "Profiles represented",
+            "value": int(points["file_name"].nunique()),
+            "meaning": "Unique public G10015 processed temperature-log files with sampled points.",
+        },
+        {
+            "metric": "Unique well codes",
+            "value": int(points["well_code"].nunique()),
+            "meaning": "G10015 well codes represented by the sampled public curve product.",
+        },
+        {
+            "metric": "Maximum source rows per profile",
+            "value": int(source_counts.max()) if source_counts.notna().any() else 0,
+            "meaning": "Maximum parsed rows in any source profile before sampling.",
+        },
+        {
+            "metric": "Maximum sampled rows per profile",
+            "value": int(sampled_counts.max()) if not sampled_counts.empty else 0,
+            "meaning": "Maximum rows retained for any one public profile curve.",
+        },
+    ]
+    return pd.DataFrame(rows)
+
+
 def temperature_inventory_summary_frame(inventory: pd.DataFrame) -> pd.DataFrame:
     if inventory.empty:
         return pd.DataFrame(columns=["metric", "value", "meaning"])
@@ -1608,6 +1740,13 @@ def load_g10015_temperature_inventory(project_root: Path) -> pd.DataFrame:
     path = default_g10015_inventory_path(project_root)
     if not path.exists():
         return pd.DataFrame()
+    return pd.read_csv(path)
+
+
+def load_g10015_temperature_profile_points_product(project_root: Path) -> pd.DataFrame:
+    path = default_g10015_profile_points_path(project_root)
+    if not path.exists():
+        return pd.DataFrame(columns=G10015_PROFILE_POINTS_PRODUCT_COLUMNS)
     return pd.read_csv(path)
 
 
@@ -2254,6 +2393,33 @@ def write_stability_temperature_model_product(
     model.to_csv(model_path, index=False)
     model_summary.to_csv(model_summary_path, index=False)
     return model_path, model_summary_path
+
+
+def write_g10015_temperature_profile_points_product(
+    project_root: Path,
+    source_root: Path | None = None,
+    max_points_per_profile: int = 160,
+) -> tuple[Path, Path] | tuple[None, None]:
+    active_source = Path(source_root) if source_root is not None else active_stability_source_path(project_root)
+    profile_dir = active_source / G10015_RELATIVE_PATH
+    if not profile_dir.exists() or not any(profile_dir.glob("*.txt")):
+        return None, None
+
+    points = build_g10015_temperature_profile_points_product(
+        active_source,
+        max_points_per_profile=max_points_per_profile,
+    )
+    if points.empty:
+        return None, None
+
+    product_dir = default_stability_products_dir(project_root)
+    product_dir.mkdir(parents=True, exist_ok=True)
+    points_summary = g10015_temperature_profile_points_summary_frame(points)
+    points_path = default_g10015_profile_points_path(project_root)
+    points_summary_path = default_g10015_profile_points_summary_path(project_root)
+    points.to_csv(points_path, index=False)
+    points_summary.to_csv(points_summary_path, index=False)
+    return points_path, points_summary_path
 
 
 def write_stability_screen_product(

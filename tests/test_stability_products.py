@@ -15,10 +15,13 @@ from dashboard.stability_products import (
     PHASE_CURVE_ID,
     PHASE_CURVE_ROLE,
     build_g10015_temperature_inventory,
+    build_g10015_temperature_profile_points_product,
     build_public_well_stability_context,
     build_stability_input_scaffold,
     build_stability_screen,
     build_stability_temperature_model,
+    default_g10015_profile_points_path,
+    default_g10015_profile_points_summary_path,
     default_phase_curve_path,
     default_phase_curve_scenario_catalog_path,
     default_stability_screen_path,
@@ -37,6 +40,7 @@ from dashboard.stability_products import (
     load_methane_phase_curve,
     parse_g10015_temperature_profile,
     phase_curve_equilibrium_temperature_c,
+    g10015_temperature_profile_points_summary_frame,
     stability_input_capability_matrix_frame,
     stability_condition_grid_from_profile,
     stability_osl_pull_triggers_frame,
@@ -52,6 +56,7 @@ from dashboard.stability_products import (
     temperature_model_from_profile,
     temperature_inventory_summary_frame,
     write_public_stability_products,
+    write_g10015_temperature_profile_points_product,
     write_stability_screen_product,
     write_stability_temperature_model_product,
 )
@@ -592,6 +597,48 @@ def test_g10015_temperature_profile_points_average_duplicate_depths(tmp_path) ->
     assert duplicate_row["temperature_c"] == -8.0
     assert len(inventory) == 1
     assert inventory.iloc[0]["sample_count"] == 3
+
+
+def test_g10015_temperature_profile_points_product_samples_public_curves(tmp_path) -> None:
+    snapshot = make_public_snapshot(tmp_path)
+    make_temperature_profile(snapshot)
+
+    points = build_g10015_temperature_profile_points_product(
+        snapshot,
+        max_points_per_profile=3,
+    )
+    summary = g10015_temperature_profile_points_summary_frame(points)
+
+    assert len(points) == 3
+    assert points["depth_m"].tolist() == [0.0, 100.0, 150.0]
+    assert set(points["sample_method"]) == {"evenly_sampled_max_3_points"}
+    assert set(points["public_product_role"]) == {
+        "temperature_curve_visualization_only_not_stability_result"
+    }
+    assert summary.loc[summary["metric"] == "Sampled profile rows", "value"].iloc[0] == 3
+
+
+def test_write_g10015_temperature_profile_points_product_creates_public_safe_csv(
+    tmp_path,
+) -> None:
+    snapshot = make_public_snapshot(tmp_path)
+    make_temperature_profile(snapshot)
+
+    points_path, summary_path = write_g10015_temperature_profile_points_product(
+        tmp_path,
+        snapshot,
+        max_points_per_profile=3,
+    )
+
+    assert points_path == default_g10015_profile_points_path(tmp_path)
+    assert points_path is not None
+    assert points_path.exists()
+    assert summary_path == default_g10015_profile_points_summary_path(tmp_path)
+    assert summary_path is not None
+    assert summary_path.exists()
+    points = pd.read_csv(points_path)
+    assert len(points) == 3
+    assert "stability_top_m" not in points.columns
 
 
 def test_temperature_model_interpolates_measured_profile() -> None:
