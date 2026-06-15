@@ -34,7 +34,7 @@ Main flowchart image:
 docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/full_project_ml_workflow_flowchart.png
 ```
 
-Expanded V4 split-node flowchart image for website review and mentor
+Expanded V5 visual architecture flowchart image for website review and mentor
 discussion:
 
 ```text
@@ -44,7 +44,7 @@ docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/ful
 ML architecture detail image:
 
 ```text
-docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/ml_pipeline_network_detail_v4.png
+docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/ml_pipeline_network_detail_v5.png
 ```
 
 Diagram-first PowerPoint draft:
@@ -150,19 +150,22 @@ acoustic impedance, lambda-rho, mu-rho, NMR-density separation, and any
 Archie-style saturation baseline are feature or check producers. They do not
 create proof by themselves.
 
-The current V4 static export splits the workflow into many small boxes rather
-than a few dense boxes and spaces the lanes farther apart so arrows can move
-through clear routing channels. It uses five lanes: sources/schema, stability
-context, feature engineering, leakage-safe ML, and validation/exports. Solid
-arrows show allowed source, context, feature, and model flow. Dashed red arrows
-show target-only labels and validation overlays that bypass the predictor
-matrix.
+The current V5 static export keeps the split-node workflow but adds visual
+mini-panels inside the architecture: source packages and spatial controls,
+pressure-temperature stability checking, depth-aligned log tracks feeding a
+feature matrix, a leakage-safe neural-network-style runtime, and reviewed
+output plots. It uses five lanes: sources/schema, stability context, feature
+engineering, leakage-safe ML, and validation/exports. Solid arrows show allowed
+source, context, feature, and model flow. Dashed red arrows show target-only
+labels and validation overlays that bypass the predictor matrix.
 
 The companion ML architecture visual expands the modeling lane into actual
 feature/QC groups, train-only preprocessing, a neural-network-style candidate
 model, occurrence and saturation output heads, baseline comparison, validation,
-and the red target-only rail. It is still an architecture guide only, not a
-trained model or result claim.
+and the red target-only rail. The V5 version also shows the compact well-log
+track strip and feature-matrix handoff so the reader can see how raw curves
+become model rows before they reach the network. It is still an architecture
+guide only, not a trained model or result claim.
 
 The stability branch feeds the ML workflow as context, a mask, a confidence
 label, or a reason flag. It is not a hydrate occurrence label and not a

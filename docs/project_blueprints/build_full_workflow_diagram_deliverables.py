@@ -253,11 +253,11 @@ def full_workflow_panel() -> Path:
     draw.rectangle((0, 0, 34, EXPANDED_H), fill=TEAL)
     draw.rectangle((0, 0, EXPANDED_W, 214), fill=(246, 251, 252))
     draw.line((84, 214, EXPANDED_W - 84, 214), fill=LINE, width=4)
-    text(draw, (92, 48), "North Slope Gas Hydrate ML Workflow V4", 64, NAVY, True)
+    text(draw, (92, 48), "North Slope Gas Hydrate ML Workflow V5", 64, NAVY, True)
     text(
         draw,
         (96, 126),
-        "Spaced split-node map: source/schema controls, stability context, physics features, leakage-safe runtime, validation, and reviewed exports.",
+        "Visual source-to-model architecture: data controls, stability physics, log-derived features, target-safe ML, validation, and reviewed outputs.",
         31,
         MUTED,
         width=4300,
@@ -449,7 +449,7 @@ def full_workflow_panel() -> Path:
     bus23 = col_x[3] - 62
     bus34a = col_x[4] - 92
     bus34b = col_x[4] - 48
-    lower_bus = section_bottom - 90
+    lower_bus = section_bottom - 500
     arrow([right("public_sources"), (bus01, right("public_sources")[1]), (bus01, left("au_gate")[1]), left("au_gate")], TEAL, label_text="public context", label_xy=(bus01, 350))
     arrow(
         [right("qc_gate"), (bus01, right("qc_gate")[1]), (bus01, lower_bus), (bus12, lower_bus), (bus12, left("measured_logs")[1]), left("measured_logs")],
@@ -487,6 +487,128 @@ def full_workflow_panel() -> Path:
         label_text="validation overlay",
         label_xy=(ml_bus_2, 1360),
     )
+
+    def visual_shell(col: int, heading: str, accent, draw_fn) -> None:
+        x = col_x[col] + 54
+        y = 2300
+        box = (x, y, x + col_w - 108, y + 400)
+        card(draw, box, fill=WHITE, outline=accent, radius=22, width=3)
+        text(draw, (x + 24, y + 18), heading, 26, accent, True, width=col_w - 156)
+        draw_fn((x + 24, y + 70, x + col_w - 132, y + 360))
+
+    def draw_source_visual(box: tuple[int, int, int, int]) -> None:
+        x1, y1, x2, y2 = box
+        for i, color in enumerate([ICE_LIGHT, BLUE_LIGHT, GREEN_LIGHT, AMBER_LIGHT]):
+            bx = x1 + i * 34
+            by = y1 + i * 22
+            card(draw, (bx, by, bx + 230, by + 120), fill=color, outline=TEAL, radius=12, width=2)
+            draw.rectangle((bx + 18, by + 22, bx + 200, by + 30), fill=TEAL)
+            draw.rectangle((bx + 18, by + 48, bx + 172, by + 56), fill=(157, 190, 199))
+            draw.rectangle((bx + 18, by + 74, bx + 142, by + 82), fill=(157, 190, 199))
+        map_x = x1 + 390
+        card(draw, (map_x, y1 + 8, x2 - 10, y2 - 12), fill=(247, 251, 252), outline=LINE, radius=16, width=2)
+        pts = [(map_x + 50, y1 + 190), (map_x + 100, y1 + 105), (map_x + 190, y1 + 88), (map_x + 270, y1 + 125), (map_x + 315, y1 + 208)]
+        draw.line(pts, fill=LINE, width=5)
+        for idx, (px, py) in enumerate(pts):
+            color = [TEAL, BLUE, GREEN, AMBER, PURPLE][idx]
+            draw.ellipse((px - 13, py - 13, px + 13, py + 13), fill=color, outline=WHITE, width=3)
+        text(draw, (map_x + 34, y2 - 54), "source packages + spatial controls", 18, MUTED, True, width=x2 - map_x - 50)
+
+    def draw_stability_visual(box: tuple[int, int, int, int]) -> None:
+        x1, y1, x2, y2 = box
+        axis_left, axis_top, axis_right, axis_bottom = x1 + 70, y1 + 34, x2 - 70, y2 - 44
+        draw.line((axis_left, axis_bottom, axis_right, axis_bottom), fill=NAVY, width=4)
+        draw.line((axis_left, axis_bottom, axis_left, axis_top), fill=NAVY, width=4)
+        text(draw, (axis_left + 120, axis_bottom + 10), "temperature", 16, MUTED, True)
+        text(draw, (x1 + 5, axis_top + 70), "depth / pressure", 16, MUTED, True, width=80)
+        curve = []
+        for i in range(80):
+            t = i / 79
+            x = int(axis_left + t * (axis_right - axis_left))
+            y = int(axis_top + (0.16 + 0.78 * (t**1.75)) * (axis_bottom - axis_top))
+            curve.append((x, y))
+        draw.line(curve, fill=AMBER, width=7)
+        temp_path = [(axis_left + 12, axis_top + 12), (axis_left + 90, axis_top + 92), (axis_left + 190, axis_top + 160), (axis_left + 290, axis_bottom - 18)]
+        draw.line(temp_path, fill=BLUE, width=6)
+        for px, py in temp_path:
+            draw.ellipse((px - 10, py - 10, px + 10, py + 10), fill=BLUE, outline=WHITE, width=3)
+        card(draw, (x1 + 345, y1 + 34, x2 - 26, y1 + 122), fill=BLUE_LIGHT, outline=BLUE, radius=14, width=2)
+        text(draw, (x1 + 368, y1 + 56), "T_model <= T_eq", 24, BLUE, True, width=x2 - x1 - 400)
+        text(draw, (x1 + 368, y1 + 91), "admissible, not proof", 17, MUTED, True, width=x2 - x1 - 400)
+
+    def draw_feature_visual(box: tuple[int, int, int, int]) -> None:
+        x1, y1, x2, y2 = box
+        track_names = ["GR", "Rt", "RHOB", "Vp", "QC"]
+        track_w = 76
+        for i, name in enumerate(track_names):
+            tx = x1 + i * (track_w + 18)
+            card(draw, (tx, y1 + 10, tx + track_w, y2 - 14), fill=(247, 251, 252), outline=LINE, radius=10, width=2)
+            text(draw, (tx + 8, y1 + 22), name, 16, [GREEN, TEAL, BLUE, PURPLE, AMBER][i], True, width=track_w - 14, align="center")
+            pts = []
+            for j in range(26):
+                yy = y1 + 58 + j * ((y2 - y1 - 95) / 25)
+                xx = tx + 12 + int((track_w - 24) * (0.5 + 0.38 * math.sin(j * 0.74 + i)))
+                pts.append((xx, int(yy)))
+            draw.line(pts, fill=[GREEN, TEAL, BLUE, PURPLE, AMBER][i], width=3)
+        matrix_x = x1 + 510
+        cell = 28
+        for r in range(7):
+            for c in range(6):
+                value = (r * 31 + c * 17) % 100
+                color = (230 - value // 3, 246 - value // 6, 236 + min(value // 8, 15))
+                draw.rectangle(
+                    (matrix_x + c * cell, y1 + 54 + r * cell, matrix_x + (c + 1) * cell - 3, y1 + 54 + (r + 1) * cell - 3),
+                    fill=color,
+                    outline=WHITE,
+                )
+        text(draw, (matrix_x - 12, y1 + 15), "X_allowed matrix", 19, GREEN, True, width=220, align="center")
+        text(draw, (matrix_x - 20, y2 - 40), "features + QC + context", 16, MUTED, True, width=240, align="center")
+
+    def draw_ml_visual(box: tuple[int, int, int, int]) -> None:
+        x1, y1, x2, y2 = box
+        layers = [(x1 + 80, 5, GREEN), (x1 + 240, 7, PURPLE), (x1 + 400, 6, PURPLE), (x1 + 560, 2, AMBER)]
+        nodes: list[list[tuple[int, int]]] = []
+        for x, count, color in layers:
+            pts = []
+            for i in range(count):
+                yy = int(y1 + 48 + i * ((y2 - y1 - 96) / max(1, count - 1)))
+                pts.append((x, yy))
+            nodes.append(pts)
+        for a_layer, b_layer in zip(nodes, nodes[1:], strict=False):
+            for a in a_layer:
+                for b in b_layer:
+                    draw.line((a, b), fill=(211, 222, 226), width=1)
+        for pts, (_, _, color) in zip(nodes, layers, strict=False):
+            for px, py in pts:
+                r = 15
+                draw.ellipse((px - r, py - r, px + r, py + r), fill=WHITE, outline=color, width=4)
+        card(draw, (x2 - 145, y1 + 35, x2 - 10, y1 + 115), fill=BLUE_LIGHT, outline=BLUE, radius=14, width=2)
+        text(draw, (x2 - 126, y1 + 54), "P(hydrate)", 18, BLUE, True, width=98, align="center")
+        card(draw, (x2 - 145, y2 - 118, x2 - 10, y2 - 38), fill=GREEN_LIGHT, outline=GREEN, radius=14, width=2)
+        text(draw, (x2 - 126, y2 - 99), "Sh_pred", 18, GREEN, True, width=98, align="center")
+        dashed_segment((x1 + 20, y2 - 22), (x2 - 30, y2 - 22), RED, 4)
+        text(draw, (x1 + 36, y2 - 55), "target-only supervision rail", 17, RED, True, width=360)
+
+    def draw_output_visual(box: tuple[int, int, int, int]) -> None:
+        x1, y1, x2, y2 = box
+        card(draw, (x1 + 10, y1 + 10, x1 + 245, y2 - 18), fill=BLUE_LIGHT, outline=BLUE, radius=16, width=2)
+        for i, h in enumerate([112, 65, 145, 90, 125]):
+            bx = x1 + 38 + i * 37
+            draw.rectangle((bx, y2 - 48 - h, bx + 24, y2 - 48), fill=BLUE)
+        text(draw, (x1 + 34, y1 + 28), "validation metrics", 19, BLUE, True, width=180)
+        card(draw, (x1 + 300, y1 + 10, x2 - 10, y2 - 18), fill=GREEN_LIGHT, outline=GREEN, radius=16, width=2)
+        pts = [(x1 + 342, y2 - 54), (x1 + 390, y2 - 118), (x1 + 455, y2 - 92), (x1 + 525, y2 - 160), (x1 + 600, y2 - 128)]
+        draw.line(pts, fill=GREEN, width=5)
+        for px, py in pts:
+            draw.ellipse((px - 10, py - 10, px + 10, py + 10), fill=GREEN, outline=WHITE, width=3)
+        text(draw, (x1 + 334, y1 + 28), "per-well outputs", 19, GREEN, True, width=220)
+        text(draw, (x1 + 334, y1 + 58), "probability, Sh, uncertainty, caveats", 16, MUTED, True, width=300)
+
+    visual_shell(0, "Public + OSL source packages", TEAL, draw_source_visual)
+    visual_shell(1, "Pressure-temperature stability check", BLUE, draw_stability_visual)
+    visual_shell(2, "Logs become matrix columns", GREEN, draw_feature_visual)
+    visual_shell(3, "Leakage-safe model runtime", PURPLE, draw_ml_visual)
+    visual_shell(4, "Validated outputs, not claims", AMBER, draw_output_visual)
 
     # Status and legend.
     card(draw, (100, 2800, 5100, 2925), fill=(245, 249, 250), outline=LINE, radius=24, width=2)
@@ -527,7 +649,7 @@ def ml_network_detail_panel() -> Path:
     draw.rectangle((0, 0, 24, NETWORK_H), fill=PURPLE)
     draw.rectangle((0, 0, NETWORK_W, 145), fill=(246, 251, 252))
     draw.line((60, 145, NETWORK_W - 60, 145), fill=LINE, width=3)
-    text(draw, (70, 34), "ML Model Architecture Detail", 46, NAVY, True)
+    text(draw, (70, 34), "ML Model Architecture Detail V5", 46, NAVY, True)
     text(
         draw,
         (72, 92),
@@ -609,6 +731,50 @@ def ml_network_detail_panel() -> Path:
         ]
         draw.polygon(pts, fill=color)
 
+    def draw_log_tracks(box: tuple[int, int, int, int]) -> None:
+        x1, y1, x2, y2 = box
+        card(draw, box, fill=(247, 251, 252), outline=LINE, radius=12, width=2)
+        text(draw, (x1 + 8, y1 + 10), "depth-aligned log tracks", 15, MUTED, True, width=x2 - x1 - 16, align="center")
+        tracks = [GREEN, TEAL, BLUE]
+        track_gap = 4
+        track_w = max(8, (x2 - x1 - 28 - track_gap * (len(tracks) - 1)) // len(tracks))
+        for idx, color in enumerate(tracks):
+            tx1 = x1 + 14 + idx * (track_w + track_gap)
+            tx2 = tx1 + track_w
+            draw.rectangle((tx1, y1 + 52, tx2, y2 - 28), outline=(222, 234, 238), width=2)
+            pts = []
+            for j in range(36):
+                yy = y1 + 62 + j * ((y2 - y1 - 104) / 35)
+                wiggle_width = max(2, tx2 - tx1 - 6)
+                xx = tx1 + 3 + int(wiggle_width * (0.5 + 0.38 * math.sin(j * 0.58 + idx * 1.1)))
+                pts.append((xx, int(yy)))
+            draw.line(pts, fill=color, width=3)
+        draw.rectangle((x1 + 10, y1 + 390, x2 - 10, y1 + 470), fill=(255, 247, 229), outline=AMBER, width=2)
+        text(draw, (x1 + 16, y1 + 410), "QC interval", 14, AMBER, True, width=x2 - x1 - 32, align="center")
+
+    def draw_feature_matrix(box: tuple[int, int, int, int]) -> None:
+        x1, y1, x2, y2 = box
+        card(draw, box, fill=WHITE, outline=GREEN, radius=12, width=2)
+        text(draw, (x1 + 8, y1 + 10), "feature matrix", 15, GREEN, True, width=x2 - x1 - 16, align="center")
+        cell = 15
+        start_x = x1 + 19
+        start_y = y1 + 48
+        for r in range(8):
+            for c in range(6):
+                value = (r * 29 + c * 19) % 100
+                fill = (230 - value // 4, 245 - value // 8, 235 + min(value // 9, 14))
+                draw.rectangle(
+                    (
+                        start_x + c * cell,
+                        start_y + r * cell,
+                        start_x + (c + 1) * cell - 2,
+                        start_y + (r + 1) * cell - 2,
+                    ),
+                    fill=fill,
+                    outline=WHITE,
+                )
+        text(draw, (x1 + 10, y2 - 35), "rows = depth samples", 13, MUTED, True, width=x2 - x1 - 20, align="center")
+
     feature_cards = [
         ("QC flags", ["caliper/washout", "missingness/outliers"], AMBER, AMBER_LIGHT),
         ("Stability context", ["AU/permafrost", "interval/status/confidence"], BLUE, BLUE_LIGHT),
@@ -645,12 +811,15 @@ def ml_network_detail_panel() -> Path:
         GREEN,
         GREEN_LIGHT,
     )
-    preprocess_points = [(520, 350), (520, 620), (520, 895)]
+    draw_log_tracks((450, 205, 510, 1080))
+    draw_feature_matrix((880, 780, 958, 1010))
     for start in feature_centers:
-        arrow_line(start, (500, 895), GREEN, width=3)
+        arrow_line(start, (450, min(max(start[1], 245), 1035)), GREEN, width=3)
     arrow_line((685, 430), (685, 520), PURPLE)
     arrow_line((685, 720), (685, 810), PURPLE)
-    arrow_line((850, 895), (970, 895), GREEN)
+    arrow_line((510, 895), (520, 895), GREEN, width=3)
+    arrow_line((850, 895), (880, 895), GREEN)
+    arrow_line((958, 895), (970, 895), GREEN)
 
     # Neural network drawing.
     layer_specs = [
@@ -743,7 +912,7 @@ def ml_network_detail_panel() -> Path:
     )
 
     ASSET_DIR.mkdir(parents=True, exist_ok=True)
-    path = ASSET_DIR / "ml_pipeline_network_detail_v4.png"
+    path = ASSET_DIR / "ml_pipeline_network_detail_v5.png"
     img.save(path, quality=94)
     return path
 
