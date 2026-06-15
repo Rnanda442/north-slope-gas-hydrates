@@ -1,0 +1,6 @@
+metric,value,meaning
+Sampled profile rows,28020,Rows exported for public website temperature-curve visualization.
+Profiles represented,184,Unique public G10015 processed temperature-log files with sampled points.
+Unique well codes,24,G10015 well codes represented by the sampled public curve product.
+Maximum source rows per profile,4858,Maximum parsed rows in any source profile before sampling.
+Maximum sampled rows per profile,160,Maximum rows retained for any one public profile curve.
