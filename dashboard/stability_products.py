@@ -34,6 +34,10 @@ STABILITY_SCREEN_RUN_ID = "stability_screen_2026_06_14_methane_5ppt_v1"
 STABILITY_SCREEN_VERSION = "2026-06-14.v1"
 STABILITY_SCREEN_FILE_NAME = "stability_screen_2026-06-14_methane_5ppt_v1.csv"
 STABILITY_SCREEN_SUMMARY_FILE_NAME = "stability_screen_summary_2026-06-14_methane_5ppt_v1.csv"
+PUBLIC_ML_FEATURE_SCAFFOLD_VERSION = "2026-06-15.v1"
+PUBLIC_ML_FEATURE_SCAFFOLD_FILE_NAME = "public_ml_feature_scaffold_2026-06-15.csv"
+PUBLIC_ML_FEATURE_SCAFFOLD_SUMMARY_FILE_NAME = "public_ml_feature_scaffold_summary_2026-06-15.csv"
+PUBLIC_ML_FEATURE_DICTIONARY_FILE_NAME = "public_ml_feature_dictionary_2026-06-15.csv"
 PHASE_CURVE_FILE_NAME = "phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv"
 PHASE_CURVE_SCENARIO_CATALOG_FILE_NAME = "phase_curve_scenario_catalog_2026-06-14.csv"
 PHASE_CURVE_ID = "methane_5ppt_sir2008_csmhyd_digitized_v1"
@@ -272,6 +276,92 @@ STABILITY_SCREEN_COLUMNS = [
     "stability_notes",
 ]
 
+PUBLIC_ML_FEATURE_SCAFFOLD_COLUMNS = [
+    "public_ml_feature_scaffold_version",
+    "public_product_role",
+    "ml_row_grain",
+    "object_id",
+    "permit_number",
+    "api_number",
+    "well_name",
+    "field",
+    "pool",
+    "lat",
+    "lon",
+    "current_status",
+    "hydrate_assessment_codes",
+    "hydrate_assessment_unit_count",
+    "within_hydrate_assessment_unit",
+    "tvd_m",
+    "depth_source",
+    "depth_basis_ft",
+    "depth_available",
+    "permafrost_base_m",
+    "permafrost_control_code",
+    "permafrost_control_distance_km",
+    "permafrost_confidence",
+    "well_depth_exceeds_nearest_permafrost_control",
+    "well_depth_minus_permafrost_control_m",
+    "temperature_profile_matched",
+    "temperature_profile_code",
+    "temperature_profile_file",
+    "temperature_profile_count_for_code",
+    "temperature_profile_max_depth_m",
+    "temperature_gradient_c_per_100m",
+    "temperature_gradient_source",
+    "temperature_profile_link_method",
+    "temperature_at_permafrost_control_c",
+    "temperature_at_permafrost_control_method",
+    "temperature_at_permafrost_control_status",
+    "temperature_at_permafrost_control_extrapolated",
+    "temperature_at_permafrost_control_extrapolation_m",
+    "temperature_at_depth_basis_c",
+    "temperature_at_depth_basis_method",
+    "temperature_at_depth_basis_status",
+    "temperature_at_depth_basis_extrapolated",
+    "temperature_at_depth_basis_extrapolation_m",
+    "pressure_model_id",
+    "pressure_at_tvd_mpa_absolute",
+    "pressure_at_permafrost_control_mpa_absolute",
+    "phase_curve_id",
+    "phase_curve_role",
+    "phase_curve_allowed_use",
+    "gas_composition_assumption",
+    "gas_methane_mol_pct",
+    "salinity_ppt_assumption",
+    "stability_input_readiness",
+    "stability_result_status",
+    "stability_confidence",
+    "stability_interval_calculated",
+    "no_stable_interval_under_baseline",
+    "stability_top_m",
+    "stability_base_m",
+    "stability_thickness_m",
+    "well_penetrated_stability_thickness_m",
+    "reaches_stability_zone",
+    "caveat_codes",
+    "blank_or_block_reason",
+    "public_ml_feature_readiness",
+    "ml_training_readiness",
+    "hydrate_occurrence_label_status",
+    "hydrate_saturation_label_status",
+    "allowed_ml_use",
+    "prohibited_ml_use",
+    "label_guardrail",
+]
+
+PUBLIC_ML_FEATURE_DICTIONARY_COLUMNS = [
+    "column_name",
+    "feature_group",
+    "source_product",
+    "source_column",
+    "current_status",
+    "allowed_ml_use",
+    "prohibited_use",
+    "upgrade_needed",
+    "notes",
+]
+
 WELL_CONTEXT_COLUMNS = [
     "object_id",
     "permit_number",
@@ -363,6 +453,18 @@ def default_stability_screen_path(project_root: Path) -> Path:
 
 def default_stability_screen_summary_path(project_root: Path) -> Path:
     return default_stability_products_dir(project_root) / STABILITY_SCREEN_SUMMARY_FILE_NAME
+
+
+def default_public_ml_feature_scaffold_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / PUBLIC_ML_FEATURE_SCAFFOLD_FILE_NAME
+
+
+def default_public_ml_feature_scaffold_summary_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / PUBLIC_ML_FEATURE_SCAFFOLD_SUMMARY_FILE_NAME
+
+
+def default_public_ml_feature_dictionary_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / PUBLIC_ML_FEATURE_DICTIONARY_FILE_NAME
 
 
 def default_phase_curve_path(project_root: Path) -> Path:
@@ -1762,6 +1864,494 @@ def load_stability_screen(project_root: Path) -> pd.DataFrame:
     if not path.exists():
         return pd.DataFrame(columns=STABILITY_SCREEN_COLUMNS)
     return pd.read_csv(path)
+
+
+def _series_or_default(frame: pd.DataFrame, column: str, default: object = pd.NA) -> pd.Series:
+    if column in frame.columns:
+        return frame[column]
+    return pd.Series(default, index=frame.index)
+
+
+def _numeric_series(frame: pd.DataFrame, column: str) -> pd.Series:
+    return pd.to_numeric(_series_or_default(frame, column), errors="coerce")
+
+
+def _boolean_series(frame: pd.DataFrame, column: str) -> pd.Series:
+    values = _series_or_default(frame, column, False)
+    if values.dtype == bool:
+        return values.fillna(False)
+    return values.map(
+        lambda value: str(value).strip().lower() in {"true", "1", "yes", "y"}
+        if pd.notna(value)
+        else False
+    )
+
+
+def _has_text_series(frame: pd.DataFrame, column: str) -> pd.Series:
+    values = _series_or_default(frame, column)
+    return values.notna() & values.astype(str).str.strip().ne("")
+
+
+def _temperature_model_feature_frame(model: pd.DataFrame) -> pd.DataFrame:
+    columns = [
+        "object_id",
+        "temperature_at_permafrost_control_c",
+        "temperature_at_permafrost_control_method",
+        "temperature_at_permafrost_control_status",
+        "temperature_at_permafrost_control_extrapolated",
+        "temperature_at_permafrost_control_extrapolation_m",
+        "temperature_at_depth_basis_c",
+        "temperature_at_depth_basis_method",
+        "temperature_at_depth_basis_status",
+        "temperature_at_depth_basis_extrapolated",
+        "temperature_at_depth_basis_extrapolation_m",
+    ]
+    if model.empty or "object_id" not in model.columns:
+        return pd.DataFrame(columns=columns)
+
+    role_prefixes = {
+        "nearest_permafrost_control": "temperature_at_permafrost_control",
+        "depth_basis": "temperature_at_depth_basis",
+    }
+    rows: list[dict[str, object]] = []
+    for object_id, group in model.groupby("object_id", dropna=False):
+        output: dict[str, object] = {"object_id": object_id}
+        for role, prefix in role_prefixes.items():
+            role_rows = group[group["temperature_model_depth_role"].eq(role)]
+            if role_rows.empty:
+                output[f"{prefix}_c"] = np.nan
+                output[f"{prefix}_method"] = "missing"
+                output[f"{prefix}_status"] = "missing"
+                output[f"{prefix}_extrapolated"] = False
+                output[f"{prefix}_extrapolation_m"] = np.nan
+                continue
+            row = role_rows.iloc[0]
+            output[f"{prefix}_c"] = row.get("temperature_model_c")
+            output[f"{prefix}_method"] = row.get("temperature_model_method")
+            output[f"{prefix}_status"] = row.get("temperature_model_status")
+            output[f"{prefix}_extrapolated"] = bool(
+                str(row.get("temperature_extrapolated_below_profile")).lower() == "true"
+                or row.get("temperature_extrapolated_below_profile") is True
+            )
+            output[f"{prefix}_extrapolation_m"] = row.get(
+                "temperature_extrapolation_below_profile_m"
+            )
+        rows.append(output)
+    return pd.DataFrame(rows, columns=columns)
+
+
+def _public_ml_feature_readiness(row: pd.Series) -> str:
+    status = str(row.get("stability_result_status", "missing"))
+    if not bool(row.get("within_hydrate_assessment_unit")):
+        return "context_only_outside_public_hydrate_au"
+    if not bool(row.get("depth_available")):
+        return "blocked_missing_public_depth"
+    if not bool(row.get("temperature_profile_matched")):
+        return "blocked_missing_temperature_profile"
+    if status == "calculated":
+        return "feature_ready_with_calculated_stability_interval"
+    if status == "calculated_no_stable_interval":
+        return "feature_ready_no_stable_interval_under_baseline"
+    if status == "blocked_phase_curve_range_insufficient":
+        return "blocked_phase_curve_range_insufficient"
+    return f"context_only_{status}"
+
+
+def _blank_or_block_reason(row: pd.Series) -> str:
+    status = str(row.get("stability_result_status", "missing"))
+    if status == "calculated":
+        return "calculated_baseline_stability_interval"
+    if status == "calculated_no_stable_interval":
+        return "calculated_no_stable_interval_under_baseline"
+    if status == "outside_au_context":
+        return "outside_public_usgs_hydrate_assessment_unit"
+    if status.startswith("blocked_"):
+        return status
+    return "context_only_or_unknown"
+
+
+def build_public_ml_feature_scaffold(project_root: Path) -> pd.DataFrame:
+    screen = load_stability_screen(project_root)
+    if screen.empty:
+        return pd.DataFrame(columns=PUBLIC_ML_FEATURE_SCAFFOLD_COLUMNS)
+
+    base = screen.copy()
+    context = load_public_well_stability_context(project_root)
+    if not context.empty:
+        context_columns = [
+            "object_id",
+            "current_status",
+            "depth_basis_ft",
+            "hydrate_assessment_unit_count",
+            "well_depth_exceeds_nearest_permafrost_control",
+        ]
+        available_context = [column for column in context_columns if column in context.columns]
+        base = base.merge(
+            context[available_context],
+            on="object_id",
+            how="left",
+            suffixes=("", "_context"),
+        )
+
+    scaffold = load_stability_input_scaffold(project_root)
+    if not scaffold.empty:
+        scaffold_columns = [
+            "object_id",
+            "stability_input_readiness",
+            "temperature_profile_count_for_code",
+            "temperature_profile_link_method",
+            "hydrostatic_pressure_mpa_absolute_at_nearest_permafrost_control",
+        ]
+        available_scaffold = [column for column in scaffold_columns if column in scaffold.columns]
+        base = base.merge(
+            scaffold[available_scaffold],
+            on="object_id",
+            how="left",
+            suffixes=("", "_scaffold"),
+        )
+
+    temperature_features = _temperature_model_feature_frame(
+        load_stability_temperature_model(project_root)
+    )
+    if not temperature_features.empty:
+        base = base.merge(temperature_features, on="object_id", how="left")
+
+    features = pd.DataFrame(index=base.index)
+    features["public_ml_feature_scaffold_version"] = PUBLIC_ML_FEATURE_SCAFFOLD_VERSION
+    features["public_product_role"] = "public_ml_feature_scaffold_not_training_labels"
+    features["ml_row_grain"] = "one_public_well"
+    for column in [
+        "object_id",
+        "permit_number",
+        "api_number",
+        "well_name",
+        "field",
+        "pool",
+        "lat",
+        "lon",
+        "current_status",
+        "hydrate_assessment_codes",
+        "hydrate_assessment_unit_count",
+        "depth_source",
+        "depth_basis_ft",
+        "permafrost_control_code",
+        "permafrost_confidence",
+        "temperature_profile_code",
+        "temperature_profile_file",
+        "temperature_profile_count_for_code",
+        "temperature_gradient_source",
+        "temperature_profile_link_method",
+        "temperature_at_permafrost_control_method",
+        "temperature_at_permafrost_control_status",
+        "temperature_at_depth_basis_method",
+        "temperature_at_depth_basis_status",
+        "pressure_model_id",
+        "phase_curve_id",
+        "phase_curve_role",
+        "phase_curve_allowed_use",
+        "gas_composition_assumption",
+        "stability_input_readiness",
+        "stability_result_status",
+        "stability_confidence",
+        "caveat_codes",
+    ]:
+        features[column] = _series_or_default(base, column)
+
+    if "depth_basis_ft_context" in base.columns:
+        features["depth_basis_ft"] = base["depth_basis_ft_context"]
+
+    numeric_columns = [
+        "tvd_m",
+        "permafrost_base_m",
+        "permafrost_control_distance_km",
+        "temperature_profile_max_depth_m",
+        "temperature_gradient_c_per_100m",
+        "temperature_at_permafrost_control_c",
+        "temperature_at_permafrost_control_extrapolation_m",
+        "temperature_at_depth_basis_c",
+        "temperature_at_depth_basis_extrapolation_m",
+        "pressure_at_tvd_mpa_absolute",
+        "pressure_at_permafrost_control_mpa_absolute",
+        "gas_methane_mol_pct",
+        "salinity_ppt_assumption",
+        "stability_top_m",
+        "stability_base_m",
+        "stability_thickness_m",
+        "well_penetrated_stability_thickness_m",
+    ]
+    for column in numeric_columns:
+        source_column = column
+        if column == "pressure_at_permafrost_control_mpa_absolute":
+            source_column = "hydrostatic_pressure_mpa_absolute_at_nearest_permafrost_control"
+        features[column] = _numeric_series(base, source_column)
+
+    features["within_hydrate_assessment_unit"] = _boolean_series(
+        base,
+        "within_hydrate_assessment_unit",
+    )
+    features["well_depth_exceeds_nearest_permafrost_control"] = _boolean_series(
+        base,
+        "well_depth_exceeds_nearest_permafrost_control",
+    )
+    features["temperature_at_permafrost_control_extrapolated"] = _boolean_series(
+        base,
+        "temperature_at_permafrost_control_extrapolated",
+    )
+    features["temperature_at_depth_basis_extrapolated"] = _boolean_series(
+        base,
+        "temperature_at_depth_basis_extrapolated",
+    )
+    features["reaches_stability_zone"] = _boolean_series(base, "reaches_stability_zone")
+    features["depth_available"] = features["tvd_m"].notna()
+    features["temperature_profile_matched"] = _has_text_series(base, "temperature_profile_file")
+    features["well_depth_minus_permafrost_control_m"] = (
+        features["tvd_m"] - features["permafrost_base_m"]
+    )
+    features["stability_interval_calculated"] = features["stability_result_status"].eq(
+        "calculated"
+    )
+    features["no_stable_interval_under_baseline"] = features["stability_result_status"].eq(
+        "calculated_no_stable_interval"
+    )
+    features["blank_or_block_reason"] = features.apply(_blank_or_block_reason, axis=1)
+    features["public_ml_feature_readiness"] = features.apply(
+        _public_ml_feature_readiness,
+        axis=1,
+    )
+    features["ml_training_readiness"] = "not_training_ready_no_validated_hydrate_labels"
+    features["hydrate_occurrence_label_status"] = "not_available_in_public_scaffold"
+    features["hydrate_saturation_label_status"] = "not_available_in_public_scaffold"
+    features["allowed_ml_use"] = "feature_engineering_and_coverage_readiness_only"
+    features["prohibited_ml_use"] = (
+        "hydrate_presence_absence_label;hydrate_saturation_label;"
+        "validated_model_training;sweet_spot_ranking"
+    )
+    features["label_guardrail"] = (
+        "baseline stability screen may be used as a physics-derived feature, "
+        "not as hydrate occurrence or saturation ground truth"
+    )
+
+    for column in PUBLIC_ML_FEATURE_SCAFFOLD_COLUMNS:
+        if column not in features.columns:
+            features[column] = pd.NA
+    return features[PUBLIC_ML_FEATURE_SCAFFOLD_COLUMNS]
+
+
+def public_ml_feature_scaffold_summary_frame(features: pd.DataFrame) -> pd.DataFrame:
+    if features.empty:
+        return pd.DataFrame(columns=["metric", "value", "meaning"])
+
+    rows = [
+        {
+            "metric": "Feature scaffold rows",
+            "value": int(len(features)),
+            "meaning": "One row per public well carried into the ML-readiness scaffold.",
+        },
+        {
+            "metric": "Rows inside public hydrate AU",
+            "value": int(features["within_hydrate_assessment_unit"].fillna(False).sum()),
+            "meaning": "Rows inside one or more USGS hydrate assessment units.",
+        },
+        {
+            "metric": "Rows with public depth",
+            "value": int(features["depth_available"].fillna(False).sum()),
+            "meaning": "Rows with a public vertical-depth basis for pressure/depth features.",
+        },
+        {
+            "metric": "Rows with matched temperature profile",
+            "value": int(features["temperature_profile_matched"].fillna(False).sum()),
+            "meaning": "Rows linked to a public G10015 temperature-profile context.",
+        },
+        {
+            "metric": "Rows with calculated stability interval feature",
+            "value": int(features["stability_interval_calculated"].fillna(False).sum()),
+            "meaning": "Rows with non-null baseline stability top/base/thickness features.",
+        },
+        {
+            "metric": "Rows with no stable interval under baseline",
+            "value": int(features["no_stable_interval_under_baseline"].fillna(False).sum()),
+            "meaning": "Rows where inputs were sufficient but the baseline screen found no stable interval.",
+        },
+        {
+            "metric": "Rows with validated hydrate occurrence labels",
+            "value": 0,
+            "meaning": "No public scaffold row is a validated hydrate-present or hydrate-absent label.",
+        },
+        {
+            "metric": "Rows training-ready for occurrence/saturation ML",
+            "value": 0,
+            "meaning": "Approved labels/logs are still required before model training.",
+        },
+    ]
+    return pd.DataFrame(rows)
+
+
+def public_ml_feature_dictionary_frame() -> pd.DataFrame:
+    groups = {
+        "public_ml_feature_scaffold_version": "product_metadata",
+        "public_product_role": "product_metadata",
+        "ml_row_grain": "product_metadata",
+        "object_id": "well_identity",
+        "permit_number": "well_identity",
+        "api_number": "well_identity",
+        "well_name": "well_identity",
+        "field": "well_identity",
+        "pool": "well_identity",
+        "lat": "well_location",
+        "lon": "well_location",
+        "current_status": "well_context",
+        "hydrate_assessment_codes": "regional_context",
+        "hydrate_assessment_unit_count": "regional_context",
+        "within_hydrate_assessment_unit": "regional_context",
+        "tvd_m": "depth_context",
+        "depth_source": "depth_context",
+        "depth_basis_ft": "depth_context",
+        "depth_available": "depth_context",
+        "permafrost_base_m": "permafrost_context",
+        "permafrost_control_code": "permafrost_context",
+        "permafrost_control_distance_km": "permafrost_context",
+        "permafrost_confidence": "permafrost_context",
+        "well_depth_exceeds_nearest_permafrost_control": "permafrost_context",
+        "well_depth_minus_permafrost_control_m": "permafrost_context",
+        "temperature_profile_matched": "temperature_context",
+        "temperature_profile_code": "temperature_context",
+        "temperature_profile_file": "temperature_context",
+        "temperature_profile_count_for_code": "temperature_context",
+        "temperature_profile_max_depth_m": "temperature_context",
+        "temperature_gradient_c_per_100m": "temperature_context",
+        "temperature_gradient_source": "temperature_context",
+        "temperature_profile_link_method": "temperature_context",
+        "temperature_at_permafrost_control_c": "temperature_model",
+        "temperature_at_permafrost_control_method": "temperature_model",
+        "temperature_at_permafrost_control_status": "temperature_model",
+        "temperature_at_permafrost_control_extrapolated": "temperature_model",
+        "temperature_at_permafrost_control_extrapolation_m": "temperature_model",
+        "temperature_at_depth_basis_c": "temperature_model",
+        "temperature_at_depth_basis_method": "temperature_model",
+        "temperature_at_depth_basis_status": "temperature_model",
+        "temperature_at_depth_basis_extrapolated": "temperature_model",
+        "temperature_at_depth_basis_extrapolation_m": "temperature_model",
+        "pressure_model_id": "pressure_phase_context",
+        "pressure_at_tvd_mpa_absolute": "pressure_phase_context",
+        "pressure_at_permafrost_control_mpa_absolute": "pressure_phase_context",
+        "phase_curve_id": "pressure_phase_context",
+        "phase_curve_role": "pressure_phase_context",
+        "phase_curve_allowed_use": "pressure_phase_context",
+        "gas_composition_assumption": "pressure_phase_context",
+        "gas_methane_mol_pct": "pressure_phase_context",
+        "salinity_ppt_assumption": "pressure_phase_context",
+        "stability_input_readiness": "stability_screen",
+        "stability_result_status": "stability_screen",
+        "stability_confidence": "stability_screen",
+        "stability_interval_calculated": "stability_screen",
+        "no_stable_interval_under_baseline": "stability_screen",
+        "stability_top_m": "stability_screen",
+        "stability_base_m": "stability_screen",
+        "stability_thickness_m": "stability_screen",
+        "well_penetrated_stability_thickness_m": "stability_screen",
+        "reaches_stability_zone": "stability_screen",
+        "caveat_codes": "stability_screen",
+        "blank_or_block_reason": "stability_screen",
+        "public_ml_feature_readiness": "ml_readiness",
+        "ml_training_readiness": "ml_readiness",
+        "hydrate_occurrence_label_status": "label_policy",
+        "hydrate_saturation_label_status": "label_policy",
+        "allowed_ml_use": "label_policy",
+        "prohibited_ml_use": "label_policy",
+        "label_guardrail": "label_policy",
+    }
+    source_products = {
+        "product_metadata": "public_ml_feature_scaffold",
+        "well_identity": "stability_screen;well_context",
+        "well_location": "stability_screen",
+        "well_context": "well_context",
+        "regional_context": "well_context;stability_screen",
+        "depth_context": "well_context;stability_screen",
+        "permafrost_context": "GGD223 nearest control via stability_screen",
+        "temperature_context": "G10015 inventory/scaffold",
+        "temperature_model": "stability_temperature_model",
+        "pressure_phase_context": "stability_screen",
+        "stability_screen": "stability_screen",
+        "ml_readiness": "derived_public_ml_feature_scaffold",
+        "label_policy": "project_guardrail",
+    }
+    rows = []
+    for column in PUBLIC_ML_FEATURE_SCAFFOLD_COLUMNS:
+        group = groups[column]
+        is_label_policy = group == "label_policy"
+        is_stability_result = group == "stability_screen"
+        rows.append(
+            {
+                "column_name": column,
+                "feature_group": group,
+                "source_product": source_products[group],
+                "source_column": "derived" if column not in STABILITY_SCREEN_COLUMNS else column,
+                "current_status": (
+                    "guardrail_not_feature"
+                    if is_label_policy
+                    else "public_feature_available_with_caveats"
+                ),
+                "allowed_ml_use": (
+                    "policy/audit only"
+                    if is_label_policy
+                    else "candidate feature or coverage/audit field"
+                ),
+                "prohibited_use": (
+                    "Do not use as a hydrate occurrence, absence, saturation, or producibility label."
+                    if is_stability_result or is_label_policy
+                    else "Do not use without source/caveat awareness."
+                ),
+                "upgrade_needed": (
+                    "Approved hydrate occurrence/saturation labels and log-depth aligned inputs."
+                    if is_label_policy
+                    else "Use approved runtime data or improved public controls to strengthen this field."
+                ),
+                "notes": (
+                    "Stability fields are thermodynamic-admissibility features only, not proof."
+                    if is_stability_result
+                    else "Public-source feature scaffold field."
+                ),
+            }
+        )
+    return pd.DataFrame(rows, columns=PUBLIC_ML_FEATURE_DICTIONARY_COLUMNS)
+
+
+def load_public_ml_feature_scaffold(project_root: Path) -> pd.DataFrame:
+    path = default_public_ml_feature_scaffold_path(project_root)
+    if not path.exists():
+        return pd.DataFrame(columns=PUBLIC_ML_FEATURE_SCAFFOLD_COLUMNS)
+    return pd.read_csv(path)
+
+
+def load_public_ml_feature_scaffold_summary(project_root: Path) -> pd.DataFrame:
+    path = default_public_ml_feature_scaffold_summary_path(project_root)
+    if not path.exists():
+        return pd.DataFrame(columns=["metric", "value", "meaning"])
+    return pd.read_csv(path)
+
+
+def load_public_ml_feature_dictionary(project_root: Path) -> pd.DataFrame:
+    path = default_public_ml_feature_dictionary_path(project_root)
+    if not path.exists():
+        return pd.DataFrame(columns=PUBLIC_ML_FEATURE_DICTIONARY_COLUMNS)
+    return pd.read_csv(path)
+
+
+def write_public_ml_feature_products(project_root: Path) -> tuple[Path, Path, Path]:
+    product_dir = default_stability_products_dir(project_root)
+    product_dir.mkdir(parents=True, exist_ok=True)
+
+    scaffold = build_public_ml_feature_scaffold(project_root)
+    summary = public_ml_feature_scaffold_summary_frame(scaffold)
+    dictionary = public_ml_feature_dictionary_frame()
+
+    scaffold_path = default_public_ml_feature_scaffold_path(project_root)
+    summary_path = default_public_ml_feature_scaffold_summary_path(project_root)
+    dictionary_path = default_public_ml_feature_dictionary_path(project_root)
+    scaffold.to_csv(scaffold_path, index=False)
+    summary.to_csv(summary_path, index=False)
+    dictionary.to_csv(dictionary_path, index=False)
+    return scaffold_path, summary_path, dictionary_path
 
 
 def representative_temperature_profiles(inventory: pd.DataFrame) -> pd.DataFrame:

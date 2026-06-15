@@ -457,7 +457,7 @@ python 01_pipeline/build_public_stability_products.py
   The script prints source metrics and writes only derived outputs under
   `data/public_stability_products/`.
 
-Fresh-chat handoff as of 2026-06-14:
+Fresh-chat handoff as of 2026-06-15:
 
 - Previous OSL-derived public-product baseline commit:
   `aedd734 Rebuild stability products with complete G10015 profiles`.
@@ -543,15 +543,20 @@ Fresh-chat handoff as of 2026-06-14:
   rows have direct profile matches, 193 unmatched rows are within 50 km of a
   located G10015 control, and 4,917 are 50-100 km regional proxy candidates.
   Proxy tiers are planning/sensitivity labels only, not baseline calculations.
-  The Calculated Intervals tab includes a selected-well temperature/phase audit
-  plot using the committed methane 5 ppt phase boundary, OSL temperature
-  key-depth product, and screen top/base markers where available; it is not the
-  full raw measured G10015 profile.
-  The code is now prepared to export
-  `g10015_temperature_profile_points_sampled_2026-06-14.csv` from OSL. After
-  OSL runs `python 01_pipeline/build_public_stability_products.py`, that sampled
-  public profile product will add measured G10015 curve traces to the selected
-  well audit plot.
+- The Calculated Intervals tab includes a selected-well temperature/phase audit
+  plot using the committed methane 5 ppt phase boundary, the sampled measured
+  G10015 profile points, OSL temperature key-depth product, and screen top/base
+  markers where available. The sampled measured profile product has `28,020`
+  rows across `184` profiles and is a visualization/audit input only.
+- The public ML feature scaffold now exists:
+  `data/public_stability_products/public_ml_feature_scaffold_2026-06-15.csv`,
+  `public_ml_feature_scaffold_summary_2026-06-15.csv`, and
+  `public_ml_feature_dictionary_2026-06-15.csv`. It has `8,084` public well
+  rows, `483` matched G10015 temperature-context rows, `22` calculated
+  baseline stability-interval feature rows, `8` no-stable-interval rows, and
+  `0` validated hydrate occurrence/saturation labels or training-ready rows.
+  The `Analyze Hydrates` page now has a Public ML Readiness tab for this real
+  public feature scaffold, while synthetic interval review remains separate.
   Next scientific task: keep improving source coverage in OSL and treat any
   future phase-curve/composition variants as cited scenarios. Do not label the
   current screen as hydrate proof, saturation, producibility, or a sweet-spot

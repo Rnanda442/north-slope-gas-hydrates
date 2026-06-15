@@ -25,12 +25,19 @@ def test_sweet_spot_page_renders() -> None:
     assert not app.exception
     assert app.title[0].value == "Analyze Hydrates"
     assert [metric.label for metric in app.metric[:4]] == [
+        "Feature rows",
+        "Temperature matched",
+        "Stability interval features",
+        "Validated ML labels",
+    ]
+    metric_labels = [metric.label for metric in app.metric]
+    for label in [
         "Synthetic intervals",
         "Review-lane candidates",
         "Hydrate-supportive",
         "Good sand, no hydrate",
-    ]
-    metric_labels = [metric.label for metric in app.metric]
+    ]:
+        assert label in metric_labels
     assert "Input status" in metric_labels
     assert "Ready outputs" in metric_labels
     assert "Blocked outputs" in metric_labels

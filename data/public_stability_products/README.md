@@ -108,6 +108,23 @@ These OpenScienceLab-derived products are the first guarded baseline methane
 and 8,054 blocked rows. Blocked rows keep top/base/thickness null. Every row
 keeps `not_hydrate_proof` in `caveat_codes`.
 
+`public_ml_feature_scaffold_2026-06-15.csv`
+
+`public_ml_feature_scaffold_summary_2026-06-15.csv`
+
+`public_ml_feature_dictionary_2026-06-15.csv`
+
+These derived products convert the guarded public stability products into a
+future-ML feature and coverage scaffold. The scaffold has one row per public
+well, joins public well/depth/AU/permafrost/temperature/pressure/phase-curve
+context, and carries the baseline stability-screen status as a physics-derived
+feature. It has 8,084 rows, 483 rows with matched G10015 temperature context,
+22 rows with calculated baseline stability-interval features, 8 rows with no
+stable interval under the baseline run, and 0 validated hydrate occurrence or
+saturation labels. It is not training data and must not be used as a hydrate
+present/absent label, saturation target, producibility result, or sweet-spot
+ranking.
+
 `stability_website_product_spec_2026-06-14.csv`
 
 This table defines the intended final website shape for the public stability

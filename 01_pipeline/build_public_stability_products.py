@@ -13,10 +13,12 @@ from dashboard.stability_products import (
     g10015_temperature_profile_points_summary_frame,
     load_g10015_temperature_inventory,
     load_g10015_temperature_profile_points_product,
+    load_public_ml_feature_scaffold,
     load_public_well_stability_context,
     load_stability_input_scaffold,
     load_stability_screen,
     load_stability_temperature_model,
+    public_ml_feature_scaffold_summary_frame,
     stability_context_summary_frame,
     stability_screen_summary_frame,
     stability_input_scaffold_summary_frame,
@@ -24,6 +26,7 @@ from dashboard.stability_products import (
     temperature_inventory_summary_frame,
     write_g10015_temperature_profile_points_product,
     write_public_stability_products,
+    write_public_ml_feature_products,
     write_stability_screen_product,
     write_stability_temperature_model_product,
 )
@@ -80,8 +83,15 @@ def main() -> None:
     profile_points_outputs = write_g10015_temperature_profile_points_product(project_root, source_root)
     temperature_model_outputs = write_stability_temperature_model_product(project_root, source_root)
     stability_screen_outputs = write_stability_screen_product(project_root, source_root)
+    ml_feature_outputs = write_public_ml_feature_products(project_root)
     print("\n## Written outputs")
-    for output in outputs + profile_points_outputs + temperature_model_outputs + stability_screen_outputs:
+    for output in (
+        outputs
+        + profile_points_outputs
+        + temperature_model_outputs
+        + stability_screen_outputs
+        + ml_feature_outputs
+    ):
         if output is not None:
             print(output)
 
@@ -91,6 +101,7 @@ def main() -> None:
     scaffold = load_stability_input_scaffold(project_root)
     temperature_model = load_stability_temperature_model(project_root)
     stability_screen = load_stability_screen(project_root)
+    ml_feature_scaffold = load_public_ml_feature_scaffold(project_root)
 
     print_frame("Well Context Summary", stability_context_summary_frame(well_context))
     print_frame("G10015 Temperature Inventory Summary", temperature_inventory_summary_frame(temperature_inventory))
@@ -101,6 +112,7 @@ def main() -> None:
     print_frame("Stability Input Scaffold Summary", stability_input_scaffold_summary_frame(scaffold))
     print_frame("Stability Temperature Model Summary", stability_temperature_model_summary_frame(temperature_model))
     print_frame("Stability Screen Summary", stability_screen_summary_frame(stability_screen))
+    print_frame("Public ML Feature Scaffold Summary", public_ml_feature_scaffold_summary_frame(ml_feature_scaffold))
 
     print(
         "\nDone. Review changed files under data/public_stability_products/ and "

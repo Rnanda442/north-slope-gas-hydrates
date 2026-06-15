@@ -29,16 +29,22 @@ from dashboard.stability_sources import (
 )
 from dashboard.stability_products import (
     default_g10015_inventory_path,
+    default_public_ml_feature_dictionary_path,
+    default_public_ml_feature_scaffold_path,
     default_stability_input_scaffold_path,
     default_stability_screen_path,
     default_well_context_path,
     load_g10015_temperature_inventory,
     load_g10015_temperature_profile_points_product,
     load_methane_phase_curve,
+    load_public_ml_feature_dictionary,
+    load_public_ml_feature_scaffold,
+    load_public_ml_feature_scaffold_summary,
     load_public_well_stability_context,
     load_stability_input_scaffold,
     load_stability_screen,
     load_stability_temperature_model,
+    public_ml_feature_scaffold_summary_frame,
     stability_input_capability_matrix_frame,
     stability_osl_pull_triggers_frame,
     stability_parameter_readiness_frame,
@@ -1022,6 +1028,21 @@ def cached_g10015_temperature_inventory(project_root: str) -> pd.DataFrame:
 @st.cache_data
 def cached_g10015_temperature_profile_points(project_root: str) -> pd.DataFrame:
     return load_g10015_temperature_profile_points_product(Path(project_root))
+
+
+@st.cache_data
+def cached_public_ml_feature_scaffold(project_root: str) -> pd.DataFrame:
+    return load_public_ml_feature_scaffold(Path(project_root))
+
+
+@st.cache_data
+def cached_public_ml_feature_scaffold_summary(project_root: str) -> pd.DataFrame:
+    return load_public_ml_feature_scaffold_summary(Path(project_root))
+
+
+@st.cache_data
+def cached_public_ml_feature_dictionary(project_root: str) -> pd.DataFrame:
+    return load_public_ml_feature_dictionary(Path(project_root))
 
 
 @st.cache_data
@@ -3968,10 +3989,118 @@ def render_interval_review(logs: pd.DataFrame, intervals: pd.DataFrame) -> None:
         )
 
 
+def render_public_ml_readiness() -> None:
+    st.subheader("Public ML Readiness")
+    features = cached_public_ml_feature_scaffold(str(PROJECT_ROOT))
+    summary = cached_public_ml_feature_scaffold_summary(str(PROJECT_ROOT))
+    dictionary = cached_public_ml_feature_dictionary(str(PROJECT_ROOT))
+
+    if features.empty:
+        st.info("The public ML feature scaffold has not been generated yet.")
+        return
+
+    if summary.empty:
+        summary = public_ml_feature_scaffold_summary_frame(features)
+
+    metric_lookup = dict(zip(summary["metric"], summary["value"], strict=False))
+    cols = st.columns(4)
+    cols[0].metric("Feature rows", f"{int(metric_lookup.get('Feature scaffold rows', 0)):,}")
+    cols[1].metric(
+        "Temperature matched",
+        f"{int(metric_lookup.get('Rows with matched temperature profile', 0)):,}",
+    )
+    cols[2].metric(
+        "Stability interval features",
+        f"{int(metric_lookup.get('Rows with calculated stability interval feature', 0)):,}",
+    )
+    cols[3].metric(
+        "Validated ML labels",
+        f"{int(metric_lookup.get('Rows with validated hydrate occurrence labels', 0)):,}",
+    )
+
+    st.warning(
+        "This is a public feature and coverage scaffold. It is not a hydrate-present label, "
+        "hydrate-absent label, saturation target, producibility result, or sweet-spot ranking."
+    )
+
+    readiness_counts = (
+        features["public_ml_feature_readiness"]
+        .fillna("unknown")
+        .value_counts()
+        .rename_axis("readiness")
+        .reset_index(name="rows")
+    )
+    figure = go.Figure(
+        go.Bar(
+            x=readiness_counts["rows"],
+            y=readiness_counts["readiness"],
+            orientation="h",
+            marker={"color": "#2563eb"},
+            hovertemplate="%{y}<br>Rows: %{x:,}<extra></extra>",
+        )
+    )
+    figure.update_layout(
+        title="Public Feature Readiness",
+        xaxis_title="Rows",
+        yaxis_title="",
+        height=360,
+        margin={"l": 20, "r": 20, "t": 50, "b": 20},
+    )
+    st.plotly_chart(figure, use_container_width=True)
+
+    st.markdown("##### Feature Scaffold Preview")
+    preview_columns = [
+        "well_name",
+        "public_ml_feature_readiness",
+        "stability_result_status",
+        "stability_confidence",
+        "temperature_profile_matched",
+        "stability_top_m",
+        "stability_base_m",
+        "stability_thickness_m",
+        "blank_or_block_reason",
+    ]
+    st.dataframe(
+        features[[column for column in preview_columns if column in features.columns]].head(500),
+        use_container_width=True,
+        hide_index=True,
+    )
+
+    with st.expander("Feature dictionary and label policy", expanded=True):
+        st.dataframe(summary, use_container_width=True, hide_index=True)
+        st.dataframe(dictionary, use_container_width=True, hide_index=True)
+
+    cols = st.columns(3)
+    cols[0].download_button(
+        "Download ML feature scaffold CSV",
+        csv_bytes(features),
+        default_public_ml_feature_scaffold_path(PROJECT_ROOT).name,
+        "text/csv",
+        key="download_public_ml_feature_scaffold",
+    )
+    cols[1].download_button(
+        "Download feature dictionary CSV",
+        csv_bytes(dictionary),
+        default_public_ml_feature_dictionary_path(PROJECT_ROOT).name,
+        "text/csv",
+        key="download_public_ml_feature_dictionary",
+    )
+    cols[2].download_button(
+        "Download ML summary CSV",
+        csv_bytes(summary),
+        "public_ml_feature_scaffold_summary_2026-06-15.csv",
+        "text/csv",
+        key="download_public_ml_feature_summary",
+    )
+
+
 def render_analyze_hydrates() -> None:
     st.markdown('<div class="atlas-kicker">Synthetic decision workspace</div>', unsafe_allow_html=True)
     st.title("Analyze Hydrates")
-    st.write("Synthetic logs show the workflow shape; approved well and core data stay outside the public site.")
+    st.write(
+        "Public stability features show current coverage; synthetic logs show the future workflow shape. "
+        "Approved well and core data stay outside the public site."
+    )
     logs = load_runtime_data()
     intervals = screen_intervals(logs)
     core = synthetic_core_placeholders()
@@ -3986,10 +4115,19 @@ def render_analyze_hydrates() -> None:
     st.warning(
         f"{SYNTHETIC_LABEL}. {HEADER_DERIVED_SYNTHETIC_NOTE} Do not upload approved logs, core data, identifiers, or derived sensitive outputs."
     )
-    tabs = st.tabs(["Interval Review", "Runtime Readiness", "Methods & Evidence"])
+    tabs = st.tabs(
+        [
+            "Public ML Readiness",
+            "Interval Review",
+            "Runtime Readiness",
+            "Methods & Evidence",
+        ]
+    )
     with tabs[0]:
-        render_interval_review(logs, intervals)
+        render_public_ml_readiness()
     with tabs[1]:
+        render_interval_review(logs, intervals)
+    with tabs[2]:
         col1, col2 = st.columns(2)
         with col1:
             render_processing_sketch(
@@ -4008,7 +4146,7 @@ def render_analyze_hydrates() -> None:
                 height=280,
             )
         render_runtime_readiness(logs)
-    with tabs[2]:
+    with tabs[3]:
         render_ml_visual_architecture()
         render_source_anchors()
         with st.expander("Header and track blueprint", expanded=True):

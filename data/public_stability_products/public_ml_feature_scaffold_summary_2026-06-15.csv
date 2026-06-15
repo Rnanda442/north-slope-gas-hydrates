@@ -1,0 +1,9 @@
+metric,value,meaning
+Feature scaffold rows,8084,One row per public well carried into the ML-readiness scaffold.
+Rows inside public hydrate AU,7992,Rows inside one or more USGS hydrate assessment units.
+Rows with public depth,7578,Rows with a public vertical-depth basis for pressure/depth features.
+Rows with matched temperature profile,483,Rows linked to a public G10015 temperature-profile context.
+Rows with calculated stability interval feature,22,Rows with non-null baseline stability top/base/thickness features.
+Rows with no stable interval under baseline,8,Rows where inputs were sufficient but the baseline screen found no stable interval.
+Rows with validated hydrate occurrence labels,0,No public scaffold row is a validated hydrate-present or hydrate-absent label.
+Rows training-ready for occurrence/saturation ML,0,Approved labels/logs are still required before model training.

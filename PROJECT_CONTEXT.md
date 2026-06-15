@@ -189,6 +189,15 @@ classification and saturation regression.
   stability screen with summary counts, status/confidence breakdowns,
   calculated interval rows, blocked/no-interval sample rows, and a CSV download
   while preserving the no-proof caveat.
+- `data/public_stability_products/public_ml_feature_scaffold_2026-06-15.csv`,
+  `public_ml_feature_scaffold_summary_2026-06-15.csv`, and
+  `public_ml_feature_dictionary_2026-06-15.csv` now turn the public stability
+  products into a future-ML feature and coverage scaffold. The scaffold has
+  `8,084` public well rows, `483` G10015 temperature-profile matches, `22`
+  calculated baseline stability-interval feature rows, `8` no-stable-interval
+  rows, and `0` validated occurrence/saturation labels or training-ready rows.
+  These products are feature engineering and readiness context only, not model
+  labels or predictions.
 - Three Excel header references were reviewed from the user's email. The images
   are not stored in Git or shown on the website; their public-safe schema
   derivative is maintained in `docs/WELL_LOG_REQUIREMENTS_MAP.md`.

@@ -147,27 +147,36 @@ hydrate proof, saturation, producibility, or a sweet-spot ranking. Do not use
 proxy tiers to fill top/base/thickness unless the mentor approves a separately
 versioned sensitivity screen.
 
+Current sampled temperature-curve export:
+`data/public_stability_products/g10015_temperature_profile_points_sampled_2026-06-14.csv`
+and its summary are committed from OSL. The sampled product has `28,020` rows,
+`184` profiles, `24` well codes, and a maximum of `160` sampled points per
+profile. The selected-well temperature/phase audit plot can now show the
+sampled measured G10015 curve along with the methane 5 ppt phase boundary,
+OSL modeled key-depth temperatures, and screen top/base markers.
+
+Current public ML feature scaffold:
+`data/public_stability_products/public_ml_feature_scaffold_2026-06-15.csv`,
+`public_ml_feature_scaffold_summary_2026-06-15.csv`, and
+`public_ml_feature_dictionary_2026-06-15.csv` now exist. The scaffold has
+`8,084` public well rows, `483` matched G10015 temperature-context rows, `22`
+calculated baseline stability-interval feature rows, `8` no-stable-interval
+rows, and `0` validated hydrate occurrence/saturation labels or training-ready
+rows. The `Analyze Hydrates` page has a `Public ML Readiness` tab for this
+real public feature scaffold. Treat stability as a physics-derived feature and
+coverage/readiness signal only, not a model label.
+
 Next task:
-Run the new sampled G10015 profile export in OSL, then continue improving the
-source-backed stability story for the mentor-facing document and slides. OSL
-command:
-
-```bash
-cd ~/north-slope-gas-hydrates
-git pull origin main
-python 01_pipeline/build_public_stability_products.py
-git status --short
-```
-
-Review and commit the new public derived files:
-`g10015_temperature_profile_points_sampled_2026-06-14.csv` and
-`g10015_temperature_profile_points_sampled_summary_2026-06-14.csv`. Do not
-commit `data/source_library/`.
-
-Future OSL work should improve source coverage rather than create the first
-screen from scratch: refine temperature matches, add better permafrost/base
-controls if public and cited, digitize or model approved phase-curve
-sensitivities, then rerun the same guarded writer and compare counts.
+Continue from the public ML-readiness layer. Good next options are:
+1. QA the hosted Streamlit `Analyze Hydrates -> Public ML Readiness` panel.
+2. Add mentor-facing screenshots/figures from the public ML feature scaffold.
+3. Build an approved-data target registry plan that maps screenshot target
+   fields (`Sgh`, `S_h`, `Sh`, `NMR_SAT`) to occurrence/saturation roles without
+   exposing raw rows.
+4. Improve source coverage in OSL: refine temperature matches, add better
+   permafrost/base controls if public and cited, digitize/model approved
+   phase-curve sensitivities, then rerun the same guarded writer and compare
+   counts.
 
 If web research is needed, use primary/public sources and cite them.
 ```

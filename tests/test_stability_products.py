@@ -17,11 +17,15 @@ from dashboard.stability_products import (
     build_g10015_temperature_inventory,
     build_g10015_temperature_profile_points_product,
     build_public_well_stability_context,
+    build_public_ml_feature_scaffold,
     build_stability_input_scaffold,
     build_stability_screen,
     build_stability_temperature_model,
     default_g10015_profile_points_path,
     default_g10015_profile_points_summary_path,
+    default_public_ml_feature_dictionary_path,
+    default_public_ml_feature_scaffold_path,
+    default_public_ml_feature_scaffold_summary_path,
     default_phase_curve_path,
     default_phase_curve_scenario_catalog_path,
     default_stability_screen_path,
@@ -41,6 +45,8 @@ from dashboard.stability_products import (
     parse_g10015_temperature_profile,
     phase_curve_equilibrium_temperature_c,
     g10015_temperature_profile_points_summary_frame,
+    public_ml_feature_dictionary_frame,
+    public_ml_feature_scaffold_summary_frame,
     stability_input_capability_matrix_frame,
     stability_condition_grid_from_profile,
     stability_osl_pull_triggers_frame,
@@ -56,6 +62,7 @@ from dashboard.stability_products import (
     temperature_model_from_profile,
     temperature_inventory_summary_frame,
     write_public_stability_products,
+    write_public_ml_feature_products,
     write_g10015_temperature_profile_points_product,
     write_stability_screen_product,
     write_stability_temperature_model_product,
@@ -1034,6 +1041,61 @@ def test_write_stability_screen_product_creates_guarded_public_csv(tmp_path) -> 
     assert "not_hydrate_proof" in screen.iloc[0]["caveat_codes"]
 
 
+def test_public_ml_feature_scaffold_uses_stability_as_feature_not_label(tmp_path) -> None:
+    make_public_well_package(tmp_path)
+    snapshot = make_public_snapshot(tmp_path)
+    make_temperature_profile(snapshot)
+    write_public_stability_products(tmp_path)
+    make_broad_phase_curve_lookup(tmp_path)
+    write_stability_temperature_model_product(tmp_path, snapshot)
+    write_stability_screen_product(tmp_path, snapshot)
+
+    features = build_public_ml_feature_scaffold(tmp_path)
+    summary = public_ml_feature_scaffold_summary_frame(features)
+    dictionary = public_ml_feature_dictionary_frame()
+
+    assert len(features) == 1
+    row = features.iloc[0]
+    assert row["public_product_role"] == "public_ml_feature_scaffold_not_training_labels"
+    assert row["stability_interval_calculated"]
+    assert row["public_ml_feature_readiness"] == "feature_ready_with_calculated_stability_interval"
+    assert row["hydrate_occurrence_label_status"] == "not_available_in_public_scaffold"
+    assert row["hydrate_saturation_label_status"] == "not_available_in_public_scaffold"
+    assert row["ml_training_readiness"] == "not_training_ready_no_validated_hydrate_labels"
+    assert "not as hydrate occurrence" in row["label_guardrail"]
+    assert summary.loc[summary["metric"] == "Rows training-ready for occurrence/saturation ML", "value"].iloc[0] == 0
+    assert set(dictionary["column_name"]) == set(features.columns)
+    assert dictionary.loc[
+        dictionary["column_name"] == "stability_top_m",
+        "prohibited_use",
+    ].iloc[0].startswith("Do not use as a hydrate occurrence")
+
+
+def test_write_public_ml_feature_products_creates_scaffold_dictionary_and_summary(
+    tmp_path,
+) -> None:
+    make_public_well_package(tmp_path)
+    snapshot = make_public_snapshot(tmp_path)
+    make_temperature_profile(snapshot)
+    write_public_stability_products(tmp_path)
+    make_broad_phase_curve_lookup(tmp_path)
+    write_stability_temperature_model_product(tmp_path, snapshot)
+    write_stability_screen_product(tmp_path, snapshot)
+
+    scaffold_path, summary_path, dictionary_path = write_public_ml_feature_products(tmp_path)
+
+    assert scaffold_path == default_public_ml_feature_scaffold_path(tmp_path)
+    assert summary_path == default_public_ml_feature_scaffold_summary_path(tmp_path)
+    assert dictionary_path == default_public_ml_feature_dictionary_path(tmp_path)
+    assert scaffold_path.exists()
+    assert summary_path.exists()
+    assert dictionary_path.exists()
+    scaffold = pd.read_csv(scaffold_path)
+    assert len(scaffold) == 1
+    assert "hydrate_present" not in scaffold.columns
+    assert scaffold["allowed_ml_use"].eq("feature_engineering_and_coverage_readiness_only").all()
+
+
 def test_committed_stability_screen_preserves_guardrails() -> None:
     project_root = Path(__file__).resolve().parents[1]
     screen = pd.read_csv(default_stability_screen_path(project_root))
@@ -1074,6 +1136,27 @@ def test_committed_stability_screen_summary_matches_screen_counts() -> None:
     assert values["No stable interval found"] == int(no_interval.sum())
     assert values["Blocked rows"] == int(blocked.sum())
     assert values["Not hydrate proof"] == len(screen)
+
+
+def test_committed_public_ml_feature_scaffold_preserves_label_guardrails() -> None:
+    project_root = Path(__file__).resolve().parents[1]
+    features = pd.read_csv(default_public_ml_feature_scaffold_path(project_root))
+    dictionary = pd.read_csv(default_public_ml_feature_dictionary_path(project_root))
+
+    assert len(features) == 8084
+    assert set(dictionary["column_name"]) == set(features.columns)
+    assert features["temperature_profile_matched"].sum() == 483
+    assert features["stability_interval_calculated"].sum() == 22
+    assert features["no_stable_interval_under_baseline"].sum() == 8
+    assert features["hydrate_occurrence_label_status"].eq(
+        "not_available_in_public_scaffold"
+    ).all()
+    assert features["hydrate_saturation_label_status"].eq(
+        "not_available_in_public_scaffold"
+    ).all()
+    assert features["ml_training_readiness"].eq(
+        "not_training_ready_no_validated_hydrate_labels"
+    ).all()
 
 
 def test_public_stability_product_runner_has_help() -> None:
