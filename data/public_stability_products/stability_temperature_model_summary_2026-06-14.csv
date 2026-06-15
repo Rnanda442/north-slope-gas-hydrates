@@ -1,0 +1,6 @@
+metric,value,meaning
+Temperature model rows,16168,One row per scaffold well per modeled key depth.
+Calculated key depths,919,Key-depth temperatures calculated from profile interpolation or gradient extrapolation.
+Extrapolated key depths,387,Calculated key depths below measured profile coverage.
+Blocked key depths,15249,Key-depth rows left without modeled temperature because required profile/depth inputs are missing.
+Final stability results,0,This product models temperature inputs only; top/base/thickness remain uncalculated.
