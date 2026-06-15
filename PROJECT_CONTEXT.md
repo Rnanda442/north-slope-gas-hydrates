@@ -139,6 +139,10 @@ calculations or claiming model results.
 - The G10015 parser now collapses duplicate depth rows by averaging
   `temperature_c`, fixing the OSL inventory failure triggered by duplicate
   depth `8.23` in `usgs_put-25-5fnandahora442.txt`.
+- A guarded baseline stability-screen writer now exists. It requires raw G10015
+  profile rows, applies the cited methane 5 ppt phase lookup, and leaves blocked
+  rows null. It must still be run in OSL to create the first real public
+  `stability_screen_*.csv` output.
 - `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`
   defines the target public website shape for the future stability screen:
   status strip, readiness/capability, map, selected-well audit panel,
@@ -424,3 +428,6 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-14: Fixed G10015 duplicate-depth handling so OSL profile rows with
   repeated depths are averaged deterministically instead of stopping the
   inventory/product rebuild.
+- 2026-06-14: Added a guarded baseline stability-screen writer with fixture
+  tests for calculated, phase-range-blocked, and raw-profile-missing behavior;
+  the real screen product still needs OSL raw profile rows.

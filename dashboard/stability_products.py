@@ -26,6 +26,10 @@ STABILITY_OSL_PULL_TRIGGERS_FILE_NAME = "stability_osl_pull_triggers_2026-06-14.
 STABILITY_WEBSITE_PRODUCT_SPEC_FILE_NAME = "stability_website_product_spec_2026-06-14.csv"
 STABILITY_TEMPERATURE_MODEL_FILE_NAME = "stability_temperature_model_2026-06-14.csv"
 STABILITY_TEMPERATURE_MODEL_SUMMARY_FILE_NAME = "stability_temperature_model_summary_2026-06-14.csv"
+STABILITY_SCREEN_RUN_ID = "stability_screen_2026_06_14_methane_5ppt_v1"
+STABILITY_SCREEN_VERSION = "2026-06-14.v1"
+STABILITY_SCREEN_FILE_NAME = "stability_screen_2026-06-14_methane_5ppt_v1.csv"
+STABILITY_SCREEN_SUMMARY_FILE_NAME = "stability_screen_summary_2026-06-14_methane_5ppt_v1.csv"
 PHASE_CURVE_FILE_NAME = "phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv"
 PHASE_CURVE_SCENARIO_CATALOG_FILE_NAME = "phase_curve_scenario_catalog_2026-06-14.csv"
 PHASE_CURVE_ID = "methane_5ppt_sir2008_csmhyd_digitized_v1"
@@ -180,6 +184,74 @@ STABILITY_TEMPERATURE_MODEL_PRODUCT_COLUMNS = [
     "stability_top_base_thickness_status",
 ]
 
+STABILITY_SCREEN_COLUMNS = [
+    "screen_run_id",
+    "screen_version",
+    "object_id",
+    "permit_number",
+    "api_number",
+    "well_name",
+    "field",
+    "pool",
+    "lat",
+    "lon",
+    "tvd_m",
+    "depth_source",
+    "depth_basis_ft",
+    "depth_reference_note",
+    "hydrate_assessment_codes",
+    "within_hydrate_assessment_unit",
+    "permafrost_base_m",
+    "permafrost_source",
+    "permafrost_control_code",
+    "permafrost_control_distance_km",
+    "permafrost_confidence",
+    "temperature_model_id",
+    "temperature_source",
+    "temperature_profile_code",
+    "temperature_profile_file",
+    "temperature_profile_max_depth_m",
+    "temperature_gradient_c_per_100m",
+    "temperature_gradient_source",
+    "temperature_extrapolated_below_profile",
+    "temperature_extrapolation_below_profile_m",
+    "temperature_model_confidence",
+    "pressure_model_id",
+    "pressure_source",
+    "pore_fluid_density_kg_m3",
+    "gravity_m_s2",
+    "surface_pressure_mpa",
+    "pressure_gradient_mpa_per_m",
+    "pressure_at_tvd_mpa_absolute",
+    "phase_curve_id",
+    "phase_curve_role",
+    "phase_curve_allowed_use",
+    "phase_curve_source",
+    "gas_composition_assumption",
+    "gas_methane_mol_pct",
+    "gas_ethane_mol_pct",
+    "gas_propane_mol_pct",
+    "gas_butane_plus_mol_pct",
+    "salinity_ppt_assumption",
+    "phase_curve_status",
+    "stable_depth_grid_step_m",
+    "stability_top_m",
+    "stability_top_pressure_mpa_absolute",
+    "stability_top_temperature_c",
+    "stability_base_m",
+    "stability_base_pressure_mpa_absolute",
+    "stability_base_temperature_c",
+    "stability_thickness_m",
+    "well_penetrated_stability_thickness_m",
+    "reaches_stability_zone",
+    "top_boundary_method",
+    "base_boundary_method",
+    "stability_result_status",
+    "stability_confidence",
+    "caveat_codes",
+    "stability_notes",
+]
+
 WELL_CONTEXT_COLUMNS = [
     "object_id",
     "permit_number",
@@ -255,6 +327,14 @@ def default_stability_temperature_model_path(project_root: Path) -> Path:
 
 def default_stability_temperature_model_summary_path(project_root: Path) -> Path:
     return default_stability_products_dir(project_root) / STABILITY_TEMPERATURE_MODEL_SUMMARY_FILE_NAME
+
+
+def default_stability_screen_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / STABILITY_SCREEN_FILE_NAME
+
+
+def default_stability_screen_summary_path(project_root: Path) -> Path:
+    return default_stability_products_dir(project_root) / STABILITY_SCREEN_SUMMARY_FILE_NAME
 
 
 def default_phase_curve_path(project_root: Path) -> Path:
@@ -386,6 +466,22 @@ def phase_curve_equilibrium_temperature_c(
     if isinstance(pressure_mpa_absolute, pd.Series):
         return pd.Series(result, index=pressure_mpa_absolute.index)
     return result
+
+
+def phase_curve_max_depth_m(
+    phase_curve: pd.DataFrame,
+    surface_pressure_mpa: float = SURFACE_PRESSURE_MPA,
+    pressure_gradient_mpa_per_m: float = HYDROSTATIC_PRESSURE_MPA_PER_M,
+) -> float:
+    if phase_curve.empty:
+        return np.nan
+    max_pressure = pd.to_numeric(
+        phase_curve["pressure_mpa_absolute"],
+        errors="coerce",
+    ).max()
+    if pd.isna(max_pressure):
+        return np.nan
+    return float((max_pressure - surface_pressure_mpa) / pressure_gradient_mpa_per_m)
 
 
 def stability_depth_grid(
@@ -1500,6 +1596,13 @@ def load_stability_temperature_model(project_root: Path) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
+def load_stability_screen(project_root: Path) -> pd.DataFrame:
+    path = default_stability_screen_path(project_root)
+    if not path.exists():
+        return pd.DataFrame(columns=STABILITY_SCREEN_COLUMNS)
+    return pd.read_csv(path)
+
+
 def representative_temperature_profiles(inventory: pd.DataFrame) -> pd.DataFrame:
     if inventory.empty:
         return pd.DataFrame()
@@ -1644,6 +1747,265 @@ def stability_temperature_model_summary_frame(model: pd.DataFrame) -> pd.DataFra
             "metric": "Final stability results",
             "value": 0,
             "meaning": "This product models temperature inputs only; top/base/thickness remain uncalculated.",
+        },
+    ]
+    return pd.DataFrame(rows)
+
+
+def _base_screen_row(row: pd.Series) -> dict[str, object]:
+    tvd_m = pd.to_numeric(row.get("depth_basis_m"), errors="coerce")
+    return {
+        "screen_run_id": STABILITY_SCREEN_RUN_ID,
+        "screen_version": STABILITY_SCREEN_VERSION,
+        "object_id": row.get("object_id"),
+        "permit_number": row.get("permit_number"),
+        "api_number": row.get("api_number"),
+        "well_name": row.get("well_name"),
+        "field": row.get("field"),
+        "pool": row.get("pool"),
+        "lat": row.get("wellhead_latitude"),
+        "lon": row.get("wellhead_longitude"),
+        "tvd_m": tvd_m,
+        "depth_source": row.get("depth_basis"),
+        "depth_basis_ft": np.nan,
+        "depth_reference_note": "Public DNR depth field; TrueVertic preferred and DrillerTot fallback is caveated.",
+        "hydrate_assessment_codes": row.get("hydrate_assessment_codes"),
+        "within_hydrate_assessment_unit": row.get("within_hydrate_assessment_unit"),
+        "permafrost_base_m": row.get("nearest_permafrost_depth_m"),
+        "permafrost_source": "GGD223 nearest point control",
+        "permafrost_control_code": row.get("nearest_ggd223_code"),
+        "permafrost_control_distance_km": row.get("nearest_ggd223_distance_km"),
+        "permafrost_confidence": "permafrost_point_control_only",
+        "temperature_model_id": TEMPERATURE_MODEL_ID,
+        "temperature_source": row.get("temperature_profile_link_method"),
+        "temperature_profile_code": row.get("nearest_temperature_profile_code"),
+        "temperature_profile_file": row.get("nearest_temperature_profile_file"),
+        "temperature_profile_max_depth_m": row.get("temperature_profile_max_depth_m"),
+        "temperature_gradient_c_per_100m": row.get("rough_geothermal_gradient_c_per_100m"),
+        "temperature_gradient_source": "deepest_window_g10015_inventory",
+        "temperature_extrapolated_below_profile": False,
+        "temperature_extrapolation_below_profile_m": 0.0,
+        "temperature_model_confidence": "blocked_missing_inputs",
+        "pressure_model_id": "hydrostatic_freshwater_surface_absolute_v1",
+        "pressure_source": "hydrostatic_assumption",
+        "pore_fluid_density_kg_m3": 1000.0,
+        "gravity_m_s2": 9.80665,
+        "surface_pressure_mpa": SURFACE_PRESSURE_MPA,
+        "pressure_gradient_mpa_per_m": HYDROSTATIC_PRESSURE_MPA_PER_M,
+        "pressure_at_tvd_mpa_absolute": hydrostatic_pressure_mpa_absolute(tvd_m),
+        "phase_curve_id": PHASE_CURVE_ID,
+        "phase_curve_role": PHASE_CURVE_ROLE,
+        "phase_curve_allowed_use": PHASE_CURVE_ALLOWED_USE,
+        "phase_curve_source": "USGS SIR 2008-5175 Figure 1A digitized methane 5 ppt lookup",
+        "gas_composition_assumption": PHASE_CURVE_GAS_COMPOSITION_ASSUMPTION,
+        "gas_methane_mol_pct": PHASE_CURVE_GAS_METHANE_MOL_PCT,
+        "gas_ethane_mol_pct": PHASE_CURVE_GAS_ETHANE_MOL_PCT,
+        "gas_propane_mol_pct": PHASE_CURVE_GAS_PROPANE_MOL_PCT,
+        "gas_butane_plus_mol_pct": PHASE_CURVE_GAS_BUTANE_PLUS_MOL_PCT,
+        "salinity_ppt_assumption": PHASE_CURVE_SALINITY_PPT,
+        "phase_curve_status": "not_applied",
+        "stable_depth_grid_step_m": np.nan,
+        "stability_top_m": np.nan,
+        "stability_top_pressure_mpa_absolute": np.nan,
+        "stability_top_temperature_c": np.nan,
+        "stability_base_m": np.nan,
+        "stability_base_pressure_mpa_absolute": np.nan,
+        "stability_base_temperature_c": np.nan,
+        "stability_thickness_m": np.nan,
+        "well_penetrated_stability_thickness_m": np.nan,
+        "reaches_stability_zone": False,
+        "top_boundary_method": "not_calculated",
+        "base_boundary_method": "not_calculated",
+        "stability_result_status": "blocked_missing_inputs",
+        "stability_confidence": "blocked_missing_inputs",
+        "caveat_codes": "hydrostatic_pressure_assumed;phase_curve_methane_5ppt;permafrost_point_control_only;om222_not_digitized;not_hydrate_proof",
+        "stability_notes": "Blocked until required public pressure-temperature inputs pass the calculation gates.",
+    }
+
+
+def _blocked_screen_row(row: pd.Series, status: str, notes: str) -> dict[str, object]:
+    output = _base_screen_row(row)
+    output["stability_result_status"] = status
+    if status == "outside_au_context":
+        output["stability_confidence"] = "outside_public_au_context"
+        output["caveat_codes"] = f"{output['caveat_codes']};outside_usgs_hydrate_au"
+    elif "temperature" in status:
+        output["caveat_codes"] = f"{output['caveat_codes']};temperature_profile_missing"
+    output["stability_notes"] = notes
+    return output
+
+
+def build_stability_screen(
+    project_root: Path,
+    source_root: Path | None = None,
+    grid_step_m: object = DEFAULT_STABILITY_DEPTH_GRID_STEP_M,
+) -> pd.DataFrame:
+    scaffold = load_stability_input_scaffold(project_root)
+    if scaffold.empty:
+        return pd.DataFrame(columns=STABILITY_SCREEN_COLUMNS)
+
+    phase_curve = load_methane_phase_curve(project_root)
+    if phase_curve.empty:
+        rows = [
+            _blocked_screen_row(
+                row,
+                "blocked_missing_phase_curve",
+                "Blocked because the baseline methane phase-curve lookup is missing.",
+            )
+            for _, row in scaffold.iterrows()
+        ]
+        return pd.DataFrame(rows, columns=STABILITY_SCREEN_COLUMNS)
+
+    active_source = Path(source_root) if source_root is not None else active_stability_source_path(project_root)
+    profile_cache: dict[str, pd.DataFrame] = {}
+    curve_depth_limit_m = phase_curve_max_depth_m(phase_curve)
+    rows: list[dict[str, object]] = []
+    for _, row in scaffold.iterrows():
+        if not bool(row.get("within_hydrate_assessment_unit")):
+            rows.append(
+                _blocked_screen_row(
+                    row,
+                    "outside_au_context",
+                    "Outside current public USGS hydrate assessment unit context.",
+                )
+            )
+            continue
+
+        depth_m = pd.to_numeric(row.get("depth_basis_m"), errors="coerce")
+        if not np.isfinite(depth_m) or depth_m <= 0:
+            rows.append(
+                _blocked_screen_row(
+                    row,
+                    "blocked_missing_depth",
+                    "Blocked because no usable public vertical-depth basis is available.",
+                )
+            )
+            continue
+
+        if row.get("stability_input_readiness") != "ready_for_phase_curve_inputs":
+            rows.append(
+                _blocked_screen_row(
+                    row,
+                    "blocked_missing_temperature_profile",
+                    "Blocked because the well lacks a matched G10015 temperature profile.",
+                )
+            )
+            continue
+
+        if np.isfinite(curve_depth_limit_m) and depth_m > curve_depth_limit_m:
+            blocked = _blocked_screen_row(
+                row,
+                "blocked_phase_curve_range_insufficient",
+                "Blocked because the public well depth exceeds the cited phase-curve lookup range.",
+            )
+            blocked["phase_curve_status"] = "blocked_phase_curve_range_insufficient"
+            rows.append(blocked)
+            continue
+
+        profile_points = _profile_points_from_source(
+            active_source,
+            row.get("nearest_temperature_profile_file"),
+            profile_cache,
+        )
+        if profile_points.empty:
+            rows.append(
+                _blocked_screen_row(
+                    row,
+                    "blocked_missing_temperature_profile_rows",
+                    "Blocked because the matched raw G10015 profile rows are unavailable in this runtime.",
+                )
+            )
+            continue
+
+        gradient = pd.to_numeric(row.get("rough_geothermal_gradient_c_per_100m"), errors="coerce")
+        if not np.isfinite(gradient):
+            gradient = None
+        condition_grid = stability_condition_grid_from_profile(
+            profile_points,
+            phase_curve,
+            depth_limit_m=depth_m,
+            gradient_c_per_100m=gradient,
+            step_m=grid_step_m,
+        )
+        interval = stability_interval_from_condition_grid(
+            condition_grid,
+            depth_limit_m=depth_m,
+            step_m=grid_step_m,
+        )
+
+        output = _base_screen_row(row)
+        output.update(interval.to_dict())
+        output["phase_curve_status"] = "applied"
+        temperature_status = "calculated"
+        if interval["stability_result_status"].startswith("blocked"):
+            temperature_status = str(condition_grid["temperature_model_status"].iloc[0])
+        label_input = {
+            **output,
+            "depth_basis": row.get("depth_basis"),
+            "phase_curve_status": output["phase_curve_status"],
+            "phase_curve_allowed_use": PHASE_CURVE_ALLOWED_USE,
+            "temperature_model_status": temperature_status,
+            "stability_result_status": output["stability_result_status"],
+            "temperature_control_distance_km": row.get("nearest_ggd223_distance_km"),
+            "within_hydrate_assessment_unit": row.get("within_hydrate_assessment_unit"),
+        }
+        confidence = stability_source_control_label(label_input)
+        output["temperature_model_confidence"] = confidence
+        output["stability_confidence"] = confidence
+        output["caveat_codes"] = (
+            f"{output['caveat_codes']};permafrost_point_control_only;om222_not_digitized"
+        )
+        if row.get("depth_basis") == "DrillerTot":
+            output["caveat_codes"] = f"{output['caveat_codes']};driller_total_depth_fallback"
+        if output["stability_result_status"] == "calculated":
+            output["stability_notes"] = (
+                "Baseline public methane 5 ppt stability-admissibility screen only; "
+                "not hydrate proof or saturation."
+            )
+        elif output["stability_result_status"] == "calculated_no_stable_interval":
+            output["stability_notes"] = (
+                "Inputs were sufficient for the baseline public screen, but no stable "
+                "interval was found in the modeled depth range."
+            )
+        else:
+            output["stability_notes"] = (
+                "Blocked because the pressure-temperature grid did not pass all calculation gates."
+            )
+        rows.append(output)
+
+    return pd.DataFrame(rows, columns=STABILITY_SCREEN_COLUMNS)
+
+
+def stability_screen_summary_frame(screen: pd.DataFrame) -> pd.DataFrame:
+    if screen.empty:
+        return pd.DataFrame(columns=["metric", "value", "meaning"])
+
+    calculated = screen["stability_result_status"].eq("calculated")
+    rows = [
+        {
+            "metric": "Screen rows",
+            "value": int(len(screen)),
+            "meaning": "One row per public scaffold well for the baseline methane 5 ppt run.",
+        },
+        {
+            "metric": "Calculated stability intervals",
+            "value": int(calculated.sum()),
+            "meaning": "Rows with non-null baseline top/base/thickness after all gates passed.",
+        },
+        {
+            "metric": "No stable interval found",
+            "value": int(screen["stability_result_status"].eq("calculated_no_stable_interval").sum()),
+            "meaning": "Rows where inputs were sufficient but the modeled interval was not stable.",
+        },
+        {
+            "metric": "Blocked rows",
+            "value": int((~screen["stability_result_status"].isin(["calculated", "calculated_no_stable_interval"])).sum()),
+            "meaning": "Rows left null because at least one source or calculation gate did not pass.",
+        },
+        {
+            "metric": "Not hydrate proof",
+            "value": int(len(screen)),
+            "meaning": "Every row remains a stability-admissibility screen, not occurrence or saturation evidence.",
         },
     ]
     return pd.DataFrame(rows)
@@ -1853,6 +2215,29 @@ def write_stability_temperature_model_product(
     model.to_csv(model_path, index=False)
     model_summary.to_csv(model_summary_path, index=False)
     return model_path, model_summary_path
+
+
+def write_stability_screen_product(
+    project_root: Path,
+    source_root: Path | None = None,
+) -> tuple[Path, Path] | tuple[None, None]:
+    active_source = Path(source_root) if source_root is not None else active_stability_source_path(project_root)
+    profile_dir = active_source / G10015_RELATIVE_PATH
+    if not profile_dir.exists() or not any(profile_dir.glob("*.txt")):
+        return None, None
+
+    screen = build_stability_screen(project_root, active_source)
+    if screen.empty:
+        return None, None
+
+    product_dir = default_stability_products_dir(project_root)
+    product_dir.mkdir(parents=True, exist_ok=True)
+    screen_summary = stability_screen_summary_frame(screen)
+    screen_path = default_stability_screen_path(project_root)
+    screen_summary_path = default_stability_screen_summary_path(project_root)
+    screen.to_csv(screen_path, index=False)
+    screen_summary.to_csv(screen_summary_path, index=False)
+    return screen_path, screen_summary_path
 
 
 def write_public_stability_products(

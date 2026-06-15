@@ -17,9 +17,11 @@ from dashboard.stability_products import (
     build_g10015_temperature_inventory,
     build_public_well_stability_context,
     build_stability_input_scaffold,
+    build_stability_screen,
     build_stability_temperature_model,
     default_phase_curve_path,
     default_phase_curve_scenario_catalog_path,
+    default_stability_screen_path,
     default_stability_temperature_model_path,
     default_stability_input_capability_matrix_path,
     default_stability_osl_pull_triggers_path,
@@ -42,12 +44,14 @@ from dashboard.stability_products import (
     stability_depth_grid,
     stability_interval_from_condition_grid,
     stability_input_scaffold_summary_frame,
+    stability_screen_summary_frame,
     stability_temperature_model_summary_frame,
     stability_website_product_spec_frame,
     stability_source_control_label,
     temperature_model_from_profile,
     temperature_inventory_summary_frame,
     write_public_stability_products,
+    write_stability_screen_product,
     write_stability_temperature_model_product,
 )
 
@@ -167,7 +171,7 @@ def make_temperature_profile(source_root):
 
 def make_phase_curve_lookup(project_root):
     product_dir = project_root / "data" / "public_stability_products"
-    product_dir.mkdir(parents=True)
+    product_dir.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(
         [
             {
@@ -225,9 +229,36 @@ def make_phase_curve_lookup(project_root):
     ).to_csv(default_phase_curve_path(project_root), index=False)
 
 
+def make_broad_phase_curve_lookup(project_root):
+    product_dir = project_root / "data" / "public_stability_products"
+    product_dir.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for depth_m, equilibrium_temperature_c in [(0.0, -5.0), (500.0, 7.5), (1000.0, 20.0)]:
+        rows.append(
+            {
+                "phase_curve_id": PHASE_CURVE_ID,
+                "source_depth_m": depth_m,
+                "pressure_mpa_absolute": hydrostatic_pressure_mpa_absolute(depth_m),
+                "equilibrium_temperature_c": equilibrium_temperature_c,
+                "phase_curve_role": "baseline",
+                "gas_composition_assumption": "100_percent_methane",
+                "gas_methane_mol_pct": 100,
+                "gas_ethane_mol_pct": 0,
+                "gas_propane_mol_pct": 0,
+                "gas_butane_plus_mol_pct": 0,
+                "salinity_ppt_assumption": 5,
+                "source_citation": "Synthetic broad phase-curve test row",
+                "source_url": "https://example.test/broad",
+                "source_extraction_method": "unit_test_fixture",
+                "source_notes": "synthetic",
+            }
+        )
+    pd.DataFrame(rows).to_csv(default_phase_curve_path(project_root), index=False)
+
+
 def make_phase_curve_scenario_catalog(project_root):
     product_dir = project_root / "data" / "public_stability_products"
-    product_dir.mkdir(parents=True)
+    product_dir.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(
         [
             {
@@ -839,6 +870,71 @@ def test_write_stability_temperature_model_product_requires_raw_profile_rows(tmp
     snapshot = make_public_snapshot(tmp_path)
 
     assert write_stability_temperature_model_product(tmp_path, snapshot) == (None, None)
+
+
+def test_stability_screen_calculates_only_when_all_gates_pass(tmp_path) -> None:
+    make_public_well_package(tmp_path)
+    snapshot = make_public_snapshot(tmp_path)
+    make_temperature_profile(snapshot)
+    write_public_stability_products(tmp_path)
+    make_broad_phase_curve_lookup(tmp_path)
+
+    screen = build_stability_screen(tmp_path, snapshot, grid_step_m=25.0)
+    summary = stability_screen_summary_frame(screen)
+
+    assert len(screen) == 1
+    row = screen.iloc[0]
+    assert row["phase_curve_status"] == "applied"
+    assert row["stability_result_status"] == "calculated"
+    assert row["stability_top_m"] == 0.0
+    assert 125.0 <= row["stability_base_m"] <= 175.0
+    assert row["stability_thickness_m"] > 0
+    assert row["stability_confidence"] in {"high_source_control", "medium_source_control"}
+    assert "not_hydrate_proof" in row["caveat_codes"]
+    assert summary.loc[summary["metric"] == "Calculated stability intervals", "value"].iloc[0] == 1
+
+
+def test_stability_screen_blocks_when_phase_curve_range_is_insufficient(tmp_path) -> None:
+    make_public_well_package(tmp_path)
+    snapshot = make_public_snapshot(tmp_path)
+    make_temperature_profile(snapshot)
+    write_public_stability_products(tmp_path)
+    make_phase_curve_lookup(tmp_path)
+
+    screen = build_stability_screen(tmp_path, snapshot, grid_step_m=25.0)
+
+    row = screen.iloc[0]
+    assert row["stability_result_status"] == "blocked_phase_curve_range_insufficient"
+    assert row["phase_curve_status"] == "blocked_phase_curve_range_insufficient"
+    assert pd.isna(row["stability_top_m"])
+    assert pd.isna(row["stability_base_m"])
+    assert row["stability_confidence"] == "blocked_missing_inputs"
+
+
+def test_write_stability_screen_product_requires_raw_profile_rows(tmp_path) -> None:
+    snapshot = make_public_snapshot(tmp_path)
+
+    assert write_stability_screen_product(tmp_path, snapshot) == (None, None)
+
+
+def test_write_stability_screen_product_creates_guarded_public_csv(tmp_path) -> None:
+    make_public_well_package(tmp_path)
+    snapshot = make_public_snapshot(tmp_path)
+    make_temperature_profile(snapshot)
+    write_public_stability_products(tmp_path)
+    make_broad_phase_curve_lookup(tmp_path)
+
+    screen_path, summary_path = write_stability_screen_product(tmp_path, snapshot)
+
+    assert screen_path == default_stability_screen_path(tmp_path)
+    assert screen_path is not None
+    assert screen_path.exists()
+    assert summary_path is not None
+    assert summary_path.exists()
+    screen = pd.read_csv(screen_path)
+    assert len(screen) == 1
+    assert set(screen["stability_result_status"]) == {"calculated"}
+    assert "not_hydrate_proof" in screen.iloc[0]["caveat_codes"]
 
 
 def test_public_stability_product_runner_has_help() -> None:

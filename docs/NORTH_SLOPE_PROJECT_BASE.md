@@ -518,6 +518,11 @@ Fresh-chat handoff as of 2026-06-14:
   the same depth, including the OSL-observed duplicate at `8.23 m`, so the
   inventory and temperature-model rebuild can continue without hiding the
   public-source provenance.
+- A guarded baseline stability-screen writer now exists in code. It will write
+  one row per public scaffold well, calculate top/base/thickness only where all
+  source and calculation gates pass, and keep blocked rows null with explicit
+  blocked statuses. The first real screen product still needs an OSL run because
+  raw G10015 profile rows are not committed to Git.
 - Website end-state control now exists as
   `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`:
   the final public stability view should show run assumptions, readiness gates,
@@ -526,10 +531,8 @@ Fresh-chat handoff as of 2026-06-14:
   hydrate proof, saturation, sweet spots, or validated ML results.
 - Next scientific task: pull/sync this GitHub state on OSL and run
   `python 01_pipeline/build_public_stability_products.py` against the full
-  source bundle to create the real public temperature-model product. After that,
-  build a guarded `stability_screen_*.csv` writer that only fills
-  top/base/thickness for rows passing the tested pressure, temperature,
-  phase-curve, intersection, and confidence gates.
+  source bundle to create the first guarded baseline `stability_screen_*.csv`
+  product. Commit only the derived public outputs after reviewing the summary.
   Do not label the current scaffold as hydrate proof.
 
 ## Equations To Preserve

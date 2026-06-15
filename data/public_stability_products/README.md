@@ -122,6 +122,11 @@ G10015 source profiles can contain duplicate depth rows. The public parser now
 averages temperature values at repeated depths before interpolation so a single
 source-file duplicate does not stop the OSL rebuild.
 
+The guarded stability-screen writer is prepared but the first real
+`stability_screen_*.csv` should be generated in OSL, where raw G10015 profile
+rows are available. It should fill top/base/thickness only for rows passing all
+calculation gates and leave blocked rows null.
+
 ## Assessment Unit Codes
 
 | Code | Name |

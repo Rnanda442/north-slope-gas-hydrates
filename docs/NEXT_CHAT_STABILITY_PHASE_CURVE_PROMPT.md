@@ -107,6 +107,15 @@ Current G10015 parser fix:
 `usgs_put-25-5fnandahora442.txt`, where duplicate depth `8.23` caused the
 inventory build to stop.
 
+Current guarded stability-screen writer:
+`write_stability_screen_product(...)` now exists and is called by
+`01_pipeline/build_public_stability_products.py` when raw G10015 profile rows
+are available. It writes one row per public scaffold well, fills
+top/base/thickness only for rows that pass the pressure, temperature,
+phase-curve, intersection, and source-control confidence gates, and leaves
+blocked rows null. The screen remains a stability-admissibility screen, not
+hydrate proof or saturation.
+
 Current website product spec:
 `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`
 defines the final public website shape for stability: status strip, readiness
@@ -119,10 +128,10 @@ The next work should happen in OSL if the full source bundle is available:
 2. pull/sync this GitHub state on OSL;
 3. run `python 01_pipeline/build_public_stability_products.py` from the repo
    with the full source bundle available;
-4. review and commit only derived public outputs, especially the new
-   `stability_temperature_model_*.csv` files;
-5. after the real temperature product exists, build a guarded
-   `stability_screen_*.csv` writer and keep blocked rows null.
+4. review the `Stability Screen Summary`;
+5. commit only derived public outputs, especially the new
+   `stability_screen_*.csv` files, after confirming blocked rows remain null
+   and every row carries `not_hydrate_proof`.
 
 Do not calculate final top/base/thickness until those implementation gates are
 complete. If web research is needed, use primary/public sources and cite them.

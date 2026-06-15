@@ -509,6 +509,11 @@ Current implementation status:
   `stability_temperature_model_2026-06-14.csv` and its summary only when raw
   G10015 profile `.txt` rows are available in the active source bundle. This is
   a temperature-input product, not a stability-screen result.
+- A guarded baseline stability-screen writer now exists in code. It writes one
+  row per public scaffold well, fills top/base/thickness only where every gate
+  passes, and leaves blocked rows null with explicit blocked statuses. The first
+  real public `stability_screen_*.csv` still needs to be generated in OSL where
+  raw G10015 profile rows are available.
 
 Until those gates are complete, the public scaffold remains an input scaffold:
 `phase_curve_status = not_applied` and
