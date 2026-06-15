@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 from collections import Counter
 from html import escape
 from pathlib import Path
@@ -119,6 +120,27 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 EXPORT_DIR = PROJECT_ROOT / "05_exports" / "html"
 ARCHITECTURE_PATH = PROJECT_ROOT / "docs" / "PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md"
 VISION_PATH = PROJECT_ROOT / "docs" / "PROJECT_VISION_GOALS_AND_NEXT_STEPS.md"
+FULL_WORKFLOW_ASSET_DIR = (
+    PROJECT_ROOT
+    / "docs"
+    / "project_blueprints"
+    / "presentation_assets"
+    / "full_workflow_diagram_2026_06_15"
+)
+FULL_WORKFLOW_FLOWCHART = FULL_WORKFLOW_ASSET_DIR / "full_project_ml_workflow_flowchart.png"
+FULL_WORKFLOW_CONTACT_SHEET = FULL_WORKFLOW_ASSET_DIR / "full_workflow_deck_contact_sheet.png"
+FULL_WORKFLOW_DECK = (
+    PROJECT_ROOT
+    / "docs"
+    / "project_blueprints"
+    / "FULL_WORKFLOW_ML_DIAGRAM_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx"
+)
+FULL_WORKFLOW_WORD = (
+    PROJECT_ROOT
+    / "docs"
+    / "project_blueprints"
+    / "North_Slope_Gas_Hydrate_Full_ML_Workflow_Diagram_2026-06-15.docx"
+)
 IGNORED_DIRS = {
     ".git",
     ".ipynb_checkpoints",
@@ -1093,6 +1115,11 @@ def project_relative_or_absolute(path: Path) -> str:
         return path.relative_to(PROJECT_ROOT).as_posix()
     except ValueError:
         return str(path)
+
+
+def png_data_uri(path: Path) -> str:
+    encoded = base64.b64encode(path.read_bytes()).decode("ascii")
+    return f"data:image/png;base64,{encoded}"
 
 
 def polygon_parts(geometry):
@@ -4117,6 +4144,80 @@ def render_public_ml_readiness() -> None:
     )
 
 
+def render_full_workflow_map_panel() -> None:
+    st.markdown("##### Full Workflow Map")
+    st.caption(
+        "One public-safe map connecting the public scaffold, OSL workbench, stability context, "
+        "approved-data schema controls, leakage barrier, future model heads, validation, and exports."
+    )
+    if FULL_WORKFLOW_FLOWCHART.exists():
+        st.markdown(
+            (
+                f'<img src="{png_data_uri(FULL_WORKFLOW_FLOWCHART)}" '
+                'alt="Full ML workflow map" '
+                'style="width: 100%; height: auto; border: 1px solid #c7d2da; border-radius: 8px;" />'
+            ),
+            unsafe_allow_html=True,
+        )
+        st.caption(
+            f"{project_relative_or_absolute(FULL_WORKFLOW_FLOWCHART)} | "
+            "workflow/status guide only, not hydrate proof or trained-model output"
+        )
+    else:
+        st.info(f"Workflow map not found yet: {project_relative_or_absolute(FULL_WORKFLOW_FLOWCHART)}")
+
+    cols = st.columns(4)
+    cols[0].metric("Public scaffold wells", "8,084")
+    cols[1].metric("Calculated admissibility intervals", "22")
+    cols[2].metric("Approved-data subset", "~3 / 71")
+    cols[3].metric("Model outputs", "Future")
+
+    st.info(
+        "Use this diagram as the mentor-facing roadmap: stability is a context/admissibility branch, "
+        "target fields bypass the feature matrix, and occurrence plus saturation outputs wait for "
+        "approved labels and whole-well validation."
+    )
+
+    download_specs = [
+        (
+            "Download workflow PNG",
+            FULL_WORKFLOW_FLOWCHART,
+            "image/png",
+            "download_full_workflow_png",
+        ),
+        (
+            "Download slide contact sheet",
+            FULL_WORKFLOW_CONTACT_SHEET,
+            "image/png",
+            "download_full_workflow_contact_sheet",
+        ),
+        (
+            "Download workflow PPTX",
+            FULL_WORKFLOW_DECK,
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "download_full_workflow_pptx",
+        ),
+        (
+            "Download workflow DOCX",
+            FULL_WORKFLOW_WORD,
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "download_full_workflow_docx",
+        ),
+    ]
+    download_columns = st.columns(4)
+    for column, (label, path, mime, key) in zip(download_columns, download_specs):
+        if path.exists():
+            column.download_button(
+                label,
+                path.read_bytes(),
+                path.name,
+                mime,
+                key=key,
+            )
+        else:
+            column.button(label, disabled=True, key=f"{key}_missing")
+
+
 def render_schema_coverage_architecture() -> None:
     st.subheader("Schema Coverage & Architecture")
     matrix = cached_approved_schema_coverage_matrix(str(PROJECT_ROOT))
@@ -4124,6 +4225,8 @@ def render_schema_coverage_architecture() -> None:
     if matrix.empty:
         st.info("The approved-data schema coverage matrix has not been generated yet.")
         return
+
+    render_full_workflow_map_panel()
 
     target_like = matrix["role"].isin(["target_only", "calibration_reference"])
     required_like = matrix["required_for_model"].fillna("").str.contains(

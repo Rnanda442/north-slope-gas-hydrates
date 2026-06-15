@@ -184,6 +184,9 @@ def test_log_scaffold_renders_source_driven_runtime_readiness() -> None:
     assert "Input status" in metric_labels
     assert "Ready outputs" in metric_labels
     assert "Blocked outputs" in metric_labels
+    assert "Approved-data subset" in metric_labels
+    markdown_values = [markdown.value for markdown in app.markdown]
+    assert any("Full Workflow Map" in value for value in markdown_values)
 
 
 def test_legacy_future_engine_query_routes_to_log_scaffold() -> None:
