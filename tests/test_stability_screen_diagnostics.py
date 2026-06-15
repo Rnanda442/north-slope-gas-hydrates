@@ -3,14 +3,17 @@ from __future__ import annotations
 from pathlib import Path
 
 from dashboard.app import (
+    build_selected_well_phase_audit_figure,
     g10015_temperature_control_crosswalk_frame,
     stability_blank_reason_summary_frame,
     temperature_proxy_candidate_audit_frame,
     temperature_proxy_tier_summary_frame,
 )
 from dashboard.stability_products import (
+    load_methane_phase_curve,
     load_g10015_temperature_inventory,
     load_stability_screen,
+    load_stability_temperature_model,
 )
 from dashboard.stability_sources import (
     active_stability_source_path,
@@ -47,3 +50,22 @@ def test_committed_stability_screen_diagnostics_explain_blanks_and_proxy_tiers()
     assert proxy_counts["proxy_candidate_near_g10015_control"] == 193
     assert proxy_counts["proxy_candidate_regional_g10015_control"] == 4917
     assert proxy_counts["distant_from_g10015_controls"] == 2003
+
+
+def test_selected_well_phase_audit_figure_uses_public_temperature_and_phase_products() -> None:
+    project_root = Path(__file__).resolve().parents[1]
+    screen = load_stability_screen(project_root)
+    temperature_model = load_stability_temperature_model(project_root)
+    phase_curve = load_methane_phase_curve(project_root)
+    calculated_row = screen[screen["stability_result_status"].eq("calculated")].iloc[0]
+
+    figure = build_selected_well_phase_audit_figure(
+        calculated_row,
+        temperature_model,
+        phase_curve,
+    )
+
+    trace_names = {trace.name for trace in figure.data}
+    assert "Methane 5 ppt phase boundary" in trace_names
+    assert "OSL modeled temperature key depths" in trace_names
+    assert "Screen top/base" in trace_names

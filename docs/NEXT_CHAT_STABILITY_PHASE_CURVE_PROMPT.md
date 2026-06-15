@@ -139,10 +139,13 @@ status/confidence breakdowns, calculated interval preview, blocked/no-interval
 sample, a 2D well-status map, a calculated interval depth chart, and CSV
 download. It also has tabs explaining why rows are blank, the G10015/GGD223
 coordinate crosswalk, nearest located G10015 control distances, proxy-candidate
-tiers, and source anchors. Do not call it hydrate proof, saturation,
-producibility, or a sweet-spot ranking. Do not use proxy tiers to fill
-top/base/thickness unless the mentor approves a separately versioned
-sensitivity screen.
+tiers, and source anchors. The Calculated Intervals tab has a selected-well
+temperature/phase audit plot using the committed methane 5 ppt phase boundary,
+OSL modeled temperature key-depth product, and screen top/base markers where
+available; it is not the full raw measured G10015 profile. Do not call it
+hydrate proof, saturation, producibility, or a sweet-spot ranking. Do not use
+proxy tiers to fill top/base/thickness unless the mentor approves a separately
+versioned sensitivity screen.
 
 Next task:
 Continue improving the source-backed stability story for the mentor-facing

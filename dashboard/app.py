@@ -33,9 +33,11 @@ from dashboard.stability_products import (
     default_stability_screen_path,
     default_well_context_path,
     load_g10015_temperature_inventory,
+    load_methane_phase_curve,
     load_public_well_stability_context,
     load_stability_input_scaffold,
     load_stability_screen,
+    load_stability_temperature_model,
     stability_input_capability_matrix_frame,
     stability_osl_pull_triggers_frame,
     stability_parameter_readiness_frame,
@@ -1024,6 +1026,16 @@ def cached_stability_input_scaffold(project_root: str) -> pd.DataFrame:
 @st.cache_data
 def cached_stability_screen(project_root: str) -> pd.DataFrame:
     return load_stability_screen(Path(project_root))
+
+
+@st.cache_data
+def cached_stability_temperature_model(project_root: str) -> pd.DataFrame:
+    return load_stability_temperature_model(Path(project_root))
+
+
+@st.cache_data
+def cached_methane_phase_curve(project_root: str) -> pd.DataFrame:
+    return load_methane_phase_curve(Path(project_root))
 
 
 def project_relative_or_absolute(path: Path) -> str:
@@ -2129,6 +2141,159 @@ def build_stability_interval_depth_figure(screen: pd.DataFrame) -> go.Figure:
     return figure
 
 
+def build_selected_well_phase_audit_figure(
+    screen_row: pd.Series,
+    temperature_model: pd.DataFrame,
+    phase_curve: pd.DataFrame,
+) -> go.Figure:
+    figure = go.Figure()
+    well_name = str(screen_row.get("well_name", "Selected well"))
+    object_id = screen_row.get("object_id")
+
+    curve = phase_curve.copy()
+    curve["source_depth_m"] = pd.to_numeric(curve.get("source_depth_m"), errors="coerce")
+    curve["equilibrium_temperature_c"] = pd.to_numeric(
+        curve.get("equilibrium_temperature_c"),
+        errors="coerce",
+    )
+    curve = curve.dropna(subset=["source_depth_m", "equilibrium_temperature_c"]).sort_values(
+        "source_depth_m"
+    )
+    if not curve.empty:
+        figure.add_trace(
+            go.Scatter(
+                x=curve["equilibrium_temperature_c"],
+                y=curve["source_depth_m"],
+                mode="lines",
+                name="Methane 5 ppt phase boundary",
+                line={"color": "#111827", "width": 3},
+                hovertemplate=(
+                    "Phase boundary<br>Depth: %{y:.1f} m"
+                    "<br>Equilibrium T: %{x:.2f} C<extra></extra>"
+                ),
+            )
+        )
+
+    model = temperature_model.copy()
+    if "object_id" in model.columns and pd.notna(object_id):
+        model = model[model["object_id"].eq(object_id)]
+    else:
+        model = model[model["well_name"].eq(well_name)]
+    model["depth_m"] = pd.to_numeric(model.get("depth_m"), errors="coerce")
+    model["temperature_model_c"] = pd.to_numeric(
+        model.get("temperature_model_c"),
+        errors="coerce",
+    )
+    model = model.dropna(subset=["depth_m", "temperature_model_c"]).sort_values("depth_m")
+    if not model.empty:
+        figure.add_trace(
+            go.Scatter(
+                x=model["temperature_model_c"],
+                y=model["depth_m"],
+                mode="lines+markers",
+                name="OSL modeled temperature key depths",
+                line={"color": "#2563eb", "width": 3},
+                marker={"size": 9},
+                customdata=model[
+                    [
+                        "temperature_model_depth_role",
+                        "temperature_model_method",
+                        "temperature_model_status",
+                    ]
+                ],
+                hovertemplate=(
+                    "Temperature model<br>Depth: %{y:.1f} m"
+                    "<br>Temperature: %{x:.2f} C"
+                    "<br>Role: %{customdata[0]}"
+                    "<br>Method: %{customdata[1]}"
+                    "<br>Status: %{customdata[2]}<extra></extra>"
+                ),
+            )
+        )
+
+    screen_points = []
+    for label, depth_col, temp_col in [
+        ("Screen top", "stability_top_m", "stability_top_temperature_c"),
+        ("Screen base", "stability_base_m", "stability_base_temperature_c"),
+    ]:
+        depth = pd.to_numeric(pd.Series([screen_row.get(depth_col)]), errors="coerce").iloc[0]
+        temp = pd.to_numeric(pd.Series([screen_row.get(temp_col)]), errors="coerce").iloc[0]
+        if pd.notna(depth) and pd.notna(temp):
+            screen_points.append({"label": label, "depth_m": depth, "temperature_c": temp})
+    if screen_points:
+        points = pd.DataFrame(screen_points)
+        figure.add_trace(
+            go.Scatter(
+                x=points["temperature_c"],
+                y=points["depth_m"],
+                mode="markers+text",
+                name="Screen top/base",
+                marker={
+                    "size": 13,
+                    "color": "#f97316",
+                    "line": {"color": "white", "width": 1},
+                },
+                text=points["label"],
+                textposition="middle right",
+                hovertemplate=(
+                    "%{text}<br>Depth: %{y:.1f} m"
+                    "<br>Temperature: %{x:.2f} C<extra></extra>"
+                ),
+            )
+        )
+
+    reference_depths = [
+        ("Permafrost control", screen_row.get("permafrost_base_m"), "#0f766e"),
+        ("Well TVD", screen_row.get("tvd_m"), "#64748b"),
+    ]
+    plotted_depths = []
+    for label, value, color in reference_depths:
+        depth = pd.to_numeric(pd.Series([value]), errors="coerce").iloc[0]
+        if pd.isna(depth):
+            continue
+        plotted_depths.append(depth)
+        figure.add_hline(
+            y=float(depth),
+            line={"color": color, "width": 1.5, "dash": "dot"},
+            annotation_text=label,
+            annotation_position="right",
+        )
+
+    if curve.empty and model.empty and not screen_points:
+        figure.update_layout(
+            annotations=[
+                {
+                    "text": "No phase/temperature audit points are available for this well.",
+                    "xref": "paper",
+                    "yref": "paper",
+                    "x": 0.5,
+                    "y": 0.5,
+                    "showarrow": False,
+                }
+            ]
+        )
+
+    max_depth_candidates = []
+    for frame, depth_column in [(curve, "source_depth_m"), (model, "depth_m")]:
+        if not frame.empty:
+            max_depth_candidates.append(float(frame[depth_column].max()))
+    max_depth_candidates.extend(float(depth) for depth in plotted_depths if pd.notna(depth))
+    if screen_points:
+        max_depth_candidates.append(float(pd.DataFrame(screen_points)["depth_m"].max()))
+    max_depth = max(max_depth_candidates) if max_depth_candidates else 1000.0
+
+    figure.update_layout(
+        height=560,
+        margin={"l": 70, "r": 32, "t": 40, "b": 56},
+        title=f"{well_name} temperature-phase audit",
+        xaxis_title="Temperature (C)",
+        yaxis_title="Depth (m)",
+        legend={"orientation": "h", "y": 1.08, "x": 0},
+    )
+    figure.update_yaxes(autorange="reversed", range=[max_depth * 1.03, 0])
+    return figure
+
+
 def stability_blank_reason_summary_frame(screen: pd.DataFrame) -> pd.DataFrame:
     if screen.empty or "stability_result_status" not in screen.columns:
         return pd.DataFrame(columns=["reason", "rows", "share_pct", "meaning", "next_step"])
@@ -2598,6 +2763,8 @@ def render_guarded_stability_screen_product() -> None:
     proxy_audit = temperature_proxy_candidate_audit_frame(screen, control_crosswalk)
     blank_summary = stability_blank_reason_summary_frame(screen)
     proxy_summary = temperature_proxy_tier_summary_frame(proxy_audit)
+    temperature_model = cached_stability_temperature_model(str(PROJECT_ROOT))
+    phase_curve = cached_methane_phase_curve(str(PROJECT_ROOT))
 
     status_tab, blanks_tab, temperature_tab, intervals_tab, tables_tab = st.tabs(
         [
@@ -2698,6 +2865,70 @@ Source anchors: [NSIDC G10015](https://nsidc.org/data/g10015/versions/1),
         )
 
     with intervals_tab:
+        st.markdown("##### Selected Well Temperature/Phase Audit")
+        st.caption(
+            "This plot uses committed public products: the methane 5 ppt phase "
+            "boundary, OSL modeled temperature at key depths, and screen "
+            "top/base markers where available. It is not the full raw measured "
+            "G10015 profile."
+        )
+        selection_source = screen.copy()
+        selection_source["selection_priority"] = selection_source[
+            "stability_result_status"
+        ].map(
+            {
+                "calculated": 0,
+                "calculated_no_stable_interval": 1,
+                "blocked_phase_curve_range_insufficient": 2,
+                "blocked_missing_temperature_profile": 3,
+                "blocked_missing_depth": 4,
+                "outside_au_context": 5,
+            }
+        ).fillna(9)
+        selection_source = selection_source.sort_values(
+            ["selection_priority", "well_name", "object_id"]
+        )
+        selection_options = [
+            (
+                f"{row.well_name} | {row.stability_result_status} | "
+                f"object {row.object_id}"
+            )
+            for row in selection_source.itertuples()
+        ]
+        selected_label = st.selectbox(
+            "Selected well audit plot",
+            selection_options,
+            index=0,
+        )
+        selected_index = selection_options.index(selected_label)
+        selected_row = selection_source.iloc[selected_index]
+        st.plotly_chart(
+            build_selected_well_phase_audit_figure(
+                selected_row,
+                temperature_model,
+                phase_curve,
+            ),
+            use_container_width=True,
+            config={"displayModeBar": True, "responsive": True},
+        )
+        st.dataframe(
+            pd.DataFrame(
+                [
+                    {
+                        "well_name": selected_row.get("well_name"),
+                        "screen_status": selected_row.get("stability_result_status"),
+                        "temperature_profile": selected_row.get("temperature_profile_code"),
+                        "temperature_source": selected_row.get("temperature_source"),
+                        "top_m": selected_row.get("stability_top_m"),
+                        "base_m": selected_row.get("stability_base_m"),
+                        "thickness_m": selected_row.get("stability_thickness_m"),
+                        "caveats": selected_row.get("caveat_codes"),
+                    }
+                ]
+            ),
+            use_container_width=True,
+            hide_index=True,
+        )
         st.markdown("##### Calculated Interval Depth View")
         st.caption(
             "The 22 calculated rows are plotted as top-to-base screen intervals. "

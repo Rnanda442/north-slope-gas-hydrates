@@ -543,6 +543,10 @@ Fresh-chat handoff as of 2026-06-14:
   rows have direct profile matches, 193 unmatched rows are within 50 km of a
   located G10015 control, and 4,917 are 50-100 km regional proxy candidates.
   Proxy tiers are planning/sensitivity labels only, not baseline calculations.
+  The Calculated Intervals tab includes a selected-well temperature/phase audit
+  plot using the committed methane 5 ppt phase boundary, OSL temperature
+  key-depth product, and screen top/base markers where available; it is not the
+  full raw measured G10015 profile.
   Next scientific task: keep improving source coverage in OSL and treat any
   future phase-curve/composition variants as cited scenarios. Do not label the
   current screen as hydrate proof, saturation, producibility, or a sweet-spot

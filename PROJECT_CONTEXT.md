@@ -458,3 +458,7 @@ blockers, and next activities in the architecture/activity map.
   GGD223 coordinate crosswalks, 483 screen rows have direct profiles, 193 are
   within 50 km of a located G10015 control, and 4,917 are 50-100 km regional
   candidates. Proxy tiers remain planning/sensitivity labels only.
+- 2026-06-14: Added a selected-well temperature/phase audit plot using the
+  committed methane 5 ppt phase boundary, OSL temperature key-depth product,
+  and screen top/base markers where available. It is explicitly not the full
+  raw measured G10015 temperature profile.
