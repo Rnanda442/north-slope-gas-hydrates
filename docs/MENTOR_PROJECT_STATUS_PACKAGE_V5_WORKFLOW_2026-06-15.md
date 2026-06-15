@@ -24,6 +24,12 @@ public scaffold, the stability-admissibility screen, schema coverage, feature
 engineering, target leakage controls, future occurrence classification,
 saturation regression, validation, and reviewed outputs in one architecture.
 
+The next method layer is also now defined in public-safe form: a field-role
+table, an approved-data intake spec, and a first model experiment plan. These
+documents do not train a model or expose approved rows; they define what the
+approved runtime must load, block, split, validate, and review before any
+occurrence or saturation result is reported.
+
 ## What Has Been Completed
 
 - Built the V5 full workflow diagram and ML architecture detail visual.
@@ -44,6 +50,19 @@ saturation regression, validation, and reviewed outputs in one architecture.
   calibration references, or validation overlays, not predictor features.
 - Added Streamlit views for Schema Coverage & Architecture, Public ML
   Readiness, and Target Registry & Leakage.
+- Added a public-safe approved-data field-role table that records original
+  headers, normalized names, roles, units, expected dtypes, required flags,
+  public-safe display status, and caveats.
+- Added a minimum approved-data intake spec for well/depth alignment, required
+  log curves, target labels, QC fields, unit conversion, and blocked
+  conditions.
+- Added a first model experiment plan that keeps occurrence classification and
+  saturation regression separate and requires whole-well/compartment/geographic
+  split controls before training.
+- Defined occurrence evidence as an approved target or validation label from
+  core or pressure-core observations, NMR/core-derived saturation, validated
+  multi-log interpretation, or documented seismic indicators, not from the
+  stability screen.
 
 ## What Remains Blocked
 
@@ -72,21 +91,23 @@ saturation regression, validation, and reviewed outputs in one architecture.
    nearest-control proxy tiers, or use explicit scenario-only gradients?
 5. ML use of stability: is the stability screen allowed as context, confidence,
    reason flag, or mask only, never as a hydrate occurrence label?
+6. Public website outputs: which diagrams, counts, schemas, caveat views,
+   blocked-reason summaries, synthetic examples, and readiness views are
+   acceptable before approved model validation?
 
 ## Weekday Report Bullets
 
-- Monday: Organized the project around the V5 workflow that separates public
-  delivery from the OSL approved-data workbench.
-- Tuesday: Verified the guarded stability screen as pressure-temperature
-  admissibility only, with calculated, no-interval, and blocked states kept
-  separate.
-- Wednesday: Added the schema and target-leakage layer so measured inputs,
-  derived features, QC fields, and saturation labels have distinct roles.
-- Thursday: Aligned the V5 PowerPoint and Word companion to explain how
-  stability context can feed future feature engineering without becoming proof.
-- Friday: Prepared mentor decisions on phase-curve policy, target authority,
-  validation split, missing-temperature handling, and allowed ML use of
-  stability context.
+- Monday: Locked the public/OSL boundary and used the V5 package as the project
+  explanation foundation.
+- Tuesday: Preserved the methane 5 ppt stability screen as admissibility
+  context only, with calculated, no-interval, and blocked rows separated.
+- Wednesday: Built the approved-data field-role table and intake spec from
+  public-safe headers and schema evidence.
+- Thursday: Defined the first approved-runtime model experiment without
+  training or reporting fake metrics.
+- Friday: Prepared mentor decisions for phase curves, target authority,
+  validation split, missing temperature coverage, stability use, and public
+  website outputs.
 
 ## Safe Mentor Language
 

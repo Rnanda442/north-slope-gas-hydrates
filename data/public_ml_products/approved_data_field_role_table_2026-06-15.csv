@@ -1,0 +1,52 @@
+original_header,normalized_name,source_dataset,role,unit,expected_dtype,required_for_model,public_safe_to_show,caveats
+DEPTH,depth_value,Main ML header block,predictor,ft_or_m,float,required,yes_header_only,Preserve source unit and convert to depth_m before alignment.
+True Depth,true_depth_value,Main ML header block,predictor,ft_or_m,float,required_when_available,yes_header_only,Preferred depth basis for pressure temperature and log alignment.
+Depth_ft,depth_ft,Main ML header block,predictor,ft,float,required_when_no_true_depth,yes_header_only,Convert feet to meters; do not treat as final vertical depth if deviated.
+DEPT,depth_value,Main ML header block,predictor,ft_or_m,float,required,yes_header_only,Alias must retain original mnemonic and unit.
+Rho_b,rhob,Main ML header block,predictor,g_cc_or_kg_m3,float,required_for_density_features,yes_header_only,Unit conversion required before porosity or impedance calculations.
+RHOB,rhob,Main ML header block,predictor,g_cc_or_kg_m3,float,required_for_density_features,yes_header_only,Unit conversion required before porosity or impedance calculations.
+Density_gpcc,rhob,Main ML header block,predictor,g_cc,float,required_for_density_features,yes_header_only,Spelling preserved from visible header; confirm exact workbook header.
+Phi_porosity,density_porosity,Main ML header block,derived_feature,fraction_or_percent,float,optional_valuable,yes_header_only,Confirm whether supplied or calculated and whether values are fraction or percent.
+phi_den,density_porosity,Main ML header block,derived_feature,fraction_or_percent,float,optional_valuable,yes_header_only,Do not mix with neutron or NMR porosity without provenance.
+DPHI,density_porosity,Main ML header block,derived_feature,fraction_or_percent,float,optional_valuable,yes_header_only,Confirm unit because one visible header appears inconsistent.
+NPHI,neutron_porosity,Main ML header block,predictor,fraction_or_percent,float,optional_valuable,yes_header_only,Use only if present and unit convention is known.
+phi_neut,neutron_porosity,Main ML header block,predictor,fraction_or_percent,float,optional_valuable,yes_header_only,Use only if present and unit convention is known.
+NMRPHI,nmr_porosity,Main ML header block,predictor,fraction_or_percent,float,optional_valuable,yes_header_only,Input curve when it is porosity; keep separate from NMR_SAT target.
+phi_nmr,nmr_porosity,Main ML header block,predictor,fraction_or_percent,float,optional_valuable,yes_header_only,Input curve when it is porosity; keep separate from NMR_SAT target.
+GR,gamma_ray,Main ML header block,predictor,API,float,required_for_lithology_context,yes_header_only,Used for lithology and shale-volume features; not a hydrate label.
+Rt,deep_resistivity,Main ML header block,predictor,ohm_m,float,required_for_resistivity_features,yes_header_only,High resistivity is non-unique and must not become an occurrence label.
+RES,deep_resistivity,Main ML header block,predictor,ohm_m,float,required_for_resistivity_features,yes_header_only,Confirm selected deep-resistivity channel before modeling.
+AO90,deep_resistivity,Main ML header block,unresolved,ohm_m,float,blocked_until_mnemonic_confirmed,yes_header_only,Tool mnemonic must be confirmed before mapping into predictors.
+AF90,deep_resistivity,Main ML header block,unresolved,ohm_m,float,blocked_until_mnemonic_confirmed,yes_header_only,Possible alternate resistivity mnemonic; keep out of X_allowed until confirmed.
+caliper,caliper,Main ML header block,QC,in_or_mm,float,required_for_qc_where_available,yes_header_only,QC and washout context; not a hydrate predictor by itself.
+CAL1,caliper,Main ML header block,QC,in_or_mm,float,required_for_qc_where_available,yes_header_only,Visible header suggests inches but unit must be preserved per source.
+differential caliper,differential_caliper,Main ML header block,QC,mm,float,required_for_qc_where_available,yes_header_only,Define sign convention and reference hole diameter before automated flags.
+Vp,compressional_velocity,Main ML header block,predictor,m_s_or_km_s,float,optional_valuable,yes_header_only,Confirm direct velocity versus sonic-derived velocity.
+VP,compressional_velocity,Main ML header block,predictor,m_s_or_km_s,float,optional_valuable,yes_header_only,Confirm direct velocity versus sonic-derived velocity.
+VELP,compressional_velocity,Main ML header block,predictor,m_s_or_km_s,float,optional_valuable,yes_header_only,Confirm direct velocity versus sonic-derived velocity.
+Vs,shear_velocity,Main ML header block,predictor,m_s_or_km_s,float,optional_valuable,yes_header_only,Missing shear sonic should create a missingness flag rather than a fake value.
+VS,shear_velocity,Main ML header block,predictor,m_s_or_km_s,float,optional_valuable,yes_header_only,Missing shear sonic should create a missingness flag rather than a fake value.
+VS1,shear_velocity,Main ML header block,predictor,m_s_or_km_s,float,optional_valuable,yes_header_only,Missing shear sonic should create a missingness flag rather than a fake value.
+Ratio Vp/Vs,vp_vs_ratio,Main ML header block,derived_feature,dimensionless,float,optional_valuable,yes_header_only,Derived from Vp and Vs when both are valid; preserve if supplied.
+Impedance,acoustic_impedance,Main ML header block,derived_feature,kg_per_m2_s_or_equivalent,float,optional_valuable,yes_header_only,Requires density and velocity units to be standardized first.
+shale volume,shale_volume_proxy,Derived feature design,derived_feature,dimensionless,float,optional_valuable,yes_metadata_only,Feature producer only; equation constants require source or mentor approval.
+density porosity,density_porosity_calc,Derived feature design,derived_feature,fraction_or_percent,float,optional_valuable,yes_metadata_only,Feature producer only; matrix/fluid density assumptions must be visible.
+resistivity transform,log_rt,Derived feature design,derived_feature,dimensionless,float,optional_valuable,yes_metadata_only,Baseline/check feature; not a direct hydrate label.
+elastic attributes,elastic_moduli,Derived feature design,derived_feature,unit_aware,float,optional_valuable,yes_metadata_only,Only compute when Vp/Vs/RHOB units are valid.
+Depth correspondence at ML data,aligned_depth,MTE_refined/IGS_refined,QC,ft_or_m,float,required_for_depth_alignment,yes_header_only,Record matching/interpolation method and depth offset.
+depths_unitD,source_depth_unit_d,MTE_refined/IGS_refined,QC,ft,float,required_for_depth_alignment,yes_header_only,Preserve unit identifier and source sampling.
+depths_unitC,source_depth_unit_c,MTE_refined/IGS_refined,QC,ft,float,required_for_depth_alignment,yes_header_only,Preserve unit identifier and source sampling.
+Sgh,hydrate_saturation,Ground truth header block,target_only,fraction_or_percent,float,target_required_after_authority_decision,yes_header_only_no_values,Ground-truth or calibration target only; never enter X_allowed.
+S_h,hydrate_saturation,MTE,target_only,fraction_or_percent,float,target_required_after_authority_decision,yes_header_only_no_values,MTE target or calibration field only; never enter X_allowed.
+Sh,hydrate_saturation,IGS,target_only,fraction_or_percent,float,target_required_after_authority_decision,yes_header_only_no_values,IGS target or calibration field only; never enter X_allowed.
+NMR_SAT,nmr_saturation_target,Ground truth header block,target_only,fraction_or_percent,float,target_required_after_authority_decision,yes_header_only_no_values,Target or independent calibration field; keep separate from NMRPHI.
+Hydrate Saturation,hydrate_saturation,Ground truth/refined sheets,target_only,fraction_or_percent,float,target_required_after_authority_decision,yes_header_only_no_values,Reporting or target field only until authority is confirmed.
+Swr,irreducible_water_saturation,IGS,calibration_reference,fraction_or_percent,float,calibration_optional,yes_header_only_no_values,Water-saturation constraint or calibration reference; fail closed if leakage is possible.
+S_wr,irreducible_water_saturation,MTE,calibration_reference,fraction_or_percent,float,calibration_optional,yes_header_only_no_values,Water-saturation constraint or calibration reference; fail closed if leakage is possible.
+interpreted phase label,phase_class,Known-well labels,target_only,categorical,category,target_required_for_occurrence_if_used,yes_header_only_no_values,Occurrence target or validation evidence only; stability cannot create it.
+core hydrate observation,hydrate_occurrence_core,Core or pressure-core labels,target_only,categorical_or_boolean,category,target_required_for_occurrence_if_used,yes_header_only_no_values,Direct occurrence evidence only after interval alignment and mentor source authority.
+pressure-core hydrate observation,hydrate_occurrence_pressure_core,Core or pressure-core labels,target_only,categorical_or_boolean,category,target_required_for_occurrence_if_used,yes_header_only_no_values,Direct occurrence evidence only after interval alignment and mentor source authority.
+validated log occurrence interpretation,hydrate_occurrence_log_interpretation,Known-well interpretation labels,target_only,categorical_or_boolean,category,target_required_for_occurrence_if_used,yes_header_only_no_values,Occurrence label only when interpretation method and QC are approved.
+regional seismic hydrate indicator,hydrate_occurrence_seismic_indicator,Regional seismic interpretation,target_only,categorical_or_boolean,category,validation_or_context_after_authority_decision,yes_header_only_no_values,Occurrence evidence or validation context only when spatial and depth support are documented.
+public stability context,stability_context_features,Public context products,context,public_product_units,mixed,optional_context_after_mentor_approval,yes_public_summary_only,Admissibility context or mask only; not proof or occurrence or saturation or sweet spot.
+MTE/IGS/refined sheet identity,sheet_source_role,Workbook organization,unresolved,not_applicable,string,required_for_provenance,yes_metadata_only,Resolve whether sheets are wells or processing stages or source datasets.

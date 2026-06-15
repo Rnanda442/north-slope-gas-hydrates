@@ -68,6 +68,14 @@ The non-stability ML/schema readiness baseline is now
 Only about 3 of the expected 71 datasets are currently available, which is
 enough for schema and architecture design but not final training, performance
 metrics, or hydrate prediction claims.
+The practical next-products layer is now defined by
+`data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`,
+`docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`,
+`docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md`, and
+`docs/MENTOR_DECISION_REQUESTS_2026-06-15.md`. These files turn the visible
+headers/screenshots into a public-safe intake contract, separate
+occurrence-classification and saturation-regression tasks, and list the mentor
+decisions needed before approved-runtime model training.
 
 The active workflow-diagram package is now the V5 completion pass under
 `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/`.
@@ -237,10 +245,17 @@ reopen OSL unless a source/product rebuild is actually needed.
   QC/alignment fields, target-only fields, calibration/reference fields, and
   unresolved fields, and keeps the workflow results-free until broader
   approved-data coverage exists.
+- `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`,
+  `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`, and
+  `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md` now define the minimum
+  approved-data intake contract and first model experiment plan. They are
+  header/schema products only: no approved rows, saturation values, trained
+  metrics, occurrence probabilities, or public sensitive outputs are committed.
 - The `Analyze Hydrates` page now includes a `Schema Coverage & Architecture`
-  tab that shows the about-3-of-71 coverage status, role counts, target-only
-  separation, and architecture path without exposing approved rows or model
-  metrics.
+  tab that shows the about-3-of-71 coverage status, current public counts,
+  public-now versus OSL-later contract, blocked reasons, mentor decisions,
+  role counts, target-only separation, approved-data field roles, and
+  architecture path without exposing approved rows or model metrics.
 - Three Excel header references were reviewed from the user's email. The images
   are not stored in Git or shown on the website; their public-safe schema
   derivative is maintained in `docs/WELL_LOG_REQUIREMENTS_MAP.md`.
@@ -343,6 +358,14 @@ It must not load or expose authorized well-log or core data.
   non-stability ML/schema readiness plan for preserving approved-data headers,
   mapping roles, blocking target leakage, and designing whole-well validation
   before final training
+- `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`: minimum approved-data intake
+  contract for well/depth alignment, required curves, optional curves, target
+  labels, QC fields, unit conversions, and blocked conditions
+- `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md`: results-free first model
+  experiment plan separating occurrence classification from saturation
+  regression
+- `docs/MENTOR_DECISION_REQUESTS_2026-06-15.md`: concise mentor update,
+  decision questions, and weekday report bullets
 - `docs/PROJECT_IMPROVEMENT_STRATEGY.md`: principles and phased improvement
   strategy for keeping product changes aligned with the scientific goal
 - `docs/PROJECT_VISION_GOALS_AND_NEXT_STEPS.md`: email-derived project vision,
@@ -387,11 +410,12 @@ the authorized runtime environment.
 The current ordered plan is maintained in
 `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md`.
 
-Immediate 2026-06-15 handoff: use the V5 diagram package to create the
-mentor-facing status/update materials. Explain what is complete outside
-stability, what the guarded methane 5 ppt admissibility screen can and cannot
-claim, how stability context connects to the future ML feature matrix, and
-which mentor decisions are needed before final model training or public claims.
+Immediate 2026-06-15 handoff: use the completed V5 diagram package as the
+explanation foundation, then move forward with the approved-data field-role
+table, minimum intake spec, first model experiment plan, and mentor decision
+packet. The next approved-runtime step is to confirm target authority, units,
+well/depth alignment, validation split policy, and whether stability may enter
+`X_allowed` only as context, mask, confidence, caveat, or blocked reason.
 
 ## Update Protocol
 
@@ -661,3 +685,8 @@ blockers, and next activities in the architecture/activity map.
   `V5 COMPLETION Full Workflow ML Diagram 9-Slide North Slope Gas Hydrate
   Slides 2026-06-15` and `V5 COMPLETION North Slope Gas Hydrate Full ML
   Workflow Diagram 2026-06-15`.
+- 2026-06-15: Added the next practical approved-data readiness layer: a
+  public-safe field-role table, minimum approved-data intake spec, first model
+  experiment plan, mentor decision packet, and website readiness tables. These
+  keep occurrence and saturation as separate future tasks, keep target labels
+  out of `X_allowed`, and do not expose approved rows or claim model results.

@@ -210,6 +210,14 @@ Use the classification-methods draft as the working direction for the DOE-style
 well-log project. Use the broader research-paper draft as background context and
 source synthesis.
 
+For the current approved-data readiness layer outside the deck builders, use
+`docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`,
+`docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md`,
+`docs/MENTOR_DECISION_REQUESTS_2026-06-15.md`, and
+`data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`.
+Those files define the next method step after the completed V5 workflow
+package; they do not contain approved rows or trained model results.
+
 ## Boundary
 
 These are public-source planning artifacts only. Do not add classified,

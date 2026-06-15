@@ -46,6 +46,20 @@ The schema-level coverage matrix is stored at:
 data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv
 ```
 
+The clearer field-role table for intake and website display is stored at:
+
+```text
+data/public_ml_products/approved_data_field_role_table_2026-06-15.csv
+```
+
+Companion method documents:
+
+```text
+docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md
+docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md
+docs/MENTOR_DECISION_REQUESTS_2026-06-15.md
+```
+
 ## Header Preservation Rule
 
 The approved-data workflow will preserve original sheet/file names and original
@@ -77,6 +91,25 @@ Minimum metadata for each imported column:
 | calibration/reference fields | `Swr`, `S_wr`, core/NMR calibration references when approved | Calibration or comparison fields pending formula/provenance review. Fail closed if leakage is possible. |
 | context features | public stability/admissibility context, regional assessment-unit context, source-control confidence | Optional context, masks, confidence labels, or reason flags only. Not hydrate labels. |
 | unresolved fields | `AO90`/`A090`/`AF90` style resistivity mnemonics, sheet identity fields, unclear refined-sheet depth vectors | Excluded or held as metadata until workbook or mentor review resolves the role. |
+
+## Approved-Data Field Role Table
+
+The field-role table converts the current coverage matrix into a direct intake
+contract. It uses these public-safe columns:
+
+| Field | Use |
+|---|---|
+| `original_header` | Header exactly as visible in screenshots or schema notes. |
+| `normalized_name` | Runtime-safe alias after original header is preserved. |
+| `source_dataset` | Public-safe sheet or dataset family. |
+| `role` | `predictor`, `derived_feature`, `QC`, `context`, `target_only`, `calibration_reference`, or `unresolved`. |
+| `unit` | Expected unit or unit-review status. |
+| `expected_dtype` | Runtime dtype expectation. |
+| `required_for_model` | Whether the field is required, optional, target-only, calibration-only, or blocked pending review. |
+| `public_safe_to_show` | Whether public outputs may show header/metadata only or public aggregate summaries. |
+| `caveats` | Unit, leakage, provenance, or blocked-condition warning. |
+
+This table remains header/metadata only. It does not expose approved data rows.
 
 ## Leakage Barrier
 
@@ -159,6 +192,39 @@ Recommended architecture:
    - carry uncertainty flags;
    - do not invent or report fake metrics.
 
+## Minimum Intake Contract
+
+The approved runtime should not start training until it can resolve:
+
+1. source/well identity and split grouping;
+2. depth and depth-unit conversion to meters;
+3. measured log predictors such as `GR`, density, resistivity, and at least one
+   porosity or hydrate-response curve family;
+4. QC and alignment fields for missingness, washout/caliper, outliers, source
+   confidence, and core/NMR depth matching;
+5. official target authority for occurrence and saturation labels;
+6. blocked-row reasons when any required unit, label, or split rule is missing.
+
+The detailed contract is in
+`docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`.
+
+## First Model Experiment Shape
+
+The first approved-runtime model experiment should be planned as two linked but
+separate tasks:
+
+| Task | Output | Guardrail |
+|---|---|---|
+| Occurrence classification | `P(hydrate)` and calibrated occurrence class | Occurrence labels come from approved target/validation evidence, not stability. |
+| Saturation regression | `Sh_pred` plus uncertainty and residual review | Saturation labels are Y-only and must be approved before training. |
+
+Both tasks must use a whole-well, compartment, or geographic/geologic split
+before preprocessing. Physics/simple baselines should run before tree,
+boosting, or ANN/Keras candidates. Metrics may be reported only against
+approved labels in held-out wells or compartments.
+
+The detailed plan is in `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md`.
+
 ## What Is Complete Outside Stability
 
 The project now has a non-stability ML/schema layer that records expected
@@ -182,3 +248,8 @@ validation without exposing approved data or overclaiming model performance.
 4. Are `MTE`, `IGS`, `MTE_refined`, and `IGS_refined` separate wells, separate
    processing stages, or separate source datasets?
 5. Which wells should be held out for blind validation?
+6. Should stability context be allowed only as context/mask/confidence/caveat,
+   never as occurrence proof or target?
+7. Which public website outputs are acceptable before approved model
+   validation: diagrams, counts, schemas, caveat views, blocked-reason
+   summaries, synthetic examples, and/or readiness summaries?

@@ -143,6 +143,12 @@ FULL_WORKFLOW_WORD = (
     / "project_blueprints"
     / "North_Slope_Gas_Hydrate_Full_ML_Workflow_Diagram_2026-06-15.docx"
 )
+APPROVED_DATA_FIELD_ROLE_TABLE = (
+    PROJECT_ROOT
+    / "data"
+    / "public_ml_products"
+    / "approved_data_field_role_table_2026-06-15.csv"
+)
 IGNORED_DIRS = {
     ".git",
     ".ipynb_checkpoints",
@@ -1090,6 +1096,14 @@ def cached_public_ml_leakage_guardrails(project_root: str) -> pd.DataFrame:
 @st.cache_data
 def cached_approved_schema_coverage_matrix(project_root: str) -> pd.DataFrame:
     return load_approved_schema_coverage_matrix(Path(project_root))
+
+
+@st.cache_data
+def cached_approved_data_field_role_table(project_root: str) -> pd.DataFrame:
+    path = Path(project_root) / "data" / "public_ml_products" / "approved_data_field_role_table_2026-06-15.csv"
+    if not path.exists():
+        return pd.DataFrame()
+    return pd.read_csv(path)
 
 
 @st.cache_data
@@ -4420,6 +4434,7 @@ def render_full_workflow_map_panel() -> None:
 def render_schema_coverage_architecture() -> None:
     st.subheader("Schema Coverage & Architecture")
     matrix = cached_approved_schema_coverage_matrix(str(PROJECT_ROOT))
+    field_roles = cached_approved_data_field_role_table(str(PROJECT_ROOT))
 
     if matrix.empty:
         st.info("The approved-data schema coverage matrix has not been generated yet.")
@@ -4446,6 +4461,122 @@ def render_schema_coverage_architecture() -> None:
         "roles, separates target-only saturation fields, and does not include "
         "approved well-log rows, trained models, predictions, or performance metrics."
     )
+
+    st.markdown("##### Current public counts")
+    current_counts = pd.DataFrame(
+        [
+            {
+                "Item": "Public scaffold wells",
+                "Count": "8,084",
+                "Use": "public regional scaffold, not approved ML rows",
+            },
+            {
+                "Item": "GGD223 permafrost controls",
+                "Count": "43",
+                "Use": "public permafrost context",
+            },
+            {
+                "Item": "G10015 temperature profiles",
+                "Count": "184",
+                "Use": "public temperature-profile context",
+            },
+            {
+                "Item": "USGS hydrate assessment units",
+                "Count": "3",
+                "Use": "regional context only",
+            },
+            {
+                "Item": "Temperature-profile matches",
+                "Count": "483",
+                "Use": "future context/mask/confidence candidates",
+            },
+            {
+                "Item": "Methane 5 ppt admissibility intervals",
+                "Count": "22",
+                "Use": "stability context only, not hydrate proof",
+            },
+            {
+                "Item": "No-stable-interval rows",
+                "Count": "8",
+                "Use": "screen outcome under current gates",
+            },
+            {
+                "Item": "Blocked stability-screen rows",
+                "Count": "8,054",
+                "Use": "blocked by current source/calculation gates",
+            },
+            {
+                "Item": "Approved datasets visible for schema design",
+                "Count": "~3 / 71",
+                "Use": "headers/schema only, not public row data",
+            },
+        ]
+    )
+    st.dataframe(current_counts, use_container_width=True, hide_index=True)
+
+    st.markdown("##### Readiness contract")
+    readiness_contract = pd.DataFrame(
+        [
+            {
+                "Area": "Public now",
+                "Allowed display": "diagrams, counts, schemas, caveats, blocked reasons, synthetic examples",
+                "Not allowed": "approved rows, trained metrics, occurrence probabilities, saturation predictions",
+            },
+            {
+                "Area": "OSL / approved runtime later",
+                "Allowed display": "approved LAS/CSV/core/NMR rows, target mapping, fitting, validation, reviewed outputs",
+                "Not allowed": "public release before boundary review",
+            },
+            {
+                "Area": "Stability",
+                "Allowed display": "methane 5 ppt admissibility context, masks, confidence, caveats",
+                "Not allowed": "hydrate proof, occurrence label, saturation target, sweet-spot rank",
+            },
+            {
+                "Area": "X_allowed",
+                "Allowed display": "measured logs, valid derived features, QC fields, approved context",
+                "Not allowed": "Sgh, S_h, Sh, NMR_SAT, Hydrate Saturation, Swr, phase labels",
+            },
+            {
+                "Area": "Y-only labels",
+                "Allowed display": "target authority, calibration, validation overlays after approval",
+                "Not allowed": "predictor columns or feature selection inputs",
+            },
+        ]
+    )
+    st.dataframe(readiness_contract, use_container_width=True, hide_index=True)
+
+    st.markdown("##### Blocked reasons and mentor decisions")
+    blocked_decisions = pd.DataFrame(
+        [
+            {
+                "Blocked item": "Official phase curve policy",
+                "Current handling": "methane 5 ppt baseline only",
+                "Decision needed": "baseline only or labeled scenarios",
+            },
+            {
+                "Blocked item": "Occurrence and saturation labels",
+                "Current handling": "target-only headers visible, zero public target rows",
+                "Decision needed": "official target authority and unit convention",
+            },
+            {
+                "Blocked item": "Validation split",
+                "Current handling": "whole-well/compartment/geographic options documented",
+                "Decision needed": "final split policy before preprocessing",
+            },
+            {
+                "Blocked item": "Missing G10015 coverage",
+                "Current handling": "rows remain blocked unless policy changes",
+                "Decision needed": "blocked, proxy tier, or scenario-only gradient",
+            },
+            {
+                "Blocked item": "Public website outputs",
+                "Current handling": "public-safe diagrams, counts, schemas, caveats, readiness",
+                "Decision needed": "which views are acceptable before validation",
+            },
+        ]
+    )
+    st.dataframe(blocked_decisions, use_container_width=True, hide_index=True)
 
     role_counts = (
         matrix["role"]
@@ -4527,6 +4658,25 @@ def render_schema_coverage_architecture() -> None:
         hide_index=True,
     )
 
+    if not field_roles.empty:
+        st.markdown("##### Approved-data field role table")
+        role_preview_columns = [
+            "original_header",
+            "normalized_name",
+            "source_dataset",
+            "role",
+            "unit",
+            "expected_dtype",
+            "required_for_model",
+            "public_safe_to_show",
+            "caveats",
+        ]
+        st.dataframe(
+            field_roles[[column for column in role_preview_columns if column in field_roles.columns]],
+            use_container_width=True,
+            hide_index=True,
+        )
+
     with st.expander("Coverage checks", expanded=False):
         st.dataframe(role_counts, use_container_width=True, hide_index=True)
         st.write(
@@ -4541,6 +4691,14 @@ def render_schema_coverage_architecture() -> None:
         "text/csv",
         key="download_approved_schema_coverage_matrix",
     )
+    if not field_roles.empty:
+        st.download_button(
+            "Download approved-data field role table CSV",
+            csv_bytes(field_roles),
+            APPROVED_DATA_FIELD_ROLE_TABLE.name,
+            "text/csv",
+            key="download_approved_data_field_role_table",
+        )
 
 
 def render_public_ml_target_registry() -> None:

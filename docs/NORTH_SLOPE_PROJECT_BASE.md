@@ -100,6 +100,21 @@ The public repo should not contain:
   The V5 completion copy is also in Drive as
   `V5 COMPLETION North Slope Gas Hydrate Full ML Workflow Diagram 2026-06-15`.
 
+### Current Method / Readiness Docs
+
+- `docs/MENTOR_PROJECT_STATUS_PACKAGE_V5_WORKFLOW_2026-06-15.md`
+- `docs/MENTOR_DECISION_REQUESTS_2026-06-15.md`
+- `docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`
+- `data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv`
+- `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`
+- `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`
+- `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md`
+
+These are the active public-safe readiness artifacts after the V5 diagram
+package. They define the field roles, approved-data intake contract, first
+model experiment shape, and mentor decisions without exposing approved rows or
+claiming occurrence/saturation results.
+
 ### Other Word Drafts
 
 - `docs/project_blueprints/Alaska_North_Slope_Wireline_ML_Research_Paper_Draft.docx`
@@ -204,6 +219,12 @@ Important working rule:
 - If code eventually needs canonical aliases, keep that mapping visible and secondary. The Word/slides should show the headers as given.
 - Label/ground-truth columns should be handled carefully as targets, calibration, validation, or comparison fields.
 - We still need to define exactly when a saturation-related field is an input support field versus the target being predicted.
+- The current public-safe field role mapping is
+  `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`.
+  It is a header/schema table only. It records original headers, normalized
+  names, source family, role, unit/dtype expectations, required-model status,
+  public-safe display status, and caveats without committing approved data
+  values.
 
 ## Official DOE Project Overview From Screenshots
 
@@ -709,34 +730,32 @@ Before each commit:
 
 Current top-priority handoff for the PC:
 
-1. Review the completed V5 workflow PPTX/DOCX package and three key PNGs.
-2. Use the package to explain what is complete outside stability: public
-   GIS/website scaffold, source library, public stability products, ML feature
-   scaffold, target registry/leakage guardrails, schema coverage matrix, and
-   workflow assets.
-3. Explain stability carefully: it is a methane 5 ppt stability-admissibility
-   screen with caveats, not hydrate proof, final stability, saturation, or
-   sweet-spot ranking.
-4. Explain how stability will enter ML as context, mask, confidence, caveat,
-   or blocked-reason fields, while target labels such as `Sgh`, `S_h`, `Sh`,
-   `NMR_SAT`, phase calls, and saturation values stay out of `X_allowed`.
-5. Use the mentor decision box to resolve phase-curve policy, official target
-   authority, validation split, missing-temperature handling, whether stability
-   context is approved as ML context only, and what public website outputs are
-   acceptable before approved validation.
+1. Use the completed V5 workflow package as the explanation foundation, but do
+   not redesign it unless an obvious bug is found.
+2. Review the mentor packet in
+   `docs/MENTOR_DECISION_REQUESTS_2026-06-15.md` and
+   `docs/MENTOR_PROJECT_STATUS_PACKAGE_V5_WORKFLOW_2026-06-15.md`.
+3. Use `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`
+   and `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md` as the public-safe
+   approved-data intake contract.
+4. Use `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md` as the first approved-
+   runtime model plan. It separates occurrence classification from saturation
+   regression and keeps target labels out of `X_allowed`.
+5. Keep the website in readiness mode only: public counts, diagrams, schemas,
+   caveats, blocked reasons, and synthetic examples are acceptable; fake ML
+   results, approved rows, trained metrics, occurrence probabilities, and
+   saturation predictions are not.
 
 Recommended next build:
 
-1. Review the header screenshots, equation screenshots, DOE project overview
-   screenshots, citation packet, and source-library index.
-2. Create a high-level Word-ready parameter science section: what each
-   screenshot parameter measures, why it matters for gas hydrate, and what
-   external factors can mimic or distort the signal.
-3. Then create `docs/PARAMETER_LOGIC_AND_SOURCE_MATRIX.md` as the detailed
-   working table behind the Word/slides/website.
-4. Use that logic to rewrite the Word document.
-5. Use the revised Word logic to revise the 9-slide Gmail deck.
-6. Use the revised Word/slide logic to update the website skeleton.
+1. Get mentor decisions on phase-curve policy, target authority, validation
+   split, missing G10015 handling, stability-as-context policy, and public
+   website output limits.
+2. Recover or inspect the approved workbook/data headers inside the authorized
+   environment and complete the field-role/intake mapping there.
+3. Confirm units, depth alignment, and target-label authority before training.
+4. Then extend the parameter logic/source matrix and Word/PPT narrative using
+   the approved intake contract rather than making new synthetic datasets.
 
 ## Questions For User
 

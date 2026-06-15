@@ -91,6 +91,10 @@ Approved-data schema architecture plan and matrix:
 ```text
 docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md
 data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv
+data/public_ml_products/approved_data_field_role_table_2026-06-15.csv
+docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md
+docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md
+docs/MENTOR_DECISION_REQUESTS_2026-06-15.md
 ```
 
 Reproducible builder:
