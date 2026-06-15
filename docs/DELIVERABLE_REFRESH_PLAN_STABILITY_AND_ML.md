@@ -14,6 +14,12 @@ added when the deliverable builders are updated.
 Use `docs/SLIDE_REMAKE_STORYBOARD_STABILITY_AND_ML.md` as the detailed
 slide-by-slide creative plan before rebuilding the current Gmail deck.
 
+User review on 2026-06-15 rejected the first stability/ML slide-remake draft
+as too disconnected from the whole project. The refresh direction is now
+diagram-first: use `docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md` and the generated
+full-workflow visual as the main project map, then use any additional slides
+only as zoom-ins on that one map.
+
 ## Boundary Rule
 
 The refreshed deliverables may show public-safe workflow diagrams, cited
@@ -32,109 +38,52 @@ saturation outputs, or sweet-spot rankings.
 | Public scaffold | Current public stability scaffold reports 8,084 Arctic Slope public wells | Approved runtime well-log inventory |
 | Authorized inventory | G10015 temperature inventory reports 184 temperature profiles across 24 well codes | Public repo data or publishable restricted identifiers |
 
-## Diagram 1: Public-To-OSL Workflow
+## Primary Diagram: Full Project ML Workflow
 
-Goal: show where each type of work belongs.
+Goal: show the whole project on one connected flowchart.
 
-Suggested structure:
+Current generated source:
 
 ```text
-Public sources + GitHub repo
--> Streamlit public scaffold and diagrams
--> communication deliverables
-
-Approved data in OpenScienceLab
--> temperature inventory and runtime calculations
--> guarded outputs and status counters
--> public-safe summaries only after review
+docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/full_project_ml_workflow_flowchart.png
 ```
 
-Visual notes:
-
-- Draw GitHub/Streamlit on the left as public delivery.
-- Draw OpenScienceLab on the right as the heavy-data workbench.
-- Put a visible boundary between them: no approved rows, restricted
-  identifiers, populated configs, trained models, or derived sensitive outputs
-  cross into public deliverables.
-- Allow only reviewed public-safe status summaries and method diagrams to flow
-  back to the Word document and slide deck.
-
-## Diagram 2: Pressure-Temperature Stability Pipeline
-
-Goal: make the stability screen legible without claiming hydrate proof.
-
 Suggested structure:
 
 ```text
-depth
--> hydrostatic pressure
--> temperature profile or extrapolated temperature model
--> cited methane 5 ppt phase curve
--> stability-admissibility comparison
--> guarded writer
--> status output: calculated admissibility interval, no modeled stable interval,
-   blocked, or not hydrate proof
+public/source inputs
++ approved runtime inputs
++ stability-admissibility screen
++ well-log/core feature engineering
++ target registry and leakage barrier
++ occurrence classification
++ saturation regression
++ validation and public-safe exports
 ```
 
 Required labels:
 
-- `100% methane + 5 ppt salinity baseline, pending mentor decision`
-- `hydrostatic pressure model`
-- `temperature model with source-control confidence`
+- `OpenScienceLab / approved-runtime build path`
+- `Public GitHub / Streamlit / Word / Slides`
+- `100% methane + 5 ppt salinity baseline`
 - `stability-admissibility only`
+- `target registry and leakage barrier`
+- `occurrence classifier`
+- `saturation regressor`
+- `reviewed public-safe summaries only`
 - `not hydrate proof, not saturation, not sweet-spot ranking`
 
-## Diagram 3: Data-Readiness And Confidence-Label Pipeline
+## Supporting Zoom-Ins
 
-Goal: show why many rows can be intentionally blocked.
+Use additional slides or Word subsections only to zoom into parts of the same
+primary diagram:
 
-Suggested structure:
-
-```text
-temperature source inventory
--> well-code/profile matching
--> key-depth target rows
--> nearest/control-distance review
--> confidence label: high, medium, low, blocked
--> block reason or calculation route
--> reviewed export status
-```
-
-Open mentor decision:
-
-Define the control-distance thresholds for high, medium, and low confidence.
-Until those thresholds are approved, confidence labels should be described as
-source-control labels rather than final scientific certainty.
-
-## Diagram 4: Guarded ML Pipeline
-
-Goal: connect the stability-screen work to the future ML deliverable without
-leaking targets or overclaiming results.
-
-Suggested structure:
-
-```text
-approved well logs + core/NMR context
--> schema and unit mapping
--> depth alignment
--> QC gates
--> physics-derived features
--> stability-admissibility and reservoir context
--> target registry and leakage barrier
--> occurrence classification
--> saturation regression
--> uncertainty, QC, reason flags, and review outputs
-```
-
-Required guardrails:
-
-- `S_h`, `Sgh`, `NMR_SAT`, phase labels, and final rankings are labels,
-  calibration references, or outputs, not predictors.
-- Occurrence classification and saturation regression should be presented as
-  linked but separate outputs.
-- Final validation must use complete wells or compartments, not random depth
-  rows as final evidence.
-- No project model metrics should appear until approved-data validation exists.
+- input and data-boundary zoom;
+- pressure-temperature stability branch zoom;
+- well-log feature and QC zoom;
+- target registry / leakage barrier / model-training zoom;
+- occurrence, saturation, validation, and export zoom;
+- complete / calculated / blocked / decision status board.
 
 ## Word Document Update Plan
 
@@ -168,13 +117,13 @@ Keep exactly nine slides unless the user changes the deck count.
 |---|---|
 | 1 | Keep title/about-me concise; do not add runtime status detail here |
 | 2 | Add clearer pressure-temperature stability screen language and the methane 5 ppt baseline caveat |
-| 3 | Keep the three-tier parameter ladder; add a small status cue that stability is context, not a label |
-| 4 | Add the guarded public-to-OSL workflow and target-leakage barrier |
-| 5 | Keep parameter behavior and false positives; emphasize stability, reservoir, and response as separate evidence tiers |
-| 6 | Add the P-T stability pipeline or confidence-label pipeline if space allows |
-| 7 | Keep map/context as public screening context only |
-| 8 | Replace any results-like placeholders with calculated/blocked/readiness status and future validation slots |
-| 9 | End with next decisions: phase-curve baseline, confidence thresholds, OM-222 permafrost base, and approved validation fields |
+| 3 | Make the one full workflow flowchart the central slide: public inputs, OSL inputs, stability branch, feature engineering, leakage barrier, occurrence classifier, saturation regressor, validation, and public-safe exports |
+| 4 | Zoom into public inputs, approved runtime inputs, and the boundary rule |
+| 5 | Zoom into the pressure-temperature stability branch and explain why it is context only |
+| 6 | Zoom into well-log/core QC, unit normalization, and physics-derived feature blocks |
+| 7 | Zoom into target registry, leakage barrier, complete-well split, and model ladder |
+| 8 | Zoom into occurrence, saturation, uncertainty, validation, and export outputs |
+| 9 | End with what is complete, what is calculated, what is intentionally blocked, and which mentor decisions remain |
 
 ## Acceptance Checks Before Publication
 

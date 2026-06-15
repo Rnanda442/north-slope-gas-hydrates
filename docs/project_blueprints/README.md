@@ -44,6 +44,18 @@ wireline machine-learning project.
   - Public-safe planning brief only. It does not contain approved log/core
     rows, trained model results, hydrate proof, saturation results, or
     sweet-spot ranking.
+- `North_Slope_Gas_Hydrate_Full_ML_Workflow_Diagram_2026-06-15.docx`
+  - Word companion for the one-map workflow diagram requested after review of
+    the first stability/ML slide remake.
+  - Embeds the full project flowchart and explains the public delivery lane,
+    OSL/approved-runtime build path, stability-admissibility branch, feature
+    engineering, leakage barrier, occurrence classification, saturation
+    regression, validation, and public-safe exports.
+  - Public-safe planning artifact only. It does not include approved log/core
+    rows, model metrics, hydrate proof, saturation results, or sweet-spot
+    ranking.
+  - Imported to the connected Google Drive account as
+    [North Slope Gas Hydrate Full ML Workflow Diagram 2026-06-15](https://docs.google.com/document/d/1MJeWz0WDQvXBo80rYps76cuPZmJrP_BTQSka1Np5lyA).
 - `North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`
   - Prior tracked 9-slide visual companion deck rebuilt on 2026-06-11 from the latest
     Drive review feedback and imported to Drive as
@@ -106,6 +118,25 @@ wireline machine-learning project.
   - This is a review draft, not a Drive-published final deck. It must keep the
     guardrail that the current result is stability-admissibility only, not
     hydrate proof, saturation, sweet-spot ranking, or validated ML output.
+  - User review on 2026-06-15 rejected this as the next direction because it did
+    not show the whole project in one connected workflow.
+- `FULL_WORKFLOW_ML_DIAGRAM_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`
+  - Diagram-first replacement draft generated after the user asked for one full
+    ML flowchart with all inputs, stability logic, feature engineering,
+    leakage barrier, occurrence classification, saturation regression,
+    validation, and public-safe exports connected.
+  - Slides 1 and 2 are preserved exactly from the current Gmail authority deck.
+    Slide 3 is the full workflow map. Slides 4-9 zoom into inputs/boundary,
+    stability, feature engineering, leakage/modeling, outputs/validation, and
+    complete/calculated/blocked next decisions.
+  - Generated from
+    `docs/project_blueprints/build_full_workflow_diagram_deliverables.py` with
+    panels under
+    `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/`.
+  - Public-safe review draft only; no approved rows, trained model results,
+    hydrate proof, saturation output, or sweet-spot ranking.
+  - Imported to the connected Google Drive account as
+    [FULL WORKFLOW ML DIAGRAM 9-SLIDE North Slope Gas Hydrate Slides 2026-06-15](https://docs.google.com/presentation/d/1zrWGi9bf9J2dukiZPqFQVvBCm7jCgOz1mTSIxiv8qzI).
 - `build_ml_revamp_powerpoint.py`
   - Reproducible builder for the current 9-slide visual-first ML parameter
     architecture PowerPoint.
@@ -129,6 +160,9 @@ wireline machine-learning project.
 - `build_pipeline_status_word_brief.py`
   - Reproducible builder for the 2026-06-15 pipeline status and forward
     workflow Word brief.
+- `build_full_workflow_diagram_deliverables.py`
+  - Reproducible builder for the diagram-first slide deck, standalone full
+    workflow PNG, and Word companion page.
 
 ## Direction
 

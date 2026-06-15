@@ -49,13 +49,19 @@ For the stability-screen communication pass, use
 `docs/WEEKDAY_PROGRESS_REPORT_TEMPLATE.md`, and
 `docs/DELIVERABLE_REFRESH_PLAN_STABILITY_AND_ML.md` to keep the
 OpenScienceLab workbench, public GitHub/Streamlit delivery surface, and
-stability-admissibility guardrail aligned. The local 2026-06-15 slide-remake
-draft preserves the current Gmail deck's first two slides and rebuilds slides
-3-9 around the public/OSL workflow, guarded stability screen, readiness labels,
-and later approved-data ML path. The 2026-06-15 pipeline status Word brief is
-the current plain-language review draft for explaining where the project stands
-now and how the approved-data ML pipeline should reach occurrence
-classification and saturation regression.
+stability-admissibility guardrail aligned. User review on 2026-06-15 rejected
+the first stability/ML slide-remake draft as too disconnected from the whole
+project; the active slide/Word refresh direction is now the one-map workflow
+diagram in `docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md`, the diagram-first PPTX,
+and the Word companion generated from
+`docs/project_blueprints/build_full_workflow_diagram_deliverables.py`. The
+diagram keeps the current Gmail deck's first two slides and makes slide 3 the
+full connected workflow from public/source inputs and OSL/approved inputs
+through stability context, feature engineering, leakage controls, occurrence
+classification, saturation regression, validation, and public-safe exports. The
+2026-06-15 pipeline status Word brief remains the plain-language review draft
+for explaining where the project stands now and how the approved-data ML
+pipeline should reach occurrence classification and saturation regression.
 
 ## Current State
 
@@ -561,3 +567,8 @@ blockers, and next activities in the architecture/activity map.
   explaining the current project status, public/runtime boundary, guarded
   stability-admissibility layer, and leakage-safe ML path toward occurrence
   classification and saturation regression.
+- 2026-06-15: Superseded the first stability/ML slide-remake draft with a
+  diagram-first deliverable refresh: one full project ML workflow flowchart, a
+  9-slide PPTX that keeps slides 1-2 locked and uses the map plus zoom-ins for
+  slides 3-9, and a Word companion explaining the same workflow without
+  claiming hydrate proof, saturation, validated ML results, or sweet spots.

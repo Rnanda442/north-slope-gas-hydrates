@@ -67,6 +67,23 @@ Review status:
 - The deck remains public-safe and does not claim hydrate proof, saturation,
   sweet-spot ranking, or validated ML performance.
 
+User review update on 2026-06-15:
+
+- The first local draft should not be used as the next presentation direction.
+  The user asked for one full project ML flowchart instead of separate
+  stability/workbench/status slides.
+- The replacement direction is recorded in
+  `docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md`.
+- The new diagram-first generated deck is:
+
+```text
+docs/project_blueprints/FULL_WORKFLOW_ML_DIAGRAM_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx
+```
+
+- Slides 1 and 2 remain preserved from the current Gmail authority deck, while
+  slide 3 becomes the full connected workflow map and slides 4-9 become
+  zoom-ins on the same map.
+
 ## Visual Direction
 
 Use a clean technical-control-room style:

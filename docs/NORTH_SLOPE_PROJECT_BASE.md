@@ -61,12 +61,23 @@ The public repo should not contain:
 - Sent: 2026-06-12 01:30 CDT
 - Verified: valid 9-slide PPTX.
 - Use this deck first. Older decks and generated panels are context unless rebuilding from scripts.
+- Current diagram-first rebuild draft:
+  `docs/project_blueprints/FULL_WORKFLOW_ML_DIAGRAM_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`.
+  It keeps slides 1 and 2 from the Gmail authority deck and uses slide 3 as
+  the full project ML workflow map. Treat the earlier
+  `STABILITY_ML_REMAKE_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`
+  as superseded unless the user asks to revive it.
 
 ### Current Word Authority
 
 - `docs/project_blueprints/North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.docx`
 - Role: current research overview document.
 - Needs next pass after parameter/source logic is made clearer.
+- Diagram companion for the current workflow discussion:
+  `docs/project_blueprints/North_Slope_Gas_Hydrate_Full_ML_Workflow_Diagram_2026-06-15.docx`.
+  This is a public-safe one-map explanation of the current public/OSL,
+  stability, feature, leakage, occurrence, saturation, validation, and export
+  path.
 
 ### Other Word Drafts
 
@@ -120,6 +131,7 @@ Keep these as supporting sources, but do not force the user to read all of them 
 - `docs/ML_SOURCE_COVERAGE_AND_DELIVERABLE_REVISION_PLAN.md`
 - `docs/ML_PARAMETER_TREE_AND_DECK_REVAMP_PLAN.md`
 - `docs/WELL_LOG_REQUIREMENTS_MAP.md`
+- `docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md`
 - `docs/SWEET_SPOT_SOURCE_MATRIX.md`
 
 ## Data Header Inventory
@@ -703,6 +715,11 @@ Remaining questions before the next major build.
 
 - 9 slides: yes, keep exactly 9.
 - Slide 1: yes, latest Gmail deck slide 1 is the intended starting point.
+- Slides 1 and 2: preserve them from the current Gmail deck for the
+  diagram-first slide refresh unless the user explicitly unlocks them.
+- Slide direction after 2026-06-15 user review: the first stability/ML remake
+  is not the active direction; use one full project ML workflow flowchart as
+  the anchor, with slides 4-9 serving as zoom-ins on the same map.
 - Work order: Word first, slides second, website third.
 - Website: skeleton for transfer into DOE/Anaconda, not final public science proof.
 - Real data: no real rows in public repo; headers/screenshots only for now.
