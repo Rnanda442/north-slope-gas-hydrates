@@ -4,10 +4,10 @@ Created: 2026-06-15
 
 ## Purpose
 
-This file records the source language for the new one-map workflow diagram
-requested for the Word document and nine-slide deck refresh. The diagram should
-replace the earlier idea of several separate workflow graphics as the main
-project architecture visual.
+This file records the source language for the V5 workflow-diagram package used
+for the Word document and nine-slide mentor deck. The package has three levels:
+a readable slide-sized overview, a detailed expanded poster, and a focused ML
+runtime detail.
 
 The figure connects:
 
@@ -47,7 +47,7 @@ ML architecture detail image:
 docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/ml_pipeline_network_detail_v5.png
 ```
 
-Diagram-first PowerPoint draft:
+V5 PowerPoint package:
 
 ```text
 docs/project_blueprints/FULL_WORKFLOW_ML_DIAGRAM_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx
@@ -67,6 +67,16 @@ https://docs.google.com/presentation/d/1VjVXmaIckAIl6JptU06NYM8Y7qgfGMF-Xupbd1Jk
 
 REVISED V5 North Slope Gas Hydrate Full ML Workflow Diagram 2026-06-15
 https://docs.google.com/document/d/1w--XY9SobY-kadNby8ABBu-odXVveSm6l9wi_hdcSsw
+```
+
+V5 completion Drive copies:
+
+```text
+V5 COMPLETION Full Workflow ML Diagram 9-Slide North Slope Gas Hydrate Slides 2026-06-15
+https://docs.google.com/presentation/d/1Tz_jpQByug6-RhsDwEKsA3AyPHMZdn8d6vnSS1Ndor0
+
+V5 COMPLETION North Slope Gas Hydrate Full ML Workflow Diagram 2026-06-15
+https://docs.google.com/document/d/17vxNmye93_W0_VEszEwMWCd7oDuCNLJxmADn9pzw6_Y
 ```
 
 Mentor status package around the V5 workflow:
@@ -95,18 +105,18 @@ docs/project_blueprints/build_full_workflow_diagram_deliverables.py
 flowchart LR
     subgraph Sources["Source and schema controls"]
         P1["Public/source inputs<br/>Alaska DNR wells<br/>GGD223 permafrost controls<br/>G10015 temperature profiles<br/>USGS hydrate AUs and phase sources"]
-        P2["Current public status<br/>8,084 public scaffold wells<br/>184 G10015 profiles across 24 codes<br/>22 calculated admissibility intervals<br/>8,054 blocked screen rows"]
+        P2["Current public status<br/>8,084 public scaffold wells<br/>43 GGD223 controls<br/>184 G10015 profiles<br/>3 hydrate AUs<br/>483 temperature-profile matches<br/>22 calculated intervals<br/>8 no-stable rows<br/>8,054 blocked screen rows<br/>about 3/71 approved datasets visible for schema only"]
         Q1["Unit, depth, and QC gates<br/>preserve original headers<br/>normalize depth/units<br/>flag washout, missingness, bad alignments"]
         P1 --> Q1 --> P2
     end
 
     subgraph Features["Stability and physics features"]
-        S1["Stability equations<br/>P_abs = P_surface + rho_w*g*z_m/1e6<br/>T_model(z) = interpolate/extrapolate G10015<br/>stable_candidate = T_model <= T_eq(P_abs, CH4, 5 ppt)"]
+        S1["Stability equations<br/>P_abs = P_surface + rho_w*g*z_m/1e6<br/>T_model(z) = G10015 interpolation/extrapolation<br/>T_eq = f(P_abs, CH4, salinity)<br/>stable_candidate = T_model <= T_eq<br/>baseline = methane 5 ppt"]
         S2["Stability branch<br/>calculated / no interval / blocked<br/>context, mask, confidence, and caveat only"]
         A1["Approved inputs later<br/>LAS / CSV logs<br/>core and NMR<br/>workbook labels<br/>headers, units, mnemonics"]
         SC1["Schema coverage<br/>about 3 of 71 datasets available now<br/>headers/screenshots define expected field families"]
         SC2["Role and unit controls<br/>measured inputs / derived features<br/>QC / calibration / unresolved fields"]
-        F0["Measured log families<br/>GR, RHOB, phi_D, NMRPHI<br/>Rt, Vp, Vs, impedance, caliper"]
+        F0["Measured log families<br/>GR, RHOB, Rt<br/>Vp, Vs, NMRPHI<br/>caliper where available"]
         E1["Derived physics equations<br/>Vsh = (GR-GRclean)/(GRshale-GRclean)<br/>phi_D = (rho_ma-RHOB)/(rho_ma-rho_f)<br/>AI = RHOB*Vp<br/>mu_rho = RHOB*Vs^2<br/>lambda_rho = RHOB*(Vp^2-2*Vs^2)"]
         B1["Baseline/check equations<br/>Sh_NMRD = max(0,(phi_D-phi_NMR)/phi_D)<br/>Archie-style saturation only when inputs are approved"]
         F1["Feature matrix<br/>X_allowed = measured logs + derived physics + QC flags + stability context"]
@@ -174,11 +184,12 @@ boundary band distinguishes public GitHub/Streamlit communication from OSL or
 approved-runtime execution, and the red target-only rail shows that Sgh, Sh,
 NMR SAT, and phase labels are Y-side labels rather than predictors.
 
-The expanded V5 poster keeps the detailed split-node workflow and visual
-mini-panels: source packages and spatial controls, pressure-temperature
-stability checking, depth-aligned log tracks feeding a feature matrix, a
-leakage-safe neural-network-style runtime, and reviewed output plots. Use it
-when the reader needs the full architecture, not as the main slide-scale view.
+The expanded V5 poster is the detailed reference. It carries the public counts,
+approved-OSL boundary, stability equations and caveats, measured/derived/QC and
+context feature families, target-only occurrence and saturation labels, split
+and train-only preprocessing controls, baseline-before-ML logic, validation
+expectations, runtime/public output rules, and mentor decisions. Use it when the
+reader needs the full architecture, not as the main slide-scale view.
 
 The companion ML architecture visual expands the modeling lane into feature/QC
 groups, the X allowed matrix, whole-well split and train-only preprocessing
@@ -214,20 +225,20 @@ presented from random depth-row splits as final evidence.
 
 | Label | Meaning in the diagram |
 |---|---|
-| Complete | Public/OSL boundary, cited methane 5 ppt phase curve, hydrostatic pressure model, temperature-model logic, source-control labels, and guarded writer. |
-| Calculated | Temperature key-depth rows and baseline methane 5 ppt stability-admissibility intervals. |
-| Blocked | Missing source/control coverage, approved logs/core/NMR, target labels, trained model metrics, hydrate proof, saturation outputs, and sweet-spot ranking. |
+| Complete | Public/OSL boundary, cited methane 5 ppt phase curve, hydrostatic pressure model, temperature-model logic, source-control labels, schema/target guardrails, and guarded writer. |
+| Calculated | 8,084 public scaffold wells, 43 GGD223 controls, 184 G10015 profiles, 3 hydrate AUs, 483 temperature-profile matches, 22 baseline methane 5 ppt admissibility intervals, and 8 no-stable rows. |
+| Blocked | 8,054 stability-screen rows plus approved logs/core/NMR, official occurrence/saturation target authority, trained model metrics, hydrate proof, saturation outputs, and sweet-spot ranking. |
 
 Blocked means the workflow is refusing to overclaim without required inputs. It
 does not mean no hydrate.
 
 ## Slide Use
 
-Use the new generated deck as the diagram-first replacement draft. Slides 1 and
-2 are preserved from the current Gmail authority deck. Slide 3 is the readable
-workflow summary; the expanded poster remains a separate detailed reference.
-Slides 4 through 8 are zoom-ins for the same map, and slide 9 summarizes what
-is complete, calculated, blocked, and pending mentor decision.
+Use the generated deck as the active V5 workflow package for mentor review.
+Slides 1 and 2 are preserved from the current Gmail authority deck. Slide 3 is
+the readable workflow summary; the expanded poster remains a separate detailed
+reference. Slides 4 through 8 are zoom-ins for the same map, and slide 9
+summarizes what is complete, calculated, blocked, and pending mentor decision.
 
 ## Word Use
 
@@ -255,3 +266,5 @@ The V5 package should keep these questions visible:
    tiers, or run scenario-only gradients?
 5. ML use of stability: allow the stability screen as context, confidence,
    reason flag, or mask only, never as an occurrence label?
+6. Public website outputs: which diagrams, counts, schema, caveat views, and
+   readiness views are acceptable before approved model validation?

@@ -69,16 +69,15 @@ Only about 3 of the expected 71 datasets are currently available, which is
 enough for schema and architecture design but not final training, performance
 metrics, or hydrate prediction claims.
 
-Latest sync for the other PC: pull `main` through commit `738ff48`
-(`Improve ML workflow architecture diagrams`). The active diagram package is
-now V5 under
+The active workflow-diagram package is now the V5 completion pass under
 `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/`.
 Use `full_project_ml_workflow_flowchart.png` as the readable slide-sized
 workflow summary, `full_project_ml_workflow_flowchart_expanded.png` as the
-detailed poster-scale architecture map, and `ml_pipeline_network_detail_v5.png`
-as the model-runtime detail. The Streamlit site points to these under Analyze
-Hydrates > Schema Coverage & Architecture, and the diagram-first PPTX plus Word
-companion are regenerated from
+detailed poster-scale architecture map with source counts, stability equations,
+feature families, target-only labels, validation, outputs, and caveats, and
+`ml_pipeline_network_detail_v5.png` as the model-runtime detail. The Streamlit
+site points to these under Analyze Hydrates > Schema Coverage & Architecture,
+and the V5 PPTX plus Word companion are regenerated from
 `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`. Do not
 reopen OSL unless a source/product rebuild is actually needed.
 
@@ -649,3 +648,16 @@ blockers, and next activities in the architecture/activity map.
   `REVISED V5 FULL WORKFLOW ML DIAGRAM 9-SLIDE North Slope Gas Hydrate Slides
   2026-06-15` and `REVISED V5 North Slope Gas Hydrate Full ML Workflow Diagram
   2026-06-15`.
+- 2026-06-15: Completed the V5 workflow package pass. The expanded poster now
+  carries the public counts, approved-OSL boundary, stability equations and
+  guardrails, feature/QC/context families, target-only occurrence and saturation
+  labels, split/preprocess/model controls, validation checks, public-safe output
+  rules, and mentor decisions. The PPTX, DOCX, PNG panels, ML runtime detail,
+  and contact sheet were regenerated without adding hydrate-proof, saturation,
+  sweet-spot, or trained-ML claims.
+- 2026-06-15: Imported the V5 completion PPTX and DOCX to the connected Google
+  Drive account as native Google Slides/Docs and verified Drive metadata plus
+  representative slide thumbnails/doc readback:
+  `V5 COMPLETION Full Workflow ML Diagram 9-Slide North Slope Gas Hydrate
+  Slides 2026-06-15` and `V5 COMPLETION North Slope Gas Hydrate Full ML
+  Workflow Diagram 2026-06-15`.

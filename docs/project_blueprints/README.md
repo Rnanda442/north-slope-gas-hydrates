@@ -45,12 +45,14 @@ wireline machine-learning project.
     rows, trained model results, hydrate proof, saturation results, or
     sweet-spot ranking.
 - `North_Slope_Gas_Hydrate_Full_ML_Workflow_Diagram_2026-06-15.docx`
-  - Word companion for the one-map workflow diagram requested after review of
-    the first stability/ML slide remake.
-  - Embeds the full project flowchart and explains the source/schema controls,
-    OSL/approved-runtime build path, stability-admissibility branch, well-log
-    physics equations, leakage barrier, occurrence classification, saturation
-    regression, validation, and reviewed exports.
+  - Word companion for the V5 workflow package requested after review of the
+    first stability/ML slide remake.
+  - Embeds the readable slide overview, the expanded poster reference, and the
+    ML runtime detail while explaining source/schema controls,
+    OSL/approved-runtime inputs, stability-admissibility equations and
+    caveats, feature engineering, target-only labels, occurrence
+    classification, saturation regression, validation, public-safe outputs,
+    and mentor decisions.
   - Public-safe planning artifact only. It does not include approved log/core
     rows, model metrics, hydrate proof, saturation results, or sweet-spot
     ranking.
@@ -59,6 +61,9 @@ wireline machine-learning project.
   - Revised V5 copy with the readable slide-sized summary and simplified ML
     runtime detail was imported to the connected Google Drive account as
     [REVISED V5 North Slope Gas Hydrate Full ML Workflow Diagram 2026-06-15](https://docs.google.com/document/d/1w--XY9SobY-kadNby8ABBu-odXVveSm6l9wi_hdcSsw).
+  - V5 completion copy with the expanded poster and six mentor decisions was
+    imported to the connected Google Drive account as
+    [V5 COMPLETION North Slope Gas Hydrate Full ML Workflow Diagram 2026-06-15](https://docs.google.com/document/d/17vxNmye93_W0_VEszEwMWCd7oDuCNLJxmADn9pzw6_Y).
 - `North_Slope_Gas_Hydrate_Mentor_Status_Package_V5_Workflow_2026-06-15.docx`
   - Short mentor-facing status package built from
     `docs/MENTOR_PROJECT_STATUS_PACKAGE_V5_WORKFLOW_2026-06-15.md`.
@@ -133,24 +138,27 @@ wireline machine-learning project.
   - User review on 2026-06-15 rejected this as the next direction because it did
     not show the whole project in one connected workflow.
 - `FULL_WORKFLOW_ML_DIAGRAM_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`
-  - Diagram-first replacement draft generated after the user asked for one full
-    ML flowchart with all inputs, stability logic, feature engineering,
-    leakage barrier, occurrence classification, saturation regression,
-    validation, and public-safe exports connected.
+  - Active V5 workflow package generated after the user asked for one connected
+    ML workflow with all inputs, stability logic, feature engineering, leakage
+    barrier, occurrence classification, saturation regression, validation, and
+    public-safe exports connected.
   - Current slide 3 uses a readable V5 mentor-scale workflow summary instead
     of a shrunken poster: source/schema controls, stability context, feature
     engineering, leakage-safe ML, reviewed outputs, a public/OSL boundary band,
     and a red target-only rail.
   - The same asset folder also preserves
     `full_project_ml_workflow_flowchart_expanded.png`, the detailed
-    poster-scale V5 architecture map with five lanes, equation cards, visual
-    mini-panels, and separate solid predictor/context arrows versus dashed
-    target-only arrows.
+    poster-scale V5 architecture map with public/source and approved-OSL
+    inputs, current counts, stability equations and guardrails, feature/QC and
+    context families, target-only labels, validation controls, public-safe
+    output rules, mentor decisions, visual mini-panels, and separate solid
+    predictor/context arrows versus dashed target-only arrows.
   - The same builder now also exports `ml_pipeline_network_detail_v5.png`, a
     companion architecture visual showing feature/QC groups, compact log-track
-    and X allowed matrix handoff, whole-well split controls, train-only
-    preprocessing, a simplified candidate model, two output heads, validation,
-    reviewed outputs, and the target-only rail.
+    and X allowed matrix handoff, whole-well/compartment/geographic split
+    controls, train-only preprocessing, a baseline gate, a simplified candidate
+    model, occurrence and saturation heads, validation against approved labels
+    only, reviewed outputs, and the target-only rail.
   - Slides 1 and 2 are preserved exactly from the current Gmail authority deck.
     Slide 3 is the readable workflow summary. Slides 4-9 zoom into
     inputs/boundary, stability, feature engineering, leakage/modeling,
@@ -166,6 +174,8 @@ wireline machine-learning project.
   - Revised V5 copy with the readable slide 3 workflow summary was imported
     to the connected Google Drive account as
     [REVISED V5 FULL WORKFLOW ML DIAGRAM 9-SLIDE North Slope Gas Hydrate Slides 2026-06-15](https://docs.google.com/presentation/d/1VjVXmaIckAIl6JptU06NYM8Y7qgfGMF-Xupbd1JkwK0).
+  - V5 completion copy was imported to the connected Google Drive account as
+    [V5 COMPLETION Full Workflow ML Diagram 9-Slide North Slope Gas Hydrate Slides 2026-06-15](https://docs.google.com/presentation/d/1Tz_jpQByug6-RhsDwEKsA3AyPHMZdn8d6vnSS1Ndor0).
 - `build_ml_revamp_powerpoint.py`
   - Reproducible builder for the current 9-slide visual-first ML parameter
     architecture PowerPoint.
