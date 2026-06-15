@@ -34,6 +34,12 @@ Main flowchart image:
 docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/full_project_ml_workflow_flowchart.png
 ```
 
+Expanded static flowchart image for website review and mentor discussion:
+
+```text
+docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/full_project_ml_workflow_flowchart_expanded.png
+```
+
 Diagram-first PowerPoint draft:
 
 ```text
@@ -63,23 +69,34 @@ docs/project_blueprints/build_full_workflow_diagram_deliverables.py
 
 ```mermaid
 flowchart LR
-    subgraph Public["Public GitHub / Streamlit / Word / Slides"]
+    subgraph Sources["Source and schema controls"]
         P1["Public/source inputs<br/>Alaska DNR wells<br/>GGD223 permafrost controls<br/>G10015 temperature profiles<br/>USGS hydrate AUs and phase sources"]
         P2["Current public status<br/>8,084 public scaffold wells<br/>184 G10015 profiles across 24 codes<br/>22 calculated admissibility intervals<br/>8,054 blocked screen rows"]
-        P3["Public communication<br/>source-backed diagrams<br/>public-safe status products<br/>caveats and mentor questions"]
-        P1 --> P2 --> P3
+        Q1["Unit, depth, and QC gates<br/>preserve original headers<br/>normalize depth/units<br/>flag washout, missingness, bad alignments"]
+        P1 --> Q1 --> P2
     end
 
-    subgraph OSL["OpenScienceLab / approved runtime"]
-        S1["Stability inputs<br/>depth basis<br/>hydrostatic pressure<br/>temperature model<br/>methane 5 ppt phase curve"]
-        S2["Stability branch<br/>T_model <= T_eq(P_abs)<br/>calculated / no interval / blocked<br/>admissibility only"]
+    subgraph Features["Stability and physics features"]
+        S1["Stability equations<br/>P_abs = P_surface + rho_w*g*z_m/1e6<br/>T_model(z) = interpolate/extrapolate G10015<br/>stable_candidate = T_model <= T_eq(P_abs, CH4, 5 ppt)"]
+        S2["Stability branch<br/>calculated / no interval / blocked<br/>context, mask, confidence, and caveat only"]
         A1["Approved inputs later<br/>LAS / CSV logs<br/>core and NMR<br/>workbook labels<br/>headers, units, mnemonics"]
         SC1["Schema coverage<br/>about 3 of 71 datasets available now<br/>headers/screenshots define expected field families"]
         SC2["Role and unit controls<br/>measured inputs / derived features<br/>QC / calibration / unresolved fields"]
+        F0["Measured log families<br/>GR, RHOB, phi_D, NMRPHI<br/>Rt, Vp, Vs, impedance, caliper"]
+        E1["Derived physics equations<br/>Vsh = (GR-GRclean)/(GRshale-GRclean)<br/>phi_D = (rho_ma-RHOB)/(rho_ma-rho_f)<br/>AI = RHOB*Vp<br/>mu_rho = RHOB*Vs^2<br/>lambda_rho = RHOB*(Vp^2-2*Vs^2)"]
+        B1["Baseline/check equations<br/>Sh_NMRD = max(0,(phi_D-phi_NMR)/phi_D)<br/>Archie-style saturation only when inputs are approved"]
+        F1["Feature matrix<br/>X_allowed = measured logs + derived physics + QC flags + stability context"]
+    end
+
+    subgraph Runtime["Leakage-safe ML runtime"]
         T1["Target-only saturation and phase fields<br/>Sgh, S_h, Sh, NMR_SAT<br/>Hydrate Saturation, Swr, S_wr, phase labels"]
         L1["Target registry and leakage barrier<br/>target-only fields bypass feature matrix"]
-        F1["Feature matrix<br/>unit-normalized measured logs<br/>valid derived elastic features<br/>optional stability/context features only"]
+        V1["Whole-well or compartment split<br/>split before preprocessing, selection, tuning, or calibration"]
+        V2["Train-only preprocessing<br/>imputation, scaling, feature selection, and thresholds fit on training wells only"]
         M1["Modeling path<br/>complete-well or compartment split<br/>train-only preprocessing<br/>physics/simple baselines<br/>tree or ANN after controls pass"]
+    end
+
+    subgraph Outputs["Validation and reviewed outputs"]
         C1["Occurrence classifier<br/>probability and calibration"]
         R1["Saturation regressor<br/>S_h estimate and residual review"]
         O1["Validated outputs<br/>probability, saturation, uncertainty<br/>QC, mimic, and reason flags<br/>plots, tables, GIS links, manuscript exports"]
@@ -90,28 +107,41 @@ flowchart LR
     S2 --> F1
     A1 --> SC1
     SC1 --> SC2
+    SC2 --> F0
+    F0 --> E1
+    E1 --> B1
+    B1 --> F1
     SC2 --> L1
     SC2 --> T1
     L1 --> F1
     T1 -. labels and validation overlays only .-> M1
     T1 -. validation overlays only .-> O1
-    F1 --> M1
+    F1 --> V1
+    V1 --> V2
+    V2 --> M1
     M1 --> C1
     M1 --> R1
     C1 --> O1
     R1 --> O1
-    O1 -. reviewed public-safe summaries only .-> P3
 ```
 
 ## How To Explain The Diagram
 
-The left side is the public delivery surface. It can show public sources,
-public stability summaries, diagrams, Streamlit views, Word text, and slide
-graphics.
+The left side is now source and schema control rather than a public
+communication box. It shows the public-source scaffold, the current status
+counts, and the unit/depth/QC gates that decide whether a row is usable,
+blocked, or still only context.
 
 The center and right side are the OSL and approved-runtime build path. That is
 where raw source rebuilds, approved LAS/CSV/core/NMR inputs, target mapping,
 model training, validation, and runtime outputs belong.
+
+The equation layer is explicit: hydrostatic absolute pressure, G10015
+temperature interpolation/extrapolation, methane 5 ppt phase-boundary lookup,
+lithology/reservoir equations, density porosity, velocity conversion,
+acoustic impedance, lambda-rho, mu-rho, NMR-density separation, and any
+Archie-style saturation baseline are feature or check producers. They do not
+create proof by themselves.
 
 The stability branch feeds the ML workflow as context, a mask, a confidence
 label, or a reason flag. It is not a hydrate occurrence label and not a

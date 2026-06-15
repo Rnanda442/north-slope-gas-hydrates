@@ -47,10 +47,10 @@ wireline machine-learning project.
 - `North_Slope_Gas_Hydrate_Full_ML_Workflow_Diagram_2026-06-15.docx`
   - Word companion for the one-map workflow diagram requested after review of
     the first stability/ML slide remake.
-  - Embeds the full project flowchart and explains the public delivery lane,
-    OSL/approved-runtime build path, stability-admissibility branch, feature
-    engineering, leakage barrier, occurrence classification, saturation
-    regression, validation, and public-safe exports.
+  - Embeds the full project flowchart and explains the source/schema controls,
+    OSL/approved-runtime build path, stability-admissibility branch, well-log
+    physics equations, leakage barrier, occurrence classification, saturation
+    regression, validation, and reviewed exports.
   - Public-safe planning artifact only. It does not include approved log/core
     rows, model metrics, hydrate proof, saturation results, or sweet-spot
     ranking.

@@ -128,6 +128,7 @@ FULL_WORKFLOW_ASSET_DIR = (
     / "full_workflow_diagram_2026_06_15"
 )
 FULL_WORKFLOW_FLOWCHART = FULL_WORKFLOW_ASSET_DIR / "full_project_ml_workflow_flowchart.png"
+FULL_WORKFLOW_EXPANDED_FLOWCHART = FULL_WORKFLOW_ASSET_DIR / "full_project_ml_workflow_flowchart_expanded.png"
 FULL_WORKFLOW_CONTACT_SHEET = FULL_WORKFLOW_ASSET_DIR / "full_workflow_deck_contact_sheet.png"
 FULL_WORKFLOW_DECK = (
     PROJECT_ROOT
@@ -4314,21 +4315,26 @@ def render_full_workflow_map_panel() -> None:
         )
 
     with st.expander("Static export preview and downloads", expanded=False):
-        if FULL_WORKFLOW_FLOWCHART.exists():
+        workflow_preview_path = (
+            FULL_WORKFLOW_EXPANDED_FLOWCHART
+            if FULL_WORKFLOW_EXPANDED_FLOWCHART.exists()
+            else FULL_WORKFLOW_FLOWCHART
+        )
+        if workflow_preview_path.exists():
             st.markdown(
                 (
-                    f'<img src="{png_data_uri(FULL_WORKFLOW_FLOWCHART)}" '
+                    f'<img src="{png_data_uri(workflow_preview_path)}" '
                     'alt="Full ML workflow map" '
                     'style="width: 100%; height: auto; border: 1px solid #c7d2da; border-radius: 8px;" />'
                 ),
                 unsafe_allow_html=True,
             )
             st.caption(
-                f"{project_relative_or_absolute(FULL_WORKFLOW_FLOWCHART)} | "
+                f"{project_relative_or_absolute(workflow_preview_path)} | "
                 "workflow/status guide only, not hydrate proof or trained-model output"
             )
         else:
-            st.info(f"Workflow map not found yet: {project_relative_or_absolute(FULL_WORKFLOW_FLOWCHART)}")
+            st.info(f"Workflow map not found yet: {project_relative_or_absolute(workflow_preview_path)}")
 
     cols = st.columns(4)
     cols[0].metric("Public scaffold wells", "8,084")
@@ -4344,8 +4350,10 @@ def render_full_workflow_map_panel() -> None:
 
     download_specs = [
         (
-            "Download workflow PNG",
-            FULL_WORKFLOW_FLOWCHART,
+            "Download expanded workflow PNG",
+            FULL_WORKFLOW_EXPANDED_FLOWCHART
+            if FULL_WORKFLOW_EXPANDED_FLOWCHART.exists()
+            else FULL_WORKFLOW_FLOWCHART,
             "image/png",
             "download_full_workflow_png",
         ),

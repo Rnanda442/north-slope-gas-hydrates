@@ -19,9 +19,11 @@ ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "full_workflow_diagram_2026_
 SOURCE_DECK = BLUEPRINT_DIR / "CURRENT_GMAIL_VISUAL_REVISION_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-11.pptx"
 OUT_DECK = BLUEPRINT_DIR / "FULL_WORKFLOW_ML_DIAGRAM_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx"
 OUT_DOCX = BLUEPRINT_DIR / "North_Slope_Gas_Hydrate_Full_ML_Workflow_Diagram_2026-06-15.docx"
+OUT_CONTACT_SHEET = ASSET_DIR / "full_workflow_deck_contact_sheet.png"
 PUBLIC_PRODUCTS = ROOT / "data" / "public_stability_products"
 
 W, H = 1600, 900
+EXPANDED_W, EXPANDED_H = 3000, 1688
 NAVY = (11, 35, 48)
 DEEP = (5, 19, 27)
 TEAL = (18, 124, 139)
@@ -245,194 +247,379 @@ def save(img: Image.Image, name: str) -> Path:
 
 def full_workflow_panel() -> Path:
     values = summaries()
-    img = canvas(False)
+    img = Image.new("RGB", (EXPANDED_W, EXPANDED_H), WHITE)
     draw = ImageDraw.Draw(img)
-    title(
+    draw.rectangle((0, 0, 30, EXPANDED_H), fill=TEAL)
+    draw.rectangle((0, 0, EXPANDED_W, 150), fill=(246, 251, 252))
+    draw.line((70, 150, EXPANDED_W - 70, 150), fill=LINE, width=3)
+    text(draw, (78, 42), "Equation-Driven North Slope Gas Hydrate ML Workflow", 46, NAVY, True)
+    text(
         draw,
-        "Full ML Workflow: Inputs, Stability, Features, Models, Outputs",
-        "One map connects the public scaffold, OSL workbench, stability-admissibility screen, and later approved-data occurrence plus saturation ML.",
+        (80, 98),
+        "Expanded roadmap from source headers and stability constraints to leakage-safe occurrence classification, saturation regression, validation, and review exports.",
+        22,
+        MUTED,
+        width=2450,
     )
 
-    # Background zones.
-    card(draw, (52, 122, 386, 722), fill=(238, 249, 250), outline=TEAL, radius=24, width=2)
-    card(draw, (410, 122, 1548, 722), fill=(248, 251, 251), outline=LINE, radius=24, width=2)
-    draw.line((398, 135, 398, 708), fill=RED, width=4)
-    text(draw, (72, 138), "Public delivery surface", 19, TEAL, True)
-    text(draw, (428, 138), "OpenScienceLab / approved-runtime build path", 19, GREEN, True)
-    pill(draw, (310, 740, 486, 770), "data boundary", RED_LIGHT, RED)
-    text(draw, (505, 742), "Only reviewed public-safe summaries, diagrams, and derived status products move back to GitHub/Streamlit/Word/slides.", 14, MUTED, width=870)
+    def big_pill(box: tuple[int, int, int, int], label: str, fill, accent) -> None:
+        card(draw, box, fill=fill, outline=accent, radius=20, width=2)
+        f = font(19, True)
+        x = box[0] + (box[2] - box[0]) // 2 - int(draw.textlength(label, font=f) // 2)
+        draw.text((x, box[1] + 11), label, font=f, fill=accent)
 
-    node(
-        draw,
-        (72, 170, 366, 328),
-        "Public/source inputs",
+    def section(box: tuple[int, int, int, int], label: str, accent) -> None:
+        card(draw, box, fill=(249, 252, 252), outline=(214, 230, 234), radius=28, width=2)
+        draw.rectangle((box[0] + 22, box[1] + 25, box[0] + 33, box[1] + 62), fill=accent)
+        text(draw, (box[0] + 50, box[1] + 24), label, 24, accent, True)
+
+    def detailed_node(
+        box: tuple[int, int, int, int],
+        heading: str,
+        rows: list[str],
+        fill,
+        accent,
+        tag: str | None = None,
+        size: int = 21,
+    ) -> None:
+        card(draw, box, fill=fill, outline=accent, radius=22, width=3)
+        draw.rounded_rectangle((box[0], box[1], box[0] + 14, box[3]), radius=12, fill=accent)
+        y = text(draw, (box[0] + 34, box[1] + 22), heading, 24, accent, True, width=box[2] - box[0] - 60)
+        y += 6
+        for row in rows:
+            draw.ellipse((box[0] + 36, y + 8, box[0] + 47, y + 19), fill=accent)
+            y = text(draw, (box[0] + 58, y), row, size, NAVY, width=box[2] - box[0] - 85, gap=8)
+        if tag:
+            big_pill((box[0] + 34, box[3] - 50, box[2] - 34, box[3] - 12), tag, WHITE, accent)
+
+    def formula_box(
+        box: tuple[int, int, int, int],
+        heading: str,
+        formulas: list[str],
+        note: str,
+        accent,
+    ) -> None:
+        card(draw, box, fill=WHITE, outline=accent, radius=18, width=2)
+        text(draw, (box[0] + 22, box[1] + 16), heading, 22, accent, True, width=box[2] - box[0] - 44)
+        y = box[1] + 55
+        for formula in formulas:
+            card(draw, (box[0] + 22, y, box[2] - 22, y + 43), fill=(247, 251, 252), outline=(224, 235, 238), radius=9, width=1)
+            text(draw, (box[0] + 38, y + 10), formula, 19, NAVY, True, width=box[2] - box[0] - 76, gap=3)
+            y += 51
+        text(draw, (box[0] + 24, y + 2), note, 17, MUTED, width=box[2] - box[0] - 48, gap=5)
+
+    def arrow_big(
+        start: tuple[int, int],
+        end: tuple[int, int],
+        fill=TEAL,
+        width: int = 5,
+        label: str | None = None,
+        label_offset: tuple[int, int] = (0, 0),
+    ) -> None:
+        draw.line((start, end), fill=fill, width=width)
+        angle = math.atan2(end[1] - start[1], end[0] - start[0])
+        length = 22
+        points = [
+            end,
+            (int(end[0] - length * math.cos(angle - 0.45)), int(end[1] - length * math.sin(angle - 0.45))),
+            (int(end[0] - length * math.cos(angle + 0.45)), int(end[1] - length * math.sin(angle + 0.45))),
+        ]
+        draw.polygon(points, fill=fill)
+        if label:
+            mx = (start[0] + end[0]) // 2 + label_offset[0]
+            my = (start[1] + end[1]) // 2 + label_offset[1]
+            f = font(18, True)
+            pad = 11
+            w = int(draw.textlength(label, font=f)) + pad * 2
+            card(draw, (mx - w // 2, my - 20, mx + w // 2, my + 19), fill=WHITE, outline=fill, radius=12, width=2)
+            draw.text((mx - w // 2 + pad, my - 12), label, font=f, fill=fill)
+
+    def dashed_arrow(
+        start: tuple[int, int],
+        end: tuple[int, int],
+        fill=RED,
+        width: int = 5,
+        label: str | None = None,
+        label_offset: tuple[int, int] = (0, 0),
+    ) -> None:
+        x1, y1 = start
+        x2, y2 = end
+        dx, dy = x2 - x1, y2 - y1
+        length = math.hypot(dx, dy)
+        if length == 0:
+            return
+        ux, uy = dx / length, dy / length
+        dash, gap = 24, 14
+        distance = 0.0
+        while distance < length - 28:
+            sx = int(x1 + ux * distance)
+            sy = int(y1 + uy * distance)
+            ex = int(x1 + ux * min(distance + dash, length - 28))
+            ey = int(y1 + uy * min(distance + dash, length - 28))
+            draw.line((sx, sy, ex, ey), fill=fill, width=width)
+            distance += dash + gap
+        arrow_big((int(x1 + ux * max(length - 42, 0)), int(y1 + uy * max(length - 42, 0))), end, fill, width, label, label_offset)
+
+    # Main section backgrounds.
+    section((70, 178, 710, 1500), "1. Source and schema controls", TEAL)
+    section((750, 178, 1515, 1500), "2. Stability and physics features", BLUE)
+    section((1555, 178, 2165, 1500), "3. Leakage-safe ML runtime", PURPLE)
+    section((2205, 178, 2930, 1500), "4. Validation and reviewed outputs", GREEN)
+
+    detailed_node(
+        (105, 245, 680, 455),
+        "Source intake",
         [
-            "Alaska DNR wells and public depths",
-            "GGD223 permafrost controls",
-            "G10015 temperature profiles",
-            "USGS hydrate AUs and phase sources",
+            "Public scaffold: DNR wells, GGD223 controls, G10015 temperature profiles, USGS hydrate AUs.",
+            "Approved runtime later: LAS/CSV logs, core, NMR, workbook labels.",
+            "Keep original headers, units, well names, depth basis, and provenance before aliasing.",
         ],
         ICE_LIGHT,
         TEAL,
+        "schema before modeling",
+        size=18,
     )
-    node(
-        draw,
-        (72, 356, 366, 530),
-        "Current public status",
+    detailed_node(
+        (105, 500, 680, 730),
+        "Unit, depth, and QC gates",
         [
-            f"{values['wells']} public scaffold wells",
-            f"{values['profiles']} G10015 profiles / {values['codes']} codes",
-            f"{values['screen_calculated']} calculated admissibility intervals",
-            f"{values['screen_blocked']} blocked screen rows",
+            "DEPTH/DEPT/True Depth -> one depth axis with original values retained.",
+            "RHOB, GR, Rt, Vp, Vs, NMRPHI, phi_D, caliper and missingness flags.",
+            "Bad-hole, outlier, unit, and alignment failures are flagged before features.",
         ],
         WHITE,
-        BLUE,
-        "not hydrate proof",
+        GREEN,
+        "fail closed",
+        size=18,
     )
-    node(
-        draw,
-        (72, 560, 366, 692),
-        "Public communication",
+    detailed_node(
+        (105, 775, 680, 1010),
+        "Current data reality",
         [
-            "GitHub and Streamlit",
-            "Word document and slide deck",
-            "source-backed diagrams and caveats",
-        ],
-        WHITE,
-        TEAL,
-    )
-
-    node(
-        draw,
-        (432, 170, 728, 328),
-        "Stability inputs",
-        [
-            "depth basis -> hydrostatic pressure",
-            "G10015/GGD223 temperature model",
-            "100% methane + 5 ppt phase curve",
-            "source-control confidence",
-        ],
-        ICE_LIGHT,
-        BLUE,
-    )
-    node(
-        draw,
-        (772, 170, 1068, 328),
-        "Stability branch",
-        [
-            "T_model <= T_eq(P_abs)",
-            "top/base/thickness only when gates pass",
-            "blocked when source coverage is insufficient",
+            f"{values['wells']} public scaffold wells; {values['profiles']} G10015 profiles across {values['codes']} codes.",
+            f"{values['temp_calculated']} calculated and {values['temp_extrapolated']} extrapolated temperature key depths.",
+            f"{values['screen_calculated']} baseline stability-admissibility intervals; {values['screen_blocked']} blocked screen rows.",
         ],
         BLUE_LIGHT,
         BLUE,
-        "admissibility only",
+        "screening context only",
+        size=19,
     )
-    node(
-        draw,
-        (432, 366, 728, 524),
-        "Approved inputs later",
+    detailed_node(
+        (105, 1055, 680, 1425),
+        "Guardrails that shape the ML design",
         [
-            "LAS / CSV well logs",
-            "core, NMR, workbook labels",
-            "original headers, units, mnemonics",
-            "approved environment only",
-        ],
-        GREEN_LIGHT,
-        GREEN,
-    )
-    node(
-        draw,
-        (772, 366, 1068, 524),
-        "Preprocess and features",
-        [
-            "unit normalization and depth alignment",
-            "caliper/QC/missingness review",
-            "GR, RHOB, phi, Rt, Vp, Vs",
-            "AI, Vp/Vs, G, K, lambda-rho, mu-rho",
-        ],
-        WHITE,
-        GREEN,
-    )
-    node(
-        draw,
-        (772, 558, 1068, 692),
-        "Leakage barrier",
-        [
-            "S_h / Sgh / NMR_SAT / phase labels",
-            "target, calibration, or validation only",
-            "excluded from predictor features",
+            "No public diagram is hydrate proof, final stability, saturation, model accuracy, or sweet-spot ranking.",
+            "Stability becomes an admissibility/context field, confidence label, mask, or caveat.",
+            "Target-like columns such as Sgh, S_h, Sh, NMR_SAT, Hydrate Saturation, Swr, and phase labels cannot become predictors.",
+            "Final validation must hold out whole wells or compartments, not random neighboring depth rows.",
         ],
         RED_LIGHT,
         RED,
+        "prevents overclaiming",
+        size=18,
     )
-    node(
-        draw,
-        (1112, 260, 1330, 470),
-        "Modeling path",
+
+    formula_box(
+        (790, 245, 1475, 590),
+        "Pressure-temperature stability branch",
         [
-            "complete-well or compartment split",
-            "train-only preprocessing",
-            "physics and simple baselines",
-            "tree / ANN after controls pass",
+            "P_abs(MPa) = P_surface + (rho_w * g * z_m) / 1,000,000",
+            "T_model(z) = interp(profile); extrapolate only inside guardrail",
+            "stable_candidate = T_model(z) <= T_eq(P_abs, CH4, 5 ppt)",
+        ],
+        "Top/base/thickness are written only when depth, pressure, temperature, phase-curve range, AU context, and source-control gates pass.",
+        BLUE,
+    )
+    detailed_node(
+        (790, 640, 1115, 900),
+        "Measured log families",
+        [
+            "Lithology/reservoir: GR, RHOB, phi_D, NMRPHI.",
+            "Fluids/hydrate response: Rt and resistivity family.",
+            "Mechanical/elastic response: Vp, Vs, impedance, Vp/Vs.",
+            "QC context: caliper, washout, missingness, depth mismatch.",
+        ],
+        WHITE,
+        TEAL,
+        size=18,
+    )
+    formula_box(
+        (1150, 640, 1475, 900),
+        "Derived physics features",
+        [
+            "Vsh = (GR - GR_clean) / (GR_shale - GR_clean)",
+            "phi_D = (rho_ma - RHOB) / (rho_ma - rho_f)",
+            "Vp = 304.8 / DT;  Vs = 304.8 / DTS",
+            "AI = RHOB * Vp",
+        ],
+        "Use only after units and curve meanings are confirmed.",
+        GREEN,
+    )
+    formula_box(
+        (790, 955, 1475, 1188),
+        "Elastic and saturation baseline checks",
+        [
+            "mu_rho = RHOB * Vs^2",
+            "lambda_rho = RHOB * (Vp^2 - 2 * Vs^2)",
+            "Sh_NMRD = max(0, (phi_D - phi_NMR) / phi_D)",
+        ],
+        "Archie/NMR-density saturation estimates are baselines or validation checks unless the mentor approves a target definition.",
+        AMBER,
+    )
+    detailed_node(
+        (790, 1232, 1475, 1425),
+        "Feature matrix contract",
+        [
+            "X_allowed = measured logs + derived physics + QC flags + stability context.",
+            "Every feature row keeps source, unit, depth, QC, confidence, and role metadata.",
+            "Rows blocked by source controls remain blank rather than silently inferred.",
+        ],
+        GREEN_LIGHT,
+        GREEN,
+        "predictors only",
+        size=18,
+    )
+
+    detailed_node(
+        (1590, 245, 2130, 455),
+        "Target registry",
+        [
+            "Y_occurrence: interval/phase/core-supported hydrate class when approved.",
+            "Y_saturation: Sgh / S_h / Sh / NMR_SAT / Hydrate Saturation after source mapping.",
+            "Targets can supervise, calibrate, or validate. They do not enter X_allowed.",
+        ],
+        RED_LIGHT,
+        RED,
+        "labels only",
+        size=18,
+    )
+    detailed_node(
+        (1590, 500, 2130, 735),
+        "Whole-well split first",
+        [
+            "Partition by well, field, or compartment before imputation, scaling, selection, or tuning.",
+            "Debugging row splits can exist, but final claims need unseen wells/compartments.",
+            "Keep train/validation/test provenance in every exported row.",
+        ],
+        ICE_LIGHT,
+        BLUE,
+        "no depth-neighbor leakage",
+        size=18,
+    )
+    detailed_node(
+        (1590, 780, 2130, 1025),
+        "Train-only preprocessing",
+        [
+            "Fit imputation, min-max/standard scaling, feature selection, PCA, and thresholds on training wells only.",
+            "Apply frozen transforms to validation, locked test, and prediction wells.",
+            "Start with simple baselines before tree/ANN/Keras candidates.",
         ],
         PURPLE_LIGHT,
         PURPLE,
+        "reproducible runtime",
+        size=18,
     )
-    node(
-        draw,
-        (1360, 190, 1530, 326),
-        "Occurrence",
-        ["classifier", "probability", "calibration"],
-        BLUE_LIGHT,
+    formula_box(
+        (1590, 1070, 2130, 1425),
+        "Model heads and learning targets",
+        [
+            "X_allowed -> P(hydrate occurrence)",
+            "X_allowed -> Sh_pred",
+            "loss = classifier_loss + regressor_loss + calibration review",
+            "candidate models = baseline, tree/boosting, ANN/Keras",
+        ],
+        "Occurrence and saturation stay linked scientifically, but they are evaluated as separate outputs with separate residual/error review.",
+        PURPLE,
+    )
+
+    formula_box(
+        (2240, 245, 2895, 455),
+        "Occurrence classifier output",
+        [
+            "P_hydrate(z) = model_occurrence(X_allowed)",
+            "class = calibrated threshold(P_hydrate)",
+        ],
+        "Report probability, calibration, confusion matrix, false-positive review, mimic flags, and confidence.",
         BLUE,
     )
-    node(
-        draw,
-        (1360, 362, 1530, 498),
-        "Saturation",
-        ["regressor", "S_h estimate", "residual review"],
-        GREEN_LIGHT,
+    formula_box(
+        (2240, 500, 2895, 735),
+        "Saturation regression output",
+        [
+            "Sh_pred(z) = model_saturation(X_allowed)",
+            "residual = Sh_target - Sh_pred",
+        ],
+        "Compare against approved NMR/core/interpreted saturation targets by well, depth, reservoir, and QC state.",
         GREEN,
     )
-    node(
-        draw,
-        (1112, 558, 1530, 692),
-        "Validated outputs",
+    detailed_node(
+        (2240, 780, 2895, 1088),
+        "Validation and error review",
         [
-            "probability, saturation, uncertainty",
-            "QC status, mimic flags, reason flags",
-            "tables, plots, GIS links, manuscript exports after review",
+            "Held-out wells/compartments: accuracy, recall/precision, calibration, R2/RMSE/MAE where valid.",
+            "Residual review by depth, lithology, permafrost/stability context, caliper, missing curves, and source confidence.",
+            "Mimic checks: shale, ice, cementation, gas, washout, tool response, pressure-temperature assumption.",
+            "Document where the model is out-of-domain rather than forcing a prediction.",
         ],
         AMBER_LIGHT,
         AMBER,
+        size=18,
+    )
+    detailed_node(
+        (2240, 1135, 2895, 1425),
+        "Reviewed export package",
+        [
+            "Per-depth outputs: P_hydrate, Sh_pred, uncertainty, QC, mimic, reason flags.",
+            "Per-well summaries: interval candidates, source confidence, validation status, blocked reasons.",
+            "Maps/plots/tables become public-safe only after review removes restricted rows and unsupported claims.",
+        ],
+        GREEN_LIGHT,
+        GREEN,
         "future approved-data result",
+        size=18,
     )
 
     # Flow arrows.
-    arrow(draw, (366, 245), (432, 245), TEAL, label="source context")
-    arrow(draw, (728, 245), (772, 245), BLUE)
-    arrow(draw, (1068, 252), (1112, 342), BLUE, label="context feature", label_offset=(-20, -18))
-    arrow(draw, (366, 442), (432, 442), GREEN, label="OSL rebuild")
-    arrow(draw, (218, 530), (218, 560), TEAL, width=3)
-    arrow(draw, (728, 442), (772, 442), GREEN)
-    arrow(draw, (920, 524), (920, 558), GREEN)
-    arrow(draw, (1068, 625), (1112, 400), RED, label="features only")
-    arrow(draw, (1330, 342), (1360, 258), PURPLE)
-    arrow(draw, (1330, 400), (1360, 430), PURPLE)
-    arrow(draw, (1445, 326), (1265, 558), BLUE)
-    arrow(draw, (1445, 498), (1315, 558), GREEN)
+    arrow_big((680, 350), (790, 350), TEAL, label="source rows")
+    arrow_big((680, 615), (790, 770), GREEN, label="validated inputs", label_offset=(-10, -20))
+    arrow_big((680, 890), (790, 1328), BLUE, label="current context", label_offset=(-20, -26))
+    arrow_big((1115, 770), (1150, 770), TEAL)
+    arrow_big((1132, 900), (1132, 955), GREEN, label="derive", label_offset=(66, 0))
+    arrow_big((1132, 1188), (1132, 1232), GREEN)
+    arrow_big((1475, 1328), (1590, 616), GREEN, label="X_allowed", label_offset=(16, -130))
+    dashed_arrow((1800, 455), (1800, 500), RED, label="target map")
+    dashed_arrow((1590, 350), (1475, 1328), RED, label="bypass feature matrix", label_offset=(-120, 175))
+    arrow_big((1860, 735), (1860, 780), PURPLE)
+    arrow_big((1860, 1025), (1860, 1070), PURPLE)
+    arrow_big((2130, 1238), (2240, 350), PURPLE, label="classification head", label_offset=(68, -190))
+    arrow_big((2130, 1298), (2240, 615), PURPLE, label="regression head", label_offset=(60, 80))
+    arrow_big((2565, 455), (2565, 500), BLUE)
+    arrow_big((2565, 735), (2565, 780), GREEN)
+    arrow_big((2565, 1088), (2565, 1135), AMBER)
 
-    # Status and legend strip.
-    card(draw, (72, 786, 1530, 836), fill=LIGHT, outline=LINE, radius=16)
-    pill(draw, (94, 798, 204, 826), "complete", GREEN_LIGHT, GREEN)
-    text(draw, (218, 801), "boundary, phase curve, pressure model, temperature logic, guarded writer", 13, NAVY, width=450)
-    pill(draw, (690, 798, 808, 826), "calculated", BLUE_LIGHT, BLUE)
-    text(draw, (822, 801), f"{values['temp_calculated']} temp key depths; {values['screen_calculated']} baseline admissibility intervals", 13, NAVY, width=370)
-    pill(draw, (1225, 798, 1324, 826), "blocked", RED_LIGHT, RED)
-    text(draw, (1338, 801), "approved ML outputs, proof, saturation, and sweet spots", 13, NAVY, width=175)
-    footer(draw, "Guardrail: stability is necessary but not sufficient; occurrence and saturation wait for approved labels, core/NMR calibration, and grouped validation.")
-    return save(img, "full_project_ml_workflow_flowchart.png")
+    # Status strip.
+    card(draw, (70, 1520, 2930, 1626), fill=(245, 249, 250), outline=LINE, radius=22, width=2)
+    big_pill((105, 1545, 270, 1595), "complete", GREEN_LIGHT, GREEN)
+    text(draw, (295, 1543), "source boundary, 5 ppt methane phase lookup, hydrostatic pressure, temperature model, schema roles, leakage guardrails", 19, NAVY, width=820)
+    big_pill((1160, 1545, 1345, 1595), "calculated", BLUE_LIGHT, BLUE)
+    text(draw, (1372, 1543), f"{values['temp_calculated']} temp key depths; {values['screen_calculated']} baseline admissibility intervals; {values['screen_no_interval']} no-interval rows", 19, NAVY, width=640)
+    big_pill((2140, 1545, 2295, 1595), "future", AMBER_LIGHT, AMBER)
+    text(draw, (2322, 1543), "approved logs/core/NMR execution, trained models, saturation predictions, final proof, and sweet-spot ranking", 19, NAVY, width=560)
+    text(
+        draw,
+        (80, 1640),
+        "Guardrail: stability is necessary but not sufficient. The ML pipeline predicts occurrence and saturation only after approved labels, leakage-safe preprocessing, and held-out-well validation.",
+        17,
+        MUTED,
+        width=2800,
+    )
+
+    ASSET_DIR.mkdir(parents=True, exist_ok=True)
+    expanded_path = ASSET_DIR / "full_project_ml_workflow_flowchart_expanded.png"
+    img.save(expanded_path, quality=94)
+    slide_img = img.resize((W, H), Image.Resampling.LANCZOS)
+    return save(slide_img, "full_project_ml_workflow_flowchart.png")
 
 
 def overview_slide_panel() -> Path:
@@ -693,6 +880,30 @@ def verify_deck(path: Path) -> None:
             raise ValueError(f"Slide {idx} no longer matches the locked source panel")
 
 
+def build_contact_sheet(panel_paths: list[Path]) -> Path:
+    thumb_w, thumb_h = 480, 270
+    margin = 34
+    label_h = 34
+    gap = 26
+    sheet_w = margin * 2 + thumb_w * 3 + gap * 2
+    sheet_h = margin * 2 + (thumb_h + label_h) * 3 + gap * 2
+    img = Image.new("RGB", (sheet_w, sheet_h), WHITE)
+    draw = ImageDraw.Draw(img)
+    for idx, path in enumerate(panel_paths, start=1):
+        row = (idx - 1) // 3
+        col = (idx - 1) % 3
+        x = margin + col * (thumb_w + gap)
+        y = margin + row * (thumb_h + label_h + gap)
+        panel = Image.open(path).convert("RGB").resize((thumb_w, thumb_h), Image.Resampling.LANCZOS)
+        card(draw, (x - 4, y - 4, x + thumb_w + 4, y + thumb_h + label_h), fill=(248, 251, 252), outline=LINE, radius=14, width=2)
+        img.paste(panel, (x, y))
+        draw.rectangle((x, y, x + thumb_w, y + thumb_h), outline=(160, 190, 198), width=2)
+        text(draw, (x + 14, y + thumb_h + 9), f"Slide {idx}", 18, NAVY, True, width=thumb_w - 28)
+    OUT_CONTACT_SHEET.parent.mkdir(parents=True, exist_ok=True)
+    img.save(OUT_CONTACT_SHEET, quality=94)
+    return OUT_CONTACT_SHEET
+
+
 def apply_doc_style(document: Document) -> None:
     normal = document.styles["Normal"]
     normal.font.name = "Arial"
@@ -723,16 +934,17 @@ def build_word_companion(diagram_path: Path) -> Path:
     document.add_heading("North Slope Gas Hydrate Full ML Workflow Diagram", level=0)
     document.add_paragraph(
         "This companion page explains the one-map workflow requested for the slide refresh. "
-        "The figure connects public source inputs, OpenScienceLab and approved-runtime inputs, "
-        "the guarded pressure-temperature stability branch, feature engineering, the leakage "
-        "barrier, occurrence classification, saturation regression, validation, and public-safe exports."
+        "The figure connects source and schema controls, OpenScienceLab and approved-runtime inputs, "
+        "the guarded pressure-temperature stability branch, well-log physics equations, the leakage "
+        "barrier, occurrence classification, saturation regression, validation, and reviewed exports."
     )
     document.add_picture(str(diagram_path), width=Inches(9.9))
 
     document.add_heading("How To Read The Diagram", level=1)
     for item in [
-        "The left lane is the public delivery surface: public sources, public stability products, GitHub, Streamlit, Word, and slides.",
-        "The center and right lanes are the OSL and approved-runtime path: raw source rebuilds, approved logs/core/NMR later, preprocessing, feature engineering, modeling, and validation.",
+        "The left lane is source and schema control: public-source context, current status counts, original headers, unit checks, depth basis, and QC gates.",
+        "The center and right lanes are the OSL and approved-runtime path: raw source rebuilds, approved logs/core/NMR later, pressure-temperature stability context, feature engineering, modeling, and validation.",
+        "The equation blocks show how pressure, temperature, phase-boundary lookup, lithology, porosity, velocity, elastic, and saturation-baseline calculations become context fields, features, or validation checks.",
         "The stability branch feeds context, masks, confidence labels, and caveats into the ML workflow. It does not become hydrate proof or a saturation label.",
         "The leakage barrier keeps S_h, Sgh, NMR_SAT, phase labels, and final ranks out of predictor features unless a field is proven to be an independent measured input.",
         "The final ML design keeps occurrence classification and saturation regression linked but separate.",
@@ -775,8 +987,10 @@ def main() -> None:
     panels = build_panels()
     deck = rebuild_deck(panels)
     verify_deck(deck)
+    contact_sheet = build_contact_sheet(panels)
     docx = build_word_companion(panels[2])
     print(f"Wrote {panels[2]}")
+    print(f"Wrote {contact_sheet}")
     print(f"Wrote {deck}")
     print(f"Wrote {docx}")
     print(f"Wrote panels to {ASSET_DIR}")
