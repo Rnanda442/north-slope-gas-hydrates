@@ -91,9 +91,9 @@ calculations or claiming model results.
   matched G10015 context where available, and provisional hydrostatic pressure,
   but keeps phase-curve and top/base/thickness results explicitly uncalculated.
 - `docs/STABILITY_CALCULATION_PLAN.md` now locks the source-backed plan for the
-  future stability screen: hydrostatic pressure equation, G10015/GGD223
+  stability screen: hydrostatic pressure equation, G10015/GGD223
   temperature-model hierarchy, methane 5 ppt phase-curve lookup source,
-  source-control confidence labels, caveats, and the future
+  source-control confidence labels, caveats, and the
   `stability_screen_*.csv` output schema.
 - `data/public_stability_products/phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv`
   is now the first cited phase-curve lookup input, digitized from USGS SIR
@@ -126,8 +126,8 @@ calculations or claiming model results.
   They combine modeled temperature, absolute hydrostatic pressure, and the
   phase lookup into per-depth stability flags, test synthetic top/base
   crossings and open-base cases, and block incomplete pressure-temperature
-  grids. They have not been applied to the public scaffold or written to a
-  public `stability_screen_*.csv`.
+  grids. They now support the OSL-derived guarded public
+  `stability_screen_*.csv`.
 - Local source-control confidence-label helpers now exist for fixture rows.
   Tests cover high, medium, low, blocked, and outside-AU labels, but these are
   source-control labels only and do not imply hydrate occurrence, saturation,
@@ -139,18 +139,24 @@ calculations or claiming model results.
 - The G10015 parser now collapses duplicate depth rows by averaging
   `temperature_c`, fixing the OSL inventory failure triggered by duplicate
   depth `8.23` in `usgs_put-25-5fnandahora442.txt`.
-- A guarded baseline stability-screen writer now exists. It requires raw G10015
-  profile rows, applies the cited methane 5 ppt phase lookup, and leaves blocked
-  rows null. It must still be run in OSL to create the first real public
-  `stability_screen_*.csv` output.
+- A guarded baseline stability-screen writer now exists and has been run in
+  OSL. It requires raw G10015 profile rows, applies the cited methane 5 ppt
+  phase lookup, leaves blocked rows null, and keeps every row tagged
+  `not_hydrate_proof`.
 - The first OSL screen run produced all blocked rows because the screen grid
   demanded phase-curve coverage from `0 m`. The writer now starts at the phase
   lookup's minimum covered depth and blocks only where the interval cannot close
-  within the lookup's maximum covered depth.
+  within the lookup's maximum covered depth. The committed rerun produced
+  `8,084` screen rows, `22` calculated intervals, `8` no-stable-interval rows,
+  and `8,054` blocked rows.
 - `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`
-  defines the target public website shape for the future stability screen:
+  defines the target public website shape for the stability screen:
   status strip, readiness/capability, map, selected-well audit panel,
   temperature-phase plot, results table, scenario controls, and exports.
+- The Structural Explorer now displays the guarded baseline methane 5 ppt
+  stability screen with summary counts, status/confidence breakdowns,
+  calculated interval rows, blocked/no-interval sample rows, and a CSV download
+  while preserving the no-proof caveat.
 - Three Excel header references were reviewed from the user's email. The images
   are not stored in Git or shown on the website; their public-safe schema
   derivative is maintained in `docs/WELL_LOG_REQUIREMENTS_MAP.md`.
@@ -226,7 +232,7 @@ It must not load or expose authorized well-log or core data.
 - `docs/source_library_index/source_index.md`: source orientation
 - `docs/source_library_index/source_manifest.csv`: source inventory
 - `docs/STABILITY_CALCULATION_PLAN.md`: source-backed pressure-temperature
-  stability-screen plan and future `stability_screen_*.csv` schema
+  stability-screen plan and `stability_screen_*.csv` schema
 - `docs/source_recovery_status.md`: Drive search results, original paths, and
   recovery checklist
 - `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md`: authoritative architecture,
@@ -412,9 +418,8 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-13: Added the OpenScienceLab stability source-bundle loader and
   Structural Explorer source-status/map panel for GGD223 permafrost controls and
   USGS gas hydrate assessment units.
-- 2026-06-14: Added the source-backed stability calculation plan for the future
-  public stability screen while keeping final top/base/thickness outputs
-  uncalculated.
+- 2026-06-14: Added the source-backed stability calculation plan for the public
+  stability-screen workflow before committing guarded screen outputs.
 - 2026-06-14: Added local G10015-style temperature-profile parsing and
   interpolation/extrapolation helpers with fixture tests, while keeping real
   temperature-model products and final stability outputs gated behind OSL
@@ -424,8 +429,8 @@ blockers, and next activities in the architecture/activity map.
   incomplete pressure-temperature grids without calculating public
   top/base/thickness outputs.
 - 2026-06-14: Added source-control confidence-label helper tests for high,
-  medium, low, blocked, and outside-AU cases while keeping public stability
-  screen outputs uncreated.
+  medium, low, blocked, and outside-AU cases before creating the public
+  stability screen outputs.
 - 2026-06-14: Added an OSL-ready temperature-model product writer to the public
   stability pipeline. It writes temperature-input rows only when raw G10015
   profile files are present and does not create final stability-screen outputs.
@@ -433,8 +438,15 @@ blockers, and next activities in the architecture/activity map.
   repeated depths are averaged deterministically instead of stopping the
   inventory/product rebuild.
 - 2026-06-14: Added a guarded baseline stability-screen writer with fixture
-  tests for calculated, phase-range-blocked, and raw-profile-missing behavior;
-  the real screen product still needs OSL raw profile rows.
+  tests for calculated, phase-range-blocked, and raw-profile-missing behavior,
+  then generated the first OSL-derived guarded screen from raw G10015 profile
+  rows.
 - 2026-06-14: Relaxed the guarded screen grid to begin at the cited phase-curve
   minimum depth after the first OSL screen run correctly produced only blocked
   rows under the earlier over-strict `0 m` coverage gate.
+- 2026-06-14: Committed the guarded methane 5 ppt stability-admissibility
+  screen: 8,084 rows, 22 calculated intervals, 8 no-stable-interval rows, and
+  8,054 blocked rows, with no hydrate-proof claim.
+- 2026-06-14: Exposed the guarded stability screen in the public Structural
+  Explorer with summary metrics, status/confidence counts, calculated interval
+  preview, blocked/no-interval sample, and download.

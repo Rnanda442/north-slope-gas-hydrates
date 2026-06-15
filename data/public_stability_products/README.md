@@ -79,6 +79,25 @@ with unit-test fixtures in Git, but real public temperature-model products need
 the raw G10015 profile rows from the full source bundle because Git commits only
 the compact inventory.
 
+`stability_temperature_model_2026-06-14.csv`
+
+`stability_temperature_model_summary_2026-06-14.csv`
+
+These OpenScienceLab-derived products model temperature at key scaffold depths
+from the public G10015 processed profile rows. They are temperature-input
+products only. They do not assert hydrate occurrence and do not by themselves
+calculate stability top, base, or thickness.
+
+`stability_screen_2026-06-14_methane_5ppt_v1.csv`
+
+`stability_screen_summary_2026-06-14_methane_5ppt_v1.csv`
+
+These OpenScienceLab-derived products are the first guarded baseline methane
+5 ppt stability-admissibility screen. The run has 8,084 public scaffold rows,
+22 calculated baseline intervals, 8 rows where no stable interval was found,
+and 8,054 blocked rows. Blocked rows keep top/base/thickness null. Every row
+keeps `not_hydrate_proof` in `caveat_codes`.
+
 `stability_website_product_spec_2026-06-14.csv`
 
 This table defines the intended final website shape for the public stability
@@ -86,10 +105,10 @@ screen: status strip, readiness/capability tables, map view, well detail panel,
 temperature-phase plot, results table, scenario controls, and export/citation
 area. Each row also states what that website area must not claim.
 
-The source-backed calculation contract for the future
-`stability_screen_*.csv` lives in `docs/STABILITY_CALCULATION_PLAN.md`. Build
-the temperature model, intersection rules, and confidence-label tests before
-writing any non-null top/base/thickness fields.
+The source-backed calculation contract for `stability_screen_*.csv` lives in
+`docs/STABILITY_CALCULATION_PLAN.md`. The current baseline screen writes
+non-null top/base/thickness only where the pressure, temperature, phase-curve,
+intersection, and source-control gates pass.
 
 The local code now includes fixture-tested temperature-model helpers in
 `dashboard/stability_products.py`. These helpers parse G10015-style profile
@@ -102,13 +121,14 @@ OpenScienceLab/source bundle.
 The same module now includes fixture-tested stability depth-grid and
 intersection helpers. They can combine modeled temperature, absolute
 hydrostatic pressure, and the methane phase lookup for synthetic test cases,
-but they have not been applied to this public scaffold. No committed public
-product in this folder is a final stability-screen result yet.
+and they now support the guarded OSL-generated public stability screen. No
+committed product in this folder is hydrate proof, saturation evidence, or a
+producibility result.
 
-Fixture-tested source-control confidence labels also exist for future stability
-screen rows. They separate high, medium, low, blocked, and outside-AU source
-control. They do not label hydrate occurrence, saturation, reservoir quality, or
-sweet spots.
+Fixture-tested source-control confidence labels also exist for stability-screen
+rows. They separate high, medium, low, blocked, and outside-AU source control.
+They do not label hydrate occurrence, saturation, reservoir quality, or sweet
+spots.
 
 The OSL rebuild pipeline is now prepared to write
 `stability_temperature_model_2026-06-14.csv` and
@@ -122,10 +142,9 @@ G10015 source profiles can contain duplicate depth rows. The public parser now
 averages temperature values at repeated depths before interpolation so a single
 source-file duplicate does not stop the OSL rebuild.
 
-The guarded stability-screen writer is prepared but the first real
-`stability_screen_*.csv` should be generated in OSL, where raw G10015 profile
-rows are available. It should fill top/base/thickness only for rows passing all
-calculation gates and leave blocked rows null.
+The guarded stability-screen writer has been run in OSL, where raw G10015
+profile rows are available. It fills top/base/thickness only for rows passing
+all calculation gates and leaves blocked rows null.
 
 ## Assessment Unit Codes
 
@@ -140,9 +159,10 @@ calculation gates and leave blocked rows null.
 `public_context_candidate` means the wellhead is inside a USGS hydrate
 assessment unit and the selected public well-depth field is deeper than the
 nearest GGD223 permafrost-depth control. This is a first-pass admissibility
-context only. A real stability product still needs local permafrost-base
-surfaces or digitized OM-222 evidence, geothermal-gradient/temperature context,
-pressure assumptions, and a methane hydrate phase curve.
+context only. The current baseline screen adds public temperature, pressure,
+and phase-curve gates, but it still is not hydrate proof. Final interpretation
+still needs local permafrost-base surfaces or digitized OM-222 evidence,
+well-specific temperature/pressure calibration, and direct hydrate evidence.
 
 The G10015 gradient field is calculated from the deepest 100 m of each
 available profile where enough samples exist. Use it as temperature context only

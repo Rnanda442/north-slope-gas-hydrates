@@ -22,6 +22,7 @@ from dashboard.stability_products import (
     default_phase_curve_path,
     default_phase_curve_scenario_catalog_path,
     default_stability_screen_path,
+    default_stability_screen_summary_path,
     default_stability_temperature_model_path,
     default_stability_input_capability_matrix_path,
     default_stability_osl_pull_triggers_path,
@@ -984,6 +985,48 @@ def test_write_stability_screen_product_creates_guarded_public_csv(tmp_path) -> 
     assert len(screen) == 1
     assert set(screen["stability_result_status"]) == {"calculated"}
     assert "not_hydrate_proof" in screen.iloc[0]["caveat_codes"]
+
+
+def test_committed_stability_screen_preserves_guardrails() -> None:
+    project_root = Path(__file__).resolve().parents[1]
+    screen = pd.read_csv(default_stability_screen_path(project_root))
+
+    assert len(screen) == 8084
+    status_counts = screen["stability_result_status"].value_counts().to_dict()
+    assert status_counts["calculated"] == 22
+    assert status_counts["calculated_no_stable_interval"] == 8
+    assert status_counts["blocked_missing_temperature_profile"] == 7113
+    assert status_counts["blocked_missing_depth"] == 505
+    assert status_counts["blocked_phase_curve_range_insufficient"] == 344
+    assert status_counts["outside_au_context"] == 92
+
+    blocked = ~screen["stability_result_status"].isin(
+        ["calculated", "calculated_no_stable_interval"]
+    )
+    protected_columns = ["stability_top_m", "stability_base_m", "stability_thickness_m"]
+    assert screen.loc[blocked, protected_columns].isna().all().all()
+    assert screen["caveat_codes"].fillna("").str.contains("not_hydrate_proof").all()
+
+    calculated = screen.loc[screen["stability_result_status"].eq("calculated")]
+    assert calculated[protected_columns].notna().all().all()
+    assert (calculated["stability_thickness_m"] > 0).all()
+
+
+def test_committed_stability_screen_summary_matches_screen_counts() -> None:
+    project_root = Path(__file__).resolve().parents[1]
+    screen = pd.read_csv(default_stability_screen_path(project_root))
+    summary = pd.read_csv(default_stability_screen_summary_path(project_root))
+    values = summary.set_index("metric")["value"].astype(int).to_dict()
+
+    calculated = screen["stability_result_status"].eq("calculated")
+    no_interval = screen["stability_result_status"].eq("calculated_no_stable_interval")
+    blocked = ~(calculated | no_interval)
+
+    assert values["Screen rows"] == len(screen)
+    assert values["Calculated stability intervals"] == int(calculated.sum())
+    assert values["No stable interval found"] == int(no_interval.sum())
+    assert values["Blocked rows"] == int(blocked.sum())
+    assert values["Not hydrate proof"] == len(screen)
 
 
 def test_public_stability_product_runner_has_help() -> None:

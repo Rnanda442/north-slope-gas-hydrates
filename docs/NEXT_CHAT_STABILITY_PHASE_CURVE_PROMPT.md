@@ -40,7 +40,7 @@ Current plan:
 `docs/STABILITY_CALCULATION_PLAN.md` now documents the source-backed stability
 calculation contract: hydrostatic pressure equation, G10015/GGD223 temperature
 model hierarchy, methane 5 ppt phase-curve lookup, source-control confidence
-labels, caveats, and the future `stability_screen_*.csv` schema.
+labels, caveats, and the `stability_screen_*.csv` schema.
 
 Current phase-curve artifact:
 `data/public_stability_products/phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv`
@@ -122,6 +122,9 @@ cause was over-strict grid coverage: the screen grid started at `0 m`, while
 the cited phase lookup begins deeper. The writer now starts the calculation
 grid at the minimum depth covered by the phase lookup and still blocks any row
 whose modeled interval cannot close within the lookup's maximum covered depth.
+The committed OSL rerun now has `8,084` screen rows, `22` calculated baseline
+intervals, `8` no-stable-interval rows, and `8,054` blocked rows. Every row
+must keep `not_hydrate_proof`.
 
 Current website product spec:
 `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`
@@ -129,17 +132,21 @@ defines the final public website shape for stability: status strip, readiness
 tables, map, selected-well audit panel, temperature-phase plot, results table,
 scenario controls, and exports/citations.
 
-Next task:
-The next work should happen in OSL if the full source bundle is available:
-1. keep the input capability matrix and phase lookup metadata current;
-2. pull/sync this GitHub state on OSL;
-3. run `python 01_pipeline/build_public_stability_products.py` from the repo
-   with the full source bundle available;
-4. review the `Stability Screen Summary`;
-5. commit only derived public outputs, especially the new
-   `stability_screen_*.csv` files, after confirming blocked rows remain null
-   and every row carries `not_hydrate_proof`.
+Current website state:
+The public Structural Explorer now exposes the guarded screen as a baseline
+methane 5 ppt stability-admissibility screen, with summary counts,
+status/confidence breakdowns, calculated interval preview, blocked/no-interval
+sample, and CSV download. Do not call it hydrate proof, saturation,
+producibility, or a sweet-spot ranking.
 
-Do not calculate final top/base/thickness until those implementation gates are
-complete. If web research is needed, use primary/public sources and cite them.
+Next task:
+Run visual QA/deployment checks for the public app and continue improving the
+source-backed stability story for the mentor-facing document and slides.
+
+Future OSL work should improve source coverage rather than create the first
+screen from scratch: refine temperature matches, add better permafrost/base
+controls if public and cited, digitize or model approved phase-curve
+sensitivities, then rerun the same guarded writer and compare counts.
+
+If web research is needed, use primary/public sources and cite them.
 ```

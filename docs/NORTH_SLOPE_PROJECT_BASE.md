@@ -332,7 +332,7 @@ Stability-source tasks before coding the explorer layer:
    - `low_source_control`: regional scenario assumption only;
    - `blocked_missing_inputs`: no final stability result.
 
-Target output fields for a future stability table:
+Core output fields for the guarded stability-screen table:
 
 ```text
 well_id
@@ -355,9 +355,8 @@ stability_confidence
 stability_notes
 ```
 
-The expanded output schema and caveat codes for the future
-`stability_screen_*.csv` are now defined in
-`docs/STABILITY_CALCULATION_PLAN.md`.
+The expanded output schema and caveat codes for `stability_screen_*.csv` are
+defined in `docs/STABILITY_CALCULATION_PLAN.md`.
 
 Structural Explorer layer direction:
 
@@ -476,8 +475,8 @@ Fresh-chat handoff as of 2026-06-14:
 - Current stability calculation plan:
   `docs/STABILITY_CALCULATION_PLAN.md`. It locks the hydrostatic pressure
   equation, G10015/GGD223 temperature model hierarchy, methane 5 ppt phase-curve
-  lookup source, confidence labels, caveats, and the future
-  `stability_screen_*.csv` schema.
+  lookup source, confidence labels, caveats, and the `stability_screen_*.csv`
+  schema.
 - Phase-curve input now exists as
   `data/public_stability_products/phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv`.
 - Phase-curve scenario control now exists as
@@ -518,26 +517,30 @@ Fresh-chat handoff as of 2026-06-14:
   the same depth, including the OSL-observed duplicate at `8.23 m`, so the
   inventory and temperature-model rebuild can continue without hiding the
   public-source provenance.
-- A guarded baseline stability-screen writer now exists in code. It will write
-  one row per public scaffold well, calculate top/base/thickness only where all
-  source and calculation gates pass, and keep blocked rows null with explicit
-  blocked statuses. The first real screen product still needs an OSL run because
-  raw G10015 profile rows are not committed to Git.
+- A guarded baseline stability-screen writer now exists in code and has been
+  run in OSL. It writes one row per public scaffold well, calculates
+  top/base/thickness only where all source and calculation gates pass, and
+  keeps blocked rows null with explicit blocked statuses. The first committed
+  baseline methane 5 ppt screen has `8,084` rows, `22` calculated intervals,
+  `8` no-stable-interval rows, and `8,054` blocked rows. Every row remains
+  tagged `not_hydrate_proof`.
 - The first OSL screen run produced `8,084` rows but all were blocked because
   the screen grid required phase-curve coverage from `0 m`. The writer now
   starts at the phase-curve minimum covered depth and still blocks intervals
-  that cannot close within the cited phase-curve maximum depth.
+  that cannot close within the cited phase-curve maximum depth; the rerun
+  produced the guarded screen counts above.
 - Website end-state control now exists as
   `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`:
   the final public stability view should show run assumptions, readiness gates,
   map status, selected-well audit details, temperature-phase intersections,
   result tables, scenario controls, and exports/citations without claiming
   hydrate proof, saturation, sweet spots, or validated ML results.
-- Next scientific task: pull/sync this GitHub state on OSL and run
-  `python 01_pipeline/build_public_stability_products.py` against the full
-  source bundle to create the first guarded baseline `stability_screen_*.csv`
-  product. Commit only the derived public outputs after reviewing the summary.
-  Do not label the current scaffold as hydrate proof.
+- The public app now exposes the guarded baseline screen with summary counts,
+  status/confidence breakdowns, calculated interval rows, blocked/no-interval
+  sample rows, and a CSV download. Next scientific task: keep improving source
+  coverage in OSL and treat any future phase-curve/composition variants as
+  cited scenarios. Do not label the current screen as hydrate proof, saturation,
+  producibility, or a sweet-spot ranking.
 
 ## Equations To Preserve
 

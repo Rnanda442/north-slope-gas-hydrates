@@ -29,15 +29,18 @@ from dashboard.stability_sources import (
 from dashboard.stability_products import (
     default_g10015_inventory_path,
     default_stability_input_scaffold_path,
+    default_stability_screen_path,
     default_well_context_path,
     load_g10015_temperature_inventory,
     load_public_well_stability_context,
     load_stability_input_scaffold,
+    load_stability_screen,
     stability_input_capability_matrix_frame,
     stability_osl_pull_triggers_frame,
     stability_parameter_readiness_frame,
     stability_context_summary_frame,
     stability_input_scaffold_summary_frame,
+    stability_screen_summary_frame,
     stability_website_product_spec_frame,
     temperature_inventory_summary_frame,
 )
@@ -878,6 +881,11 @@ def cached_g10015_temperature_inventory(project_root: str) -> pd.DataFrame:
 @st.cache_data
 def cached_stability_input_scaffold(project_root: str) -> pd.DataFrame:
     return load_stability_input_scaffold(Path(project_root))
+
+
+@st.cache_data
+def cached_stability_screen(project_root: str) -> pd.DataFrame:
+    return load_stability_screen(Path(project_root))
 
 
 def project_relative_or_absolute(path: Path) -> str:
@@ -1734,6 +1742,7 @@ def render_g10015_temperature_inventory_product() -> None:
         use_container_width=True,
     )
     render_stability_input_scaffold_product()
+    render_guarded_stability_screen_product()
     render_stability_parameter_readiness()
 
 
@@ -1799,6 +1808,101 @@ def render_stability_input_scaffold_product() -> None:
     )
 
 
+def render_guarded_stability_screen_product() -> None:
+    screen_path = default_stability_screen_path(PROJECT_ROOT)
+    screen = cached_stability_screen(str(PROJECT_ROOT))
+
+    st.markdown("#### Guarded Baseline Stability Screen")
+    if screen.empty:
+        st.info(
+            "No guarded baseline stability screen has been generated yet. "
+            f"Expected path: `{project_relative_or_absolute(screen_path)}`."
+        )
+        return
+
+    st.caption(
+        "Baseline methane 5 ppt stability-admissibility screen. It is not "
+        "hydrate proof, saturation evidence, producibility evidence, or a "
+        "sweet-spot ranking."
+    )
+    calculated = screen["stability_result_status"].eq("calculated")
+    no_interval = screen["stability_result_status"].eq("calculated_no_stable_interval")
+    blocked = ~(calculated | no_interval)
+    not_proof = screen["caveat_codes"].fillna("").str.contains("not_hydrate_proof").sum()
+
+    cols = st.columns(5)
+    cols[0].metric("Screen rows", f"{len(screen):,}")
+    cols[1].metric("Calculated intervals", f"{int(calculated.sum()):,}")
+    cols[2].metric("No stable interval", f"{int(no_interval.sum()):,}")
+    cols[3].metric("Blocked rows", f"{int(blocked.sum()):,}")
+    cols[4].metric("Not hydrate proof", f"{int(not_proof):,}")
+
+    st.dataframe(
+        stability_screen_summary_frame(screen),
+        use_container_width=True,
+        hide_index=True,
+    )
+
+    status_counts = (
+        screen["stability_result_status"]
+        .fillna("missing")
+        .value_counts()
+        .rename_axis("stability_result_status")
+        .reset_index(name="rows")
+    )
+    confidence_counts = (
+        screen["stability_confidence"]
+        .fillna("missing")
+        .value_counts()
+        .rename_axis("stability_confidence")
+        .reset_index(name="rows")
+    )
+    left, right = st.columns(2)
+    left.dataframe(status_counts, use_container_width=True, hide_index=True)
+    right.dataframe(confidence_counts, use_container_width=True, hide_index=True)
+
+    preview_columns = [
+        "well_name",
+        "tvd_m",
+        "permafrost_base_m",
+        "temperature_profile_code",
+        "stability_result_status",
+        "stability_confidence",
+        "stability_top_m",
+        "stability_base_m",
+        "stability_thickness_m",
+        "caveat_codes",
+        "stability_notes",
+    ]
+    display_columns = [column for column in preview_columns if column in screen.columns]
+    calculated_preview = (
+        screen.loc[calculated, display_columns]
+        .sort_values(["stability_confidence", "well_name"], ascending=[True, True])
+        .head(30)
+    )
+    blocked_preview = (
+        screen.loc[~calculated, display_columns]
+        .sort_values(["stability_result_status", "well_name"], ascending=[True, True])
+        .head(30)
+    )
+
+    st.markdown("##### Calculated Interval Rows")
+    if calculated_preview.empty:
+        st.info("No rows passed every screen gate in this run.")
+    else:
+        st.dataframe(calculated_preview, use_container_width=True, hide_index=True)
+
+    st.markdown("##### Blocked Or No-Interval Sample")
+    st.dataframe(blocked_preview, use_container_width=True, hide_index=True)
+    st.download_button(
+        "Download guarded stability screen CSV",
+        screen.to_csv(index=False).encode("utf-8"),
+        file_name=screen_path.name,
+        mime="text/csv",
+        use_container_width=True,
+    )
+
+
 def render_stability_parameter_readiness() -> None:
     st.markdown("#### Stability Pipeline Readiness")
     st.caption(
@@ -1832,7 +1936,7 @@ def render_stability_parameter_readiness() -> None:
     )
     st.markdown("#### Final Website Product Shape")
     st.caption(
-        "Target website sections for the future baseline stability screen, "
+        "Target website sections for the guarded baseline stability workflow, "
         "with the claims each section must avoid."
     )
     st.dataframe(
