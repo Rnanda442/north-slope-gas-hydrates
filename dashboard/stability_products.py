@@ -972,12 +972,11 @@ def load_g10015_temperature_profile_points(path: Path) -> pd.DataFrame:
 
     profile = profile.sort_values("depth_m").reset_index(drop=True)
     if profile["depth_m"].duplicated().any():
-        duplicate_depths = profile.loc[
-            profile["depth_m"].duplicated(keep=False),
-            "depth_m",
-        ]
-        formatted = ", ".join(str(float(value)) for value in sorted(duplicate_depths.unique()))
-        raise ValueError(f"G10015 profile has duplicate depth values: {formatted}")
+        profile = (
+            profile.groupby("depth_m", as_index=False, sort=True)
+            .agg(temperature_c=("temperature_c", "mean"))
+            .reset_index(drop=True)
+        )
     return profile
 
 

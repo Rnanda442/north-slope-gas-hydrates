@@ -502,6 +502,39 @@ def test_load_g10015_temperature_profile_points_reads_depth_temperature_rows(tmp
     assert points["temperature_c"].tolist() == [-10.0, -7.0, -4.0, -1.0]
 
 
+def test_g10015_temperature_profile_points_average_duplicate_depths(tmp_path) -> None:
+    source_root = tmp_path
+    profile_dir = source_root / "03_temperature_geothermal" / "NSIDC_G10015_extracted"
+    profile_dir.mkdir(parents=True)
+    profile = profile_dir / "DUP_24JUN14.txt"
+    profile.write_text(
+        "\n".join(
+            [
+                "Temperature Log Information:",
+                "  Well name:   Duplicate Depth Test Well",
+                "  File name:   DUP_24JUN14_c_d",
+                "  Log date:    14-JUN-2026",
+                "",
+                " Depth  Temperature",
+                "  0.00  -10.0",
+                "  8.23  -9.0",
+                "  8.23  -7.0",
+                " 50.00  -5.0",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    points = load_g10015_temperature_profile_points(profile)
+    inventory = build_g10015_temperature_inventory(source_root)
+
+    duplicate_row = points.loc[points["depth_m"] == 8.23].iloc[0]
+    assert points["depth_m"].tolist() == [0.0, 8.23, 50.0]
+    assert duplicate_row["temperature_c"] == -8.0
+    assert len(inventory) == 1
+    assert inventory.iloc[0]["sample_count"] == 3
+
+
 def test_temperature_model_interpolates_measured_profile() -> None:
     profile_points = pd.DataFrame(
         {

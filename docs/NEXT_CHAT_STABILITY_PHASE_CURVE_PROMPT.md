@@ -101,6 +101,12 @@ and `stability_temperature_model_summary_2026-06-14.csv`. The product is one
 row per scaffold well per modeled key depth and keeps
 `stability_top_base_thickness_status = not_calculated`.
 
+Current G10015 parser fix:
+`load_g10015_temperature_profile_points(...)` now collapses duplicate
+`depth_m` values by averaging `temperature_c`. This fixes the OSL failure in
+`usgs_put-25-5fnandahora442.txt`, where duplicate depth `8.23` caused the
+inventory build to stop.
+
 Current website product spec:
 `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`
 defines the final public website shape for stability: status strip, readiness

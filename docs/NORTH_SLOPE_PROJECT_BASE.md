@@ -514,6 +514,10 @@ Fresh-chat handoff as of 2026-06-14:
   bundle has raw G10015 processed profile `.txt` files. This product is one row
   per scaffold well per modeled key depth and remains
   temperature-input-only, not a stability result.
+- G10015 duplicate depth rows are now handled by averaging temperature values at
+  the same depth, including the OSL-observed duplicate at `8.23 m`, so the
+  inventory and temperature-model rebuild can continue without hiding the
+  public-source provenance.
 - Website end-state control now exists as
   `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`:
   the final public stability view should show run assumptions, readiness gates,

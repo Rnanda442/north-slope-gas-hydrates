@@ -164,6 +164,10 @@ Implemented local helper status:
 - `load_g10015_temperature_profile_points(path)` reads numeric depth and
   temperature rows from a G10015-style processed profile file and returns
   sorted `depth_m` / `temperature_c` points.
+- Duplicate G10015 depth rows are collapsed by averaging `temperature_c` at the
+  same `depth_m`. This prevents repeated source rows, including the observed
+  OSL duplicate at `8.23 m`, from breaking the inventory while preserving a
+  single deterministic temperature value for interpolation.
 - `temperature_model_from_profile(...)` returns modeled temperature at requested
   depths only. It does not calculate stability top, base, thickness, occurrence,
   or saturation.

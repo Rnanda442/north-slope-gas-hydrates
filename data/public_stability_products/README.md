@@ -118,6 +118,10 @@ row per scaffold well per key modeled depth, currently nearest permafrost
 control depth and well depth. It remains a temperature-input product only and
 keeps top/base/thickness uncalculated.
 
+G10015 source profiles can contain duplicate depth rows. The public parser now
+averages temperature values at repeated depths before interpolation so a single
+source-file duplicate does not stop the OSL rebuild.
+
 ## Assessment Unit Codes
 
 | Code | Name |

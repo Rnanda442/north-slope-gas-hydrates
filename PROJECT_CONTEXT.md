@@ -136,6 +136,9 @@ calculations or claiming model results.
   runs with the full source bundle and raw G10015 profile `.txt` files present,
   it writes a compact temperature-model product at key scaffold depths while
   keeping final stability top/base/thickness uncalculated.
+- The G10015 parser now collapses duplicate depth rows by averaging
+  `temperature_c`, fixing the OSL inventory failure triggered by duplicate
+  depth `8.23` in `usgs_put-25-5fnandahora442.txt`.
 - `data/public_stability_products/stability_website_product_spec_2026-06-14.csv`
   defines the target public website shape for the future stability screen:
   status strip, readiness/capability, map, selected-well audit panel,
@@ -418,3 +421,6 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-14: Added an OSL-ready temperature-model product writer to the public
   stability pipeline. It writes temperature-input rows only when raw G10015
   profile files are present and does not create final stability-screen outputs.
+- 2026-06-14: Fixed G10015 duplicate-depth handling so OSL profile rows with
+  repeated depths are averaged deterministically instead of stopping the
+  inventory/product rebuild.
