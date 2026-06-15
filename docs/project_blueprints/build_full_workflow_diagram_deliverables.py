@@ -23,7 +23,8 @@ OUT_CONTACT_SHEET = ASSET_DIR / "full_workflow_deck_contact_sheet.png"
 PUBLIC_PRODUCTS = ROOT / "data" / "public_stability_products"
 
 W, H = 1600, 900
-EXPANDED_W, EXPANDED_H = 4200, 2363
+EXPANDED_W, EXPANDED_H = 5200, 3000
+NETWORK_W, NETWORK_H = 2600, 1500
 NAVY = (11, 35, 48)
 DEEP = (5, 19, 27)
 TEAL = (18, 124, 139)
@@ -252,21 +253,21 @@ def full_workflow_panel() -> Path:
     draw.rectangle((0, 0, 34, EXPANDED_H), fill=TEAL)
     draw.rectangle((0, 0, EXPANDED_W, 214), fill=(246, 251, 252))
     draw.line((84, 214, EXPANDED_W - 84, 214), fill=LINE, width=4)
-    text(draw, (92, 48), "North Slope Gas Hydrate ML Workflow V3", 64, NAVY, True)
+    text(draw, (92, 48), "North Slope Gas Hydrate ML Workflow V4", 64, NAVY, True)
     text(
         draw,
         (96, 126),
-        "Split-node map: source/schema controls, stability context, physics features, leakage-safe runtime, validation, and reviewed exports.",
+        "Spaced split-node map: source/schema controls, stability context, physics features, leakage-safe runtime, validation, and reviewed exports.",
         31,
         MUTED,
-        width=3300,
+        width=4300,
     )
 
     boxes: dict[str, tuple[int, int, int, int]] = {}
-    col_x = [90, 900, 1710, 2520, 3330]
-    col_w = 730
-    section_top = 250
-    section_bottom = 2140
+    col_x = [100, 1120, 2140, 3160, 4180]
+    col_w = 900
+    section_top = 280
+    section_bottom = 2740
 
     def pill_text(box: tuple[int, int, int, int], label: str, fill, accent, size: int = 24) -> None:
         card(draw, box, fill=fill, outline=accent, radius=18, width=2)
@@ -389,49 +390,49 @@ def full_workflow_panel() -> Path:
     section(4, "5. Validation and exports", AMBER)
 
     # Source/schema lane.
-    node("public_sources", 0, 345, 142, "Public context bundle", ["DNR wells | GGD223 | G10015", "USGS hydrate AUs + phase sources"], TEAL, ICE_LIGHT)
-    node("approved_inputs", 0, 515, 142, "Approved runtime inputs", ["LAS/CSV logs | core | NMR", "workbook labels stay in OSL"], GREEN, GREEN_LIGHT)
-    node("role_registry", 0, 685, 154, "Header and role registry", ["preserve original headers first", "role = input / derived / QC / target"], TEAL)
-    node("unit_depth", 0, 870, 154, "Unit and depth normalization", ["depth_ft -> depth_m", "density, sonic, porosity, resistivity"], GREEN)
-    node("qc_gate", 0, 1055, 154, "QC gate", ["caliper/washout | missingness", "outliers | depth mismatch"], AMBER, AMBER_LIGHT, "fail closed")
-    node("coverage", 0, 1240, 178, "Current coverage", [f"{values['wells']} public wells", f"{values['profiles']} temperature profiles", f"{values['screen_calculated']} stable candidates; {values['screen_blocked']} blocked"], BLUE, BLUE_LIGHT, "not proof")
-    node("guardrails", 0, 1450, 250, "Project guardrails", ["stability != occurrence", "Sgh/Sh/NMR_SAT are labels", "no random-row final claims"], RED, RED_LIGHT)
+    node("public_sources", 0, 390, 160, "Public context bundle", ["DNR wells | GGD223 | G10015", "USGS hydrate AUs + phase sources"], TEAL, ICE_LIGHT)
+    node("approved_inputs", 0, 630, 160, "Approved runtime inputs", ["LAS/CSV logs | core | NMR", "workbook labels stay in OSL"], GREEN, GREEN_LIGHT)
+    node("role_registry", 0, 870, 180, "Header and role registry", ["preserve original headers first", "role = input / derived / QC / target"], TEAL)
+    node("unit_depth", 0, 1130, 180, "Unit and depth normalization", ["depth_ft -> depth_m", "density, sonic, porosity, resistivity"], GREEN)
+    node("qc_gate", 0, 1390, 180, "QC gate", ["caliper/washout | missingness", "outliers | depth mismatch"], AMBER, AMBER_LIGHT, "fail closed")
+    node("coverage", 0, 1650, 205, "Current coverage", [f"{values['wells']} public wells", f"{values['profiles']} temperature profiles", f"{values['screen_calculated']} stable candidates; {values['screen_blocked']} blocked"], BLUE, BLUE_LIGHT, "not proof")
+    node("guardrails", 0, 1920, 290, "Project guardrails", ["stability != occurrence", "Sgh/Sh/NMR_SAT are labels", "no random-row final claims"], RED, RED_LIGHT)
 
     # Stability lane.
-    node("au_gate", 1, 345, 134, "Spatial context", ["inside USGS hydrate AU", "nearest permafrost control"], BLUE, BLUE_LIGHT)
-    node("depth_basis", 1, 505, 134, "Depth basis", ["TrueVertic preferred", "DrillerTot fallback flagged"], TEAL, ICE_LIGHT)
-    node("pressure_eq", 1, 665, 168, "Pressure equation", ["P_abs = P_surface + rho_w*g*z_m/1e6", "units: MPa, meters"], BLUE, WHITE, formula=True)
-    node("temperature_eq", 1, 865, 168, "Temperature model", ["T_model(z) = interp(G10015)", "extrapolate only inside guardrail"], BLUE, WHITE, formula=True)
-    node("phase_eq", 1, 1065, 168, "Phase-boundary lookup", ["T_eq = f(P_abs, CH4, salinity)", "baseline = methane, 5 ppt"], AMBER, AMBER_LIGHT, formula=True)
-    node("stable_test", 1, 1265, 168, "Stability test", ["stable_candidate = T_model <= T_eq", "top/base/thickness only if all gates pass"], BLUE, BLUE_LIGHT, formula=True)
-    node("stability_context", 1, 1465, 190, "Stability output to ML", ["status | interval | source confidence", "blocked reason | caveat fields"], BLUE, WHITE, "context only")
+    node("au_gate", 1, 390, 152, "Spatial context", ["inside USGS hydrate AU", "nearest permafrost control"], BLUE, BLUE_LIGHT)
+    node("depth_basis", 1, 620, 152, "Depth basis", ["TrueVertic preferred", "DrillerTot fallback flagged"], TEAL, ICE_LIGHT)
+    node("pressure_eq", 1, 850, 188, "Pressure equation", ["P_abs = P_surface + rho_w*g*z_m/1e6", "units: MPa, meters"], BLUE, WHITE, formula=True)
+    node("temperature_eq", 1, 1120, 188, "Temperature model", ["T_model(z) = interp(G10015)", "extrapolate only inside guardrail"], BLUE, WHITE, formula=True)
+    node("phase_eq", 1, 1390, 188, "Phase-boundary lookup", ["T_eq = f(P_abs, CH4, salinity)", "baseline = methane, 5 ppt"], AMBER, AMBER_LIGHT, formula=True)
+    node("stable_test", 1, 1660, 188, "Stability test", ["stable_candidate = T_model <= T_eq", "top/base/thickness only if all gates pass"], BLUE, BLUE_LIGHT, formula=True)
+    node("stability_context", 1, 1930, 210, "Stability output to ML", ["status | interval | source confidence", "blocked reason | caveat fields"], BLUE, WHITE, "context only")
 
     # Feature engineering lane.
-    node("measured_logs", 2, 345, 154, "Measured log families", ["GR, RHOB, NMRPHI, phi_D", "Rt, Vp, Vs, impedance, caliper"], TEAL, ICE_LIGHT)
-    node("lithology_features", 2, 530, 154, "Lithology/reservoir", ["Vsh = (GR-GR_clean)/(GR_sh-GR_clean)", "reservoir-quality flags"], GREEN, WHITE, formula=True)
-    node("porosity_features", 2, 715, 154, "Porosity/NMR", ["phi_D = (rho_ma-RHOB)/(rho_ma-rho_f)", "NMR separation when available"], GREEN, GREEN_LIGHT, formula=True)
-    node("sonic_features", 2, 900, 178, "Sonic and elastic", ["Vp = 304.8/DT ; Vs = 304.8/DTS", "AI = RHOB*Vp | Vp/Vs", "mu_rho, lambda_rho"], PURPLE, PURPLE_LIGHT, formula=True)
-    node("resistivity_features", 2, 1110, 154, "Resistivity checks", ["Rt features and Archie-style baselines", "baseline/check, not automatic label"], AMBER, AMBER_LIGHT)
-    node("context_features", 2, 1295, 154, "Context features", ["stability status | AU | permafrost", "source confidence | blocked flags"], BLUE, BLUE_LIGHT)
-    node("feature_matrix", 2, 1480, 192, "Feature matrix", ["X_allowed = measured + derived + QC + context", "targets excluded before modeling"], GREEN, GREEN_LIGHT, "predictors only")
+    node("measured_logs", 2, 390, 170, "Measured log families", ["GR, RHOB, NMRPHI, phi_D", "Rt, Vp, Vs, impedance, caliper"], TEAL, ICE_LIGHT)
+    node("lithology_features", 2, 640, 170, "Lithology/reservoir", ["Vsh = (GR-GR_clean)/(GR_sh-GR_clean)", "reservoir-quality flags"], GREEN, WHITE, formula=True)
+    node("porosity_features", 2, 890, 170, "Porosity/NMR", ["phi_D = (rho_ma-RHOB)/(rho_ma-rho_f)", "NMR separation when available"], GREEN, GREEN_LIGHT, formula=True)
+    node("sonic_features", 2, 1140, 198, "Sonic and elastic", ["Vp = 304.8/DT ; Vs = 304.8/DTS", "AI = RHOB*Vp | Vp/Vs", "mu_rho, lambda_rho"], PURPLE, PURPLE_LIGHT, formula=True)
+    node("resistivity_features", 2, 1420, 170, "Resistivity checks", ["Rt features and Archie-style baselines", "baseline/check, not automatic label"], AMBER, AMBER_LIGHT)
+    node("context_features", 2, 1670, 170, "Context features", ["stability status | AU | permafrost", "source confidence | blocked flags"], BLUE, BLUE_LIGHT)
+    node("feature_matrix", 2, 1920, 220, "Feature matrix", ["X_allowed = measured + derived + QC + context", "targets excluded before modeling"], GREEN, GREEN_LIGHT, "predictors only")
 
     # ML runtime lane.
-    node("target_registry", 3, 345, 170, "Target registry", ["Sgh, S_h, Sh, NMR_SAT", "Hydrate Saturation, Swr, phase calls"], RED, RED_LIGHT, "Y only")
-    node("leakage_barrier", 3, 545, 154, "Leakage barrier", ["labels bypass X_allowed", "targets feed training/validation only"], RED, WHITE)
-    node("split", 3, 730, 154, "Whole-well split", ["train / validation / locked test", "split before fitting transforms"], BLUE, BLUE_LIGHT)
-    node("preprocess", 3, 915, 178, "Train-only preprocessing", ["fit imputation/scaling/selection on train", "apply frozen transform to val/test"], PURPLE, PURPLE_LIGHT)
-    node("baselines", 3, 1125, 154, "Baseline models", ["physics/simple baselines first", "check if ML beats transparent rules"], AMBER, AMBER_LIGHT)
-    node("candidates", 3, 1310, 154, "Candidate models", ["tree/boosting | ANN/Keras", "only after leakage controls pass"], PURPLE)
-    node("model_heads", 3, 1495, 178, "Two model heads", ["X_allowed -> P(hydrate)", "X_allowed -> Sh_pred"], PURPLE, PURPLE_LIGHT, "linked, separate")
+    node("target_registry", 3, 390, 190, "Target registry", ["Sgh, S_h, Sh, NMR_SAT", "Hydrate Saturation, Swr, phase calls"], RED, RED_LIGHT, "Y only")
+    node("leakage_barrier", 3, 660, 170, "Leakage barrier", ["labels bypass X_allowed", "targets feed training/validation only"], RED, WHITE)
+    node("split", 3, 910, 170, "Whole-well split", ["train / validation / locked test", "split before fitting transforms"], BLUE, BLUE_LIGHT)
+    node("preprocess", 3, 1160, 198, "Train-only preprocessing", ["fit imputation/scaling/selection on train", "apply frozen transform to val/test"], PURPLE, PURPLE_LIGHT)
+    node("baselines", 3, 1440, 170, "Baseline models", ["physics/simple baselines first", "check if ML beats transparent rules"], AMBER, AMBER_LIGHT)
+    node("candidates", 3, 1690, 170, "Candidate models", ["tree/boosting | ANN/Keras", "only after leakage controls pass"], PURPLE)
+    node("model_heads", 3, 1940, 198, "Two model heads", ["X_allowed -> P(hydrate)", "X_allowed -> Sh_pred"], PURPLE, PURPLE_LIGHT, "linked, separate")
 
     # Output lane.
-    node("occurrence", 4, 345, 154, "Occurrence classifier", ["probability + calibrated class", "false-positive review"], BLUE, BLUE_LIGHT)
-    node("saturation", 4, 530, 154, "Saturation regressor", ["continuous Sh_pred", "compare to approved target"], GREEN, GREEN_LIGHT)
-    node("metrics", 4, 715, 178, "Validation metrics", ["classification: precision/recall/calibration", "regression: R2/RMSE/MAE where valid"], PURPLE, PURPLE_LIGHT)
-    node("residuals", 4, 925, 202, "Residual and mimic review", ["by well, depth, lithology, QC, source confidence", "mimics: shale, ice, gas, cement, washout"], AMBER, AMBER_LIGHT)
-    node("exports", 4, 1160, 178, "Approved runtime exports", ["per-depth: probability, Sh, uncertainty", "per-well: intervals, caveats, status"], GREEN, GREEN_LIGHT)
-    node("public_review", 4, 1370, 190, "Public-safe review", ["remove restricted rows", "publish only reviewed summaries/figures"], TEAL, ICE_LIGHT)
-    node("mentor_decisions", 4, 1590, 178, "Mentor decisions", ["phase curve policy | proxy temperatures", "target authority | validation fields"], RED, RED_LIGHT)
+    node("occurrence", 4, 390, 170, "Occurrence classifier", ["probability + calibrated class", "false-positive review"], BLUE, BLUE_LIGHT)
+    node("saturation", 4, 640, 170, "Saturation regressor", ["continuous Sh_pred", "compare to approved target"], GREEN, GREEN_LIGHT)
+    node("metrics", 4, 890, 198, "Validation metrics", ["classification: precision/recall/calibration", "regression: R2/RMSE/MAE where valid"], PURPLE, PURPLE_LIGHT)
+    node("residuals", 4, 1170, 230, "Residual and mimic review", ["by well, depth, lithology, QC, source confidence", "mimics: shale, ice, gas, cement, washout"], AMBER, AMBER_LIGHT)
+    node("exports", 4, 1480, 198, "Approved runtime exports", ["per-depth: probability, Sh, uncertainty", "per-well: intervals, caveats, status"], GREEN, GREEN_LIGHT)
+    node("public_review", 4, 1760, 210, "Public-safe review", ["remove restricted rows", "publish only reviewed summaries/figures"], TEAL, ICE_LIGHT)
+    node("mentor_decisions", 4, 2050, 198, "Mentor decisions", ["phase curve policy | proxy temperatures", "target authority | validation fields"], RED, RED_LIGHT)
 
     # Vertical lane flows.
     arrow([bottom("approved_inputs"), top("role_registry")], GREEN, width=5)
@@ -443,46 +444,52 @@ def full_workflow_panel() -> Path:
     vchain(["metrics", "residuals", "exports", "public_review", "mentor_decisions"], AMBER)
 
     # Cross-lane flows.
-    arrow([right("public_sources"), (820, right("public_sources")[1]), (820, left("au_gate")[1]), left("au_gate")], TEAL, label_text="public context", label_xy=(820, 318))
+    bus01 = col_x[1] - 62
+    bus12 = col_x[2] - 62
+    bus23 = col_x[3] - 62
+    bus34a = col_x[4] - 92
+    bus34b = col_x[4] - 48
+    lower_bus = section_bottom - 90
+    arrow([right("public_sources"), (bus01, right("public_sources")[1]), (bus01, left("au_gate")[1]), left("au_gate")], TEAL, label_text="public context", label_xy=(bus01, 350))
     arrow(
-        [right("qc_gate"), (820, right("qc_gate")[1]), (820, 1745), (1585, 1745), (1585, left("measured_logs")[1]), left("measured_logs")],
+        [right("qc_gate"), (bus01, right("qc_gate")[1]), (bus01, lower_bus), (bus12, lower_bus), (bus12, left("measured_logs")[1]), left("measured_logs")],
         GREEN,
         label_text="clean curves",
-        label_xy=(1240, 1745),
+        label_xy=((bus01 + bus12) // 2, lower_bus),
     )
-    arrow([right("stability_context"), (1660, right("stability_context")[1]), (1660, left("context_features")[1]), left("context_features")], BLUE, label_text="mask/confidence", label_xy=(1660, 1402))
-    arrow([right("feature_matrix"), (2445, right("feature_matrix")[1]), (2445, left("split")[1]), left("split")], GREEN, label_text="X_allowed", label_xy=(2445, 1115))
-    ml_bus_1 = right("model_heads")[0] + 38
-    ml_bus_2 = right("model_heads")[0] + 78
+    arrow([right("stability_context"), (bus12, right("stability_context")[1]), (bus12, left("context_features")[1]), left("context_features")], BLUE, label_text="mask/confidence", label_xy=(bus12, 1790))
+    arrow([right("feature_matrix"), (bus23, right("feature_matrix")[1]), (bus23, left("split")[1]), left("split")], GREEN, label_text="X_allowed", label_xy=(bus23, 1450))
+    ml_bus_1 = bus34a
+    ml_bus_2 = bus34b
     arrow(
         [right("leakage_barrier"), (ml_bus_2, right("leakage_barrier")[1]), (ml_bus_2, right("model_heads")[1]), right("model_heads")],
         RED,
         dashed=True,
         label_text="Y labels only",
-        label_xy=(ml_bus_2, 1055),
+        label_xy=(ml_bus_2, 1340),
     )
     arrow(
         [right("model_heads"), (ml_bus_1, right("model_heads")[1]), (ml_bus_1, left("occurrence")[1]), left("occurrence")],
         BLUE,
         label_text="classification",
-        label_xy=(ml_bus_1, 635),
+        label_xy=(ml_bus_1, 800),
     )
     arrow(
         [right("model_heads"), (ml_bus_2, right("model_heads")[1]), (ml_bus_2, left("saturation")[1]), left("saturation")],
         GREEN,
         label_text="regression",
-        label_xy=(ml_bus_2, 825),
+        label_xy=(ml_bus_2, 980),
     )
     arrow(
         [right("target_registry"), (ml_bus_2, right("target_registry")[1]), (ml_bus_2, left("residuals")[1]), left("residuals")],
         RED,
         dashed=True,
         label_text="validation overlay",
-        label_xy=(ml_bus_2, 1115),
+        label_xy=(ml_bus_2, 1360),
     )
 
     # Status and legend.
-    card(draw, (90, 2180, 4110, 2295), fill=(245, 249, 250), outline=LINE, radius=24, width=2)
+    card(draw, (100, 2800, 5100, 2925), fill=(245, 249, 250), outline=LINE, radius=24, width=2)
     legend = [
         ("source/schema", TEAL),
         ("stability context", BLUE),
@@ -491,20 +498,20 @@ def full_workflow_panel() -> Path:
         ("model runtime", PURPLE),
         ("review/export", AMBER),
     ]
-    lx = 125
+    lx = 140
     for label_value, color in legend:
-        draw.rounded_rectangle((lx, 2209, lx + 34, 2243), radius=8, fill=color)
-        text(draw, (lx + 48, 2208), label_value, 22, NAVY, True)
-        lx += 570 if label_value == "allowed predictors" else 470
+        draw.rounded_rectangle((lx, 2832, lx + 34, 2866), radius=8, fill=color)
+        text(draw, (lx + 48, 2831), label_value, 22, NAVY, True)
+        lx += 640 if label_value == "allowed predictors" else 520
     text(
         draw,
-        (125, 2254),
+        (140, 2878),
         f"Current public status: {values['wells']} scaffold wells, {values['profiles']} G10015 profiles, "
         f"{values['screen_calculated']} baseline admissibility intervals, {values['screen_blocked']} blocked screen rows. "
         "These are workflow constraints, not hydrate proof or saturation results.",
         23,
         MUTED,
-        width=3800,
+        width=4700,
     )
 
     ASSET_DIR.mkdir(parents=True, exist_ok=True)
@@ -512,6 +519,233 @@ def full_workflow_panel() -> Path:
     img.save(expanded_path, quality=94)
     slide_img = img.resize((W, H), Image.Resampling.LANCZOS)
     return save(slide_img, "full_project_ml_workflow_flowchart.png")
+
+
+def ml_network_detail_panel() -> Path:
+    img = Image.new("RGB", (NETWORK_W, NETWORK_H), WHITE)
+    draw = ImageDraw.Draw(img)
+    draw.rectangle((0, 0, 24, NETWORK_H), fill=PURPLE)
+    draw.rectangle((0, 0, NETWORK_W, 145), fill=(246, 251, 252))
+    draw.line((60, 145, NETWORK_W - 60, 145), fill=LINE, width=3)
+    text(draw, (70, 34), "ML Model Architecture Detail", 46, NAVY, True)
+    text(
+        draw,
+        (72, 92),
+        "Feature/QC groups become X_allowed; target-only saturation and phase labels supervise or validate but do not enter the predictor matrix.",
+        22,
+        MUTED,
+        width=2200,
+    )
+
+    def small_card(box: tuple[int, int, int, int], heading: str, lines: list[str], accent, fill=WHITE, size: int = 18) -> None:
+        card(draw, box, fill=fill, outline=accent, radius=16, width=2)
+        draw.rounded_rectangle((box[0], box[1], box[0] + 10, box[3]), radius=9, fill=accent)
+        y = text(draw, (box[0] + 24, box[1] + 14), heading, 20, accent, True, width=box[2] - box[0] - 40, gap=4)
+        for line in lines:
+            y = text(draw, (box[0] + 25, y + 2), line, size, NAVY, width=box[2] - box[0] - 45, gap=3)
+
+    def arrow_line(start: tuple[int, int], end: tuple[int, int], color, width: int = 4, dashed: bool = False) -> None:
+        if dashed:
+            dx, dy = end[0] - start[0], end[1] - start[1]
+            length = math.hypot(dx, dy)
+            if length:
+                ux, uy = dx / length, dy / length
+                dist = 0
+                while dist < length - 18:
+                    dash_end = min(dist + 20, length - 18)
+                    draw.line(
+                        (
+                            int(start[0] + ux * dist),
+                            int(start[1] + uy * dist),
+                            int(start[0] + ux * dash_end),
+                            int(start[1] + uy * dash_end),
+                        ),
+                        fill=color,
+                        width=width,
+                    )
+                    dist += 32
+        else:
+            draw.line((start, end), fill=color, width=width)
+        angle = math.atan2(end[1] - start[1], end[0] - start[0])
+        length = 18
+        pts = [
+            end,
+            (int(end[0] - length * math.cos(angle - 0.45)), int(end[1] - length * math.sin(angle - 0.45))),
+            (int(end[0] - length * math.cos(angle + 0.45)), int(end[1] - length * math.sin(angle + 0.45))),
+        ]
+        draw.polygon(pts, fill=color)
+
+    def poly_arrow(points: list[tuple[int, int]], color, width: int = 4, dashed: bool = False) -> None:
+        for start, end in zip(points, points[1:], strict=False):
+            if dashed:
+                dx, dy = end[0] - start[0], end[1] - start[1]
+                length = math.hypot(dx, dy)
+                if length:
+                    ux, uy = dx / length, dy / length
+                    dist = 0
+                    while dist < length - 18:
+                        dash_end = min(dist + 20, length - 18)
+                        draw.line(
+                            (
+                                int(start[0] + ux * dist),
+                                int(start[1] + uy * dist),
+                                int(start[0] + ux * dash_end),
+                                int(start[1] + uy * dash_end),
+                            ),
+                            fill=color,
+                            width=width,
+                        )
+                        dist += 32
+            else:
+                draw.line((start, end), fill=color, width=width)
+        end = points[-1]
+        prev = points[-2]
+        angle = math.atan2(end[1] - prev[1], end[0] - prev[0])
+        length = 18
+        pts = [
+            end,
+            (int(end[0] - length * math.cos(angle - 0.45)), int(end[1] - length * math.sin(angle - 0.45))),
+            (int(end[0] - length * math.cos(angle + 0.45)), int(end[1] - length * math.sin(angle + 0.45))),
+        ]
+        draw.polygon(pts, fill=color)
+
+    feature_cards = [
+        ("QC flags", ["caliper/washout", "missingness/outliers"], AMBER, AMBER_LIGHT),
+        ("Stability context", ["AU/permafrost", "interval/status/confidence"], BLUE, BLUE_LIGHT),
+        ("Lithology/reservoir", ["GR -> Vsh", "RHOB/porosity"], GREEN, GREEN_LIGHT),
+        ("Resistivity/fluid", ["Rt features", "baseline saturation checks"], TEAL, ICE_LIGHT),
+        ("Sonic/elastic", ["Vp, Vs, AI", "lambda-rho, mu-rho"], PURPLE, PURPLE_LIGHT),
+        ("NMR/core context", ["NMRPHI where measured", "core calibration later"], GREEN, WHITE),
+    ]
+    feature_centers: list[tuple[int, int]] = []
+    for idx, (heading, lines, accent, fill) in enumerate(feature_cards):
+        y = 205 + idx * 160
+        box = (70, y, 430, y + 112)
+        small_card(box, heading, lines, accent, fill)
+        feature_centers.append((box[2], (box[1] + box[3]) // 2))
+
+    small_card(
+        (520, 270, 850, 430),
+        "Whole-well split",
+        ["split wells first", "no random-row final claim"],
+        BLUE,
+        BLUE_LIGHT,
+    )
+    small_card(
+        (520, 520, 850, 720),
+        "Train-only preprocessing",
+        ["fit imputation/scaling on train", "apply frozen transform to val/test", "feature selection after split"],
+        PURPLE,
+        PURPLE_LIGHT,
+    )
+    small_card(
+        (520, 810, 850, 980),
+        "X_allowed",
+        ["measured + derived + QC + context", "targets removed before model"],
+        GREEN,
+        GREEN_LIGHT,
+    )
+    preprocess_points = [(520, 350), (520, 620), (520, 895)]
+    for start in feature_centers:
+        arrow_line(start, (500, 895), GREEN, width=3)
+    arrow_line((685, 430), (685, 520), PURPLE)
+    arrow_line((685, 720), (685, 810), PURPLE)
+    arrow_line((850, 895), (970, 895), GREEN)
+
+    # Neural network drawing.
+    layer_specs = [
+        ("input features", 980, 8, GREEN),
+        ("hidden layer 1", 1235, 10, PURPLE),
+        ("hidden layer 2", 1490, 8, PURPLE),
+        ("shared representation", 1745, 6, BLUE),
+        ("output heads", 2025, 2, AMBER),
+    ]
+    layers: list[list[tuple[int, int]]] = []
+    for label_name, x, count, color in layer_specs:
+        top_y, bottom_y = 330, 1080
+        spacing = (bottom_y - top_y) / max(1, count - 1)
+        pts = [(x, int(top_y + i * spacing)) for i in range(count)]
+        layers.append(pts)
+        text(draw, (x - 110, 238), label_name, 19, color, True, width=220, align="center")
+
+    edge_color = (196, 211, 218)
+    for left_layer, right_layer in zip(layers, layers[1:], strict=False):
+        for a in left_layer:
+            for b in right_layer:
+                draw.line((a, b), fill=edge_color, width=1)
+
+    for pts, (_, _, _, color) in zip(layers, layer_specs, strict=False):
+        for idx, (x, y) in enumerate(pts):
+            r = 18 if len(pts) > 2 else 24
+            draw.ellipse((x - r, y - r, x + r, y + r), fill=WHITE, outline=color, width=4)
+            if len(pts) <= 2:
+                draw.ellipse((x - 8, y - 8, x + 8, y + 8), fill=color)
+
+    small_card(
+        (2135, 315, 2500, 470),
+        "Occurrence head",
+        ["P(hydrate)", "calibrated class", "false-positive review"],
+        BLUE,
+        BLUE_LIGHT,
+    )
+    small_card(
+        (2135, 915, 2500, 1070),
+        "Saturation head",
+        ["Sh_pred", "residual review", "uncertainty band"],
+        GREEN,
+        GREEN_LIGHT,
+    )
+    arrow_line((2049, layers[-1][0][1]), (2135, 392), BLUE, width=4)
+    arrow_line((2049, layers[-1][1][1]), (2135, 992), GREEN, width=4)
+
+    small_card(
+        (920, 1175, 1275, 1348),
+        "Baseline comparison",
+        ["physics/simple rules first", "tree/boosting/ANN must beat baseline"],
+        AMBER,
+        AMBER_LIGHT,
+    )
+    small_card(
+        (1370, 1175, 1725, 1348),
+        "Validation",
+        ["held-out wells", "metrics by well/depth/QC", "mimic and residual review"],
+        PURPLE,
+        PURPLE_LIGHT,
+    )
+    small_card(
+        (1820, 1175, 2260, 1348),
+        "Reviewed output package",
+        ["probability, Sh, uncertainty", "reason flags and blocked reasons"],
+        TEAL,
+        ICE_LIGHT,
+    )
+    arrow_line((1275, 1260), (1370, 1260), AMBER, width=4)
+    arrow_line((1725, 1260), (1820, 1260), PURPLE, width=4)
+
+    small_card(
+        (520, 1140, 800, 1355),
+        "Target-only rail",
+        ["Sgh / S_h / Sh", "NMR_SAT", "phase/core labels"],
+        RED,
+        RED_LIGHT,
+    )
+    poly_arrow([(800, 1248), (860, 1248), (860, 1370), (1350, 1370), (1350, 1260), (1370, 1260)], RED, width=4, dashed=True)
+    text(draw, (780, 1095), "targets supervise loss/validation, not predictors", 20, RED, True, width=730)
+
+    card(draw, (70, 1390, 2530, 1455), fill=(245, 249, 250), outline=LINE, radius=18, width=2)
+    text(
+        draw,
+        (100, 1408),
+        "Guardrail: this shows architecture only. Real training waits for approved labels, source-resolved units, complete-well splits, and mentor-approved target authority.",
+        20,
+        MUTED,
+        width=2350,
+    )
+
+    ASSET_DIR.mkdir(parents=True, exist_ok=True)
+    path = ASSET_DIR / "ml_pipeline_network_detail_v4.png"
+    img.save(path, quality=94)
+    return path
 
 
 def overview_slide_panel() -> Path:
@@ -807,7 +1041,7 @@ def apply_doc_style(document: Document) -> None:
         style.font.bold = True
 
 
-def build_word_companion(diagram_path: Path) -> Path:
+def build_word_companion(diagram_path: Path, network_path: Path) -> Path:
     document = Document()
     apply_doc_style(document)
     section = document.sections[0]
@@ -831,6 +1065,14 @@ def build_word_companion(diagram_path: Path) -> Path:
         "barrier, occurrence classification, saturation regression, validation, and reviewed exports."
     )
     document.add_picture(str(diagram_path), width=Inches(9.9))
+
+    document.add_heading("ML Architecture Detail", level=1)
+    document.add_paragraph(
+        "The companion architecture visual expands the modeling block into feature groups, "
+        "QC and train-only preprocessing, a neural-network-style candidate path, two output "
+        "heads, and the target-only rail used for training labels and validation overlays."
+    )
+    document.add_picture(str(network_path), width=Inches(9.9))
 
     document.add_heading("How To Read The Diagram", level=1)
     for item in [
@@ -877,11 +1119,13 @@ def build_word_companion(diagram_path: Path) -> Path:
 
 def main() -> None:
     panels = build_panels()
+    network = ml_network_detail_panel()
     deck = rebuild_deck(panels)
     verify_deck(deck)
     contact_sheet = build_contact_sheet(panels)
-    docx = build_word_companion(panels[2])
+    docx = build_word_companion(panels[2], network)
     print(f"Wrote {panels[2]}")
+    print(f"Wrote {network}")
     print(f"Wrote {contact_sheet}")
     print(f"Wrote {deck}")
     print(f"Wrote {docx}")
