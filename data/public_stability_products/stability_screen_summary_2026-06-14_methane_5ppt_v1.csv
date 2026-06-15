@@ -1,0 +1,6 @@
+metric,value,meaning
+Screen rows,8084,One row per public scaffold well for the baseline methane 5 ppt run.
+Calculated stability intervals,22,Rows with non-null baseline top/base/thickness after all gates passed.
+No stable interval found,8,Rows where inputs were sufficient but the modeled interval was not stable.
+Blocked rows,8054,Rows left null because at least one source or calculation gate did not pass.
+Not hydrate proof,8084,"Every row remains a stability-admissibility screen, not occurrence or saturation evidence."
