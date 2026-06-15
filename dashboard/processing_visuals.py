@@ -421,6 +421,174 @@ def render_processing_sketch(
         text(payload.barrier || "target labels cannot become features", compact ? w / 2 : bx + 12, compact ? by + 24 : 86, compact ? 10 : 11, colors.red, compact ? "center" : "left");
       }}
 
+      function detailedArrow(x1, y1, x2, y2, color=colors.muted, label="", dashed=false) {{
+        if (dashed) ctx.setLineDash([7, 6]);
+        arrow(x1, y1, x2, y2, color);
+        ctx.setLineDash([]);
+        if (label) {{
+          const lx = (x1 + x2) / 2;
+          const ly = (y1 + y2) / 2;
+          roundRect(lx - 48, ly - 13, 96, 26, 7, "rgba(11,37,51,0.86)", color);
+          text(label, lx, ly, 9, colors.white);
+        }}
+      }}
+
+      function workflowCard(card, x, y, bw, bh, compact=false) {{
+        const accent = card.color || colors.ice;
+        const tight = bw < 230;
+        roundRect(x, y, bw, bh, 8, "rgba(242,245,246,0.065)", "rgba(242,245,246,0.22)");
+        ctx.fillStyle = accent;
+        ctx.fillRect(x, y, 5, bh);
+        text(card.title, x + 14, y + 20, compact ? 10 : 12, accent, "left", 800);
+        if (card.badge) {{
+          roundRect(x + bw - 78, y + 8, 66, 21, 7, "rgba(11,37,51,0.72)", accent);
+          text(card.badge, x + bw - 45, y + 18, 8, colors.white);
+        }}
+        const lines = card.lines || [];
+        lines.slice(0, compact ? 1 : tight ? 2 : 3).forEach((line, i) => {{
+          text(line, x + 14, y + 45 + i * 17, compact ? 8 : 9.5, colors.white, "left", 500);
+        }});
+        const equations = card.equations || [];
+        const eqTop = y + (compact ? 58 : tight ? 86 : 99);
+        equations.slice(0, compact ? 1 : tight ? 2 : 3).forEach((eq, i) => {{
+          const ey = eqTop + i * 20;
+          roundRect(x + 12, ey - 10, bw - 24, 18, 6, "rgba(11,37,51,0.72)", accent);
+          text(eq, x + bw / 2, ey, compact ? 8 : tight ? 8 : 9, colors.white, "center", 650);
+        }});
+        if (card.note && !compact) text(card.note, x + 14, y + bh - 18, 9, colors.muted, "left", 500);
+      }}
+
+      function drawDetailedWorkflow(t, w, h) {{
+        const cards = payload.cards || [];
+        const sources = payload.sources || [];
+        const compact = w < 540;
+        const medium = w < 1100;
+        text("Equation-Driven ML Workflow", w / 2, 28, compact ? 18 : 23);
+        text("source schema -> unit/QC gates -> physics equations -> leakage-safe model heads", w / 2, 55, compact ? 10 : 12, colors.muted);
+        if (compact) {{
+          const x = 24;
+          const bw = w - 48;
+          const bh = 76;
+          const top = 76;
+          cards.forEach((card, i) => {{
+            const y = top + i * (bh + 10);
+            workflowCard(card, x, y, bw, bh, true);
+            if (i > 0) {{
+              detailedArrow(w / 2, y - 10, w / 2, y - 2, card.title.includes("Target") ? colors.red : colors.teal, "", card.title.includes("Target"));
+            }}
+          }});
+          text("labels/calibration bypass feature matrix", w / 2, h - 46, 10, colors.red);
+          text("not hydrate proof; final outputs wait for approved labels and whole-well validation", w / 2, h - 25, 10, colors.muted);
+          return;
+        }}
+
+        if (medium) {{
+          const left = 28;
+          const gap = 18;
+          const cardW = (w - left * 2 - gap) / 2;
+          const cardH = 122;
+          const top = 84;
+          const rowGap = 17;
+          const slots = [
+            [0, 0],
+            [1, 0],
+            [0, 1],
+            [1, 1],
+            [0, 2],
+            [1, 2],
+            [1, 3],
+          ];
+          const positions = [];
+          cards.forEach((card, i) => {{
+            const slot = slots[i] || [i % 2, Math.floor(i / 2)];
+            const x = left + slot[0] * (cardW + gap);
+            const y = top + slot[1] * (cardH + rowGap);
+            positions.push([x, y]);
+            workflowCard(card, x, y, cardW, cardH, false);
+          }});
+          detailedArrow(positions[0][0] + cardW, positions[0][1] + cardH / 2, positions[1][0], positions[1][1] + cardH / 2, colors.teal, "schema");
+          detailedArrow(positions[1][0] + cardW / 2, positions[1][1] + cardH, positions[2][0] + cardW / 2, positions[2][1], colors.ice, "P-T");
+          detailedArrow(positions[1][0] + cardW / 2, positions[1][1] + cardH, positions[3][0] + cardW / 2, positions[3][1], colors.teal, "logs");
+          detailedArrow(positions[2][0] + cardW, positions[2][1] + cardH / 2, positions[3][0], positions[3][1] + cardH / 2, colors.amber, "context");
+          detailedArrow(positions[3][0] + cardW / 2, positions[3][1] + cardH, positions[5][0] + cardW / 2, positions[5][1], colors.teal, "features");
+          detailedArrow(positions[4][0] + cardW, positions[4][1] + cardH / 2, positions[5][0], positions[5][1] + cardH / 2, colors.red, "labels only", true);
+          detailedArrow(positions[5][0] + cardW / 2, positions[5][1] + cardH, positions[6][0] + cardW / 2, positions[6][1], colors.purple, "validated");
+          ctx.strokeStyle = colors.red;
+          ctx.lineWidth = 3;
+          ctx.setLineDash([10, 7]);
+          ctx.strokeRect(positions[4][0] - 10, positions[4][1] - 10, cardW + 20, cardH + 20);
+          ctx.setLineDash([]);
+          text("target fields cannot become predictors", positions[4][0] + cardW / 2, positions[4][1] - 24, 10, colors.red);
+          const railY = h - 54;
+          text("Source anchors", left, railY, 10, colors.muted, "left", 800);
+          sources.slice(0, 5).forEach((source, i) => {{
+            const sw = (w - left * 2 - 92) / 5;
+            const x = left + 92 + i * sw;
+            roundRect(x, railY - 15, sw - 10, 30, 7, "rgba(242,245,246,0.06)", source.color || colors.ice);
+            text(source.label, x + (sw - 10) / 2, railY, 8.5, colors.white);
+          }});
+          text("Guardrail: stability and physics features guide review; labels and final predictions require approved target rows.", w / 2, h - 22, 10, colors.muted);
+          return;
+        }}
+
+        const left = 32;
+        const gap = 16;
+        const cardW = (w - left * 2 - gap * 3) / 4;
+        const cardH = 162;
+        const top = 86;
+        const rowGap = 86;
+        const slots = [
+          [0, 0],
+          [1, 0],
+          [2, 0],
+          [3, 0],
+          [1, 1],
+          [2, 1],
+          [3, 1],
+        ];
+        const positions = [];
+        cards.forEach((card, i) => {{
+          const slot = slots[i] || [i % 4, Math.floor(i / 4)];
+          const x = left + slot[0] * (cardW + gap);
+          const y = top + slot[1] * (cardH + rowGap);
+          positions.push([x, y]);
+          workflowCard(card, x, y, cardW, cardH, false);
+        }});
+
+        const midY = top + cardH / 2;
+        detailedArrow(positions[0][0] + cardW, midY, positions[1][0], midY, colors.teal, "schema");
+        detailedArrow(positions[1][0] + cardW, midY - 22, positions[2][0], midY - 22, colors.ice, "P-T");
+        detailedArrow(positions[1][0] + cardW, midY + 22, positions[3][0], midY + 22, colors.teal, "logs");
+        detailedArrow(positions[2][0] + cardW, midY, positions[3][0], midY, colors.amber, "context");
+        detailedArrow(positions[1][0] + cardW / 2, top + cardH, positions[4][0] + cardW / 2, positions[4][1], colors.red, "targets", true);
+        detailedArrow(positions[3][0] + cardW / 2, top + cardH, positions[5][0] + cardW / 2, positions[5][1], colors.teal, "features");
+        detailedArrow(positions[4][0] + cardW, positions[4][1] + cardH / 2, positions[5][0], positions[5][1] + cardH / 2, colors.red, "labels only", true);
+        detailedArrow(positions[5][0] + cardW, positions[5][1] + cardH / 2, positions[6][0], positions[6][1] + cardH / 2, colors.purple, "validated");
+
+        ctx.strokeStyle = colors.red;
+        ctx.lineWidth = 3;
+        ctx.setLineDash([10, 7]);
+        ctx.beginPath();
+        ctx.moveTo(positions[4][0] - 12, positions[4][1] - 12);
+        ctx.lineTo(positions[4][0] + cardW + 12, positions[4][1] - 12);
+        ctx.lineTo(positions[4][0] + cardW + 12, positions[4][1] + cardH + 12);
+        ctx.lineTo(positions[4][0] - 12, positions[4][1] + cardH + 12);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.setLineDash([]);
+        text("leakage barrier: target fields cannot become predictors", positions[4][0] + cardW / 2, positions[4][1] - 25, 10, colors.red);
+
+        const railY = h - 56;
+        text("Source anchors", left, railY, 10, colors.muted, "left", 800);
+        sources.slice(0, 5).forEach((source, i) => {{
+          const sw = (w - left * 2 - 92) / 5;
+          const x = left + 92 + i * sw;
+          roundRect(x, railY - 15, sw - 10, 30, 7, "rgba(242,245,246,0.06)", source.color || colors.ice);
+          text(source.label, x + (sw - 10) / 2, railY, 9, colors.white);
+        }});
+        text("Guardrail: stability and physics features guide review; labels and final predictions require approved target rows.", w / 2, h - 22, 10.5, colors.muted);
+      }}
+
       function drawDecisionTree(t, w, h) {{
         const nodes = payload.nodes || payload || [];
         text("Hydrate Interpretation Decision Tree", w / 2, 32, 22);
@@ -507,6 +675,7 @@ def render_processing_sketch(
         else if (sketch === "well_evidence") drawWellEvidence(t, w, h);
         else if (sketch === "target_boundary") drawBoundary(t, w, h);
         else if (sketch === "ml_architecture") drawMLArchitecture(t, w, h);
+        else if (sketch === "detailed_ml_workflow") drawDetailedWorkflow(t, w, h);
         else if (sketch === "decision_tree") drawDecisionTree(t, w, h);
         else if (sketch === "cohort_split") drawCohort(t, w, h);
         else if (sketch === "built_next") drawBuiltNext(t, w, h);

@@ -4150,21 +4150,185 @@ def render_full_workflow_map_panel() -> None:
         "One public-safe map connecting the public scaffold, OSL workbench, stability context, "
         "approved-data schema controls, leakage barrier, future model heads, validation, and exports."
     )
-    if FULL_WORKFLOW_FLOWCHART.exists():
-        st.markdown(
-            (
-                f'<img src="{png_data_uri(FULL_WORKFLOW_FLOWCHART)}" '
-                'alt="Full ML workflow map" '
-                'style="width: 100%; height: auto; border: 1px solid #c7d2da; border-radius: 8px;" />'
-            ),
-            unsafe_allow_html=True,
-        )
+    detailed_workflow_payload = {
+        "cards": [
+            {
+                "title": "1. Source schema",
+                "badge": "public + OSL",
+                "color": "#67d0df",
+                "lines": [
+                    "DNR wells, GGD223, G10015, USGS AUs",
+                    "approved LAS/CSV/core/NMR later",
+                    "original headers preserved first",
+                ],
+                "equations": [
+                    "source header -> canonical alias",
+                    "sheet/file -> provenance row",
+                    "role -> feature / target / QC",
+                ],
+                "note": "About 3/71 approved-data datasets visible now.",
+            },
+            {
+                "title": "2. Unit and QC gates",
+                "badge": "fail closed",
+                "color": "#25b99a",
+                "lines": [
+                    "depth, density, sonic, porosity, caliper",
+                    "missingness and bad-hole flags",
+                    "train-only transforms later",
+                ],
+                "equations": [
+                    "depth_ft -> depth_m",
+                    "RHOB kg/m3 -> g/cc",
+                    "caliper -> washout flag",
+                ],
+                "note": "Unresolved units stay out of final modeling.",
+            },
+            {
+                "title": "3. Stability equations",
+                "badge": "context",
+                "color": "#d8a24a",
+                "lines": [
+                    "hydrostatic absolute pressure",
+                    "G10015 temperature model",
+                    "methane 5 ppt phase lookup",
+                ],
+                "equations": [
+                    "Pabs = 0.101 + rho_w*g*z",
+                    "Tmodel = interp/extrap G10015",
+                    "stable if Tmodel <= Teq(Pabs)",
+                ],
+                "note": "Admissibility only, not occurrence.",
+            },
+            {
+                "title": "4. Physics features",
+                "badge": "inputs",
+                "color": "#8ea7ff",
+                "lines": [
+                    "reservoir, resistivity, sonic, NMR",
+                    "elastic crossplots and saturation proxies",
+                    "mimic risks remain visible",
+                ],
+                "equations": [
+                    "Vsh=(GR-GRc)/(GRs-GRc)",
+                    "phiD=(rho_ma-RHOB)/(rho_ma-rho_f)",
+                    "Vp=304.8/DT; Vs=304.8/DTS",
+                ],
+                "note": "lambda-rho, mu-rho, Archie, NMR-density feed review.",
+            },
+            {
+                "title": "5. Target-only rail",
+                "badge": "labels",
+                "color": "#d66a6a",
+                "lines": [
+                    "Sgh, S_h, Sh, NMR_SAT",
+                    "Hydrate Saturation, Swr, S_wr",
+                    "phase labels and manual calls",
+                ],
+                "equations": [
+                    "NMR_SAT -> target/check only",
+                    "Archie Sh -> baseline/check only",
+                    "targets bypass feature matrix",
+                ],
+                "note": "Runtime validation now blocks leakage.",
+            },
+            {
+                "title": "6. Model heads",
+                "badge": "future",
+                "color": "#8ea7ff",
+                "lines": [
+                    "whole-well train/validation/test split",
+                    "physics/simple baseline first",
+                    "tree or ANN after controls pass",
+                ],
+                "equations": [
+                    "features -> occurrence P(hydrate)",
+                    "features -> saturation Sh",
+                    "preprocessing fit on train wells",
+                ],
+                "note": "No final model metrics until approved labels exist.",
+            },
+            {
+                "title": "7. Validation and exports",
+                "badge": "review",
+                "color": "#25b99a",
+                "lines": [
+                    "calibration and residual plots",
+                    "QC, mimic, reason, uncertainty flags",
+                    "public-safe summaries only",
+                ],
+                "equations": [
+                    "compare vs Sgh/NMR/core targets",
+                    "review by well/depth/QC/lithology",
+                    "export maps/tables after review",
+                ],
+                "note": "Outputs are predictions, not proof.",
+            },
+        ],
+        "sources": [
+            {"label": "SIR 2008-5175 P-T", "color": "#d8a24a"},
+            {"label": "Chong 2022 ML", "color": "#8ea7ff"},
+            {"label": "Lee/Collett/Haines logs", "color": "#67d0df"},
+            {"label": "Target registry", "color": "#d66a6a"},
+            {"label": "ML source ledger", "color": "#25b99a"},
+        ],
+    }
+    render_processing_sketch(
+        "detailed_ml_workflow",
+        detailed_workflow_payload,
+        "Equation-Driven Workflow Map",
+        "Equations and source gates are wired into the ML path before any occurrence or saturation model is trained.",
+        height=760,
+    )
+
+    equation_gate_groups = [
+        "Lithology / reservoir quality",
+        "Density porosity",
+        "Sonic velocity",
+        "Elastic moduli",
+        "Lambda-rho / mu-rho",
+        "Pressure-temperature admissibility",
+        "Overburden / effective stress",
+        "Saturation proxy",
+        "NMR-density saturation proxy",
+        "Permeability / producibility risk",
+    ]
+    equation_gates = pd.DataFrame(EQUATION_LIBRARY)
+    equation_gates = equation_gates[
+        equation_gates["Equation group"].isin(equation_gate_groups)
+    ][
+        [
+            "Equation group",
+            "Equation",
+            "Inputs",
+            "Feature produced",
+            "Classification use",
+            "Source anchor",
+        ]
+    ]
+    with st.expander("Equation gates behind the workflow map", expanded=True):
+        st.dataframe(equation_gates, use_container_width=True, hide_index=True)
         st.caption(
-            f"{project_relative_or_absolute(FULL_WORKFLOW_FLOWCHART)} | "
-            "workflow/status guide only, not hydrate proof or trained-model output"
+            "These equations produce candidate features, context fields, baselines, or validation checks. "
+            "They do not create hydrate proof, saturation labels, or public model metrics by themselves."
         )
-    else:
-        st.info(f"Workflow map not found yet: {project_relative_or_absolute(FULL_WORKFLOW_FLOWCHART)}")
+
+    with st.expander("Static export preview and downloads", expanded=False):
+        if FULL_WORKFLOW_FLOWCHART.exists():
+            st.markdown(
+                (
+                    f'<img src="{png_data_uri(FULL_WORKFLOW_FLOWCHART)}" '
+                    'alt="Full ML workflow map" '
+                    'style="width: 100%; height: auto; border: 1px solid #c7d2da; border-radius: 8px;" />'
+                ),
+                unsafe_allow_html=True,
+            )
+            st.caption(
+                f"{project_relative_or_absolute(FULL_WORKFLOW_FLOWCHART)} | "
+                "workflow/status guide only, not hydrate proof or trained-model output"
+            )
+        else:
+            st.info(f"Workflow map not found yet: {project_relative_or_absolute(FULL_WORKFLOW_FLOWCHART)}")
 
     cols = st.columns(4)
     cols[0].metric("Public scaffold wells", "8,084")
