@@ -635,6 +635,570 @@ def slide_09(root: Path, out: Path) -> None:
     save(img, out)
 
 
+def _slide_02_final(root: Path, out: Path) -> None:
+    rev = root / "references" / "presentation-revision-2026-06-11" / "images"
+    geo = root / "raw_data" / "geology" / "CNS_AUs" / "CNS_AUs.jpg"
+    img = new_slide(
+        "What Are Methane Hydrates?",
+        "Methane trapped in water cages; North Slope hydrate is a pressure-temperature, reservoir, and log-evidence problem.",
+    )
+    d = ImageDraw.Draw(img)
+
+    # Source visual plus a clean clathrate sketch.
+    sem_box = (72, 180, 675, 695)
+    sem = fit_image(rev / "usgs_gas_hydrate_crystals_sem_public_domain.jpg", sem_box, cover=True)
+    if sem:
+        img.paste(sem, sem_box[:2])
+        overlay = Image.new("RGBA", (sem_box[2] - sem_box[0], sem_box[3] - sem_box[1]), (7, 30, 43, 0))
+        od = ImageDraw.Draw(overlay)
+        od.rectangle((0, 0, overlay.width, 130), fill=(7, 30, 43, 155))
+        od.rectangle((0, overlay.height - 120, overlay.width, overlay.height), fill=(7, 30, 43, 170))
+        img.paste(overlay.convert("RGB"), sem_box[:2], overlay)
+    else:
+        d.rectangle(sem_box, fill=PANEL)
+    d.rectangle(sem_box, outline=(183, 202, 208), width=2)
+    draw_text(d, (100, 210), "Actual hydrate crystals", 29, WHITE, True)
+    draw_text(d, (100, 620), "Ice-like solid: CH4 held inside H2O cages", 24, WHITE, True, width=520)
+
+    cx, cy = 470, 425
+    for radius, color in [(138, ICE), (93, (190, 235, 242))]:
+        pts = []
+        for i in range(12):
+            a = math.pi * 2 * i / 12 + math.pi / 12
+            pts.append((int(cx + math.cos(a) * radius), int(cy + math.sin(a) * radius)))
+        d.line(pts + [pts[0]], fill=color, width=5)
+        for px, py in pts:
+            d.ellipse((px - 10, py - 10, px + 10, py + 10), fill=(230, 252, 255), outline=WHITE, width=2)
+    d.ellipse((cx - 55, cy - 55, cx + 55, cy + 55), fill=AMBER, outline=WHITE, width=5)
+    draw_text(d, (cx, cy - 18), "CH4", 42, WHITE, True, anchor="ma")
+    draw_text(d, (710, 198), "Definition", 25, NAVY, True)
+    definition = [
+        ("water lattice", "H2O molecules form cage-like crystals", ICE),
+        ("methane guest", "CH4 occupies the cage", AMBER),
+        ("hydrate solid", "stable only under the right P-T conditions", TEAL),
+    ]
+    for i, (label, body, color) in enumerate(definition):
+        y = 250 + i * 98
+        d.ellipse((718, y, 762, y + 44), fill=color, outline=WHITE, width=3)
+        draw_text(d, (788, y - 2), label, 23, NAVY, True)
+        draw_text(d, (788, y + 35), body, 17, INK, width=390)
+    draw_text(d, (718, 575), "Conceptual reaction", 17, MUTED, True)
+    draw_text(d, (718, 615), "CH4 + nH2O -> CH4·nH2O", 30, TEAL, True)
+
+    # Stability diagram with the current North Slope public-screen assumptions.
+    plot = (1160, 188, 1778, 565)
+    draw_text(d, (1160, 158), "Stability diagram", 28, NAVY, True)
+    d.line((plot[0], plot[3], plot[2], plot[3]), fill=MUTED, width=4)
+    d.line((plot[0], plot[3], plot[0], plot[1]), fill=MUTED, width=4)
+    arrow(d, (plot[0], plot[3]), (plot[2] + 28, plot[3]), MUTED, 4)
+    arrow(d, (plot[0], plot[3]), (plot[0], plot[1] - 28), MUTED, 4)
+    draw_text(d, (plot[2] + 40, plot[3] - 10), "T", 26, MUTED, True)
+    draw_text(d, (plot[0] - 18, plot[1] - 62), "P", 26, MUTED, True)
+    stable = [
+        (plot[0], plot[3]),
+        (plot[0], plot[1] + 48),
+        (plot[0] + 260, plot[1] + 60),
+        (plot[0] + 444, plot[1] + 145),
+        (plot[0] + 540, plot[3]),
+    ]
+    d.polygon(stable, fill=(207, 239, 244))
+    boundary = [
+        (plot[0] + 35, plot[3] - 45),
+        (plot[0] + 150, plot[3] - 145),
+        (plot[0] + 285, plot[3] - 225),
+        (plot[0] + 440, plot[3] - 270),
+        (plot[2] - 12, plot[3] - 300),
+    ]
+    d.line(boundary, fill=TEAL, width=7)
+    geotherm = [
+        (plot[0] + 110, plot[3] - 5),
+        (plot[0] + 275, plot[3] - 110),
+        (plot[0] + 445, plot[3] - 235),
+        (plot[2] - 38, plot[3] - 315),
+    ]
+    d.line(geotherm, fill=RED, width=5)
+    draw_text(d, (plot[0] + 212, plot[1] + 112), "GHSZ", 34, TEAL, True)
+    draw_text(d, (plot[0] + 165, plot[1] + 152), "gas hydrate stability zone", 17, TEAL, True)
+    draw_text(d, (plot[0] + 410, plot[3] - 205), "geotherm", 18, RED, True)
+    draw_text(d, (plot[0] + 352, plot[3] + 22), "too warm / unstable", 16, MUTED)
+
+    assumptions = [
+        ("100% CH4 + 5 ppt", "public baseline phase curve"),
+        ("hydrostatic P", "first-pass pressure model"),
+        ("G10015 + GGD223", "temperature and permafrost controls"),
+        ("stability only", "necessary, not proof"),
+    ]
+    for i, (title, body) in enumerate(assumptions):
+        x = 1160 + (i % 2) * 310
+        y = 610 + (i // 2) * 86
+        card(d, (x, y, x + 280, y + 62), fill=(247, 252, 253), outline=(198, 218, 224), radius=15)
+        draw_text(d, (x + 18, y + 11), title, 18, TEAL if i != 3 else RED, True)
+        draw_text(d, (x + 18, y + 37), body, 14, INK, width=238)
+
+    # North Slope context strip: target habit and map context.
+    paste_image(img, geo, (720, 755, 925, 960), cover=True, bg=WHITE)
+    structural = fit_image(rev / "project_streamlit_structural_explorer_v2.png", (955, 755, 1245, 960), cover=True)
+    if structural:
+        img.paste(structural, (955, 755))
+        d.rectangle((955, 755, 1245, 960), outline=(201, 220, 225), width=2)
+    card(d, (1280, 755, 1780, 960), fill=(249, 244, 244), outline=AMBER, radius=20)
+    draw_text(d, (1312, 782), "North Slope project assumption", 22, NAVY, True)
+    draw_text(
+        d,
+        (1312, 822),
+        "Main target is pore-filling methane hydrate in sand-rich permafrost reservoirs. Logs/core define occurrence and saturation; maps only frame the setting.",
+        18,
+        INK,
+        width=425,
+    )
+    footer(img, "Sources: USGS gas hydrate FAQ and SEM image; NETL methane hydrate primer; USGS SIR 2008-5175 phase-curve method; project stability calculation plan.")
+    save(img, out)
+
+
+def _slide_03_final(root: Path, out: Path) -> None:
+    img = new_slide(
+        "Parameters: Well-Log Scaffold",
+        "Symbols are shown with plain names, roles, and caveats so the final deck reads like science, not a spreadsheet.",
+    )
+    d = ImageDraw.Draw(img)
+    columns = [
+        (
+            "1. Stability context",
+            "Can hydrate exist here?",
+            TEAL,
+            [
+                ("z", "Depth", "P-T position", "datum and units"),
+                ("P", "Pressure", "phase input", "hydrostatic assumption"),
+                ("T", "Temperature", "phase input", "profile extrapolation"),
+                ("PF", "Permafrost", "thermal seal context", "point controls"),
+            ],
+        ),
+        (
+            "2. Reservoir quality",
+            "Can the rock host it?",
+            GREEN,
+            [
+                ("GR", "Gamma ray", "clean-sand gate", "radioactive minerals"),
+                ("φD", "Density porosity", "pore volume", "mineral mix, washout"),
+                ("ρb", "Bulk density", "porosity and AI", "shale, compaction"),
+                ("CAL", "Caliper", "bad-hole QC", "not hydrate evidence"),
+            ],
+        ),
+        (
+            "3. Hydrate response",
+            "Do logs agree?",
+            AMBER,
+            [
+                ("Rt", "Deep resistivity", "electrical support", "gas, ice, tight rock"),
+                ("Vp", "P-wave velocity", "stiffness support", "cement, lithology"),
+                ("Vs", "S-wave velocity", "rigidity support", "missing shear sonic"),
+                ("φNMR", "NMR porosity", "mobile-fluid check", "processing settings"),
+            ],
+        ),
+    ]
+    for c, (title, question, color, rows) in enumerate(columns):
+        x = 80 + c * 600
+        card(d, (x, 172, x + 540, 760), fill=WHITE, outline=(195, 216, 223), radius=24)
+        d.rounded_rectangle((x, 172, x + 540, 224), radius=20, fill=color)
+        draw_text(d, (x + 28, 187), title, 24, WHITE, True)
+        draw_text(d, (x + 28, 246), question, 22, NAVY, True, width=470)
+        for i, (sym, name, role, caveat) in enumerate(rows):
+            y = 300 + i * 102
+            d.rounded_rectangle((x + 28, y, x + 128, y + 74), radius=18, fill=(235, 247, 249), outline=(184, 218, 224), width=2)
+            draw_text(d, (x + 78, y + 20), sym, 27, color, True, anchor="ma")
+            draw_text(d, (x + 154, y + 2), name, 21, NAVY, True)
+            draw_text(d, (x + 154, y + 32), role, 16, INK, width=210)
+            draw_text(d, (x + 365, y + 32), caveat, 15, RED if "not" in caveat or "gas" in caveat else MUTED, width=140)
+            if i < len(rows) - 1:
+                d.line((x + 78, y + 75, x + 78, y + 92), fill=(202, 222, 227), width=3)
+
+    # Derived and target fields sit below the tiered scaffold.
+    card(d, (80, 805, 1145, 938), fill=(247, 252, 253), outline=(198, 218, 224), radius=22)
+    draw_text(d, (112, 830), "Derived physics features", 23, NAVY, True)
+    derived = [("Vp/Vs", "gas and stiffness separation"), ("AI", "ρbVp impedance"), ("μρ", "rigidity"), ("λρ", "incompressibility")]
+    for i, (sym, body) in enumerate(derived):
+        x = 112 + i * 250
+        d.rounded_rectangle((x, 878, x + 210, 916), radius=12, fill=PANEL)
+        draw_text(d, (x + 14, 887), sym, 18, TEAL if i < 2 else PURPLE, True)
+        draw_text(d, (x + 84, 890), body, 13, INK, width=112)
+    card(d, (1190, 805, 1785, 938), fill=(249, 244, 244), outline=RED, radius=22)
+    draw_text(d, (1222, 830), "Locked target fields", 23, RED, True)
+    draw_text(
+        d,
+        (1222, 874),
+        "Sh, Sgh, NMR saturation, hydrate saturation, phase labels, and final rankings are labels or outputs. Keep them out of predictors.",
+        17,
+        INK,
+        width=520,
+    )
+    footer(img, "Sources: well-log requirements map; science-to-ML ladder; ML baseline source ledger; Chong et al. 2022.")
+    save(img, out)
+
+
+def _slide_04_final(root: Path, out: Path) -> None:
+    flow = root / "docs" / "project_blueprints" / "presentation_assets" / "full_workflow_diagram_2026_06_15" / "full_project_ml_workflow_flowchart.png"
+    img = new_slide(
+        "ML Methodology: Full Project Workflow",
+        "The new diagram belongs here: approved inputs, stability context, feature engineering, leakage barrier, occurrence, saturation, and validation.",
+        dark=False,
+    )
+    d = ImageDraw.Draw(img)
+    paste_image(img, flow, (58, 156, 1862, 916), cover=False, bg=WHITE)
+    card(d, (155, 930, 1765, 1000), fill=(249, 244, 244), outline=AMBER, radius=18)
+    draw_text(
+        d,
+        (190, 951),
+        "Key point: stability and maps are context. Occurrence is a classified label; saturation is a continuous target; both wait for approved labels and whole-well validation.",
+        22,
+        NAVY,
+        True,
+        width=1540,
+        align="center",
+    )
+    footer(img, "Sources: full project ML workflow diagram; approved-data schema architecture plan; ML citation packet; public/runtime boundary docs.")
+    save(img, out)
+
+
+def _slide_05_final(root: Path, out: Path) -> None:
+    img = new_slide(
+        "Why These Parameters Matter",
+        "Each parameter has a physical reason, a hydrate-supportive signal, a mimic, and an ML role.",
+    )
+    d = ImageDraw.Draw(img)
+    rows = [
+        ("Stability", "z, P, T, permafrost", "tests whether hydrate can exist", "not proof by itself", "context, mask, reason flag", TEAL),
+        ("Sand host", "GR, φ, ρb, core lithology", "low shale + pore volume can host hydrate", "clean water sand, thin beds, shale mix", "reservoir-quality gate", GREEN),
+        ("Electrical", "Rt", "hydrate replaces conductive water, so Rt can rise", "gas, ice, tight rock, salinity, invasion", "log-transform input plus mimic flag", RED),
+        ("Elastic", "Vp, Vs, AI, μρ, λρ", "hydrate stiffens the sediment frame", "cement, carbonate, compaction, ice", "derived feature block", PURPLE),
+        ("NMR and core", "φNMR, Sh, Sgh, core", "independent saturation and calibration support", "sparse core, processing settings, depth mismatch", "labels and validation overlays", BLUE),
+        ("Quality control", "CAL, missingness, outliers", "protects density, sonic, NMR, and Rt", "bad hole can fake curve changes", "exclude, downweight, or flag", AMBER),
+    ]
+    headers = [("Family", 95), ("Symbols", 360), ("Why it helps", 640), ("What can fool it", 1020), ("ML use", 1390)]
+    for label, x in headers:
+        draw_text(d, (x, 174), label, 21, NAVY, True)
+    d.line((82, 214, 1810, 214), fill=(187, 209, 216), width=3)
+    for i, (family, symbols, why, mimic, role, color) in enumerate(rows):
+        y = 238 + i * 105
+        card(d, (75, y, 1815, y + 82), fill=WHITE, outline=(201, 220, 225), radius=20)
+        d.rounded_rectangle((75, y, 92, y + 82), radius=8, fill=color)
+        draw_text(d, (105, y + 18), family, 22, color, True, width=220)
+        draw_text(d, (360, y + 18), symbols, 22, NAVY, True, width=240)
+        draw_text(d, (640, y + 13), why, 18, INK, width=320)
+        draw_text(d, (1020, y + 13), mimic, 18, RED if i in [0, 2, 3, 5] else MUTED, width=315)
+        draw_text(d, (1390, y + 13), role, 18, TEAL, True, width=340)
+
+    mini_y = 885
+    d.rounded_rectangle((240, mini_y, 1680, mini_y + 70), radius=18, fill=(235, 247, 249), outline=(184, 218, 224), width=2)
+    draw_text(
+        d,
+        (960, mini_y + 18),
+        "Final presentation point: the model should learn agreement across families, not a single cutoff such as high Rt or low GR.",
+        22,
+        NAVY,
+        True,
+        anchor="ma",
+    )
+    footer(img, "Sources: science-to-ML ladder; ML baseline source ledger; Lee and Collett 2011; Haines et al. 2022; Chong et al. 2022.")
+    save(img, out)
+
+
+def _slide_06_final(root: Path, out: Path) -> None:
+    img = new_slide(
+        "Geomechanical Feature Sketch",
+        "Rock physics explains why hydrate-supportive stiffness must be checked against gas, ice, cement, lithology, stress, and borehole quality.",
+    )
+    d = ImageDraw.Draw(img)
+
+    # Grain-pack / hydrate sketch.
+    card(d, (78, 175, 700, 760), fill=WHITE, outline=(201, 220, 225), radius=24)
+    draw_text(d, (112, 205), "Pore-scale idea", 27, NAVY, True)
+    rock_box = (140, 292, 610, 622)
+    d.rounded_rectangle(rock_box, radius=36, fill=(228, 232, 221), outline=(145, 164, 151), width=3)
+    for i in range(45):
+        px = rock_box[0] + 34 + (i % 9) * 48 + (10 if (i // 9) % 2 else 0)
+        py = rock_box[1] + 32 + (i // 9) * 58
+        fill = SAND if i % 3 else (235, 241, 242)
+        d.ellipse((px - 20, py - 15, px + 20, py + 15), fill=fill, outline=(160, 150, 119), width=1)
+    for px, py in [(245, 390), (335, 445), (425, 390), (500, 502)]:
+        d.ellipse((px - 26, py - 26, px + 26, py + 26), fill=(212, 243, 247), outline=TEAL, width=3)
+        draw_text(d, (px, py - 11), "H", 22, TEAL, True, anchor="ma")
+    arrow(d, (92, 400), (150, 400), BLUE, 5)
+    arrow(d, (612, 400), (675, 400), BLUE, 5)
+    draw_text(d, (96, 362), "Vp", 22, BLUE, True)
+    draw_text(d, (625, 362), "Vs", 22, PURPLE, True)
+    d.line((188, 270, 562, 270), fill=AMBER, width=5)
+    arrow(d, (376, 240), (376, 282), AMBER, 5)
+    draw_text(d, (250, 225), "overburden and compaction shift baselines", 17, MUTED, width=340)
+    draw_text(d, (126, 655), "Hydrate can cement or bridge pores, raising shear rigidity. Gas may raise Rt but does not stiffen the frame the same way.", 19, INK, width=520)
+
+    # Equations.
+    card(d, (755, 175, 1215, 760), fill=WHITE, outline=(201, 220, 225), radius=24)
+    draw_text(d, (790, 205), "Unit-safe features", 27, NAVY, True)
+    eqs = [
+        ("AI", "ρb × Vp"),
+        ("G = μ", "ρb × Vs²"),
+        ("K", "ρb × (Vp² − 4Vs²/3)"),
+        ("ν", "(3K − 2G) / 2(3K + G)"),
+        ("λρ", "(K − 2G/3) × ρb"),
+        ("μρ", "G × ρb"),
+    ]
+    for i, (lhs, rhs) in enumerate(eqs):
+        y = 270 + i * 70
+        d.rounded_rectangle((790, y, 910, y + 42), radius=12, fill=(235, 247, 249), outline=(184, 218, 224), width=2)
+        draw_text(d, (850, y + 9), lhs, 19, TEAL if i < 3 else PURPLE, True, anchor="ma")
+        draw_text(d, (940, y + 8), rhs, 19, INK, True, width=230)
+    draw_text(d, (790, 705), "Derived features inherit errors from density, sonic units, depth alignment, and QC.", 18, RED, True, width=360)
+
+    # Crossplot sketch.
+    card(d, (1270, 175, 1818, 760), fill=WHITE, outline=(201, 220, 225), radius=24)
+    draw_text(d, (1305, 205), "Interpretation crossplot", 27, NAVY, True)
+    px1, py1, px2, py2 = 1340, 640, 1750, 305
+    d.line((px1, py1, 1765, py1), fill=MUTED, width=3)
+    d.line((px1, py1, px1, 285), fill=MUTED, width=3)
+    arrow(d, (px1, py1), (1775, py1), MUTED, 3)
+    arrow(d, (px1, py1), (px1, 275), MUTED, 3)
+    draw_text(d, (1698, 655), "λρ", 20, MUTED, True)
+    draw_text(d, (1305, 278), "μρ", 20, MUTED, True)
+    clusters = [
+        ("water sand", 1460, 540, GREEN),
+        ("gas sand", 1530, 595, RED),
+        ("hydrate sand", 1625, 430, TEAL),
+        ("ice/cement", 1710, 345, PURPLE),
+        ("shale", 1430, 370, AMBER),
+    ]
+    for label, cx, cy, color in clusters:
+        for j in range(7):
+            dx = ((j % 3) - 1) * 14
+            dy = ((j // 3) - 1) * 12
+            d.ellipse((cx + dx - 6, cy + dy - 6, cx + dx + 6, cy + dy + 6), fill=color, outline=WHITE, width=1)
+        draw_text(d, (cx - 45, cy - 45), label, 15, color, True, width=120)
+    draw_text(d, (1310, 700), "Hydrate-supportive zone requires sand, P-T context, Rt support, and QC.", 17, INK, width=430)
+
+    checks = [
+        ("hydrate support", TEAL),
+        ("free gas risk", RED),
+        ("ice/cement risk", PURPLE),
+        ("shale risk", AMBER),
+        ("bad-hole QC", RED),
+    ]
+    for i, (label, color) in enumerate(checks):
+        x = 215 + i * 300
+        d.rounded_rectangle((x, 838, x + 250, 890), radius=15, fill=color)
+        draw_text(d, (x + 125, 853), label, 18, WHITE, True, anchor="ma")
+    footer(img, "Sources: runtime feature engineering; science-to-ML ladder; Cook and Waite 2018; Haines et al. 2022; ML baseline ledger.")
+    save(img, out)
+
+
+def _slide_07_final(root: Path, out: Path) -> None:
+    rev = root / "references" / "presentation-revision-2026-06-11" / "images"
+    geo = root / "raw_data" / "geology" / "CNS_AUs" / "CNS_AUs.jpg"
+    img = new_slide(
+        "Map Stack: Website Now and Runtime Later",
+        "The 3D view should show every map surface as context, then point forward to approved-runtime occurrence and saturation maps.",
+    )
+    d = ImageDraw.Draw(img)
+
+    panels = [
+        ((78, 178, 650, 505), "Current 3D structural explorer", rev / "project_streamlit_structural_explorer_v2.png", TEAL),
+        ((690, 178, 1180, 505), "Public AU and regional map", geo, GREEN),
+    ]
+    for box, title, path, color in panels:
+        paste_image(img, path, box, cover=True, bg=WHITE)
+        d.rounded_rectangle((box[0], box[1], box[2], box[1] + 44), radius=16, fill=(7, 30, 43))
+        draw_text(d, (box[0] + 18, box[1] + 12), title, 18, WHITE, True, width=box[2] - box[0] - 35)
+
+    # Guarded stability map sketch.
+    stab = (1220, 178, 1818, 505)
+    card(d, stab, fill=WHITE, outline=(201, 220, 225), radius=22)
+    draw_text(d, (1248, 205), "Guarded stability screen", 22, NAVY, True)
+    coast = [(1265, 330), (1340, 270), (1430, 280), (1515, 245), (1640, 290), (1770, 278)]
+    d.line(coast, fill=(112, 161, 178), width=5)
+    for i in range(90):
+        x = 1270 + (i * 47) % 500
+        y = 325 + ((i * 71) % 110)
+        color = (210, 224, 230)
+        if i % 23 == 0:
+            color = TEAL
+        elif i % 29 == 0:
+            color = GREEN
+        elif i % 17 == 0:
+            color = RED
+        d.ellipse((x - 4, y - 4, x + 4, y + 4), fill=color)
+    counts = [("22", "calculated", TEAL), ("8", "no stable interval", GREEN), ("8,054", "blocked", RED)]
+    for i, (num, label, color) in enumerate(counts):
+        x = 1255 + i * 175
+        d.rounded_rectangle((x, 445, x + 155, 485), radius=12, fill=(235, 247, 249), outline=color, width=2)
+        draw_text(d, (x + 18, 454), num, 17, color, True)
+        draw_text(d, (x + 65, 456), label, 12, INK, width=85)
+
+    # Lower panels: audit plot, current/future map inventory, future runtime.
+    audit = (78, 565, 650, 895)
+    card(d, audit, fill=WHITE, outline=(201, 220, 225), radius=22)
+    draw_text(d, (105, 592), "Selected-well P-T audit", 22, NAVY, True)
+    ax = (140, 828, 570, 635)
+    d.line((ax[0], ax[1], ax[2], ax[1]), fill=MUTED, width=3)
+    d.line((ax[0], ax[1], ax[0], ax[3]), fill=MUTED, width=3)
+    d.line([(155, 800), (250, 735), (355, 690), (500, 665)], fill=TEAL, width=5)
+    d.line([(200, 830), (315, 760), (438, 695), (545, 620)], fill=RED, width=4)
+    draw_text(d, (330, 664), "phase curve", 15, TEAL, True)
+    draw_text(d, (435, 725), "modeled T", 15, RED, True)
+    draw_text(d, (105, 850), "Shows assumption audit, not occurrence proof.", 17, RED, True, width=500)
+
+    inventory = (690, 565, 1180, 895)
+    card(d, inventory, fill=WHITE, outline=(201, 220, 225), radius=22)
+    draw_text(d, (720, 592), "Website maps to carry forward", 22, NAVY, True)
+    map_rows = [
+        ("Now", "3D structural surfaces", TEAL),
+        ("Now", "public wells + hydrate AUs", GREEN),
+        ("Now", "stability status map", AMBER),
+        ("Now", "temperature-phase audit", BLUE),
+        ("Future", "approved occurrence map", RED),
+        ("Future", "approved saturation/uncertainty map", PURPLE),
+    ]
+    for i, (status, label, color) in enumerate(map_rows):
+        y = 640 + i * 39
+        d.rounded_rectangle((720, y, 800, y + 26), radius=9, fill=color)
+        draw_text(d, (760, y + 6), status, 11, WHITE, True, anchor="ma")
+        draw_text(d, (820, y + 3), label, 17, INK, width=310)
+
+    future = (1220, 565, 1818, 895)
+    card(d, future, fill=(247, 252, 253), outline=(201, 220, 225), radius=22)
+    draw_text(d, (1248, 592), "Future approved-runtime 3D maps", 22, NAVY, True)
+    # Draw an abstract 3D surface with vertical prediction tracks.
+    surface = [(1280, 770), (1400, 690), (1610, 710), (1760, 780), (1640, 835), (1435, 820)]
+    d.polygon(surface, fill=(213, 235, 226), outline=TEAL)
+    for x, y, color, label in [(1380, 735, TEAL, "Pocc"), (1515, 725, GREEN, "Sh"), (1640, 760, AMBER, "unc")]:
+        d.line((x, y - 90, x, y + 75), fill=color, width=5)
+        d.ellipse((x - 12, y - 98, x + 12, y - 74), fill=color)
+        draw_text(d, (x - 22, y - 125), label, 15, color, True)
+    draw_text(d, (1248, 835), "Only after approved logs, labels, and validation; public version shows reviewed summaries.", 17, INK, width=510)
+
+    footer(img, "Sources: current Streamlit structural explorer; public CNS/AU map; guarded stability-screen products; planned approved-runtime outputs.")
+    save(img, out)
+
+
+def _slide_08_final(root: Path, out: Path) -> None:
+    img = new_slide(
+        "Results and Discussion: What Gets Measured",
+        "The final results section must separate source-backed labels, model outputs, uncertainty, and scientific interpretation.",
+    )
+    d = ImageDraw.Draw(img)
+
+    # Occurrence measurement answer, compact and explicit.
+    card(d, (75, 178, 1815, 382), fill=(247, 252, 253), outline=(184, 218, 224), radius=24)
+    draw_text(d, (110, 205), "How occurrence is measured in the sources", 28, NAVY, True)
+    occurrence_points = [
+        ("Chong 2024", "categorical classes from interpreted RAB resistivity images, resistivity, and Vp: pore-filling, fracture-filling, or none"),
+        ("Chong 2022 / Singh 2021", "main label is continuous Sh/Sgh from NMR-density or Archie-style saturation; occurrence is inferred only after a label policy"),
+        ("Our project", "use approved phase labels, mentor-reviewed intervals, or an approved Sh threshold; never use stability as the occurrence label"),
+    ]
+    for i, (source, body) in enumerate(occurrence_points):
+        x = 112 + i * 560
+        d.rounded_rectangle((x, 260, x + 520, 352), radius=16, fill=WHITE, outline=(201, 220, 225), width=2)
+        draw_text(d, (x + 18, 274), source, 17, TEAL if i != 2 else RED, True, width=470)
+        draw_text(d, (x + 18, 302), body, 14, INK, width=470)
+
+    outputs = [
+        ("Occurrence probability", "classifier output after approved labels", TEAL),
+        ("Saturation estimate", "continuous Sh/Sgh regression target", GREEN),
+        ("Uncertainty", "model + feature + target confidence", BLUE),
+        ("QC and mimic flags", "bad hole, shale, gas, ice, tight rock", RED),
+        ("Validation figures", "calibration, residuals, held-out wells", PURPLE),
+        ("Discussion", "why evidence agreed or disagreed", AMBER),
+    ]
+    for i, (title, body, color) in enumerate(outputs):
+        x = 90 + (i % 3) * 600
+        y = 432 + (i // 3) * 170
+        card(d, (x, y, x + 520, y + 125), fill=WHITE, outline=(201, 220, 225), radius=20)
+        d.ellipse((x + 25, y + 32, x + 85, y + 92), fill=(235, 247, 249), outline=color, width=3)
+        draw_text(d, (x + 55, y + 48), str(i + 1), 22, color, True, anchor="ma")
+        draw_text(d, (x + 112, y + 28), title, 23, color, True)
+        draw_text(d, (x + 112, y + 66), body, 17, INK, width=350)
+
+    card(d, (275, 820, 1645, 918), fill=(249, 244, 244), outline=AMBER, radius=22)
+    draw_text(d, (315, 846), "Discussion rule", 23, NAVY, True)
+    draw_text(
+        d,
+        (535, 846),
+        "For every interval: what evidence supported hydrate, what looked like a mimic, which QC checks passed, and what approved label or residual proves the model is behaving.",
+        19,
+        INK,
+        width=1040,
+    )
+    footer(img, "Sources: Chong et al. 2024 occurrence workflow; Chong et al. 2022 and Singh et al. 2021 saturation targets; ML baseline ledger.")
+    save(img, out)
+
+
+def _slide_09_final(root: Path, out: Path) -> None:
+    img = new_slide(
+        "Conclusion",
+        "The final project is an explainable workflow for hydrate occurrence, saturation, and review-ready uncertainty.",
+    )
+    d = ImageDraw.Draw(img)
+
+    center = (960, 450)
+    d.ellipse((650, 245, 1270, 655), fill=(231, 243, 245), outline=(158, 205, 212), width=4)
+    draw_text(d, (960, 332), "Final message", 40, NAVY, True, anchor="ma")
+    draw_text(
+        d,
+        (725, 400),
+        "Predict occurrence and saturation only when source role, physics response, target provenance, validation, and uncertainty stay traceable.",
+        23,
+        INK,
+        True,
+        width=470,
+        align="center",
+    )
+
+    nodes = [
+        ((110, 205), "Science value", "defines the North Slope hydrate system before parameters", TEAL),
+        ((1350, 205), "ML value", "separate occurrence classifier and saturation regressor", GREEN),
+        ((110, 635), "Delivery value", "website is a public skeleton and map/workflow surface", AMBER),
+        ((1350, 635), "Next tasks", "recover workbook formulas, labels, splits, and approved figures", RED),
+    ]
+    for (x, y), title, body, color in nodes:
+        card(d, (x, y, x + 430, y + 150), fill=WHITE, outline=(201, 220, 225), radius=22)
+        d.rounded_rectangle((x + 28, y + 42, x + 92, y + 106), radius=18, fill=(235, 247, 249), outline=color, width=3)
+        draw_text(d, (x + 60, y + 58), title[0], 25, color, True, anchor="ma")
+        draw_text(d, (x + 118, y + 35), title, 26, color, True)
+        draw_text(d, (x + 118, y + 76), body, 18, INK, width=260)
+        arrow(d, (x + (430 if x < 900 else 0), y + 75), (center[0] + (-305 if x < 900 else 305), center[1]), fill=(148, 171, 180), width=4)
+
+    checklist = [
+        ("Now", "public source maps, stability screen, schema coverage, leakage barrier"),
+        ("Next", "approved occurrence labels and Sh target policy"),
+        ("Final", "whole-well validation, calibrated outputs, reviewed public-safe summaries"),
+    ]
+    for i, (phase, body) in enumerate(checklist):
+        x = 265 + i * 465
+        d.rounded_rectangle((x, 825, x + 405, 910), radius=20, fill=(247, 252, 253), outline=(184, 218, 224), width=2)
+        draw_text(d, (x + 24, 848), phase, 23, TEAL if i == 0 else (AMBER if i == 1 else GREEN), True)
+        draw_text(d, (x + 112, 844), body, 16, INK, width=260)
+
+    footer(img, "Sources: project direction lock; full workflow diagram; approved-data schema plan; USGS/DOE/NETL source stack; ML citation packet.")
+    save(img, out)
+
+
+def _write_contact_sheet(outputs: list[Path], out_dir: Path) -> None:
+    thumbs: list[Image.Image] = []
+    for path in outputs:
+        with Image.open(path).convert("RGB") as src:
+            thumbs.append(src.resize((480, 270), Image.Resampling.LANCZOS))
+    sheet = Image.new("RGB", (3 * 520, 3 * 330), WHITE)
+    d = ImageDraw.Draw(sheet)
+    for i, thumb in enumerate(thumbs):
+        x = (i % 3) * 520 + 20
+        y = (i // 3) * 330 + 42
+        d.text((x, y - 28), path_label(outputs[i]), fill=INK, font=font(18, True))
+        sheet.paste(thumb, (x, y))
+        d.rectangle((x, y, x + 480, y + 270), outline=(190, 210, 216), width=2)
+    sheet.save(out_dir / "processing_panel_contact_sheet.jpg", quality=92)
+
+
+def path_label(path: Path) -> str:
+    return path.stem.replace("_", " ")
+
+
 def build_assets(root: Path) -> list[Path]:
     out_dir = root / "docs" / "project_blueprints" / "presentation_assets" / "processing_revisions_2026_06_11"
     outputs = [
@@ -648,9 +1212,20 @@ def build_assets(root: Path) -> list[Path]:
         out_dir / "slide_08_results_plan.png",
         out_dir / "slide_09_conclusion.png",
     ]
-    builders = [slide_01, slide_02, slide_03, slide_04, slide_05, slide_06, slide_07, slide_08, slide_09]
+    builders = [
+        slide_01,
+        _slide_02_final,
+        _slide_03_final,
+        _slide_04_final,
+        _slide_05_final,
+        _slide_06_final,
+        _slide_07_final,
+        _slide_08_final,
+        _slide_09_final,
+    ]
     for builder, output in zip(builders, outputs, strict=True):
         builder(root, output)
+    _write_contact_sheet(outputs, out_dir)
     return outputs
 
 

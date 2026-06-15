@@ -59,6 +59,13 @@ Word companion:
 docs/project_blueprints/North_Slope_Gas_Hydrate_Full_ML_Workflow_Diagram_2026-06-15.docx
 ```
 
+Mentor status package around the V5 workflow:
+
+```text
+docs/MENTOR_PROJECT_STATUS_PACKAGE_V5_WORKFLOW_2026-06-15.md
+docs/project_blueprints/North_Slope_Gas_Hydrate_Mentor_Status_Package_V5_Workflow_2026-06-15.docx
+```
+
 Approved-data schema architecture plan and matrix:
 
 ```text
@@ -215,3 +222,23 @@ Use the Word companion as a short insert or appendix page. The main Word
 document can introduce the diagram before the methodology section, then use it
 to explain why stability, reservoir quality, hydrate response, target mapping,
 modeling, and validation are separate steps.
+
+For mentor check-ins, use the separate status package to keep the message short:
+where the project is now, what has been completed outside the stability screen,
+what remains blocked by approved data or label authority, and what decisions
+are needed before final ML claims can be made.
+
+## Mentor Decisions
+
+The V5 package should keep these questions visible:
+
+1. Phase-curve policy: keep methane 5 ppt as the only official baseline, or add
+   a labeled scenario table?
+2. Target authority: which saturation and occurrence labels are official for
+   training and validation?
+3. Validation split: use whole-well, compartment, geographic holdout, or a
+   staged combination?
+4. Temperature handling: when G10015 is missing, keep rows blocked, use proxy
+   tiers, or run scenario-only gradients?
+5. ML use of stability: allow the stability screen as context, confidence,
+   reason flag, or mask only, never as an occurrence label?

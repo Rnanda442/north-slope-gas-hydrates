@@ -51,14 +51,14 @@ For the stability-screen communication pass, use
 OpenScienceLab workbench, public GitHub/Streamlit delivery surface, and
 stability-admissibility guardrail aligned. User review on 2026-06-15 rejected
 the first stability/ML slide-remake draft as too disconnected from the whole
-project; the active slide/Word refresh direction is now the one-map workflow
-diagram in `docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md`, the diagram-first PPTX,
-and the Word companion generated from
-`docs/project_blueprints/build_full_workflow_diagram_deliverables.py`. The
-diagram keeps the current Gmail deck's first two slides and makes slide 3 the
-full connected workflow from public/source inputs and OSL/approved inputs
-through stability context, feature engineering, leakage controls, occurrence
-classification, saturation regression, validation, and public-safe exports. The
+project, then rejected the diagram-first replacement as changing too much of
+the prior Gmail deck. The active slide direction is now the Gmail-style
+nine-slide raster-panel deck rebuilt from
+`docs/project_blueprints/build_ml_revamp_powerpoint.py`: keep slide 1/about-me
+authority, improve slide 2 hydrate definition and stability assumptions, keep
+slide 3 as a symbol-clean parameter scaffold, use the full workflow diagram on
+the ML methodology slide only, and strengthen the parameter rationale,
+geomechanics, map stack, results/discussion, and conclusion panels. The
 2026-06-15 pipeline status Word brief remains the plain-language review draft
 for explaining where the project stands now and how the approved-data ML
 pipeline should reach occurrence classification and saturation regression.
@@ -101,13 +101,14 @@ source/product rebuild is actually needed.
   present.
 - Two working Word drafts and a rebuilt 2026-06-13 local research-overview
   Word/PPT deliverable pair are present in `docs/project_blueprints/`.
-- The current local presentation baseline is the public-safe 2026-06-13
-  science-to-ML 9-slide revision rebuilt from
+- The current local presentation baseline is the targeted 2026-06-15
+  Gmail-style 9-slide revision rebuilt from
   `docs/project_blueprints/build_ml_revamp_powerpoint.py`; it keeps the
-  full-slide raster-panel format but reframes the deck around the hydrate
-  system, parameter movement patterns, screening envelopes, leakage-safe
-  targets, occurrence classification, saturation regression, and calibrated
-  validation.
+  full-slide raster-panel format and improves the hydrate definition/stability
+  slide, symbol-clean parameter scaffold, ML methodology workflow diagram,
+  parameter rationale, geomechanics sketch, map stack, results/discussion
+  explanation of occurrence labels, and conclusion without claiming model
+  results.
 - The 2026-06-13 science-to-ML local DOCX/PPTX rebuild was imported to the
   connected Google Drive account as native files:
   [SCIENCE-TO-ML North Slope Gas Hydrate Research Overview 2026-06-13](https://docs.google.com/document/d/1Ft0wgKV3p8HK1F7X4_WYVAp1jOtBYuCntdRP-Z84e5k)
@@ -625,3 +626,15 @@ blockers, and next activities in the architecture/activity map.
   ML architecture diagram now shows feature/QC groups, compact log tracks,
   the `X_allowed` matrix handoff, neural-network-style layers, occurrence and
   saturation heads, baseline comparison, validation, and target-only rail.
+- 2026-06-15: Returned the active slide build to the previous Gmail-style
+  nine-slide deck instead of the diagram-first replacement. Rebuilt the local
+  PPTX and Processing panels with an improved gas-hydrate definition/stability
+  slide, symbol-clean parameter scaffold, full workflow diagram on the ML
+  methodology slide, expanded parameter rationale, stronger geomechanics and
+  map-stack visuals, and corrected occurrence/saturation explanation in the
+  results/discussion and conclusion slides.
+- 2026-06-15: Built the V5 mentor status package around the new workflow
+  diagrams, including a short Markdown update, a Word export, strengthened V5
+  Word companion language, and exact mentor decisions for phase-curve policy,
+  target authority, validation split, missing-temperature handling, and ML use
+  of stability as context or mask only.

@@ -959,7 +959,7 @@ def slide_04_inputs_boundary() -> Path:
         "The diagram separates what can be shown publicly from what must stay inside OSL or the approved environment.",
         [
             ("Public sources", ["DNR wells", "GGD223 / G10015", "USGS AU + phase curve", "source documents"], ICE_LIGHT, TEAL),
-            ("Public products", ["compact CSV summaries", "screen status counts", "website visuals", "mentor slides"], BLUE_LIGHT, BLUE),
+            ("Public products", ["compact CSV summaries", "schema coverage tab", "target registry", "V5 mentor diagrams"], BLUE_LIGHT, BLUE),
             ("Approved inputs", ["LAS / CSV logs", "core and NMR", "workbook labels", "runtime only"], GREEN_LIGHT, GREEN),
             ("Boundary review", ["no approved rows", "no restricted IDs", "no trained models", "summaries only"], RED_LIGHT, RED),
             ("Deliverables", ["Word explanation", "9-slide deck", "Streamlit scaffold", "public-safe exports"], WHITE, TEAL),
@@ -1048,10 +1048,10 @@ def slide_09_status_decisions() -> Path:
             "Complete",
             [
                 "public / OSL boundary",
-                "public scaffold and status products",
+                "8,084-well public scaffold",
+                "schema coverage + target registry",
+                "V5 diagram deck and Word companion",
                 "methane 5 ppt phase lookup",
-                "hydrostatic pressure logic",
-                "temperature-model logic",
                 "guarded stability-screen writer",
             ],
             GREEN_LIGHT,
@@ -1072,11 +1072,11 @@ def slide_09_status_decisions() -> Path:
         (
             "Blocked / future",
             [
-                f"{values['temp_blocked']} blocked temperature key depths",
                 f"{values['screen_blocked']} blocked screen rows",
-                "approved logs/core/NMR execution",
-                "occurrence labels and saturation targets",
-                "trained ML metrics and sweet-spot ranking",
+                "approved logs/core/NMR rows",
+                "official occurrence and saturation labels",
+                "holdout split policy",
+                "trained metrics and final outputs",
             ],
             RED_LIGHT,
             RED,
@@ -1097,7 +1097,7 @@ def slide_09_status_decisions() -> Path:
     text(
         draw,
         (280, 698),
-        "baseline phase curve, mixed-gas sensitivity, confidence thresholds, OM-222 digitization, approved validation fields, and whether final ML always shows occurrence classification plus saturation regression as linked outputs.",
+        "phase-curve policy, official target authority, whole-well vs compartment vs geographic holdout, G10015-missing temperature handling, and whether stability is allowed only as ML context or mask.",
         22,
         NAVY,
         True,
@@ -1233,6 +1233,55 @@ def build_word_companion(diagram_path: Path, network_path: Path) -> Path:
         "the guarded pressure-temperature stability branch, well-log physics equations, the leakage "
         "barrier, occurrence classification, saturation regression, validation, and reviewed exports."
     )
+
+    values = summaries()
+    document.add_heading("Project Status In Plain Language", level=1)
+    document.add_paragraph(
+        "The project is building a defensible North Slope workflow for gas hydrate occurrence "
+        "classification and saturation regression. The public GitHub/Streamlit side explains "
+        "source-backed methods, public scaffold counts, diagrams, and public-safe outputs. "
+        "OpenScienceLab and the later approved runtime are where raw source bundles, approved "
+        "well logs, core/NMR information, target labels, feature engineering, model fitting, "
+        "validation, and reviewed outputs belong."
+    )
+
+    document.add_heading("What Is Complete Outside Stability", level=1)
+    for item in [
+        "The public/runtime data boundary is documented and reflected in the V5 workflow diagrams.",
+        "The approved-data schema coverage matrix preserves original headers and separates measured inputs, derived features, QC/alignment fields, calibration/reference fields, target-only fields, and unresolved fields.",
+        "The target registry and leakage guardrails keep Sgh, S_h, Sh, NMR_SAT, hydrate-saturation fields, Swr, S_wr, and phase labels out of the predictor matrix.",
+        "The Analyze Hydrates page includes Schema Coverage & Architecture, Public ML Readiness, and Target Registry & Leakage views without exposing approved rows or model metrics.",
+        "The future ML architecture is defined as a leakage-safe path to linked occurrence classification and saturation regression, but final training and performance reporting remain blocked until approved labels and complete rows are available.",
+    ]:
+        document.add_paragraph(item, style="List Bullet")
+
+    document.add_heading("What Stability Currently Does", level=1)
+    document.add_paragraph(
+        f"The baseline public stability screen has {values['screen_rows']} rows, "
+        f"{values['screen_calculated']} calculated pressure-temperature admissibility intervals, "
+        f"{values['screen_no_interval']} sufficient-input no-stable-interval rows, and "
+        f"{values['screen_blocked']} blocked rows. It uses the cited methane 5 ppt phase lookup, "
+        "hydrostatic absolute pressure, public G10015/GGD223 temperature and permafrost context, "
+        "and source-control caveats."
+    )
+    for item in [
+        "It can serve the ML workflow as context, a mask, a confidence field, a caveat field, or a reason flag.",
+        "It does not prove hydrate occurrence, estimate saturation, define final top/base/thickness for approved interpretation, rank sweet spots, or replace log/core evidence.",
+        "Blocked rows mean the calculation refused to overclaim without required inputs; they do not mean no hydrate.",
+    ]:
+        document.add_paragraph(item, style="List Bullet")
+
+    document.add_heading("How Approved OSL Data Feed The Future ML Pipeline", level=1)
+    for item in [
+        "Approved LAS/CSV/core/NMR and workbook inputs are loaded only inside OSL or the approved runtime.",
+        "Original headers, units, sheet/source identity, and depth references are preserved before alias mapping.",
+        "Measured log families and approved derived physics equations build X_allowed after unit checks, QC, and depth alignment.",
+        "Target-only occurrence and saturation fields bypass X_allowed and are used only for target mapping, calibration, and validation overlays.",
+        "Validation uses complete wells, compartments, or geographic holdouts selected before preprocessing, tuning, or model fitting.",
+        "Reviewed outputs become occurrence probability, saturation estimate, uncertainty/QC/reason flags, plots, tables, GIS links, and public-safe summaries only after boundary review.",
+    ]:
+        document.add_paragraph(item, style="List Number")
+
     document.add_picture(str(diagram_path), width=Inches(9.9))
 
     document.add_heading("ML Architecture Detail", level=1)
@@ -1255,7 +1304,6 @@ def build_word_companion(diagram_path: Path, network_path: Path) -> Path:
         document.add_paragraph(item, style="List Bullet")
 
     document.add_heading("Current Status Shown In The Figure", level=1)
-    values = summaries()
     status_table = document.add_table(rows=1, cols=3)
     status_table.style = "Table Grid"
     headers = ["Complete", "Calculated", "Blocked / Future"]
@@ -1280,6 +1328,16 @@ def build_word_companion(diagram_path: Path, network_path: Path) -> Path:
         "This is a workflow and admissibility-screen diagram. It does not claim final hydrate stability, "
         "hydrate proof, hydrate saturation, validated ML performance, producibility, or sweet spots."
     )
+
+    document.add_heading("Mentor Decisions Needed", level=1)
+    for item in [
+        "Phase-curve policy: keep methane 5 ppt as the only official baseline, or add a clearly labeled scenario table?",
+        "Target authority: which occurrence and saturation labels are official when Sgh, S_h, Sh, NMR_SAT, hydrate saturation, or phase labels differ?",
+        "Validation split: should final testing use whole-well holdout, compartment holdout, geographic holdout, or a staged combination?",
+        "Temperature handling: when G10015 is missing, should rows stay blocked, use nearest-control proxy tiers, or use explicit scenario-only gradients?",
+        "ML use of stability: is the stability screen allowed as context, confidence, reason flag, or mask only, never as an occurrence label?",
+    ]:
+        document.add_paragraph(item, style="List Number")
 
     OUT_DOCX.parent.mkdir(parents=True, exist_ok=True)
     document.save(OUT_DOCX)

@@ -184,3 +184,27 @@ Latest Gmail visual-feedback execution on 2026-06-12:
 - noted that the current Drive deck preserves the visual revisions as
   full-slide raster panels, so a later pass would be needed if each text/icon
   element must be separately editable in Google Slides.
+
+Targeted Gmail-style rebuild on 2026-06-15:
+
+- user clarified that the diagram-first 9-slide replacement changed too much
+  of the prior Gmail-style deck; the active local build returned to
+  `docs/project_blueprints/build_ml_revamp_powerpoint.py`;
+- kept the same nine-slide structure and slide 1/about-me authority;
+- rebuilt slide 2 with source-backed hydrate crystal imagery, a clearer
+  water-cage sketch, pressure-temperature stability diagram, and North Slope
+  public-screen assumptions;
+- rebuilt slide 3 as a symbol-clean parameter scaffold using `Rt`, `Vp`,
+  `Vs`, `GR`, `rho_b`, `phi`, `lambda-rho`, `mu-rho`, `Sh`, and `Sgh` style
+  labels without unsupported subscript glyphs or spreadsheet underscores;
+- replaced the ML methodology slide with the full workflow diagram as a single
+  slide element rather than replacing the whole deck with diagram zoom-ins;
+- strengthened the parameter-rationale, geomechanical feature sketch, map
+  stack, results/discussion, and conclusion panels;
+- added explicit source-backed occurrence language: occurrence is a categorical
+  label in the sources, while saturation is a continuous target; stability is
+  context, not an occurrence label;
+- regenerated
+  `docs/project_blueprints/North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`
+  with exactly nine slides and verified each slide embeds one full-slide
+  raster panel.

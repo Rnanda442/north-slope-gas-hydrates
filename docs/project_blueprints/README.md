@@ -56,6 +56,15 @@ wireline machine-learning project.
     ranking.
   - Imported to the connected Google Drive account as
     [North Slope Gas Hydrate Full ML Workflow Diagram 2026-06-15](https://docs.google.com/document/d/1MJeWz0WDQvXBo80rYps76cuPZmJrP_BTQSka1Np5lyA).
+- `North_Slope_Gas_Hydrate_Mentor_Status_Package_V5_Workflow_2026-06-15.docx`
+  - Short mentor-facing status package built from
+    `docs/MENTOR_PROJECT_STATUS_PACKAGE_V5_WORKFLOW_2026-06-15.md`.
+  - Summarizes where the project is now, what is complete outside stability,
+    what remains blocked by approved data and label authority, the mentor
+    decision questions, and one-sentence weekday report bullets.
+  - Public-safe planning artifact only. It does not include approved rows,
+    trained model metrics, hydrate proof, saturation outputs, or sweet-spot
+    ranking.
 - `North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`
   - Prior tracked 9-slide visual companion deck rebuilt on 2026-06-11 from the latest
     Drive review feedback and imported to Drive as
