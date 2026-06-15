@@ -69,6 +69,19 @@ Only about 3 of the expected 71 datasets are currently available, which is
 enough for schema and architecture design but not final training, performance
 metrics, or hydrate prediction claims.
 
+Latest sync for the other PC: pull `main` through commit `738ff48`
+(`Improve ML workflow architecture diagrams`). The active diagram package is
+now V5. It saves two current layouts under
+`docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/`:
+`full_project_ml_workflow_flowchart_expanded.png` for the full project
+architecture and `ml_pipeline_network_detail_v5.png` for the model-detail
+layout. The Streamlit site points to these under Analyze Hydrates > Schema
+Coverage & Architecture, and the diagram-first PPTX plus Word companion were
+regenerated from `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`.
+Next work should package these V5 diagrams into mentor-facing status language,
+weekday report bullets, and decision questions; do not reopen OSL unless a
+source/product rebuild is actually needed.
+
 ## Current State
 
 - The public Streamlit regional atlas is implemented.
@@ -374,6 +387,12 @@ the authorized runtime environment.
 The current ordered plan is maintained in
 `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md`.
 
+Immediate 2026-06-15 handoff: use the V5 diagram package to create the
+mentor-facing status/update materials. Explain what is complete outside
+stability, what the guarded methane 5 ppt admissibility screen can and cannot
+claim, how stability context connects to the future ML feature matrix, and
+which mentor decisions are needed before final model training or public claims.
+
 ## Update Protocol
 
 Keep this file concise and factual. Maintain detailed status, dependencies,
@@ -599,3 +618,10 @@ blockers, and next activities in the architecture/activity map.
   an Analyze Hydrates tab, mentor-facing language, and target-leakage controls
   that keep saturation/phase labels out of the feature matrix until approved
   training and validation are possible.
+- 2026-06-15: Improved the workflow visuals to V5 and pushed commit `738ff48`.
+  The full project architecture now includes visual mini-panels for source
+  packages, pressure-temperature stability checking, log-track feature
+  construction, target-safe model runtime, and reviewed outputs. The companion
+  ML architecture diagram now shows feature/QC groups, compact log tracks,
+  the `X_allowed` matrix handoff, neural-network-style layers, occurrence and
+  saturation heads, baseline comparison, validation, and target-only rail.

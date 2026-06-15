@@ -67,6 +67,16 @@ The public repo should not contain:
   the full project ML workflow map. Treat the earlier
   `STABILITY_ML_REMAKE_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`
   as superseded unless the user asks to revive it.
+- Current diagram layouts are V5 as of commit `738ff48`:
+  - `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/full_project_ml_workflow_flowchart_expanded.png`
+    is the large full-project architecture map.
+  - `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/ml_pipeline_network_detail_v5.png`
+    is the model-detail layout showing feature/QC groups, log-track handoff,
+    `X_allowed`, neural-network-style layers, output heads, validation, and
+    the target-only rail.
+  - The website uses these under Analyze Hydrates > Schema Coverage &
+    Architecture. The generated PPTX and Word companion were rebuilt from
+    `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`.
 
 ### Current Word Authority
 
@@ -471,6 +481,9 @@ python 01_pipeline/build_public_stability_products.py
 
 Fresh-chat handoff as of 2026-06-15:
 
+- Latest repository sync for the other PC:
+  `738ff48 Improve ML workflow architecture diagrams`. Start with
+  `git pull origin main`, then verify the V5 workflow images above exist.
 - Previous OSL-derived public-product baseline commit:
   `aedd734 Rebuild stability products with complete G10015 profiles`.
 - OpenScienceLab full source bundle is now complete enough for the current
@@ -683,6 +696,24 @@ Before each commit:
 - include source notes when a visual or claim changes.
 
 ## Next Work Plan
+
+Current top-priority handoff for the PC:
+
+1. Build a mentor-facing status package around the V5 workflow diagrams.
+2. Explain what is complete outside stability: public GIS/website scaffold,
+   source library, public stability products, ML feature scaffold, target
+   registry/leakage guardrails, schema coverage matrix, and diagram-first
+   workflow assets.
+3. Explain stability carefully: it is a methane 5 ppt stability-admissibility
+   screen with caveats, not hydrate proof, final stability, saturation, or
+   sweet-spot ranking.
+4. Explain how stability will enter ML as context, mask, confidence, caveat,
+   or blocked-reason fields, while target labels such as `Sgh`, `S_h`, `Sh`,
+   `NMR_SAT`, phase calls, and saturation values stay out of `X_allowed`.
+5. Draft mentor questions about phase-curve policy, official target authority,
+   complete-well/compartment/geographic validation split, missing-temperature
+   handling, and whether stability context is approved as ML context only.
+6. Draft short weekday report bullets. Keep them high-level and crisp.
 
 Recommended next build:
 
