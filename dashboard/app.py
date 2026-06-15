@@ -4,6 +4,7 @@ from collections import Counter
 from html import escape
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
@@ -165,6 +166,98 @@ STABILITY_SCREEN_CONFIDENCE_COLORS = {
     "high_source_control": "#2563eb",
     "medium_source_control": "#0891b2",
     "low_source_control": "#d97706",
+}
+
+BLANK_REASON_DETAILS = {
+    "calculated": {
+        "label": "Calculated baseline interval",
+        "meaning": "All current public gates passed and top/base/thickness were written.",
+        "next_step": "Use as screened interval only; compare with logs/core before any hydrate claim.",
+    },
+    "calculated_no_stable_interval": {
+        "label": "No stable interval in modeled range",
+        "meaning": "Inputs were available, but the modeled pressure-temperature path did not enter the baseline stability window.",
+        "next_step": "Keep as a valid negative screen row; revisit only if temperature or phase assumptions change.",
+    },
+    "blocked_missing_temperature_profile": {
+        "label": "Blank: no matched temperature profile",
+        "meaning": "The well did not connect to a direct public G10015 temperature profile under the current baseline crosswalk.",
+        "next_step": "Audit name/code/coordinate crosswalks or add a separate proxy-temperature sensitivity screen if approved.",
+    },
+    "blocked_missing_depth": {
+        "label": "Blank: missing usable depth",
+        "meaning": "The public well record lacks the depth needed for pressure and interval screening.",
+        "next_step": "Recover/validate a public depth field or keep this row as a data gap.",
+    },
+    "blocked_phase_curve_range_insufficient": {
+        "label": "Blank: phase-curve range insufficient",
+        "meaning": "A direct temperature profile exists, but the modeled interval does not close inside the cited phase-curve lookup range.",
+        "next_step": "Extend the cited lookup/model range or keep the row blocked.",
+    },
+    "outside_au_context": {
+        "label": "Context only: outside public AU",
+        "meaning": "The well falls outside the committed USGS hydrate assessment-unit context.",
+        "next_step": "Do not use for public hydrate screening unless the spatial context is revised and cited.",
+    },
+}
+
+TEMPERATURE_PROXY_TIER_DETAILS = {
+    "direct_g10015_profile_match": {
+        "label": "Direct G10015 profile match",
+        "meaning": "Current baseline tier. A public temperature profile is matched to the screen row.",
+        "allowed_use": "Allowed in the baseline screen.",
+        "color": "#2563eb",
+        "size": 9,
+        "opacity": 0.9,
+    },
+    "proxy_candidate_near_g10015_control": {
+        "label": "Proxy candidate: within 50 km",
+        "meaning": "No direct profile match, but the well is within 50 km of a located G10015 control.",
+        "allowed_use": "Sensitivity/planning only until mentor approves proxy assumptions.",
+        "color": "#0891b2",
+        "size": 7,
+        "opacity": 0.72,
+    },
+    "proxy_candidate_regional_g10015_control": {
+        "label": "Proxy candidate: 50-100 km",
+        "meaning": "No direct profile match; nearest located G10015 control is regional rather than local.",
+        "allowed_use": "Regional sensitivity only; not a baseline stability result.",
+        "color": "#d97706",
+        "size": 6,
+        "opacity": 0.62,
+    },
+    "distant_from_g10015_controls": {
+        "label": "Distant from located G10015 controls",
+        "meaning": "No direct profile match and more than 100 km from a located G10015 control.",
+        "allowed_use": "Needs another cited temperature source before calculation.",
+        "color": "#ef4444",
+        "size": 6,
+        "opacity": 0.55,
+    },
+    "missing_well_depth": {
+        "label": "Missing well depth",
+        "meaning": "Temperature proxying cannot help until the well depth is available.",
+        "allowed_use": "Data recovery task.",
+        "color": "#64748b",
+        "size": 6,
+        "opacity": 0.5,
+    },
+    "outside_public_au_context": {
+        "label": "Outside public AU context",
+        "meaning": "Outside the committed hydrate assessment-unit context.",
+        "allowed_use": "Context only.",
+        "color": "#7c3aed",
+        "size": 6,
+        "opacity": 0.55,
+    },
+    "temperature_control_location_gap": {
+        "label": "Temperature-control location gap",
+        "meaning": "The inventory code lacks a committed coordinate crosswalk or the row lacks location.",
+        "allowed_use": "Crosswalk/source cleanup task.",
+        "color": "#475569",
+        "size": 6,
+        "opacity": 0.55,
+    },
 }
 MASTER_2D = PROJECT_ROOT / "03_data_final" / "master_layers" / "north_slope_master_2d_layers.parquet"
 STRUCTURAL_HORIZONS = ["NStopo", "NSLCU", "NSshublik", "NSbasement"]
@@ -2036,6 +2129,394 @@ def build_stability_interval_depth_figure(screen: pd.DataFrame) -> go.Figure:
     return figure
 
 
+def stability_blank_reason_summary_frame(screen: pd.DataFrame) -> pd.DataFrame:
+    if screen.empty or "stability_result_status" not in screen.columns:
+        return pd.DataFrame(columns=["reason", "rows", "share_pct", "meaning", "next_step"])
+
+    status_counts = screen["stability_result_status"].fillna("missing").value_counts()
+    ordered_statuses = [
+        "blocked_missing_temperature_profile",
+        "blocked_missing_depth",
+        "blocked_phase_curve_range_insufficient",
+        "outside_au_context",
+        "calculated_no_stable_interval",
+        "calculated",
+    ]
+    ordered_statuses += [
+        status for status in status_counts.index.tolist() if status not in ordered_statuses
+    ]
+    rows = []
+    total = max(len(screen), 1)
+    for status in ordered_statuses:
+        count = int(status_counts.get(status, 0))
+        if count == 0:
+            continue
+        detail = BLANK_REASON_DETAILS.get(
+            status,
+            {
+                "label": status,
+                "meaning": "Status not yet documented in the diagnostic legend.",
+                "next_step": "Review before using in public interpretation.",
+            },
+        )
+        rows.append(
+            {
+                "reason": detail["label"],
+                "status_code": status,
+                "rows": count,
+                "share_pct": round(100 * count / total, 2),
+                "meaning": detail["meaning"],
+                "next_step": detail["next_step"],
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def build_blank_reason_bar_figure(summary: pd.DataFrame) -> go.Figure:
+    figure = go.Figure()
+    if summary.empty:
+        return figure
+    colors = [
+        STABILITY_SCREEN_STATUS_STYLES.get(code, {"color": "#475569"})["color"]
+        for code in summary["status_code"]
+    ]
+    figure.add_trace(
+        go.Bar(
+            x=summary["rows"],
+            y=summary["reason"],
+            orientation="h",
+            marker={"color": colors},
+            customdata=summary[["share_pct", "next_step"]],
+            hovertemplate=(
+                "<b>%{y}</b><br>Rows: %{x:,}"
+                "<br>Share: %{customdata[0]:.2f}%"
+                "<br>Next: %{customdata[1]}<extra></extra>"
+            ),
+        )
+    )
+    figure.update_layout(
+        height=max(360, 46 * len(summary) + 80),
+        margin={"l": 260, "r": 24, "t": 24, "b": 40},
+        xaxis_title="Rows",
+        yaxis_title="",
+        showlegend=False,
+    )
+    return figure
+
+
+def g10015_temperature_control_crosswalk_frame(
+    inventory: pd.DataFrame,
+    ggd223_points: pd.DataFrame,
+) -> pd.DataFrame:
+    if inventory.empty:
+        return pd.DataFrame(
+            columns=[
+                "well_code",
+                "profile_files",
+                "profile_well_names",
+                "max_profile_depth_m",
+                "ggd223_code",
+                "ggd223_well_designation",
+                "latitude",
+                "longitude",
+                "coordinate_status",
+                "crosswalk_method",
+            ]
+        )
+
+    profile_summary = (
+        inventory.assign(
+            max_depth_m=pd.to_numeric(inventory.get("max_depth_m"), errors="coerce"),
+        )
+        .groupby("well_code", dropna=False)
+        .agg(
+            profile_files=("file_name", "nunique"),
+            profile_well_names=(
+                "well_name",
+                lambda values: "; ".join(
+                    sorted({str(value) for value in values.dropna() if str(value).strip()})[:4]
+                ),
+            ),
+            max_profile_depth_m=("max_depth_m", "max"),
+        )
+        .reset_index()
+    )
+
+    controls = ggd223_points.copy()
+    for column in ["code", "well_designation"]:
+        if column in controls.columns:
+            controls[column] = controls[column].astype(str)
+    control_codes = controls["code"].dropna().astype(str) if "code" in controls else pd.Series()
+    rows = []
+    for profile in profile_summary.itertuples(index=False):
+        code = str(profile.well_code)
+        match = controls[controls["code"].eq(code)] if "code" in controls else pd.DataFrame()
+        crosswalk_method = "exact_ggd223_code"
+        if match.empty and not control_codes.empty:
+            prefix_codes = control_codes[control_codes.str.startswith(code)]
+            if len(prefix_codes) == 1:
+                match = controls[controls["code"].eq(prefix_codes.iloc[0])]
+                crosswalk_method = "unique_prefix_ggd223_code"
+
+        if match.empty:
+            rows.append(
+                {
+                    **profile._asdict(),
+                    "ggd223_code": pd.NA,
+                    "ggd223_well_designation": pd.NA,
+                    "latitude": np.nan,
+                    "longitude": np.nan,
+                    "coordinate_status": "missing_committed_coordinate_crosswalk",
+                    "crosswalk_method": "needs_g10015_location_source_or_alias",
+                }
+            )
+            continue
+
+        control = match.iloc[0]
+        rows.append(
+            {
+                **profile._asdict(),
+                "ggd223_code": control.get("code"),
+                "ggd223_well_designation": control.get("well_designation"),
+                "latitude": pd.to_numeric(
+                    pd.Series([control.get("latitude")]), errors="coerce"
+                ).iloc[0],
+                "longitude": pd.to_numeric(
+                    pd.Series([control.get("longitude")]), errors="coerce"
+                ).iloc[0],
+                "coordinate_status": "located_from_committed_ggd223_control",
+                "crosswalk_method": crosswalk_method,
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def temperature_proxy_candidate_audit_frame(
+    screen: pd.DataFrame,
+    control_crosswalk: pd.DataFrame,
+) -> pd.DataFrame:
+    if screen.empty:
+        return pd.DataFrame()
+
+    audit = screen.copy()
+    audit["lat"] = pd.to_numeric(audit.get("lat"), errors="coerce")
+    audit["lon"] = pd.to_numeric(audit.get("lon"), errors="coerce")
+    audit["tvd_m"] = pd.to_numeric(audit.get("tvd_m"), errors="coerce")
+    audit["nearest_g10015_control_code"] = pd.NA
+    audit["nearest_g10015_control_distance_km"] = np.nan
+    audit["nearest_g10015_control_crosswalk_method"] = pd.NA
+
+    located_controls = control_crosswalk.dropna(subset=["latitude", "longitude"]).copy()
+    if not located_controls.empty:
+        valid_rows = audit["lat"].notna() & audit["lon"].notna()
+        if valid_rows.any():
+            well_lat = np.radians(
+                audit.loc[valid_rows, "lat"].to_numpy(dtype="float64")
+            )[:, None]
+            well_lon = np.radians(
+                audit.loc[valid_rows, "lon"].to_numpy(dtype="float64")
+            )[:, None]
+            control_lat = np.radians(
+                located_controls["latitude"].to_numpy(dtype="float64")
+            )[None, :]
+            control_lon = np.radians(
+                located_controls["longitude"].to_numpy(dtype="float64")
+            )[None, :]
+            delta_lat = control_lat - well_lat
+            delta_lon = control_lon - well_lon
+            haversine = (
+                np.sin(delta_lat / 2) ** 2
+                + np.cos(well_lat) * np.cos(control_lat) * np.sin(delta_lon / 2) ** 2
+            )
+            distances = 6371.0088 * 2 * np.arctan2(
+                np.sqrt(haversine), np.sqrt(1 - haversine)
+            )
+            nearest_index = np.argmin(distances, axis=1)
+            nearest_controls = located_controls.iloc[nearest_index].reset_index(drop=True)
+            audit.loc[valid_rows, "nearest_g10015_control_code"] = nearest_controls[
+                "well_code"
+            ].to_numpy()
+            audit.loc[valid_rows, "nearest_g10015_control_distance_km"] = distances[
+                np.arange(distances.shape[0]), nearest_index
+            ]
+            audit.loc[valid_rows, "nearest_g10015_control_crosswalk_method"] = nearest_controls[
+                "crosswalk_method"
+            ].to_numpy()
+
+    has_direct_profile = audit["temperature_profile_code"].notna()
+    inside_au = audit["within_hydrate_assessment_unit"].eq(True)
+    has_depth = audit["tvd_m"].notna()
+    distance = audit["nearest_g10015_control_distance_km"]
+
+    audit["temperature_proxy_tier"] = "temperature_control_location_gap"
+    audit.loc[~inside_au, "temperature_proxy_tier"] = "outside_public_au_context"
+    audit.loc[inside_au & ~has_depth, "temperature_proxy_tier"] = "missing_well_depth"
+    audit.loc[
+        inside_au & has_depth & ~has_direct_profile & distance.gt(100),
+        "temperature_proxy_tier",
+    ] = "distant_from_g10015_controls"
+    audit.loc[
+        inside_au
+        & has_depth
+        & ~has_direct_profile
+        & distance.gt(50)
+        & distance.le(100),
+        "temperature_proxy_tier",
+    ] = "proxy_candidate_regional_g10015_control"
+    audit.loc[
+        inside_au & has_depth & ~has_direct_profile & distance.le(50),
+        "temperature_proxy_tier",
+    ] = "proxy_candidate_near_g10015_control"
+    audit.loc[has_direct_profile, "temperature_proxy_tier"] = "direct_g10015_profile_match"
+
+    audit["temperature_proxy_tier_label"] = audit["temperature_proxy_tier"].map(
+        lambda tier: TEMPERATURE_PROXY_TIER_DETAILS.get(tier, {"label": tier})["label"]
+    )
+    return audit
+
+
+def temperature_proxy_tier_summary_frame(audit: pd.DataFrame) -> pd.DataFrame:
+    if audit.empty:
+        return pd.DataFrame(columns=["tier", "rows", "share_pct", "meaning", "allowed_use"])
+
+    counts = audit["temperature_proxy_tier"].value_counts()
+    ordered_tiers = [
+        "direct_g10015_profile_match",
+        "proxy_candidate_near_g10015_control",
+        "proxy_candidate_regional_g10015_control",
+        "distant_from_g10015_controls",
+        "missing_well_depth",
+        "outside_public_au_context",
+        "temperature_control_location_gap",
+    ]
+    rows = []
+    total = max(len(audit), 1)
+    for tier in ordered_tiers + [tier for tier in counts.index if tier not in ordered_tiers]:
+        count = int(counts.get(tier, 0))
+        if count == 0:
+            continue
+        details = TEMPERATURE_PROXY_TIER_DETAILS.get(
+            tier,
+            {
+                "label": tier,
+                "meaning": "Tier not documented yet.",
+                "allowed_use": "Review before using.",
+            },
+        )
+        rows.append(
+            {
+                "tier": details["label"],
+                "tier_code": tier,
+                "rows": count,
+                "share_pct": round(100 * count / total, 2),
+                "meaning": details["meaning"],
+                "allowed_use": details["allowed_use"],
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def build_temperature_proxy_map(audit: pd.DataFrame) -> go.Figure:
+    map_frame = audit.dropna(subset=["lat", "lon"]).copy()
+    figure = go.Figure()
+    if map_frame.empty:
+        return figure
+
+    center_lat = float(map_frame["lat"].median())
+    center_lon = float(map_frame["lon"].median())
+    ordered_tiers = list(TEMPERATURE_PROXY_TIER_DETAILS)
+    for tier in ordered_tiers:
+        subset = map_frame[map_frame["temperature_proxy_tier"].eq(tier)]
+        if subset.empty:
+            continue
+        details = TEMPERATURE_PROXY_TIER_DETAILS[tier]
+        hover_text = (
+            "<b>"
+            + subset["well_name"].fillna("Unnamed well").astype(str)
+            + "</b><br>Tier: "
+            + subset["temperature_proxy_tier_label"].astype(str)
+            + "<br>Nearest G10015 control: "
+            + subset["nearest_g10015_control_code"].fillna("missing").astype(str)
+            + "<br>Nearest distance: "
+            + subset["nearest_g10015_control_distance_km"].round(1).astype(str)
+            + " km<br>Screen status: "
+            + subset["stability_result_status"].fillna("missing").astype(str)
+        )
+        figure.add_trace(
+            go.Scattermapbox(
+                lat=subset["lat"],
+                lon=subset["lon"],
+                mode="markers",
+                name=details["label"],
+                marker={
+                    "size": details["size"],
+                    "color": details["color"],
+                    "opacity": details["opacity"],
+                },
+                text=hover_text,
+                hovertemplate="%{text}<extra></extra>",
+            )
+        )
+
+    figure.update_layout(
+        height=560,
+        margin={"l": 0, "r": 0, "t": 30, "b": 0},
+        legend={
+            "orientation": "h",
+            "yanchor": "bottom",
+            "y": 1.01,
+            "xanchor": "left",
+            "x": 0,
+        },
+        mapbox={
+            "style": "open-street-map",
+            "center": {"lat": center_lat, "lon": center_lon},
+            "zoom": 4.0,
+        },
+    )
+    return figure
+
+
+def build_temperature_proxy_distance_figure(audit: pd.DataFrame) -> go.Figure:
+    distance_frame = audit[
+        audit["temperature_proxy_tier"].isin(
+            [
+                "proxy_candidate_near_g10015_control",
+                "proxy_candidate_regional_g10015_control",
+                "distant_from_g10015_controls",
+            ]
+        )
+    ].copy()
+    distance_frame = distance_frame.dropna(subset=["nearest_g10015_control_distance_km"])
+
+    figure = go.Figure()
+    if distance_frame.empty:
+        return figure
+
+    for tier, details in TEMPERATURE_PROXY_TIER_DETAILS.items():
+        subset = distance_frame[distance_frame["temperature_proxy_tier"].eq(tier)]
+        if subset.empty:
+            continue
+        figure.add_trace(
+            go.Histogram(
+                x=subset["nearest_g10015_control_distance_km"],
+                name=details["label"],
+                marker={"color": details["color"]},
+                opacity=0.78,
+                xbins={"start": 0, "end": 150, "size": 10},
+            )
+        )
+    figure.update_layout(
+        barmode="stack",
+        height=360,
+        margin={"l": 48, "r": 24, "t": 24, "b": 52},
+        xaxis_title="Distance to nearest located G10015 temperature control (km)",
+        yaxis_title="Rows",
+        legend={"orientation": "h", "y": 1.05, "x": 0},
+    )
+    return figure
+
+
 def render_guarded_stability_screen_product() -> None:
     screen_path = default_stability_screen_path(PROJECT_ROOT)
     screen = cached_stability_screen(str(PROJECT_ROOT))
@@ -2071,18 +2552,6 @@ def render_guarded_stability_screen_product() -> None:
         hide_index=True,
     )
 
-    st.markdown("##### 2D Screen Status Map")
-    st.caption(
-        "Point colors show calculation status only. Blue means the baseline "
-        "screen could calculate an interval for that well; it does not mean "
-        "hydrate was detected."
-    )
-    st.plotly_chart(
-        build_stability_screen_map(screen),
-        use_container_width=True,
-        config={"displayModeBar": True, "responsive": True},
-    )
-
     status_counts = (
         screen["stability_result_status"]
         .fillna("missing")
@@ -2097,10 +2566,6 @@ def render_guarded_stability_screen_product() -> None:
         .rename_axis("stability_confidence")
         .reset_index(name="rows")
     )
-    left, right = st.columns(2)
-    left.dataframe(status_counts, use_container_width=True, hide_index=True)
-    right.dataframe(confidence_counts, use_container_width=True, hide_index=True)
-
     preview_columns = [
         "well_name",
         "tvd_m",
@@ -2126,32 +2591,166 @@ def render_guarded_stability_screen_product() -> None:
         .head(30)
     )
 
-    st.markdown("##### Calculated Interval Depth View")
-    st.caption(
-        "The 22 calculated rows are plotted as top-to-base screen intervals. "
-        "These are baseline admissibility intervals, not confirmed hydrate zones."
-    )
-    st.plotly_chart(
-        build_stability_interval_depth_figure(screen),
-        use_container_width=True,
-        config={"displayModeBar": True, "responsive": True},
+    source_root = active_stability_source_path(PROJECT_ROOT)
+    ggd223_points = cached_ggd223_points(str(source_root))
+    inventory = cached_g10015_temperature_inventory(str(PROJECT_ROOT))
+    control_crosswalk = g10015_temperature_control_crosswalk_frame(inventory, ggd223_points)
+    proxy_audit = temperature_proxy_candidate_audit_frame(screen, control_crosswalk)
+    blank_summary = stability_blank_reason_summary_frame(screen)
+    proxy_summary = temperature_proxy_tier_summary_frame(proxy_audit)
+
+    status_tab, blanks_tab, temperature_tab, intervals_tab, tables_tab = st.tabs(
+        [
+            "Status Map",
+            "Why Blanks",
+            "Temperature Coverage",
+            "Calculated Intervals",
+            "Tables & Downloads",
+        ]
     )
 
-    st.markdown("##### Calculated Interval Rows")
-    if calculated_preview.empty:
-        st.info("No rows passed every screen gate in this run.")
-    else:
-        st.dataframe(calculated_preview, use_container_width=True, hide_index=True)
+    with status_tab:
+        st.markdown("##### 2D Screen Status Map")
+        st.caption(
+            "Point colors show calculation status only. Blue means the baseline "
+            "screen could calculate an interval for that well; it does not mean "
+            "hydrate was detected."
+        )
+        st.plotly_chart(
+            build_stability_screen_map(screen),
+            use_container_width=True,
+            config={"displayModeBar": True, "responsive": True},
+        )
+        left, right = st.columns(2)
+        left.dataframe(status_counts, use_container_width=True, hide_index=True)
+        right.dataframe(confidence_counts, use_container_width=True, hide_index=True)
 
-    st.markdown("##### Blocked Or No-Interval Sample")
-    st.dataframe(blocked_preview, use_container_width=True, hide_index=True)
-    st.download_button(
-        "Download guarded stability screen CSV",
-        screen.to_csv(index=False).encode("utf-8"),
-        file_name=screen_path.name,
-        mime="text/csv",
-        use_container_width=True,
-    )
+    with blanks_tab:
+        st.markdown("##### Why So Many Rows Are Blank")
+        st.caption(
+            "Blank means the row failed at least one public-source gate. It is "
+            "a data/readiness result, not a failed file transfer."
+        )
+        st.plotly_chart(
+            build_blank_reason_bar_figure(blank_summary),
+            use_container_width=True,
+            config={"displayModeBar": True, "responsive": True},
+        )
+        st.dataframe(blank_summary, use_container_width=True, hide_index=True)
+        st.info(
+            "The largest blank group is the missing-temperature-profile gate. "
+            "That reflects sparse direct G10015 coverage and current crosswalk "
+            "rules; it should be audited before any proxy-temperature screen is run."
+        )
+
+    with temperature_tab:
+        located_controls = int(
+            control_crosswalk["coordinate_status"]
+            .eq("located_from_committed_ggd223_control")
+            .sum()
+        )
+        direct_profile_rows = int(
+            proxy_audit["temperature_proxy_tier"].eq("direct_g10015_profile_match").sum()
+        )
+        near_proxy_rows = int(
+            proxy_audit["temperature_proxy_tier"]
+            .eq("proxy_candidate_near_g10015_control")
+            .sum()
+        )
+        regional_proxy_rows = int(
+            proxy_audit["temperature_proxy_tier"]
+            .eq("proxy_candidate_regional_g10015_control")
+            .sum()
+        )
+        metric_cols = st.columns(4)
+        metric_cols[0].metric("G10015 codes located", f"{located_controls}/24")
+        metric_cols[1].metric("Direct profile rows", f"{direct_profile_rows:,}")
+        metric_cols[2].metric("Near proxy candidates", f"{near_proxy_rows:,}")
+        metric_cols[3].metric("Regional candidates", f"{regional_proxy_rows:,}")
+        st.caption(
+            "Proxy tiers are planning labels only. They do not fill blank "
+            "top/base/thickness values and are not part of the baseline screen."
+        )
+        st.plotly_chart(
+            build_temperature_proxy_map(proxy_audit),
+            use_container_width=True,
+            config={"displayModeBar": True, "responsive": True},
+        )
+        st.dataframe(proxy_summary, use_container_width=True, hide_index=True)
+        st.plotly_chart(
+            build_temperature_proxy_distance_figure(proxy_audit),
+            use_container_width=True,
+            config={"displayModeBar": True, "responsive": True},
+        )
+        st.markdown("##### G10015/GGD223 Crosswalk Audit")
+        st.caption(
+            "Most G10015 codes can be located through committed GGD223 controls. "
+            "A few code/location gaps should be resolved from G10015 location "
+            "metadata before broad proxy screening."
+        )
+        st.dataframe(control_crosswalk, use_container_width=True, hide_index=True)
+        st.markdown(
+            """
+Source anchors: [NSIDC G10015](https://nsidc.org/data/g10015/versions/1),
+[NSIDC GGD223](https://nsidc.org/data/ggd223/versions/1), and
+[USGS SIR 2008-5175](https://pubs.usgs.gov/sir/2008/5175/pdf/SIR08-5175_508.pdf).
+"""
+        )
+
+    with intervals_tab:
+        st.markdown("##### Calculated Interval Depth View")
+        st.caption(
+            "The 22 calculated rows are plotted as top-to-base screen intervals. "
+            "These are baseline admissibility intervals, not confirmed hydrate zones."
+        )
+        st.plotly_chart(
+            build_stability_interval_depth_figure(screen),
+            use_container_width=True,
+            config={"displayModeBar": True, "responsive": True},
+        )
+        st.markdown("##### Calculated Interval Rows")
+        if calculated_preview.empty:
+            st.info("No rows passed every screen gate in this run.")
+        else:
+            st.dataframe(calculated_preview, use_container_width=True, hide_index=True)
+
+    with tables_tab:
+        st.markdown("##### Blocked Or No-Interval Sample")
+        st.dataframe(blocked_preview, use_container_width=True, hide_index=True)
+        audit_columns = [
+            "well_name",
+            "lat",
+            "lon",
+            "tvd_m",
+            "stability_result_status",
+            "temperature_proxy_tier_label",
+            "temperature_profile_code",
+            "nearest_g10015_control_code",
+            "nearest_g10015_control_distance_km",
+            "stability_confidence",
+            "caveat_codes",
+        ]
+        st.markdown("##### Downloadable Diagnostic Audit")
+        st.dataframe(
+            proxy_audit[[column for column in audit_columns if column in proxy_audit.columns]]
+            .head(60),
+            use_container_width=True,
+            hide_index=True,
+        )
+        st.download_button(
+            "Download guarded stability screen CSV",
+            screen.to_csv(index=False).encode("utf-8"),
+            file_name=screen_path.name,
+            mime="text/csv",
+            use_container_width=True,
+        )
+        st.download_button(
+            "Download blank/proxy diagnostic CSV",
+            proxy_audit.to_csv(index=False).encode("utf-8"),
+            file_name="stability_blank_proxy_diagnostic_2026-06-14.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
 
 
 def render_stability_parameter_readiness() -> None:

@@ -538,10 +538,15 @@ Fresh-chat handoff as of 2026-06-14:
 - The public app now exposes the guarded baseline screen with summary counts,
   status/confidence breakdowns, calculated interval rows, blocked/no-interval
   sample rows, a 2D well-status map, a calculated interval depth chart, and a
-  CSV download. Next scientific task: keep improving source coverage in OSL and
-  treat any future phase-curve/composition variants as cited scenarios. Do not
-  label the current screen as hydrate proof, saturation, producibility, or a
-  sweet-spot ranking.
+  CSV download. It also now has blank-row diagnostics and a temperature-coverage
+  tab: 22 of 24 G10015 codes are located through committed GGD223 controls, 483
+  rows have direct profile matches, 193 unmatched rows are within 50 km of a
+  located G10015 control, and 4,917 are 50-100 km regional proxy candidates.
+  Proxy tiers are planning/sensitivity labels only, not baseline calculations.
+  Next scientific task: keep improving source coverage in OSL and treat any
+  future phase-curve/composition variants as cited scenarios. Do not label the
+  current screen as hydrate proof, saturation, producibility, or a sweet-spot
+  ranking.
 
 ## Equations To Preserve
 

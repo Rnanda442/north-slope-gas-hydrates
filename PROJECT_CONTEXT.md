@@ -453,3 +453,8 @@ blockers, and next activities in the architecture/activity map.
 - 2026-06-14: Added visual stability-screen views to the Structural Explorer:
   a 2D well-status map and a calculated interval depth chart that explain the
   22 baseline intervals without implying hydrate proof.
+- 2026-06-14: Added website diagnostics for blank stability rows and
+  temperature-coverage/proxy candidates: 22 of 24 G10015 codes have committed
+  GGD223 coordinate crosswalks, 483 screen rows have direct profiles, 193 are
+  within 50 km of a located G10015 control, and 4,917 are 50-100 km regional
+  candidates. Proxy tiers remain planning/sensitivity labels only.

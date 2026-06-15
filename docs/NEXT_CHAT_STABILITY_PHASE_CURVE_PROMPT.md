@@ -137,12 +137,17 @@ The public Structural Explorer now exposes the guarded screen as a baseline
 methane 5 ppt stability-admissibility screen, with summary counts,
 status/confidence breakdowns, calculated interval preview, blocked/no-interval
 sample, a 2D well-status map, a calculated interval depth chart, and CSV
-download. Do not call it hydrate proof, saturation, producibility, or a
-sweet-spot ranking.
+download. It also has tabs explaining why rows are blank, the G10015/GGD223
+coordinate crosswalk, nearest located G10015 control distances, proxy-candidate
+tiers, and source anchors. Do not call it hydrate proof, saturation,
+producibility, or a sweet-spot ranking. Do not use proxy tiers to fill
+top/base/thickness unless the mentor approves a separately versioned
+sensitivity screen.
 
 Next task:
-Run visual QA/deployment checks for the public app and continue improving the
-source-backed stability story for the mentor-facing document and slides.
+Continue improving the source-backed stability story for the mentor-facing
+document and slides, using the new blank/proxy diagnostics to explain why many
+rows are blank.
 
 Future OSL work should improve source coverage rather than create the first
 screen from scratch: refine temperature matches, add better permafrost/base
