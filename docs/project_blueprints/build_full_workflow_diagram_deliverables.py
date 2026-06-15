@@ -246,6 +246,185 @@ def save(img: Image.Image, name: str) -> Path:
     return path
 
 
+def dashed_line(
+    draw: ImageDraw.ImageDraw,
+    start: tuple[int, int],
+    end: tuple[int, int],
+    fill: tuple[int, int, int],
+    width: int = 3,
+    dash: int = 18,
+    gap: int = 12,
+) -> None:
+    dx, dy = end[0] - start[0], end[1] - start[1]
+    length = math.hypot(dx, dy)
+    if length == 0:
+        return
+    ux, uy = dx / length, dy / length
+    distance = 0.0
+    while distance < length:
+        line_end = min(distance + dash, length)
+        draw.line(
+            (
+                int(start[0] + ux * distance),
+                int(start[1] + uy * distance),
+                int(start[0] + ux * line_end),
+                int(start[1] + uy * line_end),
+            ),
+            fill=fill,
+            width=width,
+        )
+        distance += dash + gap
+
+
+def workflow_slide_summary_panel(values: dict[str, str]) -> Path:
+    """Build a readable 16:9 summary for slide use; the poster stays separate."""
+    img = canvas(False)
+    draw = ImageDraw.Draw(img)
+    title(
+        draw,
+        "Full Project ML Workflow V5",
+        "Mentor-scale map: public source context and approved OSL data feed a leakage-safe path to occurrence and saturation outputs.",
+    )
+
+    def arrow_between(start: tuple[int, int], end: tuple[int, int], color=TEAL, width: int = 4, dashed: bool = False) -> None:
+        if dashed:
+            dashed_line(draw, start, end, color, width=width, dash=20, gap=13)
+        else:
+            draw.line((start, end), fill=color, width=width)
+        angle = math.atan2(end[1] - start[1], end[0] - start[0])
+        size = 15
+        head = [
+            end,
+            (int(end[0] - size * math.cos(angle - 0.45)), int(end[1] - size * math.sin(angle - 0.45))),
+            (int(end[0] - size * math.cos(angle + 0.45)), int(end[1] - size * math.sin(angle + 0.45))),
+        ]
+        draw.polygon(head, fill=color)
+
+    def icon(box: tuple[int, int, int, int], kind: str, accent) -> None:
+        x1, y1, x2, y2 = box
+        if kind == "sources":
+            for idx, color in enumerate([ICE_LIGHT, BLUE_LIGHT, GREEN_LIGHT]):
+                ox, oy = idx * 11, idx * 9
+                card(draw, (x1 + ox, y1 + oy, x1 + 82 + ox, y1 + 58 + oy), fill=color, outline=accent, radius=8, width=1)
+                draw.rectangle((x1 + 14 + ox, y1 + 16 + oy, x1 + 68 + ox, y1 + 21 + oy), fill=accent)
+                draw.rectangle((x1 + 14 + ox, y1 + 32 + oy, x1 + 56 + ox, y1 + 37 + oy), fill=(151, 183, 191))
+            for px, py, color in [(x2 - 78, y1 + 58, TEAL), (x2 - 36, y1 + 30, GREEN), (x2 - 18, y2 - 18, AMBER)]:
+                draw.ellipse((px - 7, py - 7, px + 7, py + 7), fill=color, outline=WHITE, width=2)
+            draw.line((x2 - 78, y1 + 58, x2 - 36, y1 + 30, x2 - 18, y2 - 18), fill=LINE, width=3)
+        elif kind == "stability":
+            ax1, ay1, ax2, ay2 = x1 + 10, y1 + 8, x2 - 10, y2 - 10
+            draw.line((ax1, ay2, ax2, ay2), fill=NAVY, width=2)
+            draw.line((ax1, ay2, ax1, ay1), fill=NAVY, width=2)
+            phase = [(ax1 + 4, ay2 - 12), (ax1 + 48, ay2 - 36), (ax1 + 98, ay2 - 70), (ax2 - 8, ay1 + 13)]
+            temp = [(ax1 + 6, ay1 + 10), (ax1 + 46, ay1 + 50), (ax1 + 88, ay2 - 32), (ax2 - 20, ay2 - 18)]
+            draw.line(phase, fill=AMBER, width=4)
+            draw.line(temp, fill=BLUE, width=4)
+        elif kind == "features":
+            colors = [GREEN, TEAL, BLUE, PURPLE]
+            for idx, color in enumerate(colors):
+                tx = x1 + idx * 35
+                draw.rectangle((tx, y1 + 8, tx + 24, y2 - 8), outline=(219, 233, 237), width=2)
+                pts = []
+                for j in range(18):
+                    yy = y1 + 15 + j * ((y2 - y1 - 30) / 17)
+                    xx = tx + 5 + int(14 * (0.5 + 0.4 * math.sin(j * 0.7 + idx)))
+                    pts.append((xx, int(yy)))
+                draw.line(pts, fill=color, width=2)
+            mx = x2 - 78
+            for r in range(5):
+                for c in range(4):
+                    draw.rectangle((mx + c * 15, y1 + 20 + r * 15, mx + c * 15 + 12, y1 + 32 + r * 15), fill=ICE_LIGHT, outline=WHITE)
+        elif kind == "model":
+            layers = [(x1 + 20, 4, GREEN), (x1 + 70, 5, PURPLE), (x1 + 120, 4, PURPLE), (x2 - 26, 2, AMBER)]
+            pts_by_layer = []
+            for lx, count, color in layers:
+                pts = [(lx, int(y1 + 15 + i * ((y2 - y1 - 30) / max(1, count - 1)))) for i in range(count)]
+                pts_by_layer.append(pts)
+            for a_layer, b_layer in zip(pts_by_layer, pts_by_layer[1:], strict=False):
+                for a in a_layer[::2]:
+                    for b in b_layer[::2]:
+                        draw.line((a, b), fill=(207, 221, 226), width=1)
+            for pts, (_, _, color) in zip(pts_by_layer, layers, strict=False):
+                for px, py in pts:
+                    draw.ellipse((px - 8, py - 8, px + 8, py + 8), fill=WHITE, outline=color, width=3)
+        elif kind == "outputs":
+            card(draw, (x1 + 2, y1 + 10, x1 + 70, y2 - 8), fill=BLUE_LIGHT, outline=BLUE, radius=8, width=1)
+            for idx, h in enumerate([32, 46, 25, 56]):
+                bx = x1 + 16 + idx * 12
+                draw.rectangle((bx, y2 - 18 - h, bx + 7, y2 - 18), fill=BLUE)
+            card(draw, (x1 + 88, y1 + 10, x2 - 2, y2 - 8), fill=GREEN_LIGHT, outline=GREEN, radius=8, width=1)
+            pts = [(x1 + 104, y2 - 22), (x1 + 128, y2 - 50), (x1 + 155, y2 - 38), (x2 - 12, y1 + 28)]
+            draw.line(pts, fill=GREEN, width=3)
+            for px, py in pts:
+                draw.ellipse((px - 5, py - 5, px + 5, py + 5), fill=GREEN, outline=WHITE, width=2)
+
+    def step_card(
+        box: tuple[int, int, int, int],
+        heading: str,
+        rows: list[str],
+        accent,
+        fill,
+        kind: str,
+        tag: str,
+    ) -> None:
+        card(draw, box, fill=fill, outline=accent, radius=18, width=2)
+        draw.rectangle((box[0] + 18, box[1] + 18, box[0] + 28, box[1] + 64), fill=accent)
+        text(draw, (box[0] + 42, box[1] + 18), heading, 21, accent, True, width=box[2] - box[0] - 58)
+        icon((box[0] + 36, box[1] + 62, box[2] - 34, box[1] + 155), kind, accent)
+        y = box[1] + 170
+        for row in rows:
+            y = text(draw, (box[0] + 32, y), row, 16, NAVY, width=box[2] - box[0] - 64, gap=5)
+        pill(draw, (box[0] + 32, box[3] - 42, box[2] - 32, box[3] - 14), tag, WHITE, accent)
+
+    top_y = 160
+    cards = [
+        ((58, top_y, 323, 555), "Source And Schema Controls", ["Public: DNR wells, GGD223, G10015, USGS AU.", "Approved later: LAS, core, NMR, workbook labels.", "Original headers and units are preserved first."], TEAL, ICE_LIGHT, "sources", "public vs OSL boundary"),
+        ((368, top_y, 633, 555), "Stability Context", ["Hydrostatic pressure + G10015 temperature.", "Methane 5 ppt phase lookup.", "Outputs status, interval, confidence, and blocked reason."], BLUE, BLUE_LIGHT, "stability", "admissibility only"),
+        ((678, top_y, 943, 555), "Feature Engineering", ["Measured logs and core context.", "Derived physics: Vsh, porosity, AI, elastic terms.", "QC, depth alignment, and stability context join the table."], GREEN, GREEN_LIGHT, "features", "X allowed only"),
+        ((988, top_y, 1253, 555), "Leakage-Safe ML", ["Target labels bypass predictors.", "Whole-well split before transforms.", "Baseline checks first; tree or ANN only after controls pass."], PURPLE, PURPLE_LIGHT, "model", "split before fit"),
+        ((1298, top_y, 1563, 555), "Reviewed Outputs", ["Occurrence probability P(hydrate).", "Saturation estimate Sh pred.", "Uncertainty, QC, mimic, caveat, and public-safe export review."], AMBER, AMBER_LIGHT, "outputs", "validated later"),
+    ]
+
+    for box, heading, rows, accent, fill, kind, tag in cards:
+        step_card(box, heading, rows, accent, fill, kind, tag)
+    for left_box, right_box, color in [
+        (cards[0][0], cards[1][0], TEAL),
+        (cards[1][0], cards[2][0], BLUE),
+        (cards[2][0], cards[3][0], GREEN),
+        (cards[3][0], cards[4][0], PURPLE),
+    ]:
+        arrow_between((left_box[2] + 6, (left_box[1] + left_box[3]) // 2), (right_box[0] - 8, (right_box[1] + right_box[3]) // 2), color)
+
+    # Target-only rail and public/runtime boundary.
+    target_box = (988, 588, 1253, 665)
+    card(draw, target_box, fill=RED_LIGHT, outline=RED, radius=16, width=2)
+    text(draw, (target_box[0] + 24, target_box[1] + 13), "Target-only labels", 20, RED, True)
+    text(draw, (target_box[0] + 24, target_box[1] + 41), "Sgh, Sh, NMR SAT, phase labels -> Y only", 15, NAVY, width=215)
+    arrow_between((target_box[2], 626), (1340, 626), RED, width=3, dashed=True)
+    text(draw, (1288, 585), "training / validation overlay", 15, RED, True, width=230)
+
+    boundary = (58, 692, 1563, 795)
+    card(draw, boundary, fill=LIGHT, outline=LINE, radius=18, width=2)
+    text(draw, (92, 718), "Data boundary", 20, TEAL, True)
+    text(
+        draw,
+        (262, 709),
+        "GitHub/Streamlit shows public methods, source-backed scaffold counts, diagrams, and public-safe summaries. OSL or the approved runtime loads real logs, core/NMR, labels, feature rows, model fitting, and reviewed outputs.",
+        21,
+        NAVY,
+        True,
+        width=1220,
+        gap=5,
+    )
+
+    stats = (
+        f"Current public screen: {values['screen_rows']} rows, {values['screen_calculated']} calculated admissibility intervals, "
+        f"{values['screen_no_interval']} no-stable-interval rows, {values['screen_blocked']} blocked rows."
+    )
+    footer(draw, stats + " Stability is context or mask only, not hydrate proof or saturation.")
+    return save(img, "full_project_ml_workflow_flowchart.png")
+
+
 def full_workflow_panel() -> Path:
     values = summaries()
     img = Image.new("RGB", (EXPANDED_W, EXPANDED_H), WHITE)
@@ -414,16 +593,16 @@ def full_workflow_panel() -> Path:
     node("sonic_features", 2, 1140, 198, "Sonic and elastic", ["Vp = 304.8/DT ; Vs = 304.8/DTS", "AI = RHOB*Vp | Vp/Vs", "mu_rho, lambda_rho"], PURPLE, PURPLE_LIGHT, formula=True)
     node("resistivity_features", 2, 1420, 170, "Resistivity checks", ["Rt features and Archie-style baselines", "baseline/check, not automatic label"], AMBER, AMBER_LIGHT)
     node("context_features", 2, 1670, 170, "Context features", ["stability status | AU | permafrost", "source confidence | blocked flags"], BLUE, BLUE_LIGHT)
-    node("feature_matrix", 2, 1920, 220, "Feature matrix", ["X_allowed = measured + derived + QC + context", "targets excluded before modeling"], GREEN, GREEN_LIGHT, "predictors only")
+    node("feature_matrix", 2, 1920, 220, "Feature matrix", ["X allowed = measured + derived + QC + context", "targets excluded before modeling"], GREEN, GREEN_LIGHT, "predictors only")
 
     # ML runtime lane.
     node("target_registry", 3, 390, 190, "Target registry", ["Sgh, S_h, Sh, NMR_SAT", "Hydrate Saturation, Swr, phase calls"], RED, RED_LIGHT, "Y only")
-    node("leakage_barrier", 3, 660, 170, "Leakage barrier", ["labels bypass X_allowed", "targets feed training/validation only"], RED, WHITE)
+    node("leakage_barrier", 3, 660, 170, "Leakage barrier", ["labels bypass X allowed", "targets feed training/validation only"], RED, WHITE)
     node("split", 3, 910, 170, "Whole-well split", ["train / validation / locked test", "split before fitting transforms"], BLUE, BLUE_LIGHT)
     node("preprocess", 3, 1160, 198, "Train-only preprocessing", ["fit imputation/scaling/selection on train", "apply frozen transform to val/test"], PURPLE, PURPLE_LIGHT)
     node("baselines", 3, 1440, 170, "Baseline models", ["physics/simple baselines first", "check if ML beats transparent rules"], AMBER, AMBER_LIGHT)
     node("candidates", 3, 1690, 170, "Candidate models", ["tree/boosting | ANN/Keras", "only after leakage controls pass"], PURPLE)
-    node("model_heads", 3, 1940, 198, "Two model heads", ["X_allowed -> P(hydrate)", "X_allowed -> Sh_pred"], PURPLE, PURPLE_LIGHT, "linked, separate")
+    node("model_heads", 3, 1940, 198, "Two model heads", ["X allowed -> P(hydrate)", "X allowed -> Sh pred"], PURPLE, PURPLE_LIGHT, "linked, separate")
 
     # Output lane.
     node("occurrence", 4, 390, 170, "Occurrence classifier", ["probability + calibrated class", "false-positive review"], BLUE, BLUE_LIGHT)
@@ -458,7 +637,7 @@ def full_workflow_panel() -> Path:
         label_xy=((bus01 + bus12) // 2, lower_bus),
     )
     arrow([right("stability_context"), (bus12, right("stability_context")[1]), (bus12, left("context_features")[1]), left("context_features")], BLUE, label_text="mask/confidence", label_xy=(bus12, 1790))
-    arrow([right("feature_matrix"), (bus23, right("feature_matrix")[1]), (bus23, left("split")[1]), left("split")], GREEN, label_text="X_allowed", label_xy=(bus23, 1450))
+    arrow([right("feature_matrix"), (bus23, right("feature_matrix")[1]), (bus23, left("split")[1]), left("split")], GREEN, label_text="X allowed", label_xy=(bus23, 1450))
     ml_bus_1 = bus34a
     ml_bus_2 = bus34b
     arrow(
@@ -561,7 +740,7 @@ def full_workflow_panel() -> Path:
                     fill=color,
                     outline=WHITE,
                 )
-        text(draw, (matrix_x - 12, y1 + 15), "X_allowed matrix", 19, GREEN, True, width=220, align="center")
+        text(draw, (matrix_x - 12, y1 + 15), "X allowed matrix", 19, GREEN, True, width=220, align="center")
         text(draw, (matrix_x - 20, y2 - 40), "features + QC + context", 16, MUTED, True, width=240, align="center")
 
     def draw_ml_visual(box: tuple[int, int, int, int]) -> None:
@@ -639,8 +818,7 @@ def full_workflow_panel() -> Path:
     ASSET_DIR.mkdir(parents=True, exist_ok=True)
     expanded_path = ASSET_DIR / "full_project_ml_workflow_flowchart_expanded.png"
     img.save(expanded_path, quality=94)
-    slide_img = img.resize((W, H), Image.Resampling.LANCZOS)
-    return save(slide_img, "full_project_ml_workflow_flowchart.png")
+    return workflow_slide_summary_panel(values)
 
 
 def ml_network_detail_panel() -> Path:
@@ -649,266 +827,202 @@ def ml_network_detail_panel() -> Path:
     draw.rectangle((0, 0, 24, NETWORK_H), fill=PURPLE)
     draw.rectangle((0, 0, NETWORK_W, 145), fill=(246, 251, 252))
     draw.line((60, 145, NETWORK_W - 60, 145), fill=LINE, width=3)
-    text(draw, (70, 34), "ML Model Architecture Detail V5", 46, NAVY, True)
+    text(draw, (70, 32), "ML Runtime Detail V5", 48, NAVY, True)
     text(
         draw,
-        (72, 92),
-        "Feature/QC groups become X_allowed; target-only saturation and phase labels supervise or validate but do not enter the predictor matrix.",
-        22,
+        (72, 91),
+        "Readable architecture view: measured and derived inputs build X allowed; target labels stay on a separate Y-only rail for training and validation.",
+        23,
         MUTED,
-        width=2200,
+        width=2240,
     )
-
-    def small_card(box: tuple[int, int, int, int], heading: str, lines: list[str], accent, fill=WHITE, size: int = 18) -> None:
-        card(draw, box, fill=fill, outline=accent, radius=16, width=2)
-        draw.rounded_rectangle((box[0], box[1], box[0] + 10, box[3]), radius=9, fill=accent)
-        y = text(draw, (box[0] + 24, box[1] + 14), heading, 20, accent, True, width=box[2] - box[0] - 40, gap=4)
-        for line in lines:
-            y = text(draw, (box[0] + 25, y + 2), line, size, NAVY, width=box[2] - box[0] - 45, gap=3)
 
     def arrow_line(start: tuple[int, int], end: tuple[int, int], color, width: int = 4, dashed: bool = False) -> None:
         if dashed:
-            dx, dy = end[0] - start[0], end[1] - start[1]
-            length = math.hypot(dx, dy)
-            if length:
-                ux, uy = dx / length, dy / length
-                dist = 0
-                while dist < length - 18:
-                    dash_end = min(dist + 20, length - 18)
-                    draw.line(
-                        (
-                            int(start[0] + ux * dist),
-                            int(start[1] + uy * dist),
-                            int(start[0] + ux * dash_end),
-                            int(start[1] + uy * dash_end),
-                        ),
-                        fill=color,
-                        width=width,
-                    )
-                    dist += 32
+            dashed_line(draw, start, end, color, width=width, dash=22, gap=14)
         else:
             draw.line((start, end), fill=color, width=width)
         angle = math.atan2(end[1] - start[1], end[0] - start[0])
-        length = 18
+        size = 18
         pts = [
             end,
-            (int(end[0] - length * math.cos(angle - 0.45)), int(end[1] - length * math.sin(angle - 0.45))),
-            (int(end[0] - length * math.cos(angle + 0.45)), int(end[1] - length * math.sin(angle + 0.45))),
+            (int(end[0] - size * math.cos(angle - 0.45)), int(end[1] - size * math.sin(angle - 0.45))),
+            (int(end[0] - size * math.cos(angle + 0.45)), int(end[1] - size * math.sin(angle + 0.45))),
         ]
         draw.polygon(pts, fill=color)
 
     def poly_arrow(points: list[tuple[int, int]], color, width: int = 4, dashed: bool = False) -> None:
         for start, end in zip(points, points[1:], strict=False):
             if dashed:
-                dx, dy = end[0] - start[0], end[1] - start[1]
-                length = math.hypot(dx, dy)
-                if length:
-                    ux, uy = dx / length, dy / length
-                    dist = 0
-                    while dist < length - 18:
-                        dash_end = min(dist + 20, length - 18)
-                        draw.line(
-                            (
-                                int(start[0] + ux * dist),
-                                int(start[1] + uy * dist),
-                                int(start[0] + ux * dash_end),
-                                int(start[1] + uy * dash_end),
-                            ),
-                            fill=color,
-                            width=width,
-                        )
-                        dist += 32
+                dashed_line(draw, start, end, color, width=width, dash=22, gap=14)
             else:
                 draw.line((start, end), fill=color, width=width)
         end = points[-1]
         prev = points[-2]
         angle = math.atan2(end[1] - prev[1], end[0] - prev[0])
-        length = 18
+        size = 18
         pts = [
             end,
-            (int(end[0] - length * math.cos(angle - 0.45)), int(end[1] - length * math.sin(angle - 0.45))),
-            (int(end[0] - length * math.cos(angle + 0.45)), int(end[1] - length * math.sin(angle + 0.45))),
+            (int(end[0] - size * math.cos(angle - 0.45)), int(end[1] - size * math.sin(angle - 0.45))),
+            (int(end[0] - size * math.cos(angle + 0.45)), int(end[1] - size * math.sin(angle + 0.45))),
         ]
         draw.polygon(pts, fill=color)
 
-    def draw_log_tracks(box: tuple[int, int, int, int]) -> None:
-        x1, y1, x2, y2 = box
-        card(draw, box, fill=(247, 251, 252), outline=LINE, radius=12, width=2)
-        text(draw, (x1 + 8, y1 + 10), "depth-aligned log tracks", 15, MUTED, True, width=x2 - x1 - 16, align="center")
-        tracks = [GREEN, TEAL, BLUE]
-        track_gap = 4
-        track_w = max(8, (x2 - x1 - 28 - track_gap * (len(tracks) - 1)) // len(tracks))
-        for idx, color in enumerate(tracks):
-            tx1 = x1 + 14 + idx * (track_w + track_gap)
-            tx2 = tx1 + track_w
-            draw.rectangle((tx1, y1 + 52, tx2, y2 - 28), outline=(222, 234, 238), width=2)
-            pts = []
-            for j in range(36):
-                yy = y1 + 62 + j * ((y2 - y1 - 104) / 35)
-                wiggle_width = max(2, tx2 - tx1 - 6)
-                xx = tx1 + 3 + int(wiggle_width * (0.5 + 0.38 * math.sin(j * 0.58 + idx * 1.1)))
-                pts.append((xx, int(yy)))
-            draw.line(pts, fill=color, width=3)
-        draw.rectangle((x1 + 10, y1 + 390, x2 - 10, y1 + 470), fill=(255, 247, 229), outline=AMBER, width=2)
-        text(draw, (x1 + 16, y1 + 410), "QC interval", 14, AMBER, True, width=x2 - x1 - 32, align="center")
+    def small_card(
+        box: tuple[int, int, int, int],
+        heading: str,
+        lines: list[str],
+        accent,
+        fill=WHITE,
+        title_size: int = 21,
+        body_size: int = 18,
+    ) -> None:
+        card(draw, box, fill=fill, outline=accent, radius=16, width=2)
+        draw.rounded_rectangle((box[0], box[1], box[0] + 10, box[3]), radius=9, fill=accent)
+        y = text(draw, (box[0] + 25, box[1] + 14), heading, title_size, accent, True, width=box[2] - box[0] - 44, gap=4)
+        for line in lines:
+            y = text(draw, (box[0] + 25, y + 2), line, body_size, NAVY, width=box[2] - box[0] - 48, gap=3)
 
-    def draw_feature_matrix(box: tuple[int, int, int, int]) -> None:
+    def lane_header(box: tuple[int, int, int, int], label: str, accent) -> None:
+        card(draw, box, fill=(247, 251, 252), outline=accent, radius=12, width=2)
+        text(draw, (box[0] + 12, box[1] + 12), label, 18, accent, True, width=box[2] - box[0] - 24, align="center")
+
+    def draw_matrix(box: tuple[int, int, int, int]) -> None:
         x1, y1, x2, y2 = box
-        card(draw, box, fill=WHITE, outline=GREEN, radius=12, width=2)
-        text(draw, (x1 + 8, y1 + 10), "feature matrix", 15, GREEN, True, width=x2 - x1 - 16, align="center")
-        cell = 15
-        start_x = x1 + 19
-        start_y = y1 + 48
-        for r in range(8):
-            for c in range(6):
-                value = (r * 29 + c * 19) % 100
-                fill = (230 - value // 4, 245 - value // 8, 235 + min(value // 9, 14))
+        card(draw, box, fill=WHITE, outline=GREEN, radius=14, width=2)
+        text(draw, (x1 + 15, y1 + 14), "X allowed matrix", 22, GREEN, True, width=x2 - x1 - 30, align="center")
+        text(draw, (x1 + 28, y1 + 48), "rows = depth samples, columns = allowed inputs", 16, MUTED, True, width=x2 - x1 - 56, align="center")
+        start_x, start_y = x1 + 54, y1 + 92
+        cell = 25
+        for r in range(9):
+            for c in range(8):
+                value = (r * 29 + c * 17) % 100
+                fill = (231 - value // 5, 247 - value // 9, 237 + min(value // 10, 12))
                 draw.rectangle(
-                    (
-                        start_x + c * cell,
-                        start_y + r * cell,
-                        start_x + (c + 1) * cell - 2,
-                        start_y + (r + 1) * cell - 2,
-                    ),
+                    (start_x + c * cell, start_y + r * cell, start_x + (c + 1) * cell - 3, start_y + (r + 1) * cell - 3),
                     fill=fill,
                     outline=WHITE,
                 )
-        text(draw, (x1 + 10, y2 - 35), "rows = depth samples", 13, MUTED, True, width=x2 - x1 - 20, align="center")
+        labels = ["logs", "physics", "QC", "context"]
+        lx = x1 + 35
+        for idx, label_value in enumerate(labels):
+            pill(draw, (lx + idx * 76, y2 - 52, lx + 64 + idx * 76, y2 - 22), label_value, [ICE_LIGHT, GREEN_LIGHT, AMBER_LIGHT, BLUE_LIGHT][idx], [TEAL, GREEN, AMBER, BLUE][idx])
+
+    def draw_log_strip(box: tuple[int, int, int, int]) -> None:
+        x1, y1, x2, y2 = box
+        card(draw, box, fill=(247, 251, 252), outline=LINE, radius=14, width=2)
+        text(draw, (x1 + 12, y1 + 12), "depth-aligned log strip", 17, MUTED, True, width=x2 - x1 - 24, align="center")
+        names = [("GR", GREEN), ("Rt", TEAL), ("RHOB", BLUE), ("Vp", PURPLE), ("QC", AMBER)]
+        track_w = 52
+        gap = 10
+        for idx, (name, color) in enumerate(names):
+            tx = x1 + 25 + idx * (track_w + gap)
+            draw.rectangle((tx, y1 + 58, tx + track_w, y2 - 22), outline=(219, 233, 237), width=2)
+            text(draw, (tx + 4, y1 + 35), name, 13, color, True, width=track_w - 8, align="center")
+            pts = []
+            for j in range(30):
+                yy = y1 + 68 + j * ((y2 - y1 - 100) / 29)
+                xx = tx + 6 + int((track_w - 12) * (0.5 + 0.38 * math.sin(j * 0.62 + idx)))
+                pts.append((xx, int(yy)))
+            draw.line(pts, fill=color, width=3)
+
+    def draw_model(box: tuple[int, int, int, int]) -> tuple[tuple[int, int], tuple[int, int]]:
+        x1, y1, x2, y2 = box
+        card(draw, box, fill=WHITE, outline=PURPLE, radius=18, width=2)
+        text(draw, (x1 + 22, y1 + 16), "Candidate model", 24, PURPLE, True, width=x2 - x1 - 44)
+        text(draw, (x1 + 22, y1 + 48), "baseline first, then tree or ANN after leakage controls pass", 17, MUTED, True, width=x2 - x1 - 44)
+        layer_specs = [(x1 + 70, 6, GREEN), (x1 + 170, 7, PURPLE), (x1 + 270, 6, PURPLE), (x1 + 370, 2, AMBER)]
+        layers: list[list[tuple[int, int]]] = []
+        for lx, count, color in layer_specs:
+            pts = [(lx, int(y1 + 125 + i * ((y2 - y1 - 190) / max(1, count - 1)))) for i in range(count)]
+            layers.append(pts)
+        edge = (202, 216, 222)
+        for a_layer, b_layer in zip(layers, layers[1:], strict=False):
+            for idx, a in enumerate(a_layer):
+                targets = [b_layer[min(len(b_layer) - 1, idx)], b_layer[min(len(b_layer) - 1, idx + 1)]]
+                for b in targets:
+                    draw.line((a, b), fill=edge, width=1)
+        for pts, (_, _, color) in zip(layers, layer_specs, strict=False):
+            for px, py in pts:
+                r = 16 if len(pts) > 2 else 21
+                draw.ellipse((px - r, py - r, px + r, py + r), fill=WHITE, outline=color, width=4)
+                if len(pts) == 2:
+                    draw.ellipse((px - 7, py - 7, px + 7, py + 7), fill=color)
+        text(draw, (x1 + 48, y2 - 48), "linked occurrence and saturation heads", 18, AMBER, True, width=x2 - x1 - 96, align="center")
+        return layers[-1][0], layers[-1][1]
+
+    # Lane headers.
+    lane_header((70, 168, 515, 218), "1. Feature families", TEAL)
+    lane_header((565, 168, 965, 218), "2. X allowed", GREEN)
+    lane_header((1015, 168, 1435, 218), "3. Split and controls", BLUE)
+    lane_header((1485, 168, 1935, 218), "4. Model candidate", PURPLE)
+    lane_header((1985, 168, 2525, 218), "5. Heads and review", AMBER)
 
     feature_cards = [
-        ("QC flags", ["caliper/washout", "missingness/outliers"], AMBER, AMBER_LIGHT),
-        ("Stability context", ["AU/permafrost", "interval/status/confidence"], BLUE, BLUE_LIGHT),
-        ("Lithology/reservoir", ["GR -> Vsh", "RHOB/porosity"], GREEN, GREEN_LIGHT),
-        ("Resistivity/fluid", ["Rt features", "baseline saturation checks"], TEAL, ICE_LIGHT),
-        ("Sonic/elastic", ["Vp, Vs, AI", "lambda-rho, mu-rho"], PURPLE, PURPLE_LIGHT),
-        ("NMR/core context", ["NMRPHI where measured", "core calibration later"], GREEN, WHITE),
+        ("Measured logs", ["GR, RHOB, Rt, Vp, Vs, NMRPHI"], TEAL, ICE_LIGHT),
+        ("Derived physics", ["Vsh, porosity, AI, elastic terms"], GREEN, GREEN_LIGHT),
+        ("QC and alignment", ["caliper, missingness, depth mismatch"], AMBER, AMBER_LIGHT),
+        ("Stability context", ["status, interval, confidence, caveat"], BLUE, BLUE_LIGHT),
+        ("Core and NMR context", ["calibration later, not public rows"], PURPLE, PURPLE_LIGHT),
     ]
-    feature_centers: list[tuple[int, int]] = []
+    feature_midpoints: list[tuple[int, int]] = []
     for idx, (heading, lines, accent, fill) in enumerate(feature_cards):
-        y = 205 + idx * 160
-        box = (70, y, 430, y + 112)
-        small_card(box, heading, lines, accent, fill)
-        feature_centers.append((box[2], (box[1] + box[3]) // 2))
+        y = 250 + idx * 125
+        box = (85, y, 500, y + 86)
+        small_card(box, heading, lines, accent, fill, title_size=20, body_size=17)
+        feature_midpoints.append((box[2], (box[1] + box[3]) // 2))
 
-    small_card(
-        (520, 270, 850, 430),
-        "Whole-well split",
-        ["split wells first", "no random-row final claim"],
-        BLUE,
-        BLUE_LIGHT,
-    )
-    small_card(
-        (520, 520, 850, 720),
-        "Train-only preprocessing",
-        ["fit imputation/scaling on train", "apply frozen transform to val/test", "feature selection after split"],
-        PURPLE,
-        PURPLE_LIGHT,
-    )
-    small_card(
-        (520, 810, 850, 980),
-        "X_allowed",
-        ["measured + derived + QC + context", "targets removed before model"],
-        GREEN,
-        GREEN_LIGHT,
-    )
-    draw_log_tracks((450, 205, 510, 1080))
-    draw_feature_matrix((880, 780, 958, 1010))
-    for start in feature_centers:
-        arrow_line(start, (450, min(max(start[1], 245), 1035)), GREEN, width=3)
-    arrow_line((685, 430), (685, 520), PURPLE)
-    arrow_line((685, 720), (685, 810), PURPLE)
-    arrow_line((510, 895), (520, 895), GREEN, width=3)
-    arrow_line((850, 895), (880, 895), GREEN)
-    arrow_line((958, 895), (970, 895), GREEN)
+    draw_log_strip((585, 250, 945, 475))
+    draw_matrix((585, 535, 945, 860))
+    for midpoint in feature_midpoints:
+        arrow_line(midpoint, (585, min(max(midpoint[1], 290), 820)), GREEN, width=3)
+    arrow_line((765, 475), (765, 535), GREEN, width=4)
 
-    # Neural network drawing.
-    layer_specs = [
-        ("input features", 980, 8, GREEN),
-        ("hidden layer 1", 1235, 10, PURPLE),
-        ("hidden layer 2", 1490, 8, PURPLE),
-        ("shared representation", 1745, 6, BLUE),
-        ("output heads", 2025, 2, AMBER),
+    small_card((1035, 250, 1415, 390), "Whole-well split", ["train / validation / locked test", "split before preprocessing"], BLUE, BLUE_LIGHT)
+    small_card((1035, 440, 1415, 610), "Train-only preprocessing", ["fit imputation, scaling, selection on train", "apply frozen transforms to validation/test"], PURPLE, PURPLE_LIGHT)
+    small_card((1035, 660, 1415, 805), "Baseline gate", ["transparent physics/simple rules first", "ML must beat baseline checks"], AMBER, AMBER_LIGHT)
+    arrow_line((945, 695), (1035, 695), GREEN)
+    arrow_line((1225, 390), (1225, 440), BLUE)
+    arrow_line((1225, 610), (1225, 660), PURPLE)
+
+    out_occurrence, out_saturation = draw_model((1495, 250, 1915, 805))
+    arrow_line((1415, 733), (1495, 733), PURPLE)
+
+    small_card((1995, 250, 2505, 385), "Occurrence head", ["P(hydrate), calibrated class", "review false positives and mimics"], BLUE, BLUE_LIGHT)
+    small_card((1995, 450, 2505, 585), "Saturation head", ["Sh pred with uncertainty", "compare only to approved labels"], GREEN, GREEN_LIGHT)
+    small_card((1995, 650, 2505, 800), "Validation", ["held-out wells or compartments", "metrics by well, depth, QC, and source confidence"], PURPLE, PURPLE_LIGHT)
+    small_card((1995, 865, 2505, 1015), "Reviewed output package", ["probability, Sh, uncertainty", "reason flags, blocked reasons, public-safe summaries"], TEAL, ICE_LIGHT)
+    arrow_line(out_occurrence, (1995, 318), BLUE)
+    arrow_line(out_saturation, (1995, 517), GREEN)
+    arrow_line((2250, 585), (2250, 650), PURPLE)
+    arrow_line((2250, 800), (2250, 865), TEAL)
+
+    # Target-only rail.
+    rail = (70, 1060, 2530, 1270)
+    card(draw, rail, fill=(255, 247, 247), outline=RED, radius=20, width=2)
+    text(draw, (105, 1088), "Target-only rail: labels supervise training and validation, but never enter X allowed", 29, RED, True, width=2200)
+    target_boxes = [
+        ((110, 1148, 540, 1238), "Target registry", ["Sgh, Sh, NMR SAT, hydrate saturation", "phase/core labels and calibration fields"], RED, RED_LIGHT),
+        ((605, 1148, 985, 1238), "Leakage barrier", ["Y only", "removed before feature matrix"], RED, WHITE),
+        ((1050, 1148, 1430, 1238), "Allowed use", ["loss, calibration, validation overlay", "not predictor columns"], PURPLE, PURPLE_LIGHT),
+        ((1495, 1148, 1875, 1238), "Mentor decisions", ["official target authority", "whole-well/compartment holdout"], AMBER, AMBER_LIGHT),
+        ((1940, 1148, 2490, 1238), "Current status", ["architecture only: no trained metrics, no saturation output", "stability can be context or mask only"], BLUE, BLUE_LIGHT),
     ]
-    layers: list[list[tuple[int, int]]] = []
-    for label_name, x, count, color in layer_specs:
-        top_y, bottom_y = 330, 1080
-        spacing = (bottom_y - top_y) / max(1, count - 1)
-        pts = [(x, int(top_y + i * spacing)) for i in range(count)]
-        layers.append(pts)
-        text(draw, (x - 110, 238), label_name, 19, color, True, width=220, align="center")
+    for box, heading, lines, accent, fill in target_boxes:
+        small_card(box, heading, lines, accent, fill, title_size=18, body_size=15)
+    poly_arrow([(790, 1060), (790, 930), (1705, 930), (1705, 805)], RED, width=4, dashed=True)
+    poly_arrow([(1235, 1060), (1235, 965), (2250, 965), (2250, 800)], RED, width=4, dashed=True)
+    text(draw, (815, 914), "Y labels feed loss or validation only", 19, RED, True, width=520)
 
-    edge_color = (196, 211, 218)
-    for left_layer, right_layer in zip(layers, layers[1:], strict=False):
-        for a in left_layer:
-            for b in right_layer:
-                draw.line((a, b), fill=edge_color, width=1)
-
-    for pts, (_, _, _, color) in zip(layers, layer_specs, strict=False):
-        for idx, (x, y) in enumerate(pts):
-            r = 18 if len(pts) > 2 else 24
-            draw.ellipse((x - r, y - r, x + r, y + r), fill=WHITE, outline=color, width=4)
-            if len(pts) <= 2:
-                draw.ellipse((x - 8, y - 8, x + 8, y + 8), fill=color)
-
-    small_card(
-        (2135, 315, 2500, 470),
-        "Occurrence head",
-        ["P(hydrate)", "calibrated class", "false-positive review"],
-        BLUE,
-        BLUE_LIGHT,
-    )
-    small_card(
-        (2135, 915, 2500, 1070),
-        "Saturation head",
-        ["Sh_pred", "residual review", "uncertainty band"],
-        GREEN,
-        GREEN_LIGHT,
-    )
-    arrow_line((2049, layers[-1][0][1]), (2135, 392), BLUE, width=4)
-    arrow_line((2049, layers[-1][1][1]), (2135, 992), GREEN, width=4)
-
-    small_card(
-        (920, 1175, 1275, 1348),
-        "Baseline comparison",
-        ["physics/simple rules first", "tree/boosting/ANN must beat baseline"],
-        AMBER,
-        AMBER_LIGHT,
-    )
-    small_card(
-        (1370, 1175, 1725, 1348),
-        "Validation",
-        ["held-out wells", "metrics by well/depth/QC", "mimic and residual review"],
-        PURPLE,
-        PURPLE_LIGHT,
-    )
-    small_card(
-        (1820, 1175, 2260, 1348),
-        "Reviewed output package",
-        ["probability, Sh, uncertainty", "reason flags and blocked reasons"],
-        TEAL,
-        ICE_LIGHT,
-    )
-    arrow_line((1275, 1260), (1370, 1260), AMBER, width=4)
-    arrow_line((1725, 1260), (1820, 1260), PURPLE, width=4)
-
-    small_card(
-        (520, 1140, 800, 1355),
-        "Target-only rail",
-        ["Sgh / S_h / Sh", "NMR_SAT", "phase/core labels"],
-        RED,
-        RED_LIGHT,
-    )
-    poly_arrow([(800, 1248), (860, 1248), (860, 1370), (1350, 1370), (1350, 1260), (1370, 1260)], RED, width=4, dashed=True)
-    text(draw, (780, 1095), "targets supervise loss/validation, not predictors", 20, RED, True, width=730)
-
-    card(draw, (70, 1390, 2530, 1455), fill=(245, 249, 250), outline=LINE, radius=18, width=2)
+    card(draw, (70, 1320, 2530, 1405), fill=(245, 249, 250), outline=LINE, radius=18, width=2)
     text(
         draw,
-        (100, 1408),
-        "Guardrail: this shows architecture only. Real training waits for approved labels, source-resolved units, complete-well splits, and mentor-approved target authority.",
-        20,
+        (102, 1342),
+        "Guardrail: this is architecture only. Real training waits for approved labels, source-resolved units, complete-well splits, and mentor-approved target authority.",
+        22,
         MUTED,
-        width=2350,
+        True,
+        width=2380,
     )
 
     ASSET_DIR.mkdir(parents=True, exist_ok=True)
@@ -1275,8 +1389,8 @@ def build_word_companion(diagram_path: Path, network_path: Path) -> Path:
     for item in [
         "Approved LAS/CSV/core/NMR and workbook inputs are loaded only inside OSL or the approved runtime.",
         "Original headers, units, sheet/source identity, and depth references are preserved before alias mapping.",
-        "Measured log families and approved derived physics equations build X_allowed after unit checks, QC, and depth alignment.",
-        "Target-only occurrence and saturation fields bypass X_allowed and are used only for target mapping, calibration, and validation overlays.",
+        "Measured log families and approved derived physics equations build X allowed after unit checks, QC, and depth alignment.",
+        "Target-only occurrence and saturation fields bypass X allowed and are used only for target mapping, calibration, and validation overlays.",
         "Validation uses complete wells, compartments, or geographic holdouts selected before preprocessing, tuning, or model fitting.",
         "Reviewed outputs become occurrence probability, saturation estimate, uncertainty/QC/reason flags, plots, tables, GIS links, and public-safe summaries only after boundary review.",
     ]:
@@ -1287,15 +1401,16 @@ def build_word_companion(diagram_path: Path, network_path: Path) -> Path:
     document.add_heading("ML Architecture Detail", level=1)
     document.add_paragraph(
         "The companion architecture visual expands the modeling block into feature groups, "
-        "QC and train-only preprocessing, a neural-network-style candidate path, two output "
-        "heads, and the target-only rail used for training labels and validation overlays."
+        "QC, the X allowed matrix, whole-well split controls, train-only preprocessing, "
+        "a simplified candidate model, two output heads, and the target-only rail used "
+        "for training labels and validation overlays."
     )
     document.add_picture(str(network_path), width=Inches(9.9))
 
     document.add_heading("How To Read The Diagram", level=1)
     for item in [
-        "The left lane is source and schema control: public-source context, current status counts, original headers, unit checks, depth basis, and QC gates.",
-        "The center and right lanes are the OSL and approved-runtime path: raw source rebuilds, approved logs/core/NMR later, pressure-temperature stability context, feature engineering, modeling, and validation.",
+        "The slide-sized summary separates source/schema controls, stability context, feature engineering, leakage-safe ML, and reviewed outputs.",
+        "The expanded poster shows the full OSL and approved-runtime path: raw source rebuilds, approved logs/core/NMR later, pressure-temperature stability context, feature engineering, modeling, and validation.",
         "The equation blocks show how pressure, temperature, phase-boundary lookup, lithology, porosity, velocity, elastic, and saturation-baseline calculations become context fields, features, or validation checks.",
         "The stability branch feeds context, masks, confidence labels, and caveats into the ML workflow. It does not become hydrate proof or a saturation label.",
         "The leakage barrier keeps S_h, Sgh, NMR_SAT, phase labels, and final ranks out of predictor features unless a field is proven to be an independent measured input.",

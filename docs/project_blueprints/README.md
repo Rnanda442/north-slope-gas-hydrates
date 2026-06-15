@@ -56,6 +56,9 @@ wireline machine-learning project.
     ranking.
   - Imported to the connected Google Drive account as
     [North Slope Gas Hydrate Full ML Workflow Diagram 2026-06-15](https://docs.google.com/document/d/1MJeWz0WDQvXBo80rYps76cuPZmJrP_BTQSka1Np5lyA).
+  - Revised V5 copy with the readable slide-sized summary and simplified ML
+    runtime detail was imported to the connected Google Drive account as
+    [REVISED V5 North Slope Gas Hydrate Full ML Workflow Diagram 2026-06-15](https://docs.google.com/document/d/1w--XY9SobY-kadNby8ABBu-odXVveSm6l9wi_hdcSsw).
 - `North_Slope_Gas_Hydrate_Mentor_Status_Package_V5_Workflow_2026-06-15.docx`
   - Short mentor-facing status package built from
     `docs/MENTOR_PROJECT_STATUS_PACKAGE_V5_WORKFLOW_2026-06-15.md`.
@@ -134,19 +137,24 @@ wireline machine-learning project.
     ML flowchart with all inputs, stability logic, feature engineering,
     leakage barrier, occurrence classification, saturation regression,
     validation, and public-safe exports connected.
-  - Current slide 3 / website static export uses the V5 visual architecture
-    map: five lanes, smaller boxes, clearer equation cards, wider arrow
-    routing, visual mini-panels, and separate solid predictor/context arrows
-    versus dashed target-only arrows.
+  - Current slide 3 uses a readable V5 mentor-scale workflow summary instead
+    of a shrunken poster: source/schema controls, stability context, feature
+    engineering, leakage-safe ML, reviewed outputs, a public/OSL boundary band,
+    and a red target-only rail.
+  - The same asset folder also preserves
+    `full_project_ml_workflow_flowchart_expanded.png`, the detailed
+    poster-scale V5 architecture map with five lanes, equation cards, visual
+    mini-panels, and separate solid predictor/context arrows versus dashed
+    target-only arrows.
   - The same builder now also exports `ml_pipeline_network_detail_v5.png`, a
     companion architecture visual showing feature/QC groups, compact log-track
-    and feature-matrix handoff, train-only preprocessing, a neural-network-style
-    candidate model, two output heads, baseline comparison, validation, and the
-    target-only rail.
+    and X allowed matrix handoff, whole-well split controls, train-only
+    preprocessing, a simplified candidate model, two output heads, validation,
+    reviewed outputs, and the target-only rail.
   - Slides 1 and 2 are preserved exactly from the current Gmail authority deck.
-    Slide 3 is the full workflow map. Slides 4-9 zoom into inputs/boundary,
-    stability, feature engineering, leakage/modeling, outputs/validation, and
-    complete/calculated/blocked next decisions.
+    Slide 3 is the readable workflow summary. Slides 4-9 zoom into
+    inputs/boundary, stability, feature engineering, leakage/modeling,
+    outputs/validation, and complete/calculated/blocked next decisions.
   - Generated from
     `docs/project_blueprints/build_full_workflow_diagram_deliverables.py` with
     panels under
@@ -155,6 +163,9 @@ wireline machine-learning project.
     hydrate proof, saturation output, or sweet-spot ranking.
   - Imported to the connected Google Drive account as
     [FULL WORKFLOW ML DIAGRAM 9-SLIDE North Slope Gas Hydrate Slides 2026-06-15](https://docs.google.com/presentation/d/1zrWGi9bf9J2dukiZPqFQVvBCm7jCgOz1mTSIxiv8qzI).
+  - Revised V5 copy with the readable slide 3 workflow summary was imported
+    to the connected Google Drive account as
+    [REVISED V5 FULL WORKFLOW ML DIAGRAM 9-SLIDE North Slope Gas Hydrate Slides 2026-06-15](https://docs.google.com/presentation/d/1VjVXmaIckAIl6JptU06NYM8Y7qgfGMF-Xupbd1JkwK0).
 - `build_ml_revamp_powerpoint.py`
   - Reproducible builder for the current 9-slide visual-first ML parameter
     architecture PowerPoint.
@@ -179,8 +190,9 @@ wireline machine-learning project.
   - Reproducible builder for the 2026-06-15 pipeline status and forward
     workflow Word brief.
 - `build_full_workflow_diagram_deliverables.py`
-  - Reproducible builder for the diagram-first slide deck, standalone full
-    workflow PNG, and Word companion page.
+  - Reproducible builder for the diagram-first slide deck, slide-sized workflow
+    summary PNG, expanded workflow poster PNG, ML runtime detail PNG, contact
+    sheet, and Word companion page.
 
 ## Direction
 

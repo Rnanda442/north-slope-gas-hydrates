@@ -71,16 +71,16 @@ metrics, or hydrate prediction claims.
 
 Latest sync for the other PC: pull `main` through commit `738ff48`
 (`Improve ML workflow architecture diagrams`). The active diagram package is
-now V5. It saves two current layouts under
-`docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/`:
-`full_project_ml_workflow_flowchart_expanded.png` for the full project
-architecture and `ml_pipeline_network_detail_v5.png` for the model-detail
-layout. The Streamlit site points to these under Analyze Hydrates > Schema
-Coverage & Architecture, and the diagram-first PPTX plus Word companion were
-regenerated from `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`.
-Next work should package these V5 diagrams into mentor-facing status language,
-weekday report bullets, and decision questions; do not reopen OSL unless a
-source/product rebuild is actually needed.
+now V5 under
+`docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/`.
+Use `full_project_ml_workflow_flowchart.png` as the readable slide-sized
+workflow summary, `full_project_ml_workflow_flowchart_expanded.png` as the
+detailed poster-scale architecture map, and `ml_pipeline_network_detail_v5.png`
+as the model-runtime detail. The Streamlit site points to these under Analyze
+Hydrates > Schema Coverage & Architecture, and the diagram-first PPTX plus Word
+companion are regenerated from
+`docs/project_blueprints/build_full_workflow_diagram_deliverables.py`. Do not
+reopen OSL unless a source/product rebuild is actually needed.
 
 ## Current State
 
@@ -638,3 +638,14 @@ blockers, and next activities in the architecture/activity map.
   Word companion language, and exact mentor decisions for phase-curve policy,
   target authority, validation split, missing-temperature handling, and ML use
   of stability as context or mask only.
+- 2026-06-15: Improved the current V5 diagram implementation so the slide deck
+  uses a readable mentor-scale workflow summary instead of a shrunken poster,
+  while the expanded architecture poster remains available separately. The ML
+  runtime detail was simplified around feature families, X allowed, whole-well
+  split controls, target-only labels, occurrence/saturation heads, and reviewed
+  outputs without adding result claims.
+- 2026-06-15: Imported the revised V5 workflow deck and Word companion to the
+  connected Google Drive account as native Google Slides/Docs for review:
+  `REVISED V5 FULL WORKFLOW ML DIAGRAM 9-SLIDE North Slope Gas Hydrate Slides
+  2026-06-15` and `REVISED V5 North Slope Gas Hydrate Full ML Workflow Diagram
+  2026-06-15`.
