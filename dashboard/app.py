@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 from collections import Counter
 from html import escape
+import json
 from pathlib import Path
 
 import numpy as np
@@ -204,6 +205,13 @@ VARIABLE_FINGERPRINT_TEMPLATE = (
     / "public_ml_products"
     / "variable_fingerprint_template_2026-06-15.csv"
 )
+INTAKE_READINESS_REPORT_DIR = PROJECT_ROOT / "data" / "public_ml_products" / "intake_readiness_reports"
+DEMO_HEADER_AUDIT_CSV = INTAKE_READINESS_REPORT_DIR / "demo_header_audit_2026-06-15.csv"
+DEMO_HEADER_AUDIT_JSON = INTAKE_READINESS_REPORT_DIR / "demo_header_audit_2026-06-15.json"
+APPROVED_DATA_INTAKE_READINESS_REPORT = (
+    PROJECT_ROOT / "docs" / "APPROVED_DATA_INTAKE_READINESS_REPORT_2026-06-15.md"
+)
+OSL_HEADER_AUDIT_RUNBOOK = PROJECT_ROOT / "docs" / "OSL_APPROVED_DATA_HEADER_AUDIT_RUNBOOK_2026-06-15.md"
 IGNORED_DIRS = {
     ".git",
     ".ipynb_checkpoints",
@@ -4862,6 +4870,116 @@ def render_schema_coverage_architecture() -> None:
                     path.read_bytes(),
                     path.name,
                     "text/csv",
+                    key=key,
+                )
+            else:
+                column.button(f"Download {label}", disabled=True, key=f"{key}_missing")
+
+    st.markdown("##### Header Audit / OSL Handoff")
+    st.caption(
+        "The CLI runner audits headers only. It can be used in OSL against "
+        "approved workbook/LAS/CSV/core/NMR sources without printing or writing "
+        "row values."
+    )
+    st.code(
+        "python 01_pipeline/validate_approved_data_headers.py "
+        "--source-csv path/to/approved_or_runtime_file.csv --header-only "
+        "--source-label osl_header_audit_public_safe "
+        "--output-prefix osl_header_audit_2026-06-15",
+        language="bash",
+    )
+
+    handoff_contract = pd.DataFrame(
+        [
+            {
+                "Area": "CLI exists",
+                "Public-safe use": "`01_pipeline/validate_approved_data_headers.py` reads inline headers, header-list CSVs, or CSV headers with `nrows=0`.",
+                "Must stay out": "approved row values and private workbook rows",
+            },
+            {
+                "Area": "Validates",
+                "Public-safe use": "recognized/unknown headers, roles, X_allowed leakage, missing required fields, blocked reasons, mentor questions",
+                "Must stay out": "trained model metrics, occurrence probabilities, saturation predictions",
+            },
+            {
+                "Area": "Safe to copy back",
+                "Public-safe use": "CSV/JSON/Markdown readiness summaries, header lists, units, row counts, depth ranges, coverage counts",
+                "Must stay out": "restricted identifiers unless anonymized and approved",
+            },
+            {
+                "Area": "OSL-only",
+                "Public-safe use": "keep approved LAS/CSV/core/NMR rows and populated runtime configs in authorized storage",
+                "Must stay out": "raw target values and row-level predictions",
+            },
+        ]
+    )
+    st.dataframe(handoff_contract, use_container_width=True, hide_index=True)
+
+    demo_summary = {}
+    if DEMO_HEADER_AUDIT_JSON.exists():
+        demo_summary = json.loads(DEMO_HEADER_AUDIT_JSON.read_text(encoding="utf-8"))
+    if demo_summary:
+        st.markdown(
+            f"Demo report summary: source `{demo_summary.get('source_label', '')}`, "
+            f"recognized headers `{demo_summary.get('recognized_header_count', '')}`, "
+            f"ready_for_schema_design `{demo_summary.get('ready_for_schema_design', False)}`, "
+            f"ready_for_training `{demo_summary.get('ready_for_training', False)}`."
+        )
+        st.dataframe(
+            pd.DataFrame(
+                [
+                    {
+                        "Demo field": "source_label",
+                        "Value": demo_summary.get("source_label", ""),
+                    },
+                    {
+                        "Demo field": "recognized_header_count",
+                        "Value": demo_summary.get("recognized_header_count", ""),
+                    },
+                    {
+                        "Demo field": "ready_for_schema_design",
+                        "Value": demo_summary.get("ready_for_schema_design", False),
+                    },
+                    {
+                        "Demo field": "ready_for_training",
+                        "Value": demo_summary.get("ready_for_training", False),
+                    },
+                    {
+                        "Demo field": "blocked_reasons",
+                        "Value": "; ".join(demo_summary.get("blocked_reasons", [])),
+                    },
+                ]
+            ),
+            use_container_width=True,
+            hide_index=True,
+        )
+    else:
+        st.info("Demo header audit report has not been generated yet.")
+
+    audit_downloads = [
+        ("Demo CSV report", DEMO_HEADER_AUDIT_CSV, "text/csv", "download_demo_header_audit_csv"),
+        ("Demo JSON report", DEMO_HEADER_AUDIT_JSON, "application/json", "download_demo_header_audit_json"),
+        (
+            "Readiness report Markdown",
+            APPROVED_DATA_INTAKE_READINESS_REPORT,
+            "text/markdown",
+            "download_approved_data_intake_readiness_report",
+        ),
+        (
+            "OSL header-audit runbook",
+            OSL_HEADER_AUDIT_RUNBOOK,
+            "text/markdown",
+            "download_osl_header_audit_runbook",
+        ),
+    ]
+    for offset in range(0, len(audit_downloads), 2):
+        for column, (label, path, mime, key) in zip(st.columns(2), audit_downloads[offset : offset + 2]):
+            if path.exists():
+                column.download_button(
+                    f"Download {label}",
+                    path.read_bytes(),
+                    path.name,
+                    mime,
                     key=key,
                 )
             else:

@@ -117,6 +117,47 @@ training readiness, and blocked reasons.
 The validator is metadata-only. It does not require or expose approved row
 values.
 
+## Command-Line Header Audit
+
+The public-safe CLI runner is:
+
+```text
+01_pipeline/validate_approved_data_headers.py
+```
+
+It supports:
+
+```bash
+python 01_pipeline/validate_approved_data_headers.py --headers "DEPTH,GR,RHOB,Rt,Sh"
+python 01_pipeline/validate_approved_data_headers.py --headers-csv path/to/header_list.csv
+python 01_pipeline/validate_approved_data_headers.py --source-csv path/to/data.csv --header-only
+```
+
+When `--source-csv` is used, `--header-only` is required and the script reads
+only `nrows=0`. It writes public-safe CSV and JSON readiness reports to:
+
+```text
+data/public_ml_products/intake_readiness_reports/
+```
+
+The demo report is:
+
+```text
+data/public_ml_products/intake_readiness_reports/demo_header_audit_2026-06-15.csv
+data/public_ml_products/intake_readiness_reports/demo_header_audit_2026-06-15.json
+docs/APPROVED_DATA_INTAKE_READINESS_REPORT_2026-06-15.md
+```
+
+The demo uses only synthetic/project-safe headers. It shows schema design is
+ready, training is not ready, target authority remains blocked, split and
+validation policy are still required, and no approved row values are present.
+
+The OSL runbook is:
+
+```text
+docs/OSL_APPROVED_DATA_HEADER_AUDIT_RUNBOOK_2026-06-15.md
+```
+
 ## Minimum Required Columns
 
 The approved runtime should refuse model training unless each loaded source can

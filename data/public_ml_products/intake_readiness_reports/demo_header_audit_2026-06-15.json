@@ -1,0 +1,47 @@
+{
+  "blocked_reasons": [
+    "approved_rows_not_loaded_public_safe_validator",
+    "missing_log_adapter_blocked_until_mentor_approval",
+    "saturation_target_requires_authoritative_field_and_fraction_or_percent_policy",
+    "target_authority_not_confirmed",
+    "validation_plan_required_before_training",
+    "whole_well_compartment_or_geographic_split_policy_required"
+  ],
+  "context_headers": [],
+  "derived_feature_headers": [],
+  "generated_at_utc": "2026-06-15T23:31:26+00:00",
+  "guardrail": "Header-only public-safe audit; no approved/private row values read or written.",
+  "header_count": 7,
+  "input_mode": "inline_headers",
+  "leakage_flags": [],
+  "mentor_questions": [
+    "Which saturation field is authoritative: Sgh, S_h, Sh, or NMR_SAT?",
+    "Should occurrence use source-style classes, saturation thresholds, or mentor-reviewed intervals?",
+    "Are MTE/IGS separate wells and are *_refined processing stages in the workbook?",
+    "Do we have enough caliper coverage to apply washout filtering?",
+    "Which wells become blind validation after full recovery?",
+    "Are missing-log adapters allowed, or should missing curves simply block that feature set?"
+  ],
+  "missing_required_fields": [],
+  "no_row_values_read": true,
+  "predictor_headers": [
+    "DEPTH",
+    "GR",
+    "RHOB",
+    "Rt"
+  ],
+  "qc_headers": [
+    "CAL1"
+  ],
+  "ready_for_public_release": false,
+  "ready_for_schema_design": true,
+  "ready_for_training": false,
+  "recognized_header_count": 7,
+  "source_label": "demo_public_safe",
+  "target_only_headers": [
+    "Sh",
+    "NMR_SAT"
+  ],
+  "unknown_headers": [],
+  "unresolved_headers": []
+}

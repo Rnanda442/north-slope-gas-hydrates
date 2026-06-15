@@ -26,6 +26,15 @@ say whether an approved-runtime dataset has the required column families,
 target-leakage barrier, target authority metadata, unit policy, and split
 readiness, but it does not train a model or inspect approved row values.
 
+The validator now has a command-line header-audit runner:
+`01_pipeline/validate_approved_data_headers.py`. It accepts inline headers,
+header-list CSVs, or CSV headers with `--source-csv ... --header-only`, then
+writes public-safe CSV/JSON readiness reports. The demo report under
+`data/public_ml_products/intake_readiness_reports/` confirms the current public
+state: schema design can proceed, but training remains false until approved
+rows, target authority, split policy, validation plan, and release review are
+available.
+
 ## Current ML Architecture Decisions And Open Mentor Questions
 
 ### A. Ready to encode now

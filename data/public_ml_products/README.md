@@ -33,6 +33,15 @@ names, source families, units, dtypes, model roles, public-display status, and
 caveats. It includes V5.1 variable-fingerprint and mentor-question metadata,
 but no approved row values.
 
+`intake_readiness_reports/demo_header_audit_2026-06-15.csv`
+
+`intake_readiness_reports/demo_header_audit_2026-06-15.json`
+
+These are demo outputs from the public-safe CLI header audit runner:
+`01_pipeline/validate_approved_data_headers.py`. The demo uses synthetic/project
+safe headers only. It shows schema design readiness, training not ready, blocked
+reasons, and mentor questions without approved row values.
+
 ## Public-Safe Templates
 
 The schema-only templates are:
@@ -50,3 +59,19 @@ The schema-only templates are:
 These files are headers/schema only. They do not contain approved LAS/CSV/core
 rows, private workbook rows, occurrence probabilities, saturation predictions,
 trained model metrics, or sensitive identifiers.
+
+## Header Audit CLI
+
+Run from the repository root:
+
+```bash
+python 01_pipeline/validate_approved_data_headers.py \
+  --headers "DEPTH,GR,RHOB,Rt,Sh,NMR_SAT,CAL1" \
+  --source-label demo_public_safe \
+  --output-prefix demo_header_audit_2026-06-15
+```
+
+When using `--source-csv`, pass `--header-only`. The script reads only CSV
+headers with `nrows=0`; it never prints or writes row values. Private-looking
+paths are sanitized by default unless `--include-source-name` is explicitly
+used for a public-safe source name.

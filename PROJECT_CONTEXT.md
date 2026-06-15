@@ -84,7 +84,12 @@ The intake contract is now operationalized in
 `first_model_output_schema_2026-06-15.csv`. The V5.1 skeleton adds explicit
 variable-fingerprint templates, source-column registry, well-depth index,
 `X_allowed`, `Y_target_registry`, and first-output schema templates under the
-same public-safe folder.
+same public-safe folder. The header audit can now be run from
+`01_pipeline/validate_approved_data_headers.py`, which reads inline headers,
+header-list CSVs, or CSV headers with `--header-only`, writes public-safe
+CSV/JSON readiness summaries under
+`data/public_ml_products/intake_readiness_reports/`, and is documented for OSL
+use in `docs/OSL_APPROVED_DATA_HEADER_AUDIT_RUNBOOK_2026-06-15.md`.
 
 The active workflow-diagram package is now the V5 completion pass under
 `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/`.
@@ -476,10 +481,11 @@ The current ordered plan is maintained in
 Immediate 2026-06-15 handoff: use the completed V5 diagram package as the
 explanation foundation and the tested approved-data intake validator as the
 runtime contract. The next approved-runtime step is to run the header/schema
-validator against approved workbook/LAS/CSV/core/NMR sources, then confirm
-target authority, units, well/depth alignment, validation split policy, and
-whether stability may enter `X_allowed` only as context, mask, confidence,
-caveat, or blocked reason.
+validator against approved workbook/LAS/CSV/core/NMR sources using the
+header-only CLI/runbook, then safely bring back summary artifacts while
+confirming target authority, units, well/depth alignment, validation split
+policy, and whether stability may enter `X_allowed` only as context, mask,
+confidence, caveat, or blocked reason.
 
 ## Update Protocol
 

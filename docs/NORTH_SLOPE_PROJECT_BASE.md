@@ -110,7 +110,9 @@ The public repo should not contain:
 - `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`
 - `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md`
 - `dashboard/approved_data_intake.py`
+- `01_pipeline/validate_approved_data_headers.py`
 - `tests/test_approved_data_intake.py`
+- `tests/test_approved_data_intake_cli.py`
 - `data/public_ml_products/approved_data_intake_template_2026-06-15.csv`
 - `data/public_ml_products/approved_data_intake_validation_schema_2026-06-15.csv`
 - `data/public_ml_products/first_model_output_schema_2026-06-15.csv`
@@ -120,11 +122,16 @@ The public repo should not contain:
 - `data/public_ml_products/approved_data_y_target_registry_template_2026-06-15.csv`
 - `data/public_ml_products/first_model_output_schema_template_2026-06-15.csv`
 - `data/public_ml_products/variable_fingerprint_template_2026-06-15.csv`
+- `data/public_ml_products/intake_readiness_reports/demo_header_audit_2026-06-15.csv`
+- `data/public_ml_products/intake_readiness_reports/demo_header_audit_2026-06-15.json`
+- `docs/APPROVED_DATA_INTAKE_READINESS_REPORT_2026-06-15.md`
+- `docs/OSL_APPROVED_DATA_HEADER_AUDIT_RUNBOOK_2026-06-15.md`
 
 These are the active public-safe readiness artifacts after the V5 diagram
 package. They define and now test the field roles, approved-data intake
-contract, first model experiment shape, runtime templates, and mentor decisions
-without exposing approved rows or claiming occurrence/saturation results.
+contract, first model experiment shape, runtime templates, CLI header audits,
+OSL-safe summary handoff, and mentor decisions without exposing approved rows
+or claiming occurrence/saturation results.
 
 ## Current ML Architecture Decisions And Open Mentor Questions
 
@@ -801,9 +808,10 @@ Current top-priority handoff for the PC:
 4. Use `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md` as the first approved-
    runtime model plan. It separates occurrence classification from saturation
    regression and keeps target labels out of `X_allowed`.
-5. Use `dashboard/approved_data_intake.py` and the public-safe templates in
-   `data/public_ml_products/` as the tested header/schema contract for later
-   approved-runtime loading.
+5. Use `dashboard/approved_data_intake.py`,
+   `01_pipeline/validate_approved_data_headers.py`, and the public-safe
+   templates/reports in `data/public_ml_products/` as the tested header/schema
+   contract for later approved-runtime loading.
 6. Keep the website in readiness mode only: public counts, diagrams, schemas,
    caveats, blocked reasons, and synthetic examples are acceptable; fake ML
    results, approved rows, trained metrics, occurrence probabilities, and
@@ -815,11 +823,11 @@ Recommended next build:
    split, missing G10015 handling, stability-as-context policy, and public
    website output limits.
 2. Recover or inspect the approved workbook/data headers inside the authorized
-   environment and run the intake validator against the approved source
-   headers there.
+   environment and run the CLI header audit there using `--header-only`.
 3. Confirm units, depth alignment, and target-label authority before training.
-4. Then extend the parameter logic/source matrix and Word/PPT narrative using
-   the approved intake contract rather than making new synthetic datasets.
+4. Copy back only reviewed public-safe readiness summaries, then extend the
+   parameter logic/source matrix and Word/PPT narrative using the approved
+   intake contract rather than making new synthetic datasets.
 
 ## Questions For User
 
