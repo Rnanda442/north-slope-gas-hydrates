@@ -12,7 +12,7 @@ import pandas as pd
 
 from dashboard.runtime.feature_engineering import add_standard_features
 from dashboard.runtime.loaders import standardize_curve_columns
-from dashboard.runtime.schemas import target_only_column_aliases
+from dashboard.runtime.schemas import default_curve_aliases, target_only_column_aliases
 from dashboard.runtime.validation import readiness_frame, validate_log_table
 
 
@@ -73,9 +73,37 @@ def target_like_column(column: object) -> bool:
     normalized = normalize_header_name(column)
     if normalized in target_alias_lookup():
         return True
-    has_hydrate = "hydrate" in normalized or "sgh" in normalized
+    if normalized in {"class", "label", "target", "y", "occurrence", "phase", "hydratepresent"}:
+        return True
+    has_hydrate = "hydrate" in normalized or "sgh" in normalized or normalized.startswith("sh")
     has_target_word = any(part in normalized for part in ("sat", "saturation", "occur", "class", "label", "phase"))
     return has_hydrate and has_target_word
+
+
+def canonical_name_for_header(header: object) -> str | None:
+    normalized = normalize_header_name(header)
+    for canonical, aliases in default_curve_aliases().items():
+        if normalized == normalize_header_name(canonical):
+            return canonical
+        for alias in aliases:
+            if normalized == normalize_header_name(alias):
+                return canonical
+    return None
+
+
+def header_role_hint(header: object) -> str:
+    normalized = normalize_header_name(header)
+    target_lookup = target_alias_lookup().get(normalized)
+    if target_lookup is not None:
+        return f"target_only_{target_lookup[0]}"
+    if target_like_column(header):
+        return "possible_target_review"
+    canonical = canonical_name_for_header(header)
+    if canonical in {"well_alias", "depth_m"}:
+        return "identifier_or_depth_axis"
+    if canonical is not None:
+        return "candidate_feature_or_context"
+    return "unmapped_review"
 
 
 def read_first_nonempty_excel_sheet(path: Path, sheet_name: str | None = None) -> tuple[pd.DataFrame, str]:
@@ -91,6 +119,121 @@ def read_first_nonempty_excel_sheet(path: Path, sheet_name: str | None = None) -
             return frame, str(candidate)
     first_sheet = str(excel.sheet_names[0])
     return pd.read_excel(excel, sheet_name=first_sheet), first_sheet
+
+
+def scan_workbook_headers(path: Path, *, sample_rows: int = 25) -> tuple[pd.DataFrame, pd.DataFrame]:
+    if not path.exists():
+        raise FileNotFoundError(f"Workbook does not exist: {path}")
+    excel = pd.ExcelFile(path)
+    sheet_rows: list[dict[str, Any]] = []
+    column_rows: list[dict[str, Any]] = []
+    for sheet_name in excel.sheet_names:
+        sample = pd.read_excel(excel, sheet_name=sheet_name, nrows=sample_rows)
+        full_header = pd.read_excel(excel, sheet_name=sheet_name, nrows=0)
+        sheet_rows.append(
+            {
+                "workbook": path.name,
+                "sheet_name": str(sheet_name),
+                "sampled_rows": int(len(sample)),
+                "column_count": int(len(full_header.columns)),
+                "has_target_like_header": bool(any(target_like_column(column) for column in full_header.columns)),
+            }
+        )
+        for position, column in enumerate(full_header.columns, start=1):
+            values = sample[column] if column in sample else pd.Series(dtype=object)
+            numeric = pd.to_numeric(values, errors="coerce")
+            role_hint = header_role_hint(column)
+            column_rows.append(
+                {
+                    "workbook": path.name,
+                    "sheet_name": str(sheet_name),
+                    "column_position": position,
+                    "original_header": str(column),
+                    "normalized_header": normalize_header_name(column),
+                    "canonical_header": canonical_name_for_header(column) or "",
+                    "role_hint": role_hint,
+                    "non_null_sample_rows": int(values.notna().sum()),
+                    "numeric_sample_rows": int(numeric.notna().sum()),
+                    "unique_sample_values": int(values.dropna().nunique()),
+                    "suggested_target_task": (
+                        "classification"
+                        if role_hint.endswith("phase_or_occurrence_label")
+                        or role_hint == "possible_target_review"
+                        and any(hint in normalize_header_name(column) for hint in CLASSIFICATION_NAME_HINTS)
+                        else "regression"
+                        if "saturation" in role_hint or "sat" in normalize_header_name(column)
+                        else ""
+                    ),
+                }
+            )
+    return pd.DataFrame(sheet_rows), pd.DataFrame(column_rows)
+
+
+def scan_three_dataset_headers(
+    data_dir: Path,
+    *,
+    files: tuple[str, ...] = (DEFAULT_TRAIN_FILE, *DEFAULT_TEST_FILES),
+    sample_rows: int = 25,
+    output_root: Path = Path("outputs_runtime"),
+    run_label: str | None = None,
+) -> dict[str, Any]:
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    label = sanitize_label(run_label or f"three_dataset_header_scan_{timestamp}")
+    run_dir = Path(output_root) / label
+    run_dir.mkdir(parents=True, exist_ok=True)
+
+    sheet_frames: list[pd.DataFrame] = []
+    column_frames: list[pd.DataFrame] = []
+    missing_files: list[str] = []
+    for file_name in files:
+        path = Path(data_dir).expanduser() / file_name
+        if not path.exists():
+            missing_files.append(str(path))
+            continue
+        sheets, columns = scan_workbook_headers(path, sample_rows=sample_rows)
+        sheet_frames.append(sheets)
+        column_frames.append(columns)
+
+    sheet_inventory = pd.concat(sheet_frames, ignore_index=True) if sheet_frames else pd.DataFrame()
+    column_inventory = pd.concat(column_frames, ignore_index=True) if column_frames else pd.DataFrame()
+    target_hints = (
+        column_inventory[column_inventory["role_hint"].str.contains("target", case=False, na=False)].copy()
+        if not column_inventory.empty
+        else pd.DataFrame()
+    )
+
+    sheet_path = run_dir / "workbook_sheet_inventory.csv"
+    column_path = run_dir / "workbook_column_inventory.csv"
+    target_path = run_dir / "target_header_hints.csv"
+    sheet_inventory.to_csv(sheet_path, index=False)
+    column_inventory.to_csv(column_path, index=False)
+    target_hints.to_csv(target_path, index=False)
+
+    suggestions: list[str] = []
+    if not target_hints.empty:
+        first = target_hints.iloc[0]
+        task = first.get("suggested_target_task") or "regression"
+        suggestions.append(
+            "python 01_pipeline\\run_three_dataset_ml_pipeline.py "
+            f"--data-dir \"{Path(data_dir).expanduser()}\" "
+            f"--target \"{first['original_header']}\" --target-task {task}"
+        )
+    suggestions_path = run_dir / "suggested_commands.txt"
+    suggestions_path.write_text("\n".join(suggestions) + ("\n" if suggestions else ""), encoding="utf-8")
+
+    manifest = {
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "data_dir_name": Path(data_dir).expanduser().name,
+        "missing_files": missing_files,
+        "sheet_inventory": str(sheet_path),
+        "column_inventory": str(column_path),
+        "target_header_hints": str(target_path),
+        "suggested_commands": str(suggestions_path),
+        "target_hint_count": int(len(target_hints)),
+        "guardrail": "Header/sample scan is approved-runtime local only; do not commit workbook rows or sensitive identifiers.",
+    }
+    write_json(run_dir / "header_scan_manifest.json", manifest)
+    return {"run_dir": str(run_dir), **manifest}
 
 
 def load_workbook_dataset(path: Path, *, label: str, split: str, sheet_name: str | None = None) -> WorkbookDataset:

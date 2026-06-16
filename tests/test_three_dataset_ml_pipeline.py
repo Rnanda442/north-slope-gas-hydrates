@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from dashboard.runtime.three_dataset_pipeline import run_three_dataset_pipeline
+from dashboard.runtime.three_dataset_pipeline import run_three_dataset_pipeline, scan_three_dataset_headers
 
 
 pytest.importorskip("openpyxl")
@@ -87,3 +87,43 @@ def test_three_dataset_pipeline_writes_readiness_when_no_target_is_available(tmp
     assert (run_dir / "dataset_inventory.csv").exists()
     assert (run_dir / "schema_readiness.csv").exists()
     assert (run_dir / "feature_columns.csv").exists()
+
+
+def test_three_dataset_header_scan_finds_target_hints_across_workbook_sheets(tmp_path: Path) -> None:
+    for index in range(1, 4):
+        workbook_path = tmp_path / f"curated_dataset{index}.xlsx"
+        with pd.ExcelWriter(workbook_path) as writer:
+            pd.DataFrame(
+                {
+                    "WELL": ["MTE"],
+                    "DEPTH": [500],
+                    "GR": [42],
+                    "RT": [35],
+                    "RHOB": [2.2],
+                }
+            ).to_excel(writer, sheet_name="logs", index=False)
+            pd.DataFrame(
+                {
+                    "WELL": ["MTE"],
+                    "DEPTH": [500],
+                    "Class": ["hydrate"],
+                    "Hydrate_Sat": [0.25],
+                }
+            ).to_excel(writer, sheet_name="targets", index=False)
+
+    result = scan_three_dataset_headers(
+        tmp_path,
+        output_root=tmp_path / "outputs_runtime",
+        run_label="header_scan_test",
+    )
+
+    run_dir = Path(result["run_dir"])
+    target_hints = pd.read_csv(run_dir / "target_header_hints.csv")
+    columns = pd.read_csv(run_dir / "workbook_column_inventory.csv")
+
+    assert result["target_hint_count"] >= 6
+    assert {"Class", "Hydrate_Sat"}.issubset(set(target_hints["original_header"]))
+    assert "candidate_feature_or_context" in set(columns["role_hint"])
+    assert (run_dir / "suggested_commands.txt").read_text(encoding="utf-8").startswith(
+        "python 01_pipeline\\run_three_dataset_ml_pipeline.py"
+    )

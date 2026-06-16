@@ -34,6 +34,20 @@ keeps entire recovered workbook groups separate.
 From the repository root in Anaconda Prompt:
 
 ```bash
+python 01_pipeline/inspect_three_dataset_headers.py
+```
+
+Run this first if the target column is unclear. It writes local CSVs under
+`outputs_runtime/three_dataset_header_scan_*`:
+
+- `workbook_sheet_inventory.csv`
+- `workbook_column_inventory.csv`
+- `target_header_hints.csv`
+- `suggested_commands.txt`
+
+Then run the model command:
+
+```bash
 python 01_pipeline/run_three_dataset_ml_pipeline.py --data-dir "%USERPROFILE%\Downloads\Northslopedatasets06052026"
 ```
 

@@ -51,6 +51,7 @@ are limited to `active`, `superseded`, `reference`, and `needs review`.
 | Approved data intake validator | `dashboard/approved_data_intake.py` | Public-safe header/schema intake validation | active | Yes | No approved rows; synthetic/header-only tests only. |
 | Header audit CLI | `01_pipeline/validate_approved_data_headers.py` | OSL/approved environment header-only audit tool | active | Yes | Use `--header-only` for CSV paths; outputs public-safe readiness reports. |
 | DOE three-dataset ML runbook | `docs/DOE_THREE_DATASET_ML_PIPELINE_RUNBOOK_2026-06-16.md` | Approved-runtime guide for dataset1 train and dataset2/3 external-test execution | active | Yes | Do not copy approved rows, predictions, fitted models, or runtime manifests into public GitHub. |
+| DOE three-dataset header inspector | `01_pipeline/inspect_three_dataset_headers.py` | One-command approved-runtime sheet/header scanner for the three curated workbooks | active | Yes | Writes local-only header inventories and target hints under ignored `outputs_runtime/`. |
 | DOE three-dataset ML CLI | `01_pipeline/run_three_dataset_ml_pipeline.py` | Local approved-runtime ML runner for the three current curated Excel workbooks | active | Yes | Reads first non-empty Excel sheet by default; writes only to ignored `outputs_runtime/` and `models_runtime/`. |
 | Three-dataset runtime module | `dashboard/runtime/three_dataset_pipeline.py` | Tested feature/target/model helper for the DOE three-workbook run | active | Yes | Reuses canonical header aliases, feature engineering, target-only leakage checks, train-only scaling, and baseline/MLP model options. |
 | Approved data field role table | `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv` | Header role and variable-fingerprint metadata | active | Yes | No approved row values. |
@@ -72,5 +73,5 @@ are limited to `active`, `superseded`, `reference`, and `needs review`.
 | Hydrate ML/physics sources | `references/hydrate-ml-physics-sources/2026-06-13/` | Public/official source package and manifest | reference | Yes | Do not add restricted or credentialed source files. |
 | ML sources | `references/ml-sources/2026-06-11/` | Direct ML/source reference package | reference | Yes | Public-safe source package. |
 | Email screenshot evidence | `docs/evidence/email_screenshots_2026_06_12/` | User-supplied header/equation/project screenshot evidence | reference | No unless adding verified evidence | Treat as origin evidence; do not replace with generic summaries. |
-| Full pytest suite | `tests/` | Project verification suite | active | Yes | Expected current count: `116 passed` with `python -m pytest`. |
+| Full pytest suite | `tests/` | Project verification suite | active | Yes | Expected current count: `117 passed` with `python -m pytest`. |
 | OSL runtime layout | `docs/opensciencelab_runtime_layout.md` | Ignored runtime folder and boundary instructions | active | Yes | Use before any OSL/runtime data handling. |

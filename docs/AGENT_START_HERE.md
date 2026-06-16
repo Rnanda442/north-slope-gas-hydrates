@@ -208,7 +208,7 @@ Run the full suite before committing meaningful changes:
 python -m pytest
 ```
 
-Expected current result: `116 passed` as of the 2026-06-16 three-dataset
+Expected current result: `117 passed` as of the 2026-06-16 three-dataset
 runtime-pipeline update. Update this count only after verifying it locally.
 
 Current test files:

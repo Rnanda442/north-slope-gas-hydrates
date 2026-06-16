@@ -188,6 +188,7 @@ Then use:
 - `dashboard/approved_data_intake.py`
 - `01_pipeline/validate_approved_data_headers.py`
 - `dashboard/runtime/three_dataset_pipeline.py`
+- `01_pipeline/inspect_three_dataset_headers.py`
 - `01_pipeline/run_three_dataset_ml_pipeline.py`
 - `docs/DOE_THREE_DATASET_ML_PIPELINE_RUNBOOK_2026-06-16.md`
 - `tests/test_approved_data_intake.py`
