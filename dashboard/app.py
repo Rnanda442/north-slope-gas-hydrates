@@ -13,6 +13,12 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 from dashboard.approved_data_intake import build_variable_fingerprints, intake_validator_contract_frame
+from dashboard.parameter_evidence import (
+    default_parameter_evidence_registry_path,
+    load_parameter_evidence_registry,
+    parameter_evidence_summary_frame,
+    validate_parameter_evidence_registry,
+)
 from dashboard.processing_visuals import render_processing_sketch
 from dashboard.runtime.feature_engineering import add_standard_features
 from dashboard.runtime.schemas import (
@@ -207,6 +213,7 @@ VARIABLE_FINGERPRINT_TEMPLATE = (
     / "public_ml_products"
     / "variable_fingerprint_template_2026-06-15.csv"
 )
+PUBLIC_PARAMETER_EVIDENCE_REGISTRY = default_parameter_evidence_registry_path(PROJECT_ROOT)
 INTAKE_READINESS_REPORT_DIR = PROJECT_ROOT / "data" / "public_ml_products" / "intake_readiness_reports"
 DEMO_HEADER_AUDIT_CSV = INTAKE_READINESS_REPORT_DIR / "demo_header_audit_2026-06-15.csv"
 DEMO_HEADER_AUDIT_JSON = INTAKE_READINESS_REPORT_DIR / "demo_header_audit_2026-06-15.json"
@@ -1169,6 +1176,11 @@ def cached_approved_data_field_role_table(project_root: str) -> pd.DataFrame:
     if not path.exists():
         return pd.DataFrame()
     return pd.read_csv(path)
+
+
+@st.cache_data
+def cached_parameter_evidence_registry(project_root: str) -> pd.DataFrame:
+    return load_parameter_evidence_registry(Path(project_root))
 
 
 @st.cache_data
@@ -4225,6 +4237,157 @@ def render_public_ml_readiness() -> None:
     )
 
 
+PARAMETER_TIER_COLORS = {
+    "Stability context": "#2f80d0",
+    "Reservoir quality": "#1f9f73",
+    "Hydrate response": "#127c8b",
+    "QC and review": "#d79a2b",
+    "Targets and validation": "#c84242",
+}
+
+
+def build_parameter_evidence_bar_figure(registry: pd.DataFrame) -> go.Figure:
+    if registry.empty:
+        return go.Figure()
+
+    plot_frame = registry.iloc[::-1].copy()
+    fig = go.Figure()
+    fig.add_trace(
+        go.Bar(
+            y=plot_frame["parameter_family"],
+            x=[1.0] * len(plot_frame),
+            orientation="h",
+            marker_color="#eef5f7",
+            marker_line_color="#bad3da",
+            marker_line_width=1,
+            hoverinfo="skip",
+            showlegend=False,
+            name="Normalized axis",
+        )
+    )
+    for _, row in plot_frame.iterrows():
+        tier = str(row["tier"])
+        color = PARAMETER_TIER_COLORS.get(tier, "#526770")
+        start = float(row["hydrate_window_norm_start"])
+        end = float(row["hydrate_window_norm_end"])
+        if end <= start:
+            fig.add_trace(
+                go.Scatter(
+                    x=[0.5],
+                    y=[row["parameter_family"]],
+                    mode="markers+text",
+                    marker={"size": 11, "color": color, "symbol": "x"},
+                    text=["Y-only"],
+                    textposition="middle right",
+                    hovertext=row["public_guardrail"],
+                    hoverinfo="text",
+                    showlegend=False,
+                )
+            )
+            continue
+
+        fig.add_trace(
+            go.Bar(
+                y=[row["parameter_family"]],
+                x=[end - start],
+                base=[start],
+                orientation="h",
+                marker_color=color,
+                marker_line_color=color,
+                marker_line_width=1,
+                text=[row["hydrate_direction_label"]],
+                textposition="inside",
+                insidetextanchor="middle",
+                hovertemplate=(
+                    "<b>%{y}</b><br>"
+                    + f"Tier: {tier}<br>"
+                    + f"Hydrate-compatible: {escape(str(row['working_screening_envelope']))}<br>"
+                    + f"Mimics/masks: {escape(str(row['false_positives_or_masks']))}<br>"
+                    + f"Guardrail: {escape(str(row['public_guardrail']))}<extra></extra>"
+                ),
+                showlegend=False,
+                name=str(row["hydrate_direction_label"]),
+            )
+        )
+        fig.add_annotation(
+            x=start,
+            y=row["parameter_family"],
+            text=str(row["low_axis_label"]),
+            showarrow=False,
+            xanchor="right",
+            yshift=20,
+            font={"size": 10, "color": "#526770"},
+        )
+        fig.add_annotation(
+            x=end,
+            y=row["parameter_family"],
+            text=str(row["high_axis_label"]),
+            showarrow=False,
+            xanchor="left",
+            yshift=20,
+            font={"size": 10, "color": "#526770"},
+        )
+
+    fig.update_layout(
+        title={"text": ""},
+        height=max(470, 42 * len(plot_frame) + 160),
+        margin={"l": 210, "r": 35, "t": 35, "b": 45},
+        xaxis={
+            "range": [0, 1],
+            "tickmode": "array",
+            "tickvals": [0, 0.5, 1],
+            "ticktext": ["low / outside", "middle", "high / inside"],
+            "title": "Normalized evidence axis for presentation only",
+            "showgrid": False,
+            "zeroline": False,
+        },
+        yaxis={"title": None, "automargin": True},
+        barmode="overlay",
+        bargap=0.35,
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        font={"family": "Arial, sans-serif", "color": "#0b2330"},
+    )
+    return fig
+
+
+def render_parameter_evidence_board() -> None:
+    registry = cached_parameter_evidence_registry(str(PROJECT_ROOT))
+    if registry.empty:
+        st.info("The public parameter evidence registry has not been created yet.")
+        return
+
+    validation = validate_parameter_evidence_registry(registry)
+    st.markdown("##### Parameter Evidence Board")
+    st.caption(
+        "Public-safe, source-backed screening logic for the slide parameter bars. "
+        "Numeric envelopes are working ranges, not final DOE thresholds; directional rows stay directional."
+    )
+    st.dataframe(parameter_evidence_summary_frame(registry), use_container_width=True, hide_index=True)
+    if not validation["valid"]:
+        st.warning(f"Registry needs review: {validation}")
+
+    st.plotly_chart(build_parameter_evidence_bar_figure(registry), use_container_width=True)
+
+    display_columns = [
+        "tier",
+        "parameter_family",
+        "hydrate_direction_label",
+        "opposing_or_mimic_label",
+        "working_screening_envelope",
+        "ml_role",
+        "public_guardrail",
+    ]
+    st.dataframe(registry[display_columns], use_container_width=True, hide_index=True)
+    st.download_button(
+        "Download parameter evidence registry CSV",
+        csv_bytes(registry),
+        PUBLIC_PARAMETER_EVIDENCE_REGISTRY.name,
+        "text/csv",
+        key="download_public_parameter_evidence_registry",
+    )
+
+
 def render_full_workflow_map_panel() -> None:
     st.markdown("##### Full Workflow Map")
     st.caption(
@@ -4526,6 +4689,8 @@ def render_schema_coverage_architecture() -> None:
         "roles, separates target-only saturation fields, and does not include "
         "approved well-log rows, trained models, predictions, or performance metrics."
     )
+
+    render_parameter_evidence_board()
 
     st.markdown("##### Latest V5.2 deck and companion roles")
     latest_roles = [

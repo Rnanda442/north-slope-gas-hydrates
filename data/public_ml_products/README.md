@@ -25,6 +25,15 @@ The matrix does not include raw data rows. It does not train a model, report
 hydrate predictions, report saturation values, or claim performance. The
 current public-safe status is schema and model-architecture readiness only.
 
+`public_parameter_evidence_registry_2026-06-16.csv`
+
+This is the public-safe parameter evidence board for the website and next
+slide/Word pass. It turns the science-to-ML logic ladder into normalized visual
+bars for stability, reservoir quality, hydrate-response logs, QC, and Y-only
+targets. Numeric ranges are working screening envelopes from the project
+synthesis, not final DOE cutoffs; directional rows stay directional until
+source recovery and approved-data calibration confirm thresholds.
+
 `approved_data_field_role_table_2026-06-15.csv`
 
 This is the public-safe header role table used by

@@ -150,6 +150,7 @@ The public repo should not contain:
 - `data/public_ml_products/approved_data_y_target_registry_template_2026-06-15.csv`
 - `data/public_ml_products/first_model_output_schema_template_2026-06-15.csv`
 - `data/public_ml_products/variable_fingerprint_template_2026-06-15.csv`
+- `data/public_ml_products/public_parameter_evidence_registry_2026-06-16.csv`
 - `data/public_ml_products/intake_readiness_reports/demo_header_audit_2026-06-15.csv`
 - `data/public_ml_products/intake_readiness_reports/demo_header_audit_2026-06-15.json`
 - `docs/APPROVED_DATA_INTAKE_READINESS_REPORT_2026-06-15.md`
@@ -158,8 +159,13 @@ The public repo should not contain:
 These are the active public-safe readiness artifacts after the V5.2 diagram
 package. They define and now test the field roles, approved-data intake
 contract, first model experiment shape, runtime templates, CLI header audits,
-OSL-safe summary handoff, and mentor decisions without exposing approved rows
-or claiming occurrence/saturation results.
+OSL-safe summary handoff, mentor decisions, and a normalized parameter
+evidence board without exposing approved rows or claiming
+occurrence/saturation results. The parameter evidence registry is the current
+source for slide/website bars showing hydrate-compatible directions, working
+screening envelopes, mimics, ML role, and guardrails for stability, GR,
+porosity/density, NMR separation, resistivity, sonic/elastic response, caliper
+QC, and Y-only targets.
 
 ## Current ML Architecture Decisions And Open Mentor Questions
 

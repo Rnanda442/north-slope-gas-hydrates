@@ -123,6 +123,16 @@ header-list CSVs, or CSV headers with `--header-only`, writes public-safe
 CSV/JSON readiness summaries under
 `data/public_ml_products/intake_readiness_reports/`, and is documented for OSL
 use in `docs/OSL_APPROVED_DATA_HEADER_AUDIT_RUNBOOK_2026-06-15.md`.
+The parameter evidence board is now implemented as a public-safe registry at
+`data/public_ml_products/public_parameter_evidence_registry_2026-06-16.csv`,
+with loader/validation logic in `dashboard/parameter_evidence.py`, tests in
+`tests/test_parameter_evidence_registry.py`, and a Streamlit display under
+Analyze Hydrates > Schema Coverage & Architecture. Use this registry as the
+source for the next slide 3 and slide 5 parameter-range visuals: it separates
+stability, reservoir quality, hydrate-response logs, QC, and Y-only targets;
+marks numeric values as working screening envelopes rather than final DOE
+cutoffs; and keeps the guardrails that stability, high resistivity, low GR, and
+target labels are not hydrate proof.
 
 The active workflow-diagram package is now the V5.2 refresh under
 `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/`.
@@ -199,8 +209,8 @@ restored, and the two complex diagrams are kept intact where they matter.
   scaffold views.
 - Tests exist in `tests/test_well_log_engine.py` and
   `tests/test_runtime_skeleton.py`.
-- The full project test suite passed after the final deck prompt execution:
-  107 tests passed.
+- The full project test suite passed after the parameter evidence board update:
+  111 tests passed.
 - Public GIS layers, notebooks, structural surfaces, and Plotly exports are
   present.
 - Two working Word drafts and a rebuilt 2026-06-13 local research-overview
