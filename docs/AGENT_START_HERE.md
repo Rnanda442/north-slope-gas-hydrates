@@ -3,9 +3,8 @@
 Last updated: 2026-06-16
 
 Use this file as the first read for future Codex, PC, and OpenScienceLab
-sessions. It was created after commit `a2ac71b Add public parameter evidence
-board` and should be updated only when the project orientation, authoritative
-artifacts, guardrails, tests, or next actions materially change.
+sessions. It should be updated only when the project orientation,
+authoritative artifacts, guardrails, tests, or next actions materially change.
 
 ## Read Order
 
