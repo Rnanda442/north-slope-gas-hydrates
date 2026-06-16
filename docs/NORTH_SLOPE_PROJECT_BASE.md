@@ -72,13 +72,13 @@ Then use:
 ### Slide Authority And Current Deck
 
 - Current mentor-review deck:
-  `docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`
+  `docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`
 - Current native Google Slides review copy:
-  <https://docs.google.com/presentation/d/1kP0icjCLpldXZX80eww27IIokG1s3VbM5bSXiGLk8Sw>
+  <https://docs.google.com/presentation/d/1olavI9-nUSSvYtEm-TjYVOte-Cg-1UgaO9GMl6skDt0>
 - Current Word companion:
-  `docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx`
+  `docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx`
 - Current native Google Docs review copy:
-  <https://docs.google.com/document/d/1QcF-31U77_MyPHnrBSYFZSswFyIzO8P3pMLBSTIMgMQ>
+  <https://docs.google.com/document/d/1sgl7cyGHOyJyWGoVC9e7LHb0JFnriPIDAmRizyf5wIg>
 
 - `docs/project_blueprints/CURRENT_GMAIL_VISUAL_REVISION_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-11.pptx`
 - Source: Gmail message `19eba86da8752830`
@@ -86,7 +86,7 @@ Then use:
 - Sent: 2026-06-12 01:30 CDT
 - Verified: valid 9-slide PPTX.
 - Use this deck as historical visual authority only. The current review deck is
-  V5.3 above.
+  V5.4 corrected above.
 - Cleanup/consolidation control now exists at
   `docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md`.
   Use it before opening or deleting any older Word, PPTX, or Drive copy. The
@@ -113,18 +113,23 @@ Then use:
   runtime diagrams intact as whole-slide plates. The rebuilt deck was imported
   to Drive as native Google Slides for review:
   <https://docs.google.com/presentation/d/1cWG9ZJvBTQ2hLTbIGJHggcBn46geRrdIUpGY7hWYtd8>.
-- Current V5.3 mentor-facing workflow package:
+- Current V5.4 corrected mentor-facing workflow package:
+  `docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`.
+  It has the agreed nine-slide spine, restores the original personal/about-me
+  opener, uses source-backed hydrate and North Slope context visuals, makes
+  slide 3 parameter-range-only, restores the full complex project workflow as
+  slide 4, explains parameter behavior on slide 5, centers equations and unit
+  gates on slide 6, restores the complex ML runtime architecture as slide 7,
+  and ties validation, planned outputs, status, mentor decisions, and OSL next
+  actions together on slides 8 and 9. It does not include approved rows,
+  trained model metrics, occurrence predictions, saturation predictions,
+  hydrate proof, or sweet-spot ranking.
+  The V5.4 copy is also in Drive as
+  [V5.4 CORRECTED North Slope Gas Hydrate ML Workflow Slides 2026-06-16](https://docs.google.com/presentation/d/1olavI9-nUSSvYtEm-TjYVOte-Cg-1UgaO9GMl6skDt0).
+- V5.3 is a flawed intermediate/reference, not the active mentor deck. Keep it
+  for provenance, counts, website captures, and any genuinely improved
+  source-backed visual only:
   `docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`.
-  It has nine main audience slides plus two appendix plates for the intact
-  expanded architecture and ML runtime diagrams. It uses website captures for
-  the North Slope/well-map context, source-backed hydrate and phase-curve
-  visuals, a parameter-range-only slide 3, a simplified non-ML workflow slide
-  4, visual evidence/validation panels, and a beginner ML architecture with
-  baseline models before ANN/Keras. It does not include approved rows, trained
-  model metrics, occurrence predictions, saturation predictions, hydrate proof,
-  or sweet-spot ranking.
-  The V5.3 copy is also in Drive as
-  [V5.3 North Slope Gas Hydrate ML Workflow Slides 2026-06-16](https://docs.google.com/presentation/d/1kP0icjCLpldXZX80eww27IIokG1s3VbM5bSXiGLk8Sw).
 - Prior V5.2 workflow package:
   `docs/project_blueprints/V5_2_FULL_WORKFLOW_ML_DIAGRAM_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`.
   It uses a project-specific cover slide, keeps the methane hydrate intro in
@@ -137,17 +142,15 @@ Then use:
   as superseded unless the user asks to revive it.
   The V5.2 copy is also in Drive as prior provenance:
   [V5.2 FULL WORKFLOW ML DIAGRAM North Slope Gas Hydrate Slides 2026-06-15](https://docs.google.com/presentation/d/1w9eqANgOc89c1wCUC0xi9eZoBup-3JNllSUI923skgA).
-- Current diagram layouts are the V5.3 refresh:
-  - `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/slide_04_simplified_workflow_v5_3.png`
-    is the readable non-ML workflow overview.
-  - `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/full_project_ml_workflow_flowchart_expanded.png`
-    is the detailed poster-scale architecture map with source counts,
-    equations, gates, features, targets, validation, outputs, caveats, and
-    mentor decisions.
-  - `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/ml_pipeline_network_detail_v5.png`
-    is the model-detail layout showing feature/QC groups, log-track handoff,
+- Current diagram layouts are the V5.4 corrected refresh:
+  - `docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/slide_04_full_complex_project_workflow_v5_4.png`
+    is the full complex project workflow architecture plate.
+  - `docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/slide_07_complex_ml_runtime_architecture_v5_4.png`
+    is the complex ML runtime architecture plate showing feature/QC groups,
     `X_allowed`, validation split, train-only preprocessing, output heads, and
     the target-only rail.
+  - `docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/v5_4_corrected_contact_sheet.png`
+    is the current visual QA contact sheet.
   - The generated PPTX and Word companion were rebuilt from
     `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`.
 
@@ -157,13 +160,13 @@ Then use:
 - Role: current research overview document.
 - Needs next pass after parameter/source logic is made clearer.
 - Diagram companion for the current workflow discussion:
-  `docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx`.
-  This is the current mentor-facing V5.3 companion. It explains the public vs
-  OSL boundary, gas hydrate science and North Slope context, gas chemistry and
-  structure type, parameter evidence table, stability method, leakage-safe ML
-  workflow, website outputs, complete/future work, and mentor decisions.
-  The V5.3 copy is also in Drive as
-  [V5.3 North Slope Gas Hydrate ML Workflow Companion 2026-06-16](https://docs.google.com/document/d/1QcF-31U77_MyPHnrBSYFZSswFyIzO8P3pMLBSTIMgMQ).
+  `docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx`.
+  This is the current mentor-facing V5.4 companion. It explains the corrected
+  deck slide by slide and includes short source-backed sections on hydrate
+  structures, stability as admissibility only, log-response ambiguity,
+  leakage-safe ML, and separate occurrence/saturation outputs.
+  The V5.4 copy is also in Drive as
+  [V5.4 CORRECTED North Slope Gas Hydrate ML Workflow Companion 2026-06-16](https://docs.google.com/document/d/1sgl7cyGHOyJyWGoVC9e7LHb0JFnriPIDAmRizyf5wIg).
 - Prior diagram companion:
   `docs/project_blueprints/V5_2_North_Slope_Gas_Hydrate_Full_ML_Workflow_Companion_2026-06-15.docx`.
   This is a public-safe one-map explanation of the current public/OSL,
@@ -201,7 +204,7 @@ Then use:
 - `docs/APPROVED_DATA_INTAKE_READINESS_REPORT_2026-06-15.md`
 - `docs/OSL_APPROVED_DATA_HEADER_AUDIT_RUNBOOK_2026-06-15.md`
 
-These are the active public-safe readiness artifacts after the V5.3 workflow
+These are the active public-safe readiness artifacts after the V5.4 corrected workflow
 package. They define and now test the field roles, approved-data intake
 contract, first model experiment shape, runtime templates, CLI header audits,
 OSL-safe summary handoff, mentor decisions, and a normalized parameter
@@ -216,8 +219,8 @@ The slide and website visual provenance layer is now tracked in
 `data/public_ml_products/source_visual_inventory_2026-06-16.csv`, documented in
 `docs/SOURCE_VISUAL_INVENTORY_2026-06-16.md`, loaded by
 `dashboard/source_visual_inventory.py`, and displayed under Analyze Hydrates >
-Presentation Exports. Use it to choose V5.3 slide-ready panels, website
-captures, expanded architecture diagrams, and contact sheets before revising a
+Presentation Exports. Use it to choose V5.4 slide-ready panels, V5.3 reference
+panels, website captures, source-backed visuals, authority diagrams, and contact sheets before revising a
 deck or Word document. It intentionally flags uncited or AI-looking visuals and
 keeps all outputs public-safe.
 
@@ -898,20 +901,21 @@ Current top-priority handoff for the PC:
    `docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md`
    before editing, uploading, deleting, or renaming Word/PowerPoint/Drive
    deliverables.
-2. Use the completed V5.3 workflow package as the explanation foundation, but
-   do not redesign it unless an obvious bug is found.
-3. Review the rebuilt V5.3 presentation at
-   `docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`
+2. Use the completed V5.4 corrected workflow package as the explanation
+   foundation, but do not redesign it unless an obvious bug is found.
+3. Review the rebuilt V5.4 presentation at
+   `docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`
    and companion at
-   `docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx`.
+   `docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx`.
    The native Google Slides and Docs review copies are
-   <https://docs.google.com/presentation/d/1kP0icjCLpldXZX80eww27IIokG1s3VbM5bSXiGLk8Sw>
+   <https://docs.google.com/presentation/d/1olavI9-nUSSvYtEm-TjYVOte-Cg-1UgaO9GMl6skDt0>
    and
-   <https://docs.google.com/document/d/1QcF-31U77_MyPHnrBSYFZSswFyIzO8P3pMLBSTIMgMQ>.
-   V5.3 carries forward the final-deck prompt requirements, website visual
-   language, source-backed slide 2, parameter-range slide 3, simplified
-   workflow slide 4, and intact complex V5.2 architecture diagrams as appendix
-   plates.
+   <https://docs.google.com/document/d/1sgl7cyGHOyJyWGoVC9e7LHb0JFnriPIDAmRizyf5wIg>.
+   V5.4 carries forward the final-deck prompt requirements, restores the
+   personal opener, uses source-backed slide 2 visuals, keeps slide 3 as a
+   parameter-range board, restores complex workflow/runtime architecture on
+   slides 4 and 7, and keeps validation/output language in planned mode.
+   V5.3 is a flawed intermediate/reference, not the active deck.
    Its prior build contracts are `docs/FINAL_NEW_SLIDE_DECK_CREATION_PROMPT_2026-06-15.md`,
    with supporting rules in
    `docs/GMAIL_STYLE_V5_2_SLIDE_REMAKE_PROMPT_2026-06-15.md` and
@@ -966,13 +970,13 @@ Remaining questions before the next major build.
 
 - 9 main audience topic slides: yes. Appendix plates are acceptable only when
   explicitly needed to keep the complex workflow and ML runtime diagrams whole.
-- Slide 1: use a project-specific cover based on the website/map context rather
-  than a personal/about-me cover for the V5.3 mentor package.
+- Slide 1: restore the original personal/about-me opener for the V5.4 mentor
+  package.
 - Slide 2: rebuild completely with source-backed hydrate/North Slope visuals;
   do not reuse the old AI-looking methane cage or PT sketch.
-- Slide direction after 2026-06-16 review: use the V5.3 mentor-facing sequence
-  as the current package, with nine audience slides and two appendix plates for
-  the complex workflow and ML runtime diagrams.
+- Slide direction after 2026-06-16 review: use the V5.4 corrected
+  mentor-facing package, with the complex workflow and ML runtime diagrams
+  restored to the main nine-slide sequence.
 - Work order: Word first, slides second, website third.
 - Website: skeleton for transfer into DOE/Anaconda, not final public science proof.
 - Real data: no real rows in public repo; headers/screenshots only for now.

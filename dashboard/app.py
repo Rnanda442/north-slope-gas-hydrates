@@ -139,12 +139,12 @@ FULL_WORKFLOW_ASSET_DIR = (
     / "docs"
     / "project_blueprints"
     / "presentation_assets"
-    / "full_workflow_diagram_2026_06_16_v5_3"
+    / "v5_4_corrected_2026_06_16"
 )
-FULL_WORKFLOW_FLOWCHART = FULL_WORKFLOW_ASSET_DIR / "slide_04_simplified_workflow_v5_3.png"
-FULL_WORKFLOW_EXPANDED_FLOWCHART = FULL_WORKFLOW_ASSET_DIR / "full_project_ml_workflow_flowchart_expanded.png"
-FULL_WORKFLOW_ML_NETWORK = FULL_WORKFLOW_ASSET_DIR / "ml_pipeline_network_detail_v5.png"
-FULL_WORKFLOW_CONTACT_SHEET = FULL_WORKFLOW_ASSET_DIR / "v5_3_workflow_deck_contact_sheet.png"
+FULL_WORKFLOW_FLOWCHART = FULL_WORKFLOW_ASSET_DIR / "slide_04_full_complex_project_workflow_v5_4.png"
+FULL_WORKFLOW_EXPANDED_FLOWCHART = FULL_WORKFLOW_ASSET_DIR / "slide_04_full_complex_project_workflow_v5_4.png"
+FULL_WORKFLOW_ML_NETWORK = FULL_WORKFLOW_ASSET_DIR / "slide_07_complex_ml_runtime_architecture_v5_4.png"
+FULL_WORKFLOW_CONTACT_SHEET = FULL_WORKFLOW_ASSET_DIR / "v5_4_corrected_contact_sheet.png"
 V5_3_WEBSITE_CAPTURE_DIR = (
     PROJECT_ROOT
     / "docs"
@@ -156,16 +156,16 @@ FULL_WORKFLOW_DECK = (
     PROJECT_ROOT
     / "docs"
     / "project_blueprints"
-    / "V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx"
+    / "V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx"
 )
 FULL_WORKFLOW_WORD = (
     PROJECT_ROOT
     / "docs"
     / "project_blueprints"
-    / "V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx"
+    / "V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx"
 )
-FULL_WORKFLOW_DRIVE_SLIDES_URL = "https://docs.google.com/presentation/d/1kP0icjCLpldXZX80eww27IIokG1s3VbM5bSXiGLk8Sw"
-FULL_WORKFLOW_DRIVE_DOC_URL = "https://docs.google.com/document/d/1QcF-31U77_MyPHnrBSYFZSswFyIzO8P3pMLBSTIMgMQ"
+FULL_WORKFLOW_DRIVE_SLIDES_URL = "https://docs.google.com/presentation/d/1olavI9-nUSSvYtEm-TjYVOte-Cg-1UgaO9GMl6skDt0"
+FULL_WORKFLOW_DRIVE_DOC_URL = "https://docs.google.com/document/d/1sgl7cyGHOyJyWGoVC9e7LHb0JFnriPIDAmRizyf5wIg"
 SOURCE_VISUAL_INVENTORY = default_source_visual_inventory_path(PROJECT_ROOT)
 APPROVED_DATA_FIELD_ROLE_TABLE = (
     PROJECT_ROOT
@@ -4629,7 +4629,7 @@ def render_full_workflow_map_panel() -> None:
     cols[3].metric("Model outputs", "Future")
 
     st.info(
-        "Use the V5.3 deck and companion as the mentor-facing roadmap: stability is a context/admissibility branch, "
+        "Use the V5.4 corrected deck and companion as the mentor-facing roadmap: stability is a context/admissibility branch, "
         "target fields bypass the feature matrix, and occurrence plus saturation outputs wait for "
         "approved labels and whole-well validation."
     )
@@ -4713,8 +4713,8 @@ def render_presentation_export_image_card(
 def render_presentation_exports() -> None:
     st.subheader("Presentation Exports")
     st.caption(
-        "Slide-ready, public-safe panels for the current V5.3 deck and Word companion. "
-        "These previews reuse current website captures, generated V5.3 panels, and source-backed visuals; "
+        "Slide-ready, public-safe panels for the current V5.4 corrected deck and Word companion. "
+        "These previews reuse current website captures, generated V5.4 panels, and source-backed visuals; "
         "they do not include approved rows, trained-model outputs, occurrence predictions, or saturation predictions."
     )
 
@@ -4742,46 +4742,52 @@ def render_presentation_exports() -> None:
             "north_slope_map",
         ),
         (
+            "Hydrate Context",
+            FULL_WORKFLOW_ASSET_DIR / "slide_02_source_context_v5_4.png",
+            "Source-backed hydrate context panel with USGS image, methane 5 ppt curve, and public map capture",
+            "hydrate_context",
+        ),
+        (
             "Parameter Ranges",
-            FULL_WORKFLOW_ASSET_DIR / "slide_03_parameter_ranges_v5_3.png",
+            FULL_WORKFLOW_ASSET_DIR / "slide_03_parameter_ranges_v5_4.png",
             "Slide-scale bars for parameter direction and working ranges",
             "parameter_ranges",
         ),
         (
-            "Parameter Evidence",
-            FULL_WORKFLOW_ASSET_DIR / "slide_05_parameter_evidence_visuals_v5_3.png",
-            "Normalized evidence visual for hydrate-compatible log behavior",
-            "parameter_evidence",
+            "Parameter Behavior",
+            FULL_WORKFLOW_ASSET_DIR / "slide_05_parameter_behavior_v5_4.png",
+            "Why each parameter range matters, where it fails, and which mimics/masks can fool it",
+            "parameter_behavior",
         ),
         (
-            "Stability Schematic",
-            FULL_WORKFLOW_ASSET_DIR / "slide_06_stability_physics_v5_3.png",
-            "Pressure-temperature admissibility method; not hydrate proof",
-            "stability_schematic",
+            "Equations And Unit Gate",
+            FULL_WORKFLOW_ASSET_DIR / "slide_06_equations_feature_unit_gate_v5_4.png",
+            "Equation features, unit checks, QC gates, stability context, and leakage stop",
+            "equations_unit_gate",
         ),
         (
-            "Simplified Workflow",
-            FULL_WORKFLOW_ASSET_DIR / "slide_04_simplified_workflow_v5_3.png",
-            "Non-ML audience explanation of the public/OSL workflow",
-            "simplified_workflow",
-        ),
-        (
-            "Validation Outputs",
-            FULL_WORKFLOW_ASSET_DIR / "slide_08_validation_uncertainty_outputs_v5_3.png",
-            "Planned validation and uncertainty outputs with no fake results",
-            "validation_outputs",
-        ),
-        (
-            "Expanded Architecture",
-            FULL_WORKFLOW_EXPANDED_FLOWCHART,
-            "Detailed project architecture appendix plate",
-            "expanded_architecture",
+            "Full Complex Workflow",
+            FULL_WORKFLOW_ASSET_DIR / "slide_04_full_complex_project_workflow_v5_4.png",
+            "Full public/OSL/stability/feature/leakage/model/validation architecture plate",
+            "full_complex_workflow",
         ),
         (
             "ML Runtime Detail",
             FULL_WORKFLOW_ML_NETWORK,
             "Detailed ML runtime, target rail, validation, and output plate",
             "ml_runtime_detail",
+        ),
+        (
+            "Validation Outputs",
+            FULL_WORKFLOW_ASSET_DIR / "slide_08_validation_uncertainty_outputs_v5_4.png",
+            "Planned validation and uncertainty outputs with no fake results",
+            "validation_outputs",
+        ),
+        (
+            "Status And Mentor Decisions",
+            FULL_WORKFLOW_ASSET_DIR / "slide_09_status_mentor_decisions_v5_4.png",
+            "Current public scaffold status, mentor decisions, and OSL next action",
+            "status_mentor_decisions",
         ),
     ]
 
@@ -4888,9 +4894,9 @@ def render_schema_coverage_architecture() -> None:
     if FULL_WORKFLOW_DRIVE_SLIDES_URL or FULL_WORKFLOW_DRIVE_DOC_URL:
         link_parts = []
         if FULL_WORKFLOW_DRIVE_SLIDES_URL:
-            link_parts.append(f"[Open V5.3 Google Slides]({FULL_WORKFLOW_DRIVE_SLIDES_URL})")
+            link_parts.append(f"[Open V5.4 Google Slides]({FULL_WORKFLOW_DRIVE_SLIDES_URL})")
         if FULL_WORKFLOW_DRIVE_DOC_URL:
-            link_parts.append(f"[Open V5.3 Google Doc]({FULL_WORKFLOW_DRIVE_DOC_URL})")
+            link_parts.append(f"[Open V5.4 Google Doc]({FULL_WORKFLOW_DRIVE_DOC_URL})")
         st.markdown(" | ".join(link_parts))
 
     st.markdown("##### Current public counts")

@@ -79,12 +79,12 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
 - `docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md` -
   required before uploading, deleting, archiving, or renaming Word/PPT/Drive
   deliverables.
-- `docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md` - current V5.3 workflow package
-  source language, generated file paths, and slide-use rules.
+- `docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md` - current V5.4 corrected
+  workflow package source language, generated file paths, and slide-use rules.
 - `docs/FINAL_NINE_SLIDE_GAP_AND_DIAGRAM_REUSE_PLAN_2026-06-15.md`,
   `docs/FINAL_NEW_SLIDE_DECK_CREATION_PROMPT_2026-06-15.md`, and
   `docs/GMAIL_STYLE_V5_2_SLIDE_REMAKE_PROMPT_2026-06-15.md` - provenance for
-  the V5.3 visual/topic decisions.
+  the corrected V5.4 visual/topic decisions and the older Gmail/V5.2 spine.
 - `docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`,
   `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`, and
   `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md` - current ML/schema
@@ -101,15 +101,20 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
 
 ## Current Authoritative Slide and Doc Assets
 
-- Current V5.3 mentor-facing deck:
-  `docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`
-- Native V5.3 Google Slides review copy:
-  <https://docs.google.com/presentation/d/1kP0icjCLpldXZX80eww27IIokG1s3VbM5bSXiGLk8Sw>
-- Current V5.3 mentor-facing companion:
-  `docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx`
-- Native V5.3 Google Docs review copy:
-  <https://docs.google.com/document/d/1QcF-31U77_MyPHnrBSYFZSswFyIzO8P3pMLBSTIMgMQ>
-- Current V5.3 slide panels, contact sheet, and appendix diagrams:
+- Current V5.4 corrected mentor-facing deck:
+  `docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`
+- Native V5.4 Google Slides review copy:
+  <https://docs.google.com/presentation/d/1olavI9-nUSSvYtEm-TjYVOte-Cg-1UgaO9GMl6skDt0>
+- Current V5.4 corrected mentor-facing companion:
+  `docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx`
+- Native V5.4 Google Docs review copy:
+  <https://docs.google.com/document/d/1sgl7cyGHOyJyWGoVC9e7LHb0JFnriPIDAmRizyf5wIg>
+- Current V5.4 slide panels and contact sheet:
+  `docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/`
+- V5.3 mentor-facing workflow package is a flawed intermediate/reference,
+  not the active mentor deck. Use it only for current counts, website captures,
+  the source-visual inventory trail, and any genuinely improved source-backed
+  visual:
   `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/`
 - Prior Gmail-style and V5.2 workflow decks remain provenance:
   `docs/project_blueprints/North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`,

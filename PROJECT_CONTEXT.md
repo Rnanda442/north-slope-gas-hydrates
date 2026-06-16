@@ -54,8 +54,10 @@ stability-admissibility guardrail aligned. User review on 2026-06-15 rejected
 the first stability/ML slide-remake draft as too disconnected from the whole
 project, then rejected the diagram-first replacement as changing too much of
 the prior Gmail deck. Those rebuild plans remain provenance for the visual
-direction, but the active review package is now the V5.3 mentor-facing deck and
-companion generated on 2026-06-16. The deliverable cleanup and final build plan is
+direction, but the active review package is now the V5.4 corrected mentor deck
+and companion generated and imported on 2026-06-16. V5.3 is a flawed
+intermediate/reference because it demoted the complex diagrams and did not
+restore the agreed personal opener. The deliverable cleanup and final build plan is
 `docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md`; use it
 before editing, uploading, deleting, or renaming any older Word, PPTX, or Drive
 copy. It classifies what to pull forward from Gmail, V5.2, the rule books, and
@@ -63,14 +65,14 @@ the website, and it lists deletion/archive candidates that still need explicit
 approval. The earlier Gmail-style prompt, gap plan, and rebuilt 2026-06-15
 deck remain provenance. Do not delete or archive them until cleanup is
 explicitly approved.
-The current mentor-facing rebuild is now V5.3. It was generated from actual
-website captures, source-backed hydrate/context visuals, the approved-data
-schema architecture, and the current public stability scaffold. The V5.3 deck
-keeps nine main audience slides and adds two appendix plates so the complex
-workflow and ML-runtime diagrams stay intact in one place. It replaces the old
-AI-looking hydrate/PT visuals, makes slide 3 a parameter-range board only,
-uses a simplified non-ML workflow explanation on slide 4, and keeps stability
-as context/admissibility only rather than proof or prediction.
+The current mentor-facing rebuild is V5.4 corrected. It restores the original
+Gmail-style personal/about-me opener, replaces AI-looking hydrate/PT visuals
+with source-backed USGS/public visuals, makes slide 3 a parameter-range board
+only, restores the complex project workflow on slide 4, explains why parameter
+ranges matter on slide 5, centers equations and unit gates on slide 6, restores
+the complex ML runtime architecture on slide 7, and ties validation, outputs,
+status, mentor decisions, and OSL next actions together on slides 8 and 9. It
+keeps stability as context/admissibility only rather than proof or prediction.
 The
 2026-06-15 pipeline status Word brief remains the plain-language review draft
 for explaining where the project stands now and how the approved-data ML
@@ -118,27 +120,26 @@ The slide/website visual layer now has a public-safe source inventory at
 in `dashboard/source_visual_inventory.py`, tests in
 `tests/test_source_visual_inventory.py`, and a Streamlit display under Analyze
 Hydrates > Presentation Exports. Use this inventory before changing deck or
-Word visuals: it tracks V5.3 slide panels, website captures, expanded
-architecture diagrams, and the contact sheet, and it flags uncited or
-AI-looking visuals before they enter the mentor-facing package.
+Word visuals: it tracks V5.4 corrected slide panels, V5.3 reference panels,
+website captures, source-backed figures, authority diagrams, and the contact
+sheet, and it flags uncited or AI-looking visuals before they enter the
+mentor-facing package.
 
-The active mentor-facing workflow package is now the V5.3 refresh under
-`docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/`.
-Use `slide_04_simplified_workflow_v5_3.png` as the readable non-ML workflow
-summary, `full_project_ml_workflow_flowchart_expanded.png` as the detailed
-poster-scale architecture map with source counts, stability equations, feature
-families, target-only labels, validation, outputs, and caveats, and
-`ml_pipeline_network_detail_v5.png` as the model-runtime detail. The V5.3 PPTX
-plus Word companion are regenerated from
+The active mentor-facing workflow package is now the V5.4 corrected refresh
+under
+`docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/`.
+Use `slide_04_full_complex_project_workflow_v5_4.png` as the full project
+architecture plate and `slide_07_complex_ml_runtime_architecture_v5_4.png` as
+the ML runtime plate. The V5.4 PPTX plus Word companion are regenerated from
 `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`.
 The current local deliverables are
-`docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`
+`docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`
 and
-`docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx`.
-The V5.3 Drive imports are:
-`https://docs.google.com/presentation/d/1kP0icjCLpldXZX80eww27IIokG1s3VbM5bSXiGLk8Sw`
+`docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx`.
+The V5.4 Drive imports are:
+`https://docs.google.com/presentation/d/1olavI9-nUSSvYtEm-TjYVOte-Cg-1UgaO9GMl6skDt0`
 and
-`https://docs.google.com/document/d/1QcF-31U77_MyPHnrBSYFZSswFyIzO8P3pMLBSTIMgMQ`.
+`https://docs.google.com/document/d/1sgl7cyGHOyJyWGoVC9e7LHb0JFnriPIDAmRizyf5wIg`.
 Do not reopen OSL unless a source/product rebuild is actually needed.
 
 ## Current ML Architecture Decisions And Open Mentor Questions
@@ -178,8 +179,8 @@ occurrence-label provenance, train/validation/locked-test well assignment,
 caliper coverage sufficiency, and missing-log adapter permission.
 
 The 2026-06-15 Gmail-style prompt remains provenance for the visual direction.
-For current mentor review, start from the V5.3 deck and companion generated by
-`docs/project_blueprints/build_full_workflow_diagram_deliverables.py`.
+For current mentor review, start from the V5.4 corrected deck and companion
+generated by `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`.
 
 ## Current State
 
@@ -195,24 +196,24 @@ For current mentor review, start from the V5.3 deck and companion generated by
   scaffold views.
 - Tests exist in `tests/test_well_log_engine.py` and
   `tests/test_runtime_skeleton.py`.
-- The full project test suite passed after the parameter evidence board update:
-  111 tests passed.
+- The full project test suite passed after the source-visual inventory update:
+  114 tests passed. Update this count only after a fresh local pytest run.
 - Public GIS layers, notebooks, structural surfaces, and Plotly exports are
   present.
 - Two working Word drafts and a rebuilt 2026-06-13 local research-overview
   Word/PPT deliverable pair are present in `docs/project_blueprints/`.
-- The current local presentation baseline is the V5.3 mentor-facing workflow
-  deck rebuilt from `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`:
-  `docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`.
-  It keeps nine main audience slides, replaces weak/AI-looking hydrate visuals
-  with source-backed context, makes slide 3 a parameter-range board, simplifies
-  slide 4 for a non-ML audience, includes beginner ML architecture with target
-  labels on a separate rail, and keeps the complex architecture diagrams whole
-  as appendix plates. The rebuilt deck and companion were imported to Drive as
-  native Google Slides/Docs:
-  <https://docs.google.com/presentation/d/1kP0icjCLpldXZX80eww27IIokG1s3VbM5bSXiGLk8Sw>
+- The current local presentation baseline is the V5.4 corrected mentor-facing
+  workflow deck rebuilt from `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`:
+  `docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`.
+  It keeps the agreed nine-slide spine, restores the personal/about-me opener,
+  uses source-backed hydrate/North Slope context, makes slide 3 a
+  parameter-range board, restores complex workflow and ML runtime architecture
+  plates on slides 4 and 7, and keeps validation/output/status language in
+  planned/readiness mode. The rebuilt deck and companion were imported to Drive
+  as native Google Slides/Docs:
+  <https://docs.google.com/presentation/d/1olavI9-nUSSvYtEm-TjYVOte-Cg-1UgaO9GMl6skDt0>
   and
-  <https://docs.google.com/document/d/1QcF-31U77_MyPHnrBSYFZSswFyIzO8P3pMLBSTIMgMQ>.
+  <https://docs.google.com/document/d/1sgl7cyGHOyJyWGoVC9e7LHb0JFnriPIDAmRizyf5wIg>.
 - The 2026-06-13 science-to-ML local DOCX/PPTX rebuild was imported to the
   connected Google Drive account as native files:
   [SCIENCE-TO-ML North Slope Gas Hydrate Research Overview 2026-06-13](https://docs.google.com/document/d/1Ft0wgKV3p8HK1F7X4_WYVAp1jOtBYuCntdRP-Z84e5k)
@@ -522,9 +523,10 @@ the authorized runtime environment.
 The current ordered plan is maintained in
 `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md`.
 
-Immediate 2026-06-16 handoff: review the V5.3 Google Slides and Google Docs
-imports as the current mentor-facing package. The deck has nine audience slides
-plus two appendix plates for the intact complex architecture diagrams. The
+Immediate 2026-06-16 handoff: review the V5.4 corrected Google Slides and
+Google Docs imports as the current mentor-facing package. The deck has the
+expected nine-slide spine and restores the complex architecture diagrams in the
+main sequence rather than appendix-only support. The
 next approved-runtime step is still to run the header/schema validator against
 approved workbook/LAS/CSV/core/NMR sources using the header-only CLI/runbook,
 then safely bring back summary artifacts while confirming target authority,

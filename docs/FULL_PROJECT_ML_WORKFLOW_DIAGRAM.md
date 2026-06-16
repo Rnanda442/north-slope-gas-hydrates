@@ -4,10 +4,11 @@ Created: 2026-06-15
 
 ## Purpose
 
-This file records the source language for the V5.3 workflow package used for
-the Word companion and mentor deck. The package has nine main audience slides,
-plus two appendix plates that keep the detailed expanded poster and focused ML
-runtime diagram intact.
+This file records the source language for the V5.4 corrected workflow package
+used for the Word companion and mentor deck. The package has the agreed nine
+main audience slides and restores the complex project workflow and complex ML
+runtime diagrams inside the main sequence rather than demoting them to
+appendix-only support.
 
 The figure connects:
 
@@ -28,46 +29,44 @@ sweet-spot ranking.
 
 ## Current Generated Files
 
-Audience workflow summary image:
+Current V5.4 corrected slide panels and contact sheet:
 
 ```text
-docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/slide_04_simplified_workflow_v5_3.png
+docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/
+docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/v5_4_corrected_contact_sheet.png
 ```
 
-Expanded V5.3 visual architecture poster image for website review and mentor
-discussion:
+Key V5.4 authority panels:
 
 ```text
-docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/full_project_ml_workflow_flowchart_expanded.png
+docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/slide_04_full_complex_project_workflow_v5_4.png
+docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/slide_07_complex_ml_runtime_architecture_v5_4.png
 ```
 
-ML architecture detail image:
+V5.4 PowerPoint package:
 
 ```text
-docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/ml_pipeline_network_detail_v5.png
-```
-
-V5.3 PowerPoint package:
-
-```text
-docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx
+docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx
 ```
 
 Word companion:
 
 ```text
-docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx
+docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx
 ```
 
-V5.3 Drive review copies:
+V5.4 Drive review copies:
 
 ```text
-V5.3 North Slope Gas Hydrate ML Workflow Slides 2026-06-16
-https://docs.google.com/presentation/d/1kP0icjCLpldXZX80eww27IIokG1s3VbM5bSXiGLk8Sw
+V5.4 CORRECTED North Slope Gas Hydrate ML Workflow Slides 2026-06-16
+https://docs.google.com/presentation/d/1olavI9-nUSSvYtEm-TjYVOte-Cg-1UgaO9GMl6skDt0
 
-V5.3 North Slope Gas Hydrate ML Workflow Companion 2026-06-16
-https://docs.google.com/document/d/1QcF-31U77_MyPHnrBSYFZSswFyIzO8P3pMLBSTIMgMQ
+V5.4 CORRECTED North Slope Gas Hydrate ML Workflow Companion 2026-06-16
+https://docs.google.com/document/d/1sgl7cyGHOyJyWGoVC9e7LHb0JFnriPIDAmRizyf5wIg
 ```
+
+V5.3 is retained as a flawed intermediate/reference package only. It should not
+override the V5.4 corrected spine.
 
 Prior V5/V5.2 Drive copies:
 
@@ -177,9 +176,9 @@ flowchart LR
 
 ### A. Ready to encode now
 
-- Keep slide 4 as the readable V5.3 non-ML workflow overview. V5.3
-  implementation details belong in the appendix plates, the Word companion,
-  the website readiness panel, and the intake-validator docs.
+- Keep slide 4 as the full complex V5.4 project workflow architecture plate.
+  Do not reduce it to a beginner flowchart. Slide 7 likewise stays the
+  complex ML runtime architecture plate.
 - Train two linked outputs in the approved runtime: occurrence classification
   and saturation regression. Stability remains context/admissibility only and
   does not create either label.
@@ -239,28 +238,26 @@ acoustic impedance, lambda-rho, mu-rho, NMR-density separation, and any
 Archie-style saturation baseline are feature or check producers. They do not
 create proof by themselves.
 
-The current V5.3 slide export is a mentor-facing explanation package. It uses
-source-backed hydrate and North Slope context, a parameter-range board,
-website-captured map/context visuals, simplified non-ML workflow storytelling,
-visual parameter evidence, a stability-as-admissibility panel, beginner ML
-architecture, validation/output controls, and a status/mentor-decision panel.
-The data boundary distinguishes public GitHub/Streamlit communication from OSL
-or approved-runtime execution, and the red target-only rail shows that Sgh, Sh,
-NMR SAT, hydrate saturation, and phase labels are Y-side labels rather than
-predictors.
+The current V5.4 slide export is a mentor-facing explanation package. It uses
+the original personal/about-me opener, source-backed hydrate and North Slope
+context, a parameter-range board, the full complex project workflow,
+visual parameter behavior, equation and unit-gate logic, the full complex ML
+runtime architecture, validation/output controls, and a status/mentor-decision
+panel. The data boundary distinguishes public GitHub/Streamlit communication
+from OSL or approved-runtime execution, and the red target-only rail shows that
+Sgh, Sh, NMR SAT, hydrate saturation, and phase labels are Y-side labels rather
+than predictors.
 
-The expanded V5.3 poster is the detailed reference. It carries the public
-counts, approved-OSL boundary, stability equations and caveats,
-measured/derived/QC and context feature families, target-only occurrence and
-saturation labels, split and train-only preprocessing controls,
-baseline-before-ML logic, validation expectations, runtime/public output rules,
-and mentor decisions. Use it when the reader needs the full architecture. It is
-kept whole as slide 10 in the V5.3 deck rather than fragmented across multiple
-audience slides.
+The V5.4 full workflow plate carries the public counts, approved-OSL boundary,
+stability equations and caveats, measured/derived/QC and context feature
+families, target-only occurrence and saturation labels, split and train-only
+preprocessing controls, baseline-before-ML logic, validation expectations,
+runtime/public output rules, and mentor decisions. Use it when the reader
+needs the full architecture.
 
-The companion ML architecture visual expands the modeling lane into feature/QC
-groups, the X allowed matrix, whole-well split and train-only preprocessing
-controls, a simplified candidate model, occurrence and saturation output heads,
+The V5.4 ML runtime visual expands the modeling lane into feature/QC groups,
+the X allowed matrix, whole-well split and train-only preprocessing controls,
+baselines, ANN/Keras candidate model, occurrence and saturation output heads,
 validation, reviewed outputs, and the red target-only rail. It is still an
 architecture guide only, not a trained model or result claim.
 
@@ -301,12 +298,12 @@ does not mean no hydrate.
 
 ## Slide Use
 
-Use the generated deck as the active V5.3 workflow package for mentor review.
-Slides 1-9 are the audience-facing sequence: project cover, hydrate and North
-Slope context, parameter ranges, simplified workflow, parameter evidence,
-stability physics, ML architecture for beginners, validation/uncertainty, and
-current status plus mentor decisions. Slide 10 embeds the expanded architecture
-map intact. Slide 11 embeds the ML runtime/network detail intact.
+Use the generated deck as the active V5.4 corrected workflow package for
+mentor review. Slides 1-9 are the audience-facing sequence: personal/about-me
+opener, gas hydrate and North Slope context, parameter ranges, full complex
+project workflow, why parameter ranges matter, equations/feature engineering
+and unit gate, complex ML runtime architecture, validation/uncertainty/outputs,
+and current status plus mentor decisions.
 
 ## Word Use
 
@@ -322,7 +319,7 @@ are needed before final ML claims can be made.
 
 ## Mentor Decisions
 
-The V5.3 package should keep these questions visible:
+The V5.4 corrected package should keep these questions visible:
 
 1. Phase-curve policy: keep methane 5 ppt as the only official baseline, or add
    a labeled scenario table?

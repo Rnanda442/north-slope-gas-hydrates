@@ -1,7 +1,7 @@
 # Source Visual Inventory 2026-06-16
 
 This file documents the public-safe visual provenance layer used by the
-website, V5.3 slide deck, and V5.3 Word companion.
+website, V5.4 corrected slide deck, and V5.4 Word companion.
 
 ## Product
 
@@ -17,9 +17,9 @@ website, V5.3 slide deck, and V5.3 Word companion.
 ## Purpose
 
 The inventory prevents the slide and website workflow from drifting back to
-uncited or AI-looking visuals. It tracks the current V5.3 slide panels, current
-website captures, the expanded architecture plate, the ML runtime plate, and
-the V5.3 contact sheet with:
+uncited or AI-looking visuals. It tracks the current V5.4 corrected slide
+panels, current website captures, source-backed figures, authority diagrams,
+V5.3 reference panels, and the V5.4 contact sheet with:
 
 - local path or URL;
 - slide/site use;
@@ -43,10 +43,9 @@ visuals:
 - guardrail text prevents unsupported hydrate-proof, occurrence-prediction,
   saturation-prediction, model-metric, or approved-row claims.
 
-The current inventory passes those checks. Slide 2 remains marked
-`review_caption_only` because it includes source-backed hydrate and pressure-
-temperature context visuals whose captions must stay tied to cited source
-anchors.
+The current inventory passes those checks. V5.4 slide 2 is source-backed by
+USGS hydrate imagery, a digitized methane 5 ppt USGS SIR curve, and a public
+website capture; captions must stay tied to cited source anchors.
 
 ## Use In Future Deck/Doc Work
 
@@ -54,20 +53,22 @@ Use these visuals first:
 
 - North Slope map/context:
   `docs/project_blueprints/presentation_assets/v5_3_website_captures/02_explore_regional_map.png`
+- hydrate context:
+  `docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/slide_02_source_context_v5_4.png`
 - parameter ranges:
-  `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/slide_03_parameter_ranges_v5_3.png`
-- parameter evidence:
-  `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/slide_05_parameter_evidence_visuals_v5_3.png`
-- stability schematic:
-  `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/slide_06_stability_physics_v5_3.png`
-- simplified workflow:
-  `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/slide_04_simplified_workflow_v5_3.png`
+  `docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/slide_03_parameter_ranges_v5_4.png`
+- parameter behavior:
+  `docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/slide_05_parameter_behavior_v5_4.png`
+- equations and unit gate:
+  `docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/slide_06_equations_feature_unit_gate_v5_4.png`
+- full complex workflow:
+  `docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/slide_04_full_complex_project_workflow_v5_4.png`
 - validation outputs:
-  `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/slide_08_validation_uncertainty_outputs_v5_3.png`
-- expanded architecture:
-  `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/full_project_ml_workflow_flowchart_expanded.png`
+  `docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/slide_08_validation_uncertainty_outputs_v5_4.png`
 - ML runtime detail:
-  `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/ml_pipeline_network_detail_v5.png`
+  `docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/slide_07_complex_ml_runtime_architecture_v5_4.png`
+- status and mentor decisions:
+  `docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/slide_09_status_mentor_decisions_v5_4.png`
 
 Do not add untracked slide visuals to a final deck without updating this
 inventory and rerunning tests.

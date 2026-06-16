@@ -15,14 +15,19 @@ from pptx import Presentation
 
 ROOT = Path(__file__).resolve().parents[2]
 BLUEPRINT_DIR = ROOT / "docs" / "project_blueprints"
-ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "full_workflow_diagram_2026_06_16_v5_3"
+ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "v5_4_corrected_2026_06_16"
 SOURCE_DECK = BLUEPRINT_DIR / "CURRENT_GMAIL_VISUAL_REVISION_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-11.pptx"
-OUT_DECK = BLUEPRINT_DIR / "V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx"
-OUT_DOCX = BLUEPRINT_DIR / "V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx"
-OUT_CONTACT_SHEET = ASSET_DIR / "v5_3_workflow_deck_contact_sheet.png"
+OUT_DECK = BLUEPRINT_DIR / "V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx"
+OUT_DOCX = BLUEPRINT_DIR / "V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx"
+OUT_CONTACT_SHEET = ASSET_DIR / "v5_4_corrected_contact_sheet.png"
 PUBLIC_PRODUCTS = ROOT / "data" / "public_stability_products"
+PUBLIC_ML_PRODUCTS = ROOT / "data" / "public_ml_products"
 WEBSITE_CAPTURE_DIR = BLUEPRINT_DIR / "presentation_assets" / "v5_3_website_captures"
 REFERENCE_IMAGE_DIR = ROOT / "references" / "presentation-revision-2026-06-11" / "images"
+V52_ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "full_workflow_diagram_2026_06_15"
+PROCESSING_ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "processing_revisions_2026_06_11"
+PARAMETER_EVIDENCE_REGISTRY = PUBLIC_ML_PRODUCTS / "public_parameter_evidence_registry_2026-06-16.csv"
+PHASE_CURVE_METHANE_5PPT = PUBLIC_PRODUCTS / "phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv"
 
 W, H = 1600, 900
 EXPANDED_W, EXPANDED_H = 5200, 3000
@@ -2791,15 +2796,742 @@ def build_word_companion(diagram_path: Path, network_path: Path) -> Path:
     return OUT_DOCX
 
 
+def v54_registry_rows() -> dict[str, dict[str, str]]:
+    if not PARAMETER_EVIDENCE_REGISTRY.exists():
+        return {}
+    with PARAMETER_EVIDENCE_REGISTRY.open(newline="", encoding="utf-8") as fh:
+        return {row["parameter_family"]: row for row in csv.DictReader(fh)}
+
+
+def v54_range(row: dict[str, str] | None, fallback: tuple[float, float]) -> tuple[float, float]:
+    if not row:
+        return fallback
+    try:
+        return (float(row["hydrate_window_norm_start"]), float(row["hydrate_window_norm_end"]))
+    except (KeyError, TypeError, ValueError):
+        return fallback
+
+
+def v54_copy_authority_panel(
+    source_path: Path,
+    filename: str,
+    heading: str | None = None,
+    subheading: str | None = None,
+) -> Path:
+    if source_path.exists():
+        img = Image.open(source_path).convert("RGB").resize((W, H), Image.Resampling.LANCZOS)
+    else:
+        img = canvas(False)
+        draw = ImageDraw.Draw(img)
+        v53_panel_title(draw, heading or "Source panel unavailable", subheading or "Expected authority visual was not found.")
+        v53_placeholder_image(draw, (120, 180, 1480, 710), str(source_path))
+    if heading:
+        draw = ImageDraw.Draw(img)
+        draw.rectangle((0, 0, W, 92), fill=(245, 250, 251))
+        draw.rectangle((0, 0, 18, H), fill=TEAL)
+        text(draw, (58, 24), heading, 34, NAVY, True)
+        if subheading:
+            text(draw, (61, 67), subheading, 15, MUTED, width=1410)
+    return save(img, filename)
+
+
+def v54_source_label(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int], label: str) -> None:
+    x1, y1, x2, y2 = box
+    draw.rectangle((x1, y2 - 24, x2, y2), fill=(11, 35, 48))
+    text(draw, (x1 + 10, y2 - 21), label, 10, WHITE, True, width=x2 - x1 - 20, gap=1)
+
+
+def v54_phase_curve(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int]) -> None:
+    card(draw, box, fill=WHITE, outline=LINE, radius=10, width=2)
+    x1, y1, x2, y2 = box
+    text(draw, (x1 + 22, y1 + 16), "Methane 5 ppt stability curve", 20, NAVY, True, width=x2 - x1 - 44)
+    rows: list[tuple[float, float]] = []
+    if PHASE_CURVE_METHANE_5PPT.exists():
+        with PHASE_CURVE_METHANE_5PPT.open(newline="", encoding="utf-8") as fh:
+            for row in csv.DictReader(fh):
+                try:
+                    rows.append((float(row["equilibrium_temperature_c"]), float(row["pressure_mpa_absolute"])))
+                except (KeyError, TypeError, ValueError):
+                    continue
+    ax = (x1 + 60, y1 + 78, x2 - 38, y2 - 58)
+    draw.line((ax[0], ax[3], ax[2], ax[3]), fill=MUTED, width=3)
+    draw.line((ax[0], ax[3], ax[0], ax[1]), fill=MUTED, width=3)
+    draw.text((ax[2] - 78, ax[3] + 14), "Temperature C", font=font(12, True), fill=MUTED)
+    draw.text((ax[0] - 46, ax[1] - 10), "MPa", font=font(12, True), fill=MUTED)
+    for i in range(1, 4):
+        gx = ax[0] + i * (ax[2] - ax[0]) // 4
+        gy = ax[3] - i * (ax[3] - ax[1]) // 4
+        draw.line((gx, ax[1], gx, ax[3]), fill=(226, 238, 241), width=1)
+        draw.line((ax[0], gy, ax[2], gy), fill=(226, 238, 241), width=1)
+    if rows:
+        temps = [r[0] for r in rows]
+        pressures = [r[1] for r in rows]
+        t_min, t_max = min(temps) - 1.0, max(temps) + 1.0
+        p_min, p_max = min(pressures) - 0.4, max(pressures) + 0.4
+
+        def project(t: float, p: float) -> tuple[int, int]:
+            px = ax[0] + int((t - t_min) / (t_max - t_min) * (ax[2] - ax[0]))
+            py = ax[3] - int((p - p_min) / (p_max - p_min) * (ax[3] - ax[1]))
+            return px, py
+
+        pts = [project(t, p) for t, p in rows]
+        if len(pts) > 1:
+            draw.line(pts, fill=TEAL, width=4)
+        for pt in pts[:: max(1, len(pts) // 14)]:
+            draw.ellipse((pt[0] - 3, pt[1] - 3, pt[0] + 3, pt[1] + 3), fill=TEAL)
+        text(draw, (ax[0] + 22, ax[1] + 16), "T_model <= T_eq is admissible context", 14, TEAL, True, width=210)
+        text(draw, (ax[0] + 20, ax[3] - 34), f"{t_min:.0f}", 10, MUTED)
+        text(draw, (ax[2] - 20, ax[3] - 34), f"{t_max:.0f}", 10, MUTED)
+    else:
+        text(draw, (ax[0] + 28, ax[1] + 58), "Digitized phase curve CSV missing", 17, RED, True, width=280)
+    v54_source_label(draw, box, "Lee et al. 2008 USGS SIR 2008-5175 Fig. 1A, digitized methane 5 ppt curve")
+
+
+def v54_slide_personal_opener() -> Path:
+    return v54_copy_authority_panel(
+        V52_ASSET_DIR / "slide_01_locked_from_current_gmail_deck.png",
+        "slide_01_personal_about_me_v5_4.png",
+    )
+
+
+def v54_slide_context() -> Path:
+    img = canvas(False)
+    draw = ImageDraw.Draw(img)
+    v53_panel_title(
+        draw,
+        "Gas Hydrate And North Slope Context",
+        "Source-backed hydrate visuals only: USGS image, public map capture, and digitized methane 5 ppt stability context.",
+    )
+
+    sem_box = (66, 145, 642, 520)
+    card(draw, (sem_box[0] - 6, sem_box[1] - 6, sem_box[2] + 6, sem_box[3] + 40), fill=WHITE, outline=LINE, radius=10, width=2)
+    sem_path = REFERENCE_IMAGE_DIR / "usgs_gas_hydrate_crystals_sem_public_domain.jpg"
+    if not v53_paste(img, sem_path, sem_box):
+        v53_placeholder_image(draw, sem_box, "USGS hydrate SEM image unavailable")
+    draw.rectangle((sem_box[0], sem_box[1], sem_box[2], sem_box[1] + 48), fill=(11, 35, 48))
+    text(draw, (sem_box[0] + 22, sem_box[1] + 12), "Gas hydrate crystals", 21, WHITE, True)
+    v54_source_label(draw, sem_box, "USGS public domain Gas Hydrate Crystals SEM")
+
+    type_box = (66, 600, 642, 790)
+    card(draw, type_box, fill=WHITE, outline=LINE, radius=10, width=2)
+    text(draw, (92, 622), "Hydrate structure types", 22, NAVY, True)
+    type_rows = [
+        ("I", "methane-dominant hydrate", TEAL),
+        ("II", "larger guests and mixed gases", PURPLE),
+        ("H", "larger hydrocarbon guests", AMBER),
+    ]
+    tx = 92
+    for label, desc, color in type_rows:
+        card(draw, (tx, 670, tx + 148, 740), fill=(248, 252, 253), outline=color, radius=8, width=2)
+        text(draw, (tx + 14, 683), f"Structure {label}", 17, color, True, width=120, align="center")
+        text(draw, (tx + 12, 713), desc, 10, NAVY, True, width=124, align="center", gap=2)
+        tx += 166
+    text(draw, (92, 746), "Current public method: methane 5 ppt baseline; gas-composition scenarios are future mentor policy.", 11, MUTED, True, width=520)
+
+    v54_phase_curve(draw, (690, 145, 1530, 458))
+
+    map_box = (690, 540, 1530, 780)
+    card(draw, (map_box[0] - 6, map_box[1] - 6, map_box[2] + 6, map_box[3] + 40), fill=WHITE, outline=LINE, radius=10, width=2)
+    if not v53_paste(img, WEBSITE_CAPTURE_DIR / "02_explore_regional_map.png", map_box, crop=(360, 330, 1180, 670)):
+        v53_placeholder_image(draw, map_box, "North Slope public map capture")
+    draw.rectangle((map_box[0], map_box[1], map_box[2], map_box[1] + 42), fill=(11, 35, 48))
+    text(draw, (map_box[0] + 20, map_box[1] + 10), "North Slope public context", 19, WHITE, True)
+    v54_source_label(draw, map_box, "Project Streamlit public map capture, regional context only")
+
+    footer(
+        draw,
+        "Sources: USGS Gas Hydrate Crystals; Lee et al. 2008 USGS SIR 2008-5175; Sloan/Koh hydrate structure context; project Streamlit capture. No generic AI cage diagram.",
+    )
+    return save(img, "slide_02_source_context_v5_4.png")
+
+
+def v54_parameter_bar(
+    draw: ImageDraw.ImageDraw,
+    y: int,
+    label: str,
+    left: str,
+    right: str,
+    good: tuple[float, float],
+    direction: str,
+    opposite: str,
+    mimic: str,
+    role: str,
+    color: tuple[int, int, int],
+    target: bool = False,
+) -> None:
+    row_box = (58, y, 1542, y + 70)
+    card(draw, row_box, fill=(255, 248, 248) if target else WHITE, outline=RED if target else LINE, radius=8, width=2)
+    text(draw, (82, y + 13), label, 16, RED if target else NAVY, True, width=190)
+    if target:
+        text(draw, (298, y + 15), "Y-only target rail", 16, RED, True, width=190)
+        text(draw, (520, y + 15), "Labels supervise training and validation, but never enter X_allowed.", 15, NAVY, True, width=610)
+        pill(draw, (1260, y + 18, 1495, y + 48), role, RED_LIGHT, RED)
+        return
+    ax0, ax1 = 300, 900
+    draw.line((ax0, y + 36, ax1, y + 36), fill=(220, 234, 238), width=13)
+    gx0 = ax0 + int((ax1 - ax0) * good[0])
+    gx1 = ax0 + int((ax1 - ax0) * good[1])
+    draw.line((gx0, y + 36, gx1, y + 36), fill=color, width=15)
+    draw.line((gx0, y + 24, gx0, y + 48), fill=color, width=3)
+    draw.polygon([(gx1 + 12, y + 36), (gx1 - 8, y + 24), (gx1 - 8, y + 48)], fill=color)
+    text(draw, (ax0, y + 9), left, 11, MUTED, True, width=150)
+    text(draw, (ax1 - 150, y + 9), right, 11, MUTED, True, width=150, align="right")
+    text(draw, (926, y + 8), direction, 13, color, True, width=130)
+    text(draw, (1068, y + 8), opposite, 12, NAVY, True, width=160)
+    text(draw, (1235, y + 8), mimic, 12, MUTED, True, width=170)
+    pill(draw, (1414, y + 20, 1516, y + 50), role, ICE_LIGHT if role != "Y-only" else RED_LIGHT, TEAL if role != "Y-only" else RED)
+
+
+def v54_slide_parameter_ranges() -> Path:
+    registry = v54_registry_rows()
+    img = canvas(False)
+    draw = ImageDraw.Draw(img)
+    v53_panel_title(
+        draw,
+        "Parameters And Expected Hydrate Ranges",
+        "Working normalized screening envelopes only: direction, opposite meaning, mimic risk, and ML role.",
+    )
+    headers = [("family", 82), ("range direction", 300), ("supports", 926), ("opposite", 1068), ("mimic / mask", 1235), ("role", 1420)]
+    for label, x in headers:
+        text(draw, (x, 125), label, 12, MUTED, True)
+
+    combined_stiff = (
+        min(
+            v54_range(registry.get("Compressional velocity stiffness"), (0.58, 0.88))[0],
+            v54_range(registry.get("Vp/Vs ratio"), (0.25, 0.55))[0],
+            v54_range(registry.get("Acoustic impedance and elastic contrast"), (0.55, 0.88))[0],
+        ),
+        max(
+            v54_range(registry.get("Compressional velocity stiffness"), (0.58, 0.88))[1],
+            v54_range(registry.get("Vp/Vs ratio"), (0.25, 0.55))[1],
+            v54_range(registry.get("Acoustic impedance and elastic contrast"), (0.55, 0.88))[1],
+        ),
+    )
+    rows = [
+        ("GR clean sand", "clean", "shaly", v54_range(registry.get("Gamma ray clean-sand proxy"), (0.00, 0.35)), "clean sand", "shale/clay", "radioactive minerals", "input", GREEN),
+        ("Density / porosity", "tight", "porous", v54_range(registry.get("Porosity and density support"), (0.45, 0.75)), "porous", "tight/shale", "gas, washout", "input", BLUE),
+        ("Deep resistivity", "conductive", "resistive", v54_range(registry.get("Deep resistivity response"), (0.65, 0.98)), "resistive", "wet/saline", "ice/free gas/tight", "input", RED),
+        ("NMR separation", "mobile water", "separation", v54_range(registry.get("NMR porosity and NMR-density separation"), (0.60, 0.90)), "separation", "water/clay", "processing/depth", "input/Y guard", PURPLE),
+        ("Vp/Vs/AI elastic", "soft", "stiff", combined_stiff, "stiff contrast", "soft/gas", "compaction/cement", "derived", PURPLE),
+        ("Caliper QC", "in gauge", "washout", v54_range(registry.get("Caliper and bad-hole QC"), (0.00, 0.25)), "trust gate", "bad hole", "tool standoff", "QC", AMBER),
+        ("Stability context", "outside", "inside", v54_range(registry.get("Pressure-temperature stability"), (0.60, 1.00)), "admissible", "unstable", "gas/depth/temp", "context", TEAL),
+    ]
+    y = 154
+    for row in rows:
+        v54_parameter_bar(draw, y, *row)
+        y += 76
+    v54_parameter_bar(
+        draw,
+        y,
+        "Occurrence / saturation",
+        "predictor",
+        "target",
+        (0, 0),
+        "Y-only",
+        "leakage",
+        "fake performance",
+        "Y-only",
+        RED,
+        target=True,
+    )
+    footer(draw, "Source: data/public_ml_products/public_parameter_evidence_registry_2026-06-16.csv. Ranges are working envelopes unless source-locked; none prove hydrate.")
+    return save(img, "slide_03_parameter_ranges_v5_4.png")
+
+
+def v54_slide_full_workflow() -> Path:
+    return v54_copy_authority_panel(
+        V52_ASSET_DIR / "slide_04_expanded_architecture_map.png",
+        "slide_04_full_complex_project_workflow_v5_4.png",
+        "Full Complex Project Workflow V5.4",
+        "Public sources, OSL later inputs, variable fingerprints, gates, stability context, features, leakage-safe ML, dual heads, validation, and exports.",
+    )
+
+
+def v54_behavior_card(
+    draw: ImageDraw.ImageDraw,
+    box: tuple[int, int, int, int],
+    label: str,
+    tag: str,
+    good: tuple[float, float],
+    why: str,
+    opposite: str,
+    mimic: str,
+    color: tuple[int, int, int],
+) -> None:
+    card(draw, box, fill=WHITE, outline=color, radius=10, width=2)
+    x1, y1, x2, y2 = box
+    pill(draw, (x1 + 16, y1 + 14, x1 + 132, y1 + 43), tag, ICE_LIGHT if color != RED else RED_LIGHT, color)
+    text(draw, (x1 + 150, y1 + 14), label, 18, NAVY, True, width=x2 - x1 - 168)
+    ax0, ax1 = x1 + 34, x2 - 34
+    ay = y1 + 80
+    draw.line((ax0, ay, ax1, ay), fill=(221, 235, 238), width=12)
+    gx0 = ax0 + int((ax1 - ax0) * good[0])
+    gx1 = ax0 + int((ax1 - ax0) * good[1])
+    draw.line((gx0, ay, gx1, ay), fill=color, width=14)
+    draw.line((gx0, ay - 13, gx0, ay + 13), fill=color, width=3)
+    draw.polygon([(gx1 + 12, ay), (gx1 - 7, ay - 11), (gx1 - 7, ay + 11)], fill=color)
+    text(draw, (x1 + 26, y1 + 106), f"Why: {why}", 13, NAVY, True, width=x2 - x1 - 52)
+    text(draw, (x1 + 26, y1 + 149), f"Opposite: {opposite}", 12, MUTED, True, width=(x2 - x1) // 2 - 34)
+    text(draw, (x1 + (x2 - x1) // 2 + 6, y1 + 149), f"Mimic: {mimic}", 12, RED if mimic else MUTED, True, width=(x2 - x1) // 2 - 34)
+
+
+def v54_slide_parameter_behavior() -> Path:
+    registry = v54_registry_rows()
+    img = canvas(False)
+    draw = ImageDraw.Draw(img)
+    v53_panel_title(
+        draw,
+        "Why Parameter Ranges Matter",
+        "The ranges are working screening envelopes: useful because they encode physics, risky because several non-hydrate cases can mimic them.",
+    )
+    cards = [
+        ("GR", "clean sand", v54_range(registry.get("Gamma ray clean-sand proxy"), (0.00, 0.35)), "lower radiation supports cleaner reservoir host", "shaly, clay-prone interval", "low GR alone", GREEN),
+        ("Porosity", "porous", v54_range(registry.get("Porosity and density support"), (0.45, 0.75)), "pore volume is needed before hydrate can fill pores", "tight/compacted or shale", "gas/washout", BLUE),
+        ("Rt", "resistive", v54_range(registry.get("Deep resistivity response"), (0.65, 0.98)), "hydrate can replace conductive pore water", "wet/saline sand", "ice/free gas/tight", RED),
+        ("Vp/Vs/AI", "stiff", (0.50, 0.88), "hydrate can stiffen the frame and raise elastic contrast", "soft gas or poor consolidation", "cement/lithology", PURPLE),
+        ("NMR", "separation", v54_range(registry.get("NMR porosity and NMR-density separation"), (0.60, 0.90)), "mobile-water response can separate from density porosity", "mobile water or clay-bound water", "processing/depth", TEAL),
+        ("Stability", "admissible", v54_range(registry.get("Pressure-temperature stability"), (0.60, 1.00)), "P-T window is required physical context", "too warm or too shallow", "gas chemistry/temp", AMBER),
+        ("Caliper", "washout", v54_range(registry.get("Caliper and bad-hole QC"), (0.00, 0.25)), "in-gauge hole protects density, sonic, and resistivity trust", "bad hole, downweight or block", "tool standoff", AMBER),
+        ("Labels", "target-only", (0.00, 0.00), "occurrence and saturation are Y labels for supervision", "using as predictors creates leakage", "fake metrics", RED),
+    ]
+    positions = [
+        (60, 145, 420, 340),
+        (440, 145, 800, 340),
+        (820, 145, 1180, 340),
+        (1200, 145, 1540, 340),
+        (60, 382, 420, 577),
+        (440, 382, 800, 577),
+        (820, 382, 1180, 577),
+        (1200, 382, 1540, 577),
+    ]
+    for box, card_data in zip(positions, cards):
+        v54_behavior_card(draw, box, *card_data)
+
+    card(draw, (60, 640, 1540, 790), fill=(248, 252, 253), outline=LINE, radius=10, width=2)
+    text(draw, (88, 665), "Interpretation rule", 23, NAVY, True)
+    text(
+        draw,
+        (88, 705),
+        "A hydrate-compatible direction becomes useful only when the reservoir gate, pore volume, hydrate-response logs, QC, stability context, and leakage-safe label policy agree. A single curve is never proof.",
+        23,
+        NAVY,
+        True,
+        width=1370,
+        gap=8,
+    )
+    footer(draw, "Source: public parameter evidence registry plus ML logic ladder. All thresholds are working envelopes unless source-locked and unit-checked.")
+    return save(img, "slide_05_parameter_behavior_v5_4.png")
+
+
+def v54_equation_chip(
+    draw: ImageDraw.ImageDraw,
+    box: tuple[int, int, int, int],
+    label: str,
+    formula: str,
+    note: str,
+    color: tuple[int, int, int],
+) -> None:
+    card(draw, box, fill=WHITE, outline=color, radius=9, width=2)
+    x1, y1, x2, _ = box
+    text(draw, (x1 + 16, y1 + 12), label, 15, color, True, width=x2 - x1 - 32)
+    text(draw, (x1 + 16, y1 + 42), formula, 13, NAVY, True, width=x2 - x1 - 32, gap=3)
+    text(draw, (x1 + 16, y1 + 78), note, 10, MUTED, True, width=x2 - x1 - 32, gap=2)
+
+
+def v54_slide_equations_unit_gate() -> Path:
+    img = canvas(False)
+    draw = ImageDraw.Draw(img)
+    v53_panel_title(
+        draw,
+        "Equations, Feature Engineering, And Unit Gate",
+        "Equation features enter X_allowed only after source, unit, depth, QC, and leakage checks.",
+    )
+
+    gate_box = (58, 145, 350, 790)
+    card(draw, gate_box, fill=(248, 252, 253), outline=TEAL, radius=10, width=2)
+    text(draw, (84, 170), "Unit and leakage gate", 22, TEAL, True, width=240)
+    gate_steps = [
+        ("1", "source header preserved"),
+        ("2", "units visible or mapped"),
+        ("3", "depth axis aligned"),
+        ("4", "caliper/QC first"),
+        ("5", "derived formula provenance"),
+        ("6", "Y-only fields removed"),
+        ("7", "X_allowed matrix"),
+    ]
+    y = 228
+    for num, label in gate_steps:
+        draw.ellipse((86, y, 116, y + 30), fill=TEAL)
+        text(draw, (96, y + 5), num, 13, WHITE, True)
+        text(draw, (130, y + 4), label, 14, NAVY, True, width=180)
+        if num != "7":
+            arrow(draw, (101, y + 36), (101, y + 62), TEAL, width=3)
+        y += 74
+
+    chips = [
+        ("GR clean/shale", "GR_clean = low-GR reservoir proxy", "input/gate; not hydrate by itself", GREEN),
+        ("Density porosity", "phi_D = (rho_ma - RHOB)/(rho_ma - rho_f)", "requires matrix/fluid assumptions", BLUE),
+        ("Resistivity", "log_Rt = log10(Rt); Archie only if a,m,n,Rw approved", "hydrate support, not proof", RED),
+        ("Vp from sonic", "Vp = 304800 / DT_us_per_ft", "unit conversion must be explicit", PURPLE),
+        ("Vs where available", "Vs from shear sonic or approved source", "missingness flag if absent", PURPLE),
+        ("Vp/Vs", "VpVs = Vp / Vs", "derived crossplot feature", PURPLE),
+        ("Acoustic impedance", "AI = RHOB * Vp", "inherits density and sonic QC", TEAL),
+        ("Elastic moduli", "G = rho*Vs^2; K = rho*(Vp^2 - 4Vs^2/3)", "unit-consistent physics only", TEAL),
+        ("lambda-rho / mu-rho", "lambda_rho = rho*(Vp^2 - 2Vs^2); mu_rho = rho*Vs^2", "elastic contrast, not label", TEAL),
+        ("NMR-density separation", "sep = phi_D - NMRPHI", "NMR_SAT/Sgh/Sh remain Y-only", AMBER),
+    ]
+    x_positions = [390, 760]
+    y0 = 145
+    for idx, chip in enumerate(chips):
+        col = idx % 2
+        row = idx // 2
+        box = (x_positions[col], y0 + row * 128, x_positions[col] + 335, y0 + row * 128 + 104)
+        v54_equation_chip(draw, box, *chip)
+
+    right_box = (1150, 145, 1540, 790)
+    card(draw, right_box, fill=(248, 252, 253), outline=AMBER, radius=10, width=2)
+    text(draw, (1178, 170), "Stability context chip", 22, AMBER, True, width=320)
+    v54_equation_chip(
+        draw,
+        (1178, 230, 1512, 338),
+        "Hydrostatic pressure",
+        "P_abs(z) = P_surface + rho_w*g*z_m/1e6",
+        "assumption, not measured reservoir pressure",
+        AMBER,
+    )
+    v54_equation_chip(
+        draw,
+        (1178, 370, 1512, 478),
+        "Phase check",
+        "admissible = T_model <= T_eq(P, CH4, 5 ppt)",
+        "context/mask only; no occurrence claim",
+        AMBER,
+    )
+    card(draw, (1178, 535, 1512, 700), fill=WHITE, outline=RED, radius=9, width=2)
+    text(draw, (1204, 560), "Leakage stop", 20, RED, True, width=280)
+    text(draw, (1204, 600), "Sgh, S_h, Sh, NMR_SAT, hydrate saturation, Swr/S_wr, and phase labels stay out of X_allowed.", 16, NAVY, True, width=270, gap=5)
+    footer(draw, "Sources: processing slide 6 direction, WELL_LOG_REQUIREMENTS_MAP, approved intake spec, stability calculation plan, and parameter evidence registry.")
+    return save(img, "slide_06_equations_feature_unit_gate_v5_4.png")
+
+
+def v54_slide_ml_runtime() -> Path:
+    return v54_copy_authority_panel(
+        V52_ASSET_DIR / "slide_07_ml_runtime_detail.png",
+        "slide_07_complex_ml_runtime_architecture_v5_4.png",
+        "Complex ML Runtime Architecture V5.4",
+        "Measured logs, derived physics, QC, stability/core context, X_allowed, whole-well split, train-only preprocessing, baselines, ANN/Keras candidate, dual heads, validation, and Y-only rail.",
+    )
+
+
+def v54_validation_lane(
+    draw: ImageDraw.ImageDraw,
+    box: tuple[int, int, int, int],
+    heading: str,
+    body: str,
+    color: tuple[int, int, int],
+) -> None:
+    card(draw, box, fill=WHITE, outline=color, radius=10, width=2)
+    x1, y1, x2, _ = box
+    text(draw, (x1 + 20, y1 + 18), heading, 20, color, True, width=x2 - x1 - 40)
+    text(draw, (x1 + 20, y1 + 58), body, 16, NAVY, True, width=x2 - x1 - 40, gap=5)
+
+
+def v54_slide_validation_outputs() -> Path:
+    img = canvas(False)
+    draw = ImageDraw.Draw(img)
+    v53_panel_title(
+        draw,
+        "Validation, Uncertainty, And Outputs",
+        "Future outputs are designed now, but no trained metrics, occurrence predictions, or saturation predictions are reported.",
+    )
+    lanes = [
+        ((70, 155, 430, 295), "1. Whole-well split", "Hold out complete wells or compartments before any preprocessing. Random depth-row splits are not final validation.", BLUE),
+        ((470, 155, 830, 295), "2. Train-only preprocessing", "Scaling, imputation, feature selection, and model choice are fit on training wells only.", PURPLE),
+        ((870, 155, 1230, 295), "3. Planned checks", "Confusion, calibration, residuals, and source/QC confidence plots are placeholders until approved labels exist.", AMBER),
+        ((70, 345, 430, 505), "Occurrence output", "Future P(hydrate) and class label with calibration and reason flags. No occurrence map yet.", TEAL),
+        ((470, 345, 830, 505), "Saturation output", "Future Sh_pred regression with residual review against approved target labels only. No saturation estimate yet.", GREEN),
+        ((870, 345, 1230, 505), "Uncertainty and mimic flags", "Flag sparse logs, missing NMR/core, washout, high-resistivity mimics, elastic ambiguity, and stability assumptions.", RED),
+    ]
+    for box, heading, body, color in lanes:
+        v54_validation_lane(draw, box, heading, body, color)
+    for start, end, color in [
+        ((430, 225), (470, 225), BLUE),
+        ((830, 225), (870, 225), PURPLE),
+        ((1030, 295), (300, 345), AMBER),
+        ((1030, 295), (700, 345), AMBER),
+        ((1030, 295), (1030, 345), AMBER),
+    ]:
+        arrow(draw, start, end, color, width=4)
+
+    package_box = (1265, 155, 1530, 705)
+    card(draw, package_box, fill=(248, 252, 253), outline=TEAL, radius=10, width=2)
+    text(draw, (1290, 180), "Reviewed output package", 21, TEAL, True, width=215)
+    package_items = [
+        "probability table",
+        "Sh prediction table",
+        "uncertainty flags",
+        "mimic flags",
+        "calibration/residual review",
+        "locked reasons",
+        "public-safe later maps/tables",
+    ]
+    y = 238
+    for item in package_items:
+        draw.rounded_rectangle((1290, y, 1510, y + 36), radius=8, fill=WHITE, outline=LINE, width=1)
+        text(draw, (1306, y + 9), item, 13, NAVY, True, width=185)
+        y += 54
+    arrow(draw, (1230, 425), (1265, 425), TEAL, width=4)
+
+    card(draw, (70, 630, 1230, 760), fill=(255, 248, 248), outline=RED, radius=10, width=2)
+    text(draw, (98, 655), "No-results guardrail", 22, RED, True)
+    text(draw, (98, 695), "The deck shows validation architecture and output shape only. It does not report trained metrics, confusion values, occurrence predictions, saturation predictions, or hydrate proof.", 20, NAVY, True, width=1070, gap=6)
+    footer(draw, "Sources: FIRST_MODEL_EXPERIMENT_PLAN, first model output schema, target registry, leakage guardrails, and V5.2 ML runtime detail.")
+    return save(img, "slide_08_validation_uncertainty_outputs_v5_4.png")
+
+
+def v54_slide_status_decisions(values: dict[str, str]) -> Path:
+    img = canvas(False)
+    draw = ImageDraw.Draw(img)
+    v53_panel_title(
+        draw,
+        "Status, Mentor Decisions, And Next Actions",
+        "The project is ready for approved-data header audit and OSL runtime mapping; model training has not started.",
+    )
+
+    metrics = [
+        (values["wells"], "public scaffold wells"),
+        (values["profiles"], "G10015 profiles"),
+        (values["temp_matches"], "temp-profile matches"),
+        (values["screen_calculated"], "admissibility intervals"),
+        (values["approved_visible"], "approved datasets visible"),
+        ("0", "trained ML results"),
+    ]
+    metric_positions = [
+        (70, 150),
+        (338, 150),
+        (70, 265),
+        (338, 265),
+        (70, 380),
+        (338, 380),
+    ]
+    for idx, (number, label) in enumerate(metrics):
+        x, y = metric_positions[idx]
+        card(draw, (x, y, x + 235, y + 88), fill=WHITE, outline=LINE, radius=10, width=2)
+        color = RED if label == "trained ML results" else TEAL
+        text(draw, (x + 18, y + 18), number, 25, color, True, width=199, align="center")
+        text(draw, (x + 18, y + 54), label, 12, MUTED, True, width=199, align="center")
+
+    card(draw, (70, 505, 605, 740), fill=(248, 252, 253), outline=TEAL, radius=10, width=2)
+    text(draw, (98, 528), "Current status", 22, TEAL, True)
+    status_items = [
+        "stability screen has 22 calculated intervals, not proof",
+        "only about 3/71 approved datasets visible for schema design",
+        "ML architecture/readiness scaffold exists",
+        "no training, metrics, occurrence maps, or saturation outputs yet",
+    ]
+    sy = 572
+    for item in status_items:
+        text(draw, (108, sy), f"- {item}", 15, NAVY, True, width=455, gap=3)
+        sy += 38
+
+    card(draw, (645, 150, 1530, 555), fill=WHITE, outline=AMBER, radius=10, width=2)
+    text(draw, (675, 178), "Mentor decisions to lock", 24, AMBER, True)
+    decisions = [
+        "authoritative saturation target field",
+        "occurrence label policy",
+        "blind validation wells or compartments",
+        "missing-log adapter policy",
+        "phase curve / gas composition scenario policy",
+        "caliper QC policy",
+    ]
+    dx, dy = 675, 230
+    for idx, item in enumerate(decisions, start=1):
+        draw.ellipse((dx, dy + 2, dx + 28, dy + 30), fill=AMBER)
+        text(draw, (dx + 10, dy + 6), str(idx), 12, WHITE, True)
+        text(draw, (dx + 42, dy + 4), item, 17, NAVY, True, width=350)
+        if idx == 3:
+            dx, dy = 1110, 230
+        else:
+            dy += 82
+
+    card(draw, (645, 600, 1530, 740), fill=(255, 248, 248), outline=RED, radius=10, width=2)
+    text(draw, (675, 630), "Next action", 24, RED, True)
+    text(draw, (675, 675), "Run approved-data header audit and runtime mapping in OSL. Keep GitHub/Streamlit public-safe: schema, counts, diagrams, guardrails, and no approved/private rows.", 18, NAVY, True, width=800, gap=5)
+    footer(draw, "Counts from public scaffold summaries. Stability is admissibility only; outputs are planned until approved labels and validation are complete.")
+    return save(img, "slide_09_status_mentor_decisions_v5_4.png")
+
+
+def v54_build_panels() -> list[Path]:
+    values = summaries()
+    return [
+        v54_slide_personal_opener(),
+        v54_slide_context(),
+        v54_slide_parameter_ranges(),
+        v54_slide_full_workflow(),
+        v54_slide_parameter_behavior(),
+        v54_slide_equations_unit_gate(),
+        v54_slide_ml_runtime(),
+        v54_slide_validation_outputs(),
+        v54_slide_status_decisions(values),
+    ]
+
+
+def v54_build_word_companion(panel_paths: list[Path], contact_sheet: Path) -> Path:
+    values = summaries()
+    document = Document()
+    apply_doc_style(document)
+    section = document.sections[0]
+    section.top_margin = Inches(0.6)
+    section.bottom_margin = Inches(0.6)
+    section.left_margin = Inches(0.65)
+    section.right_margin = Inches(0.65)
+
+    props = document.core_properties
+    props.title = "V5.4 Corrected North Slope Gas Hydrate ML Workflow Companion"
+    props.subject = "Corrected mentor-facing slide companion"
+    props.author = "North Slope Gas Hydrates project"
+
+    document.add_heading("V5.4 Corrected North Slope Gas Hydrate ML Workflow Companion", level=0)
+    document.add_paragraph(
+        "This companion explains the corrected nine-slide mentor deck. V5.4 restores the personal opener and the "
+        "complex workflow/runtime diagrams, replaces AI-looking hydrate visuals with source-backed figures, and "
+        "keeps the project guardrails explicit. It does not report hydrate proof, trained metrics, occurrence "
+        "predictions, saturation predictions, or approved/private data rows."
+    )
+
+    document.add_heading("Current Public State", level=1)
+    document.add_paragraph(
+        f"The public scaffold currently tracks {values['wells']} Arctic Slope public wells, {values['profiles']} "
+        f"G10015 temperature profiles, {values['temp_matches']} temperature-profile matches, and "
+        f"{values['screen_calculated']} methane 5 ppt calculated stability-admissibility intervals. Only about "
+        "3/71 approved datasets are visible for schema design. The ML scaffold exists, but no model training has started."
+    )
+
+    document.add_heading("Hydrate Structures And North Slope Methane Context", level=1)
+    document.add_paragraph(
+        "Gas hydrate is an ice-like crystalline solid where water cages trap guest gas molecules. Structure I is the "
+        "methane-dominant hydrate structure used as the current public baseline. Structure II can host larger guest "
+        "molecules and mixed gases, and Structure H involves larger hydrocarbon guests. Because gas composition shifts "
+        "the stability boundary, V5.4 treats methane 5 ppt as the current public method and leaves mixed-gas scenarios "
+        "as a mentor policy decision."
+    )
+
+    document.add_heading("Stability Is Admissibility Only", level=1)
+    document.add_paragraph(
+        "The stability branch compares a public temperature model against a digitized methane 5 ppt phase curve under "
+        "a hydrostatic pressure assumption. Intervals where modeled temperature is at or below the equilibrium "
+        "temperature are physically admissible under those assumptions. This is not hydrate occurrence, saturation, "
+        "producibility, final stability top/base/thickness, or proof."
+    )
+
+    document.add_heading("Why Log Responses Are Useful But Ambiguous", level=1)
+    document.add_paragraph(
+        "Low gamma ray helps identify cleaner reservoir-quality sand, but clean sand alone is not hydrate. High deep "
+        "resistivity can support hydrate interpretation in clean porous sand, but free gas, ice, tight rock, salinity, "
+        "cement, invasion, and bad borehole conditions can mimic or mask the response. Density, porosity, NMR, velocity, "
+        "Vp/Vs, acoustic impedance, and elastic attributes are useful only after unit, provenance, depth, QC, and "
+        "lithology checks."
+    )
+
+    document.add_heading("Leakage-Safe ML Design", level=1)
+    document.add_paragraph(
+        "The ML architecture keeps measured logs, derived physics, QC flags, alignment fields, and approved context in "
+        "X_allowed after source and unit gates. Occurrence labels, Sgh, S_h, Sh, NMR_SAT, hydrate saturation, Swr/S_wr, "
+        "and interpreted phase labels are Y-only targets. They supervise training and validation but never enter the "
+        "feature matrix."
+    )
+
+    document.add_heading("Separate Outputs", level=1)
+    document.add_paragraph(
+        "The future model has two separate outputs: occurrence classification as P(hydrate) and saturation regression "
+        "as Sh_pred. Both require approved labels, whole-well or grouped validation, train-only preprocessing, and "
+        "mentor review before public release. V5.4 shows planned output shapes and review flags only, not results."
+    )
+
+    slide_notes = [
+        (
+            "Slide 1 - Personal/about-me opener",
+            "Restores the original Gmail-style personal opener and keeps the project title, personal imagery, and old spine.",
+        ),
+        (
+            "Slide 2 - Gas hydrate and North Slope context",
+            "Uses source-backed visuals only: USGS hydrate crystals, the digitized USGS SIR methane 5 ppt curve, and the public website map capture. Hydrate structures are explained in text rather than with generic cage art.",
+        ),
+        (
+            "Slide 3 - Parameters and expected hydrate ranges",
+            "Shows only parameter families, normalized working envelopes, opposite meaning, mimic or mask risk, and ML role from the public parameter evidence registry.",
+        ),
+        (
+            "Slide 4 - Full complex project workflow",
+            "Restores the V5.2 complex workflow architecture as the main visual, including public sources, OSL later inputs, fingerprint registry, gates, feature engineering, leakage-safe ML, dual heads, validation, and exports.",
+        ),
+        (
+            "Slide 5 - Why parameter ranges matter",
+            "Explains why each family is scientifically useful and where it can fail. The point is evidence combination, not single-log proof.",
+        ),
+        (
+            "Slide 6 - Equations, feature engineering, and unit gate",
+            "Moves away from a pressure-temperature-only slide and centers the equations, unit checks, QC gates, and leakage stop that decide whether derived features enter X_allowed.",
+        ),
+        (
+            "Slide 7 - Complex ML architecture",
+            "Restores the complex runtime diagram: measured logs, derived physics, QC, stability/core context, X_allowed, grouped split, train-only preprocessing, baselines, ANN/Keras candidate, dual heads, validation, reviewed output package, and Y-only rail.",
+        ),
+        (
+            "Slide 8 - Validation, uncertainty, and outputs",
+            "Connects whole-well validation, planned calibration and residual review, uncertainty and mimic flags, occurrence classification, saturation regression, and the reviewed output package. Metrics are intentionally absent.",
+        ),
+        (
+            "Slide 9 - Status, mentor decisions, and next steps",
+            "Summarizes current counts, unresolved mentor decisions, and the immediate OSL action: approved-data header audit and runtime mapping.",
+        ),
+    ]
+    document.add_heading("Slide-By-Slide Companion", level=1)
+    for idx, (heading, body) in enumerate(slide_notes):
+        document.add_heading(heading, level=2)
+        document.add_paragraph(body)
+        if idx < len(panel_paths) and panel_paths[idx].exists():
+            document.add_picture(str(panel_paths[idx]), width=Inches(6.7))
+
+    document.add_heading("Contact Sheet", level=1)
+    if contact_sheet.exists():
+        document.add_picture(str(contact_sheet), width=Inches(6.7))
+
+    document.add_heading("Source And Guardrail Anchors", level=1)
+    anchors = [
+        "USGS Gas Hydrate Crystals public-domain image.",
+        "Lee et al. 2008 USGS SIR 2008-5175 methane 5 ppt phase curve digitized product.",
+        "data/public_ml_products/public_parameter_evidence_registry_2026-06-16.csv.",
+        "docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md.",
+        "docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md and target leakage guardrails.",
+        "docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md and first model output schema.",
+    ]
+    for item in anchors:
+        document.add_paragraph(item, style="List Bullet")
+
+    document.add_heading("Language To Preserve", level=1)
+    for item in [
+        "Use 'admissible under assumptions' rather than hydrate proof.",
+        "Use 'planned validation/output shape' rather than trained metrics.",
+        "Use 'future occurrence classification' and 'future saturation regression' rather than predictions.",
+        "Keep OpenScienceLab as the approved/private runtime workbench and GitHub/Streamlit as the public delivery surface.",
+    ]:
+        document.add_paragraph(item, style="List Bullet")
+
+    OUT_DOCX.parent.mkdir(parents=True, exist_ok=True)
+    document.save(OUT_DOCX)
+    return OUT_DOCX
+
+
 def main() -> None:
-    network = ml_network_detail_panel()
-    panels = build_panels(network)
+    panels = v54_build_panels()
+    if len(panels) != 9:
+        raise ValueError(f"V5.4 must have exactly 9 slides, found {len(panels)}")
     deck = rebuild_deck(panels)
     verify_deck(deck)
     contact_sheet = build_contact_sheet(panels)
-    docx = build_word_companion(panels[2], network)
-    print(f"Wrote {panels[2]}")
-    print(f"Wrote {network}")
+    docx = v54_build_word_companion(panels, contact_sheet)
+    print(f"Wrote {len(panels)} V5.4 panels")
     print(f"Wrote {contact_sheet}")
     print(f"Wrote {deck}")
     print(f"Wrote {docx}")
