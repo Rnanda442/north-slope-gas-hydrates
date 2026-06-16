@@ -100,6 +100,9 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
   provenance and QA layer.
 - `docs/ANACONDA_DEPENDENCY_REQUEST_2026-06-16.md` - DOE/Anaconda environment
   package request for website, GIS, slides/docs, and future approved runtime.
+- `docs/DOE_THREE_DATASET_ML_PIPELINE_RUNBOOK_2026-06-16.md` - approved-runtime
+  command guide for using `curated_dataset1.xlsx` as training and
+  `curated_dataset2.xlsx` / `curated_dataset3.xlsx` as external tests.
 
 ## Current Authoritative Slide and Doc Assets
 
@@ -205,9 +208,8 @@ Run the full suite before committing meaningful changes:
 python -m pytest
 ```
 
-Expected current result: `114 passed` as of the 2026-06-16 presentation export
-and source-visual inventory update. Update this count only after verifying it
-locally.
+Expected current result: `116 passed` as of the 2026-06-16 three-dataset
+runtime-pipeline update. Update this count only after verifying it locally.
 
 Current test files:
 
@@ -222,6 +224,7 @@ Current test files:
 - `tests/test_approved_data_intake_cli.py`
 - `tests/test_parameter_evidence_registry.py`
 - `tests/test_source_visual_inventory.py`
+- `tests/test_three_dataset_ml_pipeline.py`
 
 ## Current Guardrails
 

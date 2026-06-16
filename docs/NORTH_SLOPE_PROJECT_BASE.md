@@ -187,8 +187,12 @@ Then use:
 - `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md`
 - `dashboard/approved_data_intake.py`
 - `01_pipeline/validate_approved_data_headers.py`
+- `dashboard/runtime/three_dataset_pipeline.py`
+- `01_pipeline/run_three_dataset_ml_pipeline.py`
+- `docs/DOE_THREE_DATASET_ML_PIPELINE_RUNBOOK_2026-06-16.md`
 - `tests/test_approved_data_intake.py`
 - `tests/test_approved_data_intake_cli.py`
+- `tests/test_three_dataset_ml_pipeline.py`
 - `data/public_ml_products/approved_data_intake_template_2026-06-15.csv`
 - `data/public_ml_products/approved_data_intake_validation_schema_2026-06-15.csv`
 - `data/public_ml_products/first_model_output_schema_2026-06-15.csv`
@@ -207,9 +211,14 @@ Then use:
 These are the active public-safe readiness artifacts after the V5.4 corrected workflow
 package. They define and now test the field roles, approved-data intake
 contract, first model experiment shape, runtime templates, CLI header audits,
-OSL-safe summary handoff, mentor decisions, and a normalized parameter
-evidence board without exposing approved rows or claiming
-occurrence/saturation results. The parameter evidence registry is the current
+OSL-safe summary handoff, mentor decisions, a normalized parameter evidence
+board, and the approved-runtime three-workbook runner without exposing
+approved rows in GitHub. The three-workbook runner defaults to
+`curated_dataset1.xlsx` for training and `curated_dataset2.xlsx` plus
+`curated_dataset3.xlsx` as external tests; it keeps target-like saturation or
+occurrence fields out of `X_allowed`, excludes depth as a default predictor,
+uses train-only 0-1 scaling, and writes predictions/models only to ignored
+runtime folders. The parameter evidence registry is the current
 source for slide/website bars showing hydrate-compatible directions, working
 screening envelopes, mimics, ML role, and guardrails for stability, GR,
 porosity/density, NMR separation, resistivity, sonic/elastic response, caliper
