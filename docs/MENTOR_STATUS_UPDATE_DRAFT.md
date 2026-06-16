@@ -75,6 +75,18 @@ Public-safe artifacts for this layer are now:
 - `docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`
 - `data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv`
 
+The current V5.3 mentor package translates that work into a presentation and
+companion document: the slides use source-backed hydrate/North Slope visuals,
+a parameter-range board, a simplified workflow, leakage-safe ML architecture,
+and validation/output guardrails, while the companion explains the same
+workflow without claiming approved-data training, predictions, saturation
+results, or hydrate proof.
+
+- Slides:
+  <https://docs.google.com/presentation/d/1kP0icjCLpldXZX80eww27IIokG1s3VbM5bSXiGLk8Sw>
+- Companion:
+  <https://docs.google.com/document/d/1QcF-31U77_MyPHnrBSYFZSswFyIzO8P3pMLBSTIMgMQ>
+
 ## Mentor Questions For Future Decisions
 
 1. Should the official baseline remain 100% methane plus 5 ppt salinity?

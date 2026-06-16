@@ -2,11 +2,16 @@
 
 Created: 2026-06-12
 
-Use this file as the main working base for the Alaska North Slope gas hydrate project. Older planning files remain in the repo as provenance, but this is the one file to read first before changing the Word document, slides, or website.
+Use `docs/AGENT_START_HERE.md` as the first read for new sessions. This file is
+the broader working base for the Alaska North Slope gas hydrate project. Older
+planning files remain in the repo as provenance, but future agents should start
+with the short handoff layer before changing the Word document, slides, or
+website.
 
 ## Current Repository
 
-- Local path: `C:\Users\gargi\OneDrive\Documents\ai north slope gas hydrates`
+- Local path varies by machine; current workspace:
+  `C:\Users\Writwik\Documents\north-slope-gas-hydrates`
 - GitHub: `Rnanda442/north-slope-gas-hydrates`
 - Main branch: `main`
 
@@ -40,8 +45,11 @@ The public repo should not contain:
 - Real data work and real model metrics will happen later inside the DOE/approved environment.
 - Screenshots of headers, equations, and project overview are acceptable evidence and should stay available in Git.
 - The project needs actual ranges, numbers, scientific reasoning, and source backing before major deliverable edits.
-- Slide 1 of the latest Gmail deck is basically ready. Slides 2-9 need stronger specifics, formatting, syntax, science, and ML pipeline clarity.
-- The deck must stay exactly 9 slides.
+- Earlier Gmail-deck feedback treated slide 1 as close and slides 2-9 as needing
+  stronger specifics, formatting, syntax, science, and ML pipeline clarity.
+- The main audience deck should keep the original nine topic slides; technical
+  diagram plates can be appended when explicitly needed to keep complex
+  architecture diagrams whole.
 - Word first, slides second, website third.
 - Do not make fake datasets as the next priority. Focus first on equations, parameter logic, source-backed hydrate constraints, and the ML pipeline design.
 - If synthetic/fake data is ever used later, it should only test code structure and must preserve the screenshot header style. It should not drive the science narrative.
@@ -51,16 +59,34 @@ The public repo should not contain:
 
 ### One File To Read First
 
-- `docs/NORTH_SLOPE_PROJECT_BASE.md`
+- `docs/AGENT_START_HERE.md`
 
-### Latest Slide Authority
+Then use:
+
+- `docs/CURRENT_ARTIFACT_INDEX.md` for active/superseded/reference artifacts
+  and edit safety.
+- `docs/PROJECT_PROMPT_LIBRARY.md` for reusable slide, Word, website, OSL,
+  source research, parameter evidence, stability, and mentor-status prompts.
+- `docs/NORTH_SLOPE_PROJECT_BASE.md` for the broader project base.
+
+### Slide Authority And Current Deck
+
+- Current mentor-review deck:
+  `docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`
+- Current native Google Slides review copy:
+  <https://docs.google.com/presentation/d/1kP0icjCLpldXZX80eww27IIokG1s3VbM5bSXiGLk8Sw>
+- Current Word companion:
+  `docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx`
+- Current native Google Docs review copy:
+  <https://docs.google.com/document/d/1QcF-31U77_MyPHnrBSYFZSswFyIzO8P3pMLBSTIMgMQ>
 
 - `docs/project_blueprints/CURRENT_GMAIL_VISUAL_REVISION_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-11.pptx`
 - Source: Gmail message `19eba86da8752830`
 - Subject: `New pressy`
 - Sent: 2026-06-12 01:30 CDT
 - Verified: valid 9-slide PPTX.
-- Use this deck first. Older decks and generated panels are context unless rebuilding from scripts.
+- Use this deck as historical visual authority only. The current review deck is
+  V5.3 above.
 - Cleanup/consolidation control now exists at
   `docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md`.
   Use it before opening or deleting any older Word, PPTX, or Drive copy. The
@@ -87,7 +113,19 @@ The public repo should not contain:
   runtime diagrams intact as whole-slide plates. The rebuilt deck was imported
   to Drive as native Google Slides for review:
   <https://docs.google.com/presentation/d/1cWG9ZJvBTQ2hLTbIGJHggcBn46geRrdIUpGY7hWYtd8>.
-- Current V5.2 workflow package:
+- Current V5.3 mentor-facing workflow package:
+  `docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`.
+  It has nine main audience slides plus two appendix plates for the intact
+  expanded architecture and ML runtime diagrams. It uses website captures for
+  the North Slope/well-map context, source-backed hydrate and phase-curve
+  visuals, a parameter-range-only slide 3, a simplified non-ML workflow slide
+  4, visual evidence/validation panels, and a beginner ML architecture with
+  baseline models before ANN/Keras. It does not include approved rows, trained
+  model metrics, occurrence predictions, saturation predictions, hydrate proof,
+  or sweet-spot ranking.
+  The V5.3 copy is also in Drive as
+  [V5.3 North Slope Gas Hydrate ML Workflow Slides 2026-06-16](https://docs.google.com/presentation/d/1kP0icjCLpldXZX80eww27IIokG1s3VbM5bSXiGLk8Sw).
+- Prior V5.2 workflow package:
   `docs/project_blueprints/V5_2_FULL_WORKFLOW_ML_DIAGRAM_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`.
   It uses a project-specific cover slide, keeps the methane hydrate intro in
   the Gmail visual format, uses slide 3 as the readable mentor-scale workflow
@@ -97,21 +135,20 @@ The public repo should not contain:
   Treat the earlier
   `STABILITY_ML_REMAKE_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`
   as superseded unless the user asks to revive it.
-  The V5.2 copy is also in Drive as
+  The V5.2 copy is also in Drive as prior provenance:
   [V5.2 FULL WORKFLOW ML DIAGRAM North Slope Gas Hydrate Slides 2026-06-15](https://docs.google.com/presentation/d/1w9eqANgOc89c1wCUC0xi9eZoBup-3JNllSUI923skgA).
-- Current diagram layouts are the V5.2 refresh:
-  - `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/full_project_ml_workflow_flowchart.png`
-    is the readable slide-sized overview.
-  - `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/full_project_ml_workflow_flowchart_expanded.png`
+- Current diagram layouts are the V5.3 refresh:
+  - `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/slide_04_simplified_workflow_v5_3.png`
+    is the readable non-ML workflow overview.
+  - `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/full_project_ml_workflow_flowchart_expanded.png`
     is the detailed poster-scale architecture map with source counts,
     equations, gates, features, targets, validation, outputs, caveats, and
     mentor decisions.
-  - `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/ml_pipeline_network_detail_v5.png`
+  - `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/ml_pipeline_network_detail_v5.png`
     is the model-detail layout showing feature/QC groups, log-track handoff,
     `X_allowed`, validation split, train-only preprocessing, output heads, and
     the target-only rail.
-  - The website uses these under Analyze Hydrates > Schema Coverage &
-    Architecture. The generated PPTX and Word companion were rebuilt from
+  - The generated PPTX and Word companion were rebuilt from
     `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`.
 
 ### Current Word Authority
@@ -120,12 +157,20 @@ The public repo should not contain:
 - Role: current research overview document.
 - Needs next pass after parameter/source logic is made clearer.
 - Diagram companion for the current workflow discussion:
+  `docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx`.
+  This is the current mentor-facing V5.3 companion. It explains the public vs
+  OSL boundary, gas hydrate science and North Slope context, gas chemistry and
+  structure type, parameter evidence table, stability method, leakage-safe ML
+  workflow, website outputs, complete/future work, and mentor decisions.
+  The V5.3 copy is also in Drive as
+  [V5.3 North Slope Gas Hydrate ML Workflow Companion 2026-06-16](https://docs.google.com/document/d/1QcF-31U77_MyPHnrBSYFZSswFyIzO8P3pMLBSTIMgMQ).
+- Prior diagram companion:
   `docs/project_blueprints/V5_2_North_Slope_Gas_Hydrate_Full_ML_Workflow_Companion_2026-06-15.docx`.
   This is a public-safe one-map explanation of the current public/OSL,
   stability, feature, leakage, occurrence, saturation, validation, and export
   path, with research source anchors, current ML architecture decisions, and
   the variable fingerprint/intake validator contract.
-  The V5.2 copy is also in Drive as
+  The V5.2 copy is also in Drive as prior provenance:
   [V5.2 North Slope Gas Hydrate Full ML Workflow Companion 2026-06-15](https://docs.google.com/document/d/1dWBNYmwGerBV8steCo0v37PbhpIAZzqNQ-Psl78Ypa8).
 
 ### Current Method / Readiness Docs
@@ -156,7 +201,7 @@ The public repo should not contain:
 - `docs/APPROVED_DATA_INTAKE_READINESS_REPORT_2026-06-15.md`
 - `docs/OSL_APPROVED_DATA_HEADER_AUDIT_RUNBOOK_2026-06-15.md`
 
-These are the active public-safe readiness artifacts after the V5.2 diagram
+These are the active public-safe readiness artifacts after the V5.3 workflow
 package. They define and now test the field roles, approved-data intake
 contract, first model experiment shape, runtime templates, CLI header audits,
 OSL-safe summary handoff, mentor decisions, and a normalized parameter
@@ -844,13 +889,21 @@ Current top-priority handoff for the PC:
    `docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md`
    before editing, uploading, deleting, or renaming Word/PowerPoint/Drive
    deliverables.
-2. Use the completed V5.2 workflow package as the explanation foundation, but do
-   not redesign it unless an obvious bug is found.
-3. Review the rebuilt targeted Gmail-style presentation at
-   `docs/project_blueprints/North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`.
-   The native Google Slides review copy is
-   <https://docs.google.com/presentation/d/1cWG9ZJvBTQ2hLTbIGJHggcBn46geRrdIUpGY7hWYtd8>.
-   Its build contract is `docs/FINAL_NEW_SLIDE_DECK_CREATION_PROMPT_2026-06-15.md`,
+2. Use the completed V5.3 workflow package as the explanation foundation, but
+   do not redesign it unless an obvious bug is found.
+3. Review the rebuilt V5.3 presentation at
+   `docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`
+   and companion at
+   `docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx`.
+   The native Google Slides and Docs review copies are
+   <https://docs.google.com/presentation/d/1kP0icjCLpldXZX80eww27IIokG1s3VbM5bSXiGLk8Sw>
+   and
+   <https://docs.google.com/document/d/1QcF-31U77_MyPHnrBSYFZSswFyIzO8P3pMLBSTIMgMQ>.
+   V5.3 carries forward the final-deck prompt requirements, website visual
+   language, source-backed slide 2, parameter-range slide 3, simplified
+   workflow slide 4, and intact complex V5.2 architecture diagrams as appendix
+   plates.
+   Its prior build contracts are `docs/FINAL_NEW_SLIDE_DECK_CREATION_PROMPT_2026-06-15.md`,
    with supporting rules in
    `docs/GMAIL_STYLE_V5_2_SLIDE_REMAKE_PROMPT_2026-06-15.md` and
    `docs/FINAL_NINE_SLIDE_GAP_AND_DIAGRAM_REUSE_PLAN_2026-06-15.md`.
@@ -902,13 +955,15 @@ Remaining questions before the next major build.
 
 ## Current Answers Already Given
 
-- 9 slides: yes, keep exactly 9.
-- Slide 1: yes, latest Gmail deck slide 1 is the intended starting point.
-- Slides 1 and 2: preserve them from the current Gmail deck for the
-  diagram-first slide refresh unless the user explicitly unlocks them.
-- Slide direction after 2026-06-15 user review: the first stability/ML remake
-  is not the active direction; use one full project ML workflow flowchart as
-  the anchor, with slides 4-9 serving as zoom-ins on the same map.
+- 9 main audience topic slides: yes. Appendix plates are acceptable only when
+  explicitly needed to keep the complex workflow and ML runtime diagrams whole.
+- Slide 1: use a project-specific cover based on the website/map context rather
+  than a personal/about-me cover for the V5.3 mentor package.
+- Slide 2: rebuild completely with source-backed hydrate/North Slope visuals;
+  do not reuse the old AI-looking methane cage or PT sketch.
+- Slide direction after 2026-06-16 review: use the V5.3 mentor-facing sequence
+  as the current package, with nine audience slides and two appendix plates for
+  the complex workflow and ML runtime diagrams.
 - Work order: Word first, slides second, website third.
 - Website: skeleton for transfer into DOE/Anaconda, not final public science proof.
 - Real data: no real rows in public repo; headers/screenshots only for now.

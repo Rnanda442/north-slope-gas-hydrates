@@ -1,0 +1,64 @@
+# Current Artifact Index
+
+Last updated: 2026-06-16
+
+This index lists the current authoritative, reference, superseded, and
+needs-review artifacts that future sessions are likely to touch. Status values
+are limited to `active`, `superseded`, `reference`, and `needs review`.
+
+| artifact | path/link | role | status | safe to edit? | notes |
+|---|---|---|---|---|---|
+| Agent start here | `docs/AGENT_START_HERE.md` | First-read handoff for future agents | active | Yes | Update only when orientation, guardrails, tests, or authoritative files change. |
+| Current artifact index | `docs/CURRENT_ARTIFACT_INDEX.md` | Authority and edit-safety map | active | Yes | Keep paths verified locally before adding rows. |
+| Project prompt library | `docs/PROJECT_PROMPT_LIBRARY.md` | Reusable prompts for common workflows | active | Yes | Each prompt should point to `docs/AGENT_START_HERE.md` first. |
+| Project context | `PROJECT_CONTEXT.md` | Concise living project memory | active | Yes | Update after meaningful project orientation changes. |
+| North Slope project base | `docs/NORTH_SLOPE_PROJECT_BASE.md` | Broader base, deliverable inventory, and working rules | active | Yes | Use after the first-read handoff. |
+| Architecture and activity map | `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md` | Architecture, workstreams, priorities, decisions, activity log | active | Yes | Update for milestones, blockers, dependency changes, priority changes, and next actions. |
+| V5.3 mentor-facing workflow deck | `docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx` | Current mentor-review deck: nine audience slides plus two appendix plates | active | Prefer builder edits | Built from actual website captures and source-backed visuals; no approved rows, metrics, predictions, or hydrate-proof claims. |
+| V5.3 Drive deck | <https://docs.google.com/presentation/d/1kP0icjCLpldXZX80eww27IIokG1s3VbM5bSXiGLk8Sw> | Native Google Slides review copy of V5.3 | active | Connector/Drive edits only with explicit direction | Verified as 11 slides with representative large thumbnails on 2026-06-16. |
+| V5.3 workflow companion | `docs/project_blueprints/V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx` | Current mentor-facing Word companion | active | Prefer builder edits | Rewritten for project purpose, public/OSL boundary, hydrate science, parameter evidence, stability method, ML workflow, website outputs, and mentor decisions. |
+| V5.3 Drive companion | <https://docs.google.com/document/d/1QcF-31U77_MyPHnrBSYFZSswFyIzO8P3pMLBSTIMgMQ> | Native Google Docs review copy of V5.3 companion | active | Connector/Drive edits only with explicit direction | Connector readback verified headings, tables, source anchors, and guardrails on 2026-06-16. |
+| V5.3 generated assets | `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/` | Slide PNG panels, contact sheet, expanded architecture PNG, and ML runtime detail | active | Rebuild from builder | Slide 2 source-backed, slide 3 parameter-range focused, slides 10-11 preserve complex diagrams whole. |
+| Final-style research overview deck | `docs/project_blueprints/North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx` | Prior final-presentation track, exactly nine slides | reference | No direct binary edit | Rebuild from scripts only if user explicitly asks to revive this format. |
+| Final-style Drive deck | <https://docs.google.com/presentation/d/1cWG9ZJvBTQ2hLTbIGJHggcBn46geRrdIUpGY7hWYtd8> | Native Google Slides review copy of the prior final-style deck | reference | Connector/Drive edits only with explicit direction | Verified as nine slides when imported on 2026-06-15. |
+| Current research overview Word doc | `docs/project_blueprints/North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.docx` | Current research-overview document | active | Prefer builder edits | Public-safe overview; results-bearing sections remain placeholders until approved execution. |
+| V5.2 workflow deck | `docs/project_blueprints/V5_2_FULL_WORKFLOW_ML_DIAGRAM_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx` | Prior connected workflow deck | reference | Prefer builder edits | V5.2 explains public/OSL boundary, stability, feature engineering, leakage, occurrence, saturation, validation, and exports. |
+| V5.2 workflow Drive deck | <https://docs.google.com/presentation/d/1w9eqANgOc89c1wCUC0xi9eZoBup-3JNllSUI923skgA> | Native Google Slides copy of V5.2 workflow deck | reference | Connector/Drive edits only with explicit direction | Use as provenance, not as the active source of truth. |
+| V5.2 workflow companion | `docs/project_blueprints/V5_2_North_Slope_Gas_Hydrate_Full_ML_Workflow_Companion_2026-06-15.docx` | Word companion for the V5.2 workflow package | reference | Prefer builder edits | Contains source anchors, ML decisions, variable fingerprints, and intake-validator contract. |
+| V5.2 workflow companion Drive doc | <https://docs.google.com/document/d/1dWBNYmwGerBV8steCo0v37PbhpIAZzqNQ-Psl78Ypa8> | Native Google Docs review copy | reference | Connector/Drive edits only with explicit direction | Use as provenance unless explicitly revived. |
+| Pipeline status Word brief | `docs/project_blueprints/North_Slope_Gas_Hydrate_ML_Pipeline_Status_And_Forward_Workflow_2026-06-15.docx` | Plain-language status and future workflow brief | reference | Prefer builder edits | Built from `docs/PIPELINE_STATUS_AND_ML_WORKFLOW_BRIEF.md`. |
+| Mentor status package | `docs/project_blueprints/North_Slope_Gas_Hydrate_Mentor_Status_Package_V5_Workflow_2026-06-15.docx` | Short mentor-facing status package | reference | Prefer builder edits | Built from `docs/MENTOR_PROJECT_STATUS_PACKAGE_V5_WORKFLOW_2026-06-15.md`. |
+| Current Gmail visual deck | `docs/project_blueprints/CURRENT_GMAIL_VISUAL_REVISION_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-11.pptx` | Visual/topic provenance for the final-style slide direction | reference | No | Keep as source authority/provenance; do not overwrite. |
+| First stability/ML remake deck | `docs/project_blueprints/STABILITY_ML_REMAKE_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx` | Earlier rejected stability/ML remake | superseded | No unless user revives it | User review rejected this direction on 2026-06-15. |
+| Final deliverable cleanup plan | `docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md` | Required control before upload/delete/archive/rename of deliverables | active | Yes | No cleanup action without explicit approval. |
+| Final nine-slide gap plan | `docs/FINAL_NINE_SLIDE_GAP_AND_DIAGRAM_REUSE_PLAN_2026-06-15.md` | Slide-by-slide gap and diagram reuse rules | active | Yes | Keeps original/main nine-slide topic authority. |
+| Final new deck creation prompt | `docs/FINAL_NEW_SLIDE_DECK_CREATION_PROMPT_2026-06-15.md` | Executed prompt/provenance for the prior final-style deck | reference | Yes | Use as context only; current rebuild baseline is V5.3. |
+| Gmail-style V5.2 remake prompt | `docs/GMAIL_STYLE_V5_2_SLIDE_REMAKE_PROMPT_2026-06-15.md` | Prompt preserving Gmail visual authority and V5.2 method content | reference | Yes | Blue callouts only for runtime confirmations. |
+| Processing slide asset builder | `docs/project_blueprints/build_processing_slide_assets.py` | Raster panel builder for final-style slide visuals | active | Yes, with visual QA | Do not add approved/private rows or fake metrics. |
+| ML revamp PowerPoint builder | `docs/project_blueprints/build_ml_revamp_powerpoint.py` | PPTX builder for the prior final-style deck | reference | Yes, with visual QA | Use only if the older Gmail-style deck is explicitly revived. |
+| V5 workflow deliverable builder | `docs/project_blueprints/build_full_workflow_diagram_deliverables.py` | Builder for workflow deck/doc/diagram package | active | Yes, with visual QA | Check `git status` first; do not overwrite unrelated local V5 work. |
+| Parameter evidence registry | `data/public_ml_products/public_parameter_evidence_registry_2026-06-16.csv` | Public-safe parameter evidence board | active | Yes | Screening envelopes and directions, not final DOE cutoffs or proof. |
+| Parameter evidence loader | `dashboard/parameter_evidence.py` | Loads and validates parameter evidence rows | active | Yes | Covered by `tests/test_parameter_evidence_registry.py`. |
+| Approved data intake validator | `dashboard/approved_data_intake.py` | Public-safe header/schema intake validation | active | Yes | No approved rows; synthetic/header-only tests only. |
+| Header audit CLI | `01_pipeline/validate_approved_data_headers.py` | OSL/approved environment header-only audit tool | active | Yes | Use `--header-only` for CSV paths; outputs public-safe readiness reports. |
+| Approved data field role table | `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv` | Header role and variable-fingerprint metadata | active | Yes | No approved row values. |
+| Approved schema coverage matrix | `data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv` | Schema-level matrix for expected/visible approved-data families | active | Yes | About 3 of expected 71 datasets visible for design only. |
+| Public ML templates | `data/public_ml_products/*_template_2026-06-15.csv` | Schema-only runtime templates | active | Yes | Keep headers only; no approved rows or metrics. |
+| Demo header audit reports | `data/public_ml_products/intake_readiness_reports/demo_header_audit_2026-06-15.csv` and `.json` | Public-safe demo outputs from the CLI | reference | Yes | Synthetic/project-safe headers only. |
+| Stability calculation plan | `docs/STABILITY_CALCULATION_PLAN.md` | Method control for the methane 5 ppt stability screen | active | Yes | Stability-admissibility only; not hydrate proof. |
+| Guarded stability screen | `data/public_stability_products/stability_screen_2026-06-14_methane_5ppt_v1.csv` | Public-safe baseline stability-admissibility screen | active | Yes, with care | Contains 8,084 public rows, 22 calculated intervals, 8 no-stable-interval rows, 8,054 blocked rows; not final proof. |
+| Public ML feature scaffold | `data/public_stability_products/public_ml_feature_scaffold_2026-06-15.csv` | Public feature scaffold for readiness view | active | Yes | No validated occurrence/saturation labels or training-ready rows. |
+| Public target registry | `data/public_stability_products/public_ml_target_registry_2026-06-15.csv` | Target-only label registry | active | Yes | Keeps saturation/phase labels out of `X_allowed`. |
+| Public leakage guardrails | `data/public_stability_products/public_ml_leakage_guardrails_2026-06-15.csv` | Target leakage barrier table | active | Yes | Public-safe guardrail product. |
+| Public phase-curve lookup | `data/public_stability_products/phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv` | Cited methane 5 ppt phase-curve input | active | Yes, with provenance | Do not replace baseline without source and mentor policy. |
+| Public stability product README | `data/public_stability_products/README.md` | Stability product overview | active | Yes | Update when stability products change materially. |
+| Public ML product README | `data/public_ml_products/README.md` | ML product overview | active | Yes | Update when ML/schema products change materially. |
+| Streamlit app | `dashboard/app.py` | Public website surface | active | Yes, with tests and browser QA for UI changes | Must never load approved runtime data. |
+| Streamlit entry point | `streamlit_app.py` | Public deployment entry point | active | Yes | Keep synchronized with `dashboard/app.py`. |
+| Runtime skeleton | `dashboard/runtime/` | Empty approved-runtime structure | active | Yes | Public-safe adapters and tests only. |
+| Source library index | `docs/source_library_index/` | Public source manifests and bundle notes | active | Yes | Raw heavy source bundles stay ignored/outside Git. |
+| Hydrate ML/physics sources | `references/hydrate-ml-physics-sources/2026-06-13/` | Public/official source package and manifest | reference | Yes | Do not add restricted or credentialed source files. |
+| ML sources | `references/ml-sources/2026-06-11/` | Direct ML/source reference package | reference | Yes | Public-safe source package. |
+| Email screenshot evidence | `docs/evidence/email_screenshots_2026_06_12/` | User-supplied header/equation/project screenshot evidence | reference | No unless adding verified evidence | Treat as origin evidence; do not replace with generic summaries. |
+| Full pytest suite | `tests/` | Project verification suite | active | Yes | Expected current count: `111 passed` with `python -m pytest`. |
+| OSL runtime layout | `docs/opensciencelab_runtime_layout.md` | Ignored runtime folder and boundary instructions | active | Yes | Use before any OSL/runtime data handling. |

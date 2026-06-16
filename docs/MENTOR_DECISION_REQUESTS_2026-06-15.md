@@ -13,7 +13,7 @@ validation, and reviewed outputs belong.
 
 Completed work outside stability includes the public GIS/website scaffold,
 source-library organization, public ML feature scaffold, target registry,
-leakage guardrails, approved-data schema coverage matrix, V5.2 workflow package,
+leakage guardrails, approved-data schema coverage matrix, V5.3 workflow package,
 and the new approved-data field-role/intake/model-plan documents. The current
 public scaffold has 8,084 wells. The approved-data schema layer is based on
 visible headers/screenshots and about 3 of the expected 71 datasets, which is
@@ -35,6 +35,13 @@ but separate tasks.
 Blocked work: final training, metrics, occurrence probabilities, saturation
 predictions, and public model outputs require approved rows, official target
 authority, unit confirmation, complete split policy, and public-release review.
+
+Current V5.3 review copies:
+
+- Slides:
+  <https://docs.google.com/presentation/d/1kP0icjCLpldXZX80eww27IIokG1s3VbM5bSXiGLk8Sw>
+- Companion:
+  <https://docs.google.com/document/d/1QcF-31U77_MyPHnrBSYFZSswFyIzO8P3pMLBSTIMgMQ>
 
 ## How Occurrence Should Be Measured
 
@@ -110,7 +117,7 @@ North Slope field truth: <https://pubs.usgs.gov/publication/70250169>.
 
 ## Weekday Report Bullets
 
-- Monday: Locked the public/OSL boundary and used the V5.2 package as the project
+- Monday: Locked the public/OSL boundary and used the V5.3 package as the project
   explanation foundation.
 - Tuesday: Preserved the methane 5 ppt stability screen as admissibility
   context only, with calculated, no-interval, and blocked rows separated.

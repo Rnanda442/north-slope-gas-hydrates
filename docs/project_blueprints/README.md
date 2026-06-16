@@ -67,6 +67,18 @@ wireline machine-learning project.
   - V5.2 copy with research source anchors, current ML architecture decisions,
     and the variable fingerprint/intake validator contract was imported as
     [V5.2 North Slope Gas Hydrate Full ML Workflow Companion 2026-06-15](https://docs.google.com/document/d/1dWBNYmwGerBV8steCo0v37PbhpIAZzqNQ-Psl78Ypa8).
+- `V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx`
+  - Current mentor-facing V5.3 companion generated with
+    `build_full_workflow_diagram_deliverables.py`.
+  - Rewrites the companion around project purpose, public vs OSL boundary, gas
+    hydrate science and North Slope context, gas chemistry and hydrate
+    structure type, parameter evidence, stability method, leakage-safe ML
+    workflow, website outputs, complete/future work, and mentor decisions.
+  - Public-safe planning artifact only. It does not include approved rows,
+    trained model metrics, hydrate proof, saturation outputs, occurrence
+    predictions, or sweet-spot ranking.
+  - Imported to the connected Google Drive account as
+    [V5.3 North Slope Gas Hydrate ML Workflow Companion 2026-06-16](https://docs.google.com/document/d/1QcF-31U77_MyPHnrBSYFZSswFyIzO8P3pMLBSTIMgMQ).
 - `North_Slope_Gas_Hydrate_Mentor_Status_Package_V5_Workflow_2026-06-15.docx`
   - Short mentor-facing status package built from
     `docs/MENTOR_PROJECT_STATUS_PACKAGE_V5_WORKFLOW_2026-06-15.md`.
@@ -140,8 +152,24 @@ wireline machine-learning project.
     hydrate proof, saturation, sweet-spot ranking, or validated ML output.
   - User review on 2026-06-15 rejected this as the next direction because it did
     not show the whole project in one connected workflow.
+- `V5_3_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`
+  - Current V5.3 mentor-facing workflow deck generated from
+    `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`.
+  - Uses nine main audience slides plus two appendix plates. The appendix
+    plates keep `full_project_ml_workflow_flowchart_expanded.png` and
+    `ml_pipeline_network_detail_v5.png` whole instead of fragmenting the
+    complex diagrams.
+  - Replaces old/AI-looking hydrate visuals with source-backed hydrate/North
+    Slope context, makes slide 3 a parameter-range-only board, simplifies the
+    workflow for non-ML audiences on slide 4, adds visual evidence and
+    validation/output panels, and keeps stability as admissible under
+    assumptions rather than occurrence or saturation proof.
+  - Generated panels, appendix diagrams, and the contact sheet are under
+    `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/`.
+  - Imported to the connected Google Drive account as
+    [V5.3 North Slope Gas Hydrate ML Workflow Slides 2026-06-16](https://docs.google.com/presentation/d/1kP0icjCLpldXZX80eww27IIokG1s3VbM5bSXiGLk8Sw).
 - `V5_2_FULL_WORKFLOW_ML_DIAGRAM_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`
-  - Active V5.2 workflow package generated after the user asked for one connected
+  - Prior V5.2 workflow package generated after the user asked for one connected
     ML workflow with all inputs, stability logic, feature engineering, leakage
     barrier, occurrence classification, saturation regression, validation, and
     public-safe exports connected.
@@ -211,9 +239,9 @@ wireline machine-learning project.
   - Reproducible builder for the 2026-06-15 pipeline status and forward
     workflow Word brief.
 - `build_full_workflow_diagram_deliverables.py`
-  - Reproducible builder for the diagram-first slide deck, slide-sized workflow
-    summary PNG, expanded workflow poster PNG, ML runtime detail PNG, contact
-    sheet, and Word companion page.
+  - Reproducible builder for the V5.3 mentor-facing slide deck, audience PNG
+    panels, expanded workflow poster PNG, ML runtime detail PNG, contact sheet,
+    and Word companion.
 
 ## Direction
 
@@ -226,7 +254,7 @@ For the current approved-data readiness layer outside the deck builders, use
 `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md`,
 `docs/MENTOR_DECISION_REQUESTS_2026-06-15.md`, and
 `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`.
-Those files define the next method step after the completed V5.2 workflow
+Those files define the next method step after the completed V5.3 workflow
 package; they do not contain approved rows or trained model results.
 
 ## Boundary
