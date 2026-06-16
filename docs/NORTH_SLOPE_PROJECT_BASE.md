@@ -61,6 +61,32 @@ The public repo should not contain:
 - Sent: 2026-06-12 01:30 CDT
 - Verified: valid 9-slide PPTX.
 - Use this deck first. Older decks and generated panels are context unless rebuilding from scripts.
+- Cleanup/consolidation control now exists at
+  `docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md`.
+  Use it before opening or deleting any older Word, PPTX, or Drive copy. The
+  plan locks the working rule: the original/main nine-slide topic sequence is
+  topic authority, the Gmail deck is visual authority, V5.2 supplies method
+  content and intact complex architecture slides, Word is the method spine, and the website
+  mirrors the final Word/PPT story rather than driving it.
+- The slide-by-slide gap and diagram-reuse plan is
+  `docs/FINAL_NINE_SLIDE_GAP_AND_DIAGRAM_REUSE_PLAN_2026-06-15.md`.
+  Use it to decide what each original slide is lacking and how to keep the
+  complex V5.2 diagrams whole without changing the slide topics.
+- The final deck-build prompt is
+  `docs/FINAL_NEW_SLIDE_DECK_CREATION_PROMPT_2026-06-15.md`.
+  It has now been executed locally through
+  `docs/project_blueprints/build_processing_slide_assets.py` and
+  `docs/project_blueprints/build_ml_revamp_powerpoint.py`. The rebuilt targeted
+  Gmail-style deck is
+  `docs/project_blueprints/North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`,
+  with refreshed raster panels under
+  `docs/project_blueprints/presentation_assets/processing_revisions_2026_06_11/`.
+  The rebuild preserves the original nine-slide topic structure, corrects the
+  slide 2 image/composition problem, adds the sticky variable-fingerprint and
+  unit-normalization logic, and keeps the V5.2 expanded architecture and ML
+  runtime diagrams intact as whole-slide plates. The rebuilt deck was imported
+  to Drive as native Google Slides for review:
+  <https://docs.google.com/presentation/d/1cWG9ZJvBTQ2hLTbIGJHggcBn46geRrdIUpGY7hWYtd8>.
 - Current V5.2 workflow package:
   `docs/project_blueprints/V5_2_FULL_WORKFLOW_ML_DIAGRAM_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`.
   It uses a project-specific cover slide, keeps the methane hydrate intro in
@@ -172,17 +198,26 @@ or claiming occurrence/saturation results.
   settings but not automatic North Slope permafrost transfer:
   <https://www.mdpi.com/1996-1073/16/23/7709>.
 
-### B. Blue mentor questions
+### B. Blue slide review callouts
 
-- Which saturation field is authoritative: `Sgh`, `S_h`, `Sh`, or `NMR_SAT`?
-- Should occurrence use source-style classes, saturation thresholds, or
-  mentor-reviewed intervals?
-- Are `MTE`/`IGS` separate wells and are `*_refined` processing stages in the
-  workbook?
-- Do we have enough caliper coverage to apply washout filtering?
-- Which wells become blind validation after full recovery?
-- Are missing-log adapters allowed, or should missing curves simply block that
-  feature set?
+For the next slide rebuild, do not present the architecture choices above as
+unanswered. Occurrence and saturation are linked but separate reviewed targets;
+target-only saturation and phase-label fields stay out of `X_allowed`; numeric
+predictors use train-only 0-1 scaling after whole-well or grouped split; depth
+stays an alignment/context axis; units stay visible; caliper is coverage-first
+QC; and ANN/Keras belongs after baselines and tree/boosting.
+
+Use blue callouts only for runtime confirmations that still require full
+approved-workbook recovery: target priority when multiple saturation labels
+exist, fraction-vs-percent convention, occurrence-label provenance, train/
+validation/locked-test well assignment, caliper coverage sufficiency, and
+missing-log adapter permission.
+
+Use `docs/GMAIL_STYLE_V5_2_SLIDE_REMAKE_PROMPT_2026-06-15.md` as the slide
+remake prompt: the original/main nine-slide topic sequence is the topic
+authority, the older Gmail deck is the visual authority, V5.2 is the method
+content source, and the two complex diagrams should stay intact as
+whole-slide architecture plates.
 
 ### Other Word Drafts
 
@@ -799,22 +834,36 @@ Before each commit:
 
 Current top-priority handoff for the PC:
 
-1. Use the completed V5.2 workflow package as the explanation foundation, but do
+1. Use
+   `docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md`
+   before editing, uploading, deleting, or renaming Word/PowerPoint/Drive
+   deliverables.
+2. Use the completed V5.2 workflow package as the explanation foundation, but do
    not redesign it unless an obvious bug is found.
-2. Review the mentor packet in
+3. Review the rebuilt targeted Gmail-style presentation at
+   `docs/project_blueprints/North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`.
+   The native Google Slides review copy is
+   <https://docs.google.com/presentation/d/1cWG9ZJvBTQ2hLTbIGJHggcBn46geRrdIUpGY7hWYtd8>.
+   Its build contract is `docs/FINAL_NEW_SLIDE_DECK_CREATION_PROMPT_2026-06-15.md`,
+   with supporting rules in
+   `docs/GMAIL_STYLE_V5_2_SLIDE_REMAKE_PROMPT_2026-06-15.md` and
+   `docs/FINAL_NINE_SLIDE_GAP_AND_DIAGRAM_REUSE_PLAN_2026-06-15.md`.
+   Do not upload, delete, archive, or rename older deliverables until the
+   rebuilt deck and final Word direction are approved.
+4. Review the mentor packet in
    `docs/MENTOR_DECISION_REQUESTS_2026-06-15.md` and
    `docs/MENTOR_PROJECT_STATUS_PACKAGE_V5_WORKFLOW_2026-06-15.md`.
-3. Use `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`
+5. Use `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`
    and `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md` as the public-safe
    approved-data intake contract.
-4. Use `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md` as the first approved-
+6. Use `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md` as the first approved-
    runtime model plan. It separates occurrence classification from saturation
    regression and keeps target labels out of `X_allowed`.
-5. Use `dashboard/approved_data_intake.py`,
+7. Use `dashboard/approved_data_intake.py`,
    `01_pipeline/validate_approved_data_headers.py`, and the public-safe
    templates/reports in `data/public_ml_products/` as the tested header/schema
    contract for later approved-runtime loading.
-6. Keep the website in readiness mode only: public counts, diagrams, schemas,
+8. Keep the website in readiness mode only: public counts, diagrams, schemas,
    caveats, blocked reasons, and synthetic examples are acceptable; fake ML
    results, approved rows, trained metrics, occurrence probabilities, and
    saturation predictions are not.

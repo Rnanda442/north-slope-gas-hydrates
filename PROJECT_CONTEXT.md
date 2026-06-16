@@ -59,6 +59,39 @@ authority, improve slide 2 hydrate definition and stability assumptions, keep
 slide 3 as a symbol-clean parameter scaffold, use the full workflow diagram on
 the ML methodology slide only, and strengthen the parameter rationale,
 geomechanics, map stack, results/discussion, and conclusion panels. The
+deliverable cleanup and final build plan is
+`docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md`; use it
+before editing, uploading, deleting, or renaming any older Word, PPTX, or Drive
+copy. It classifies what to pull forward from Gmail, V5.2, the rule books, and
+the website, and it lists deletion/archive candidates that still need explicit
+approval. The plan now locks the original/main nine-slide topic sequence as the
+topic authority; V5.2 contributes method content and intact complex
+architecture slides but does not rename the final slide topics. The remake
+prompt for this direction is
+`docs/GMAIL_STYLE_V5_2_SLIDE_REMAKE_PROMPT_2026-06-15.md`: preserve the
+original/main topic spine, use the Gmail deck as the visual authority, insert
+V5.2 science/ML decisions inside those topics, and use blue callouts only for
+runtime confirmations that still depend on approved-workbook recovery. The
+slide-by-slide execution plan is
+`docs/FINAL_NINE_SLIDE_GAP_AND_DIAGRAM_REUSE_PLAN_2026-06-15.md`; it records
+which original slides are lacking, what current materials should fill each gap,
+and how the complex V5.2 diagrams should be kept whole as architecture plates.
+The final deck-build prompt is
+`docs/FINAL_NEW_SLIDE_DECK_CREATION_PROMPT_2026-06-15.md`; it uses the
+original Gmail structure, website look, corrected slide 2 guidance, intact
+complex V5.2 diagram slides, and the current ML/schema decisions.
+That prompt has now been executed locally through
+`docs/project_blueprints/build_processing_slide_assets.py` and
+`docs/project_blueprints/build_ml_revamp_powerpoint.py`, producing the rebuilt
+Gmail-style PPTX at
+`docs/project_blueprints/North_Slope_Gas_Hydrate_Reservoir_Characterization_Research_Overview.pptx`.
+The rebuilt deck keeps the original nine topics, replaces the weak slide 2
+composition, shows the sticky variable fingerprint and unit-normalization
+rules, keeps the V5.2 expanded architecture and runtime diagrams intact as
+whole-slide plates, and closes with blue runtime-confirmation callouts.
+It was imported to Drive as a native Google Slides file for review:
+`https://docs.google.com/presentation/d/1cWG9ZJvBTQ2hLTbIGJHggcBn46geRrdIUpGY7hWYtd8`.
+The
 2026-06-15 pipeline status Word brief remains the plain-language review draft
 for explaining where the project stands now and how the approved-data ML
 pipeline should reach occurrence classification and saturation regression.
@@ -138,17 +171,19 @@ Do not reopen OSL unless a source/product rebuild is actually needed.
   validation-required; the MDPI marine hydrate example is background, not North
   Slope validation: <https://www.mdpi.com/1996-1073/16/23/7709>.
 
-### B. Blue mentor questions
+### B. Slide review callouts
 
-- Which saturation field is authoritative: `Sgh`, `S_h`, `Sh`, or `NMR_SAT`?
-- Should occurrence use source-style classes, saturation thresholds, or
-  mentor-reviewed intervals?
-- Are `MTE`/`IGS` separate wells and are `*_refined` processing stages in the
-  workbook?
-- Do we have enough caliper coverage to apply washout filtering?
-- Which wells become blind validation after full recovery?
-- Are missing-log adapters allowed, or should missing curves simply block that
-  feature set?
+For slide work, treat the items above as known architecture decisions rather
+than unanswered questions. Blue callouts should be used only for runtime
+confirmations that depend on full approved-workbook recovery: target priority
+when multiple saturation labels exist, fraction-vs-percent target convention,
+occurrence-label provenance, train/validation/locked-test well assignment,
+caliper coverage sufficiency, and missing-log adapter permission.
+
+Use `docs/GMAIL_STYLE_V5_2_SLIDE_REMAKE_PROMPT_2026-06-15.md` when remaking
+the presentation so the original/main topic spine is preserved, V5.2 method
+content is inserted into the right topics, the older Gmail visual style is
+restored, and the two complex diagrams are kept intact where they matter.
 
 ## Current State
 
@@ -164,7 +199,8 @@ Do not reopen OSL unless a source/product rebuild is actually needed.
   scaffold views.
 - Tests exist in `tests/test_well_log_engine.py` and
   `tests/test_runtime_skeleton.py`.
-- The full project test suite passed on 2026-06-12: 23 tests passed.
+- The full project test suite passed after the final deck prompt execution:
+  107 tests passed.
 - Public GIS layers, notebooks, structural surfaces, and Plotly exports are
   present.
 - Two working Word drafts and a rebuilt 2026-06-13 local research-overview
@@ -172,11 +208,15 @@ Do not reopen OSL unless a source/product rebuild is actually needed.
 - The current local presentation baseline is the targeted 2026-06-15
   Gmail-style 9-slide revision rebuilt from
   `docs/project_blueprints/build_ml_revamp_powerpoint.py`; it keeps the
-  full-slide raster-panel format and improves the hydrate definition/stability
-  slide, symbol-clean parameter scaffold, ML methodology workflow diagram,
-  parameter rationale, geomechanics sketch, map stack, results/discussion
-  explanation of occurrence labels, and conclusion without claiming model
-  results.
+  full-slide raster-panel format and now executes the final creation prompt:
+  slide 2 uses a cleaner gas-hydrate introduction instead of a dark
+  SEM-dominant image, slide 3 shows the variable fingerprint and depth/unit
+  rules, slide 4 uses the intact V5.2 expanded architecture plate, slide 8 uses
+  the intact V5.2 ML runtime plate, and slide 9 summarizes the completed
+  non-stability ML/schema contribution and blue runtime confirmations without
+  claiming model results. The rebuilt deck was imported to Drive as native
+  Google Slides:
+  <https://docs.google.com/presentation/d/1cWG9ZJvBTQ2hLTbIGJHggcBn46geRrdIUpGY7hWYtd8>.
 - The 2026-06-13 science-to-ML local DOCX/PPTX rebuild was imported to the
   connected Google Drive account as native files:
   [SCIENCE-TO-ML North Slope Gas Hydrate Research Overview 2026-06-13](https://docs.google.com/document/d/1Ft0wgKV3p8HK1F7X4_WYVAp1jOtBYuCntdRP-Z84e5k)
@@ -782,3 +822,35 @@ blockers, and next activities in the architecture/activity map.
   fingerprint/intake validator contract, and research source anchors. Native
   Google Slides/Docs imports were verified in Drive without adding approved
   rows or ML-result claims.
+- 2026-06-15: Added a Gmail-style V5.2 slide-remake prompt that preserves the
+  original/main slide-topic sequence, uses V5.2 science/ML decisions as method
+  content, restores the older Gmail deck as the visual authority, and converts
+  prior blue mentor questions into runtime confirmation callouts where the base
+  already gives the architecture decision.
+- 2026-06-15: Added a final deliverable consolidation and cleanup plan after
+  reviewing local PPTX/DOCX versions, Drive copies, slide/Word rule books,
+  website structure, and the base. The plan defines the final build path as
+  Word method spine first, Gmail-style slide rebuild second, website wording
+  sync third, with exact local and Drive cleanup candidates held for approval.
+- 2026-06-15: Corrected the final slide-rebuild instructions so the
+  original/main nine-slide topic sequence remains the slide-topic authority;
+  V5.2 is used for updated method content and intact complex architecture
+  slides only.
+- 2026-06-15: Added a final nine-slide gap and diagram-reuse plan that maps
+  each original slide topic to its weak spots, source materials, and allowed
+  use of the complex V5.2 workflow and ML runtime diagrams as whole-slide
+  architecture plates.
+- 2026-06-15: Added the final new-slide-deck creation prompt that corrects the
+  slide 2 image/composition problem, keeps the original Gmail topic structure,
+  uses the website visual language, and preserves the complex V5.2 architecture
+  diagrams as intact whole-slide plates.
+- 2026-06-15: Executed the final new-slide-deck prompt locally by patching the
+  Gmail-style raster builder, regenerating the nine slide panels and PPTX,
+  preserving the original topic sequence, replacing the weak hydrate intro,
+  adding the sticky variable-fingerprint/unit logic, and embedding the intact
+  V5.2 expanded architecture and ML runtime plates without adding approved rows,
+  fake metrics, hydrate proof, or model-result claims.
+- 2026-06-15: Imported the rebuilt final Gmail-style PPTX to Drive as native
+  Google Slides and verified Drive metadata, nine-slide readback, and large
+  thumbnails for the corrected intro, expanded architecture plate, ML runtime
+  plate, and conclusion.
