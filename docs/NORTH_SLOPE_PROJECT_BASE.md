@@ -61,18 +61,19 @@ The public repo should not contain:
 - Sent: 2026-06-12 01:30 CDT
 - Verified: valid 9-slide PPTX.
 - Use this deck first. Older decks and generated panels are context unless rebuilding from scripts.
-- Current V5 workflow package:
-  `docs/project_blueprints/FULL_WORKFLOW_ML_DIAGRAM_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`.
-  It keeps slides 1 and 2 from the Gmail authority deck and uses slide 3 as
-  the readable mentor-scale workflow map, with slides 4-9 carrying the
-  public/OSL boundary, stability, features, target leakage, outputs, and
-  decision details. Treat the earlier
+- Current V5.2 workflow package:
+  `docs/project_blueprints/V5_2_FULL_WORKFLOW_ML_DIAGRAM_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`.
+  It uses a project-specific cover slide, keeps the methane hydrate intro in
+  the Gmail visual format, uses slide 3 as the readable mentor-scale workflow
+  map, embeds the expanded architecture map on slide 4, embeds the ML runtime
+  detail on slide 7, and uses the other slides for stability context,
+  variable-fingerprint decisions, model decision boxes, and mentor decisions.
+  Treat the earlier
   `STABILITY_ML_REMAKE_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`
   as superseded unless the user asks to revive it.
-  The V5 completion copy is also in Drive as
-  `V5 COMPLETION Full Workflow ML Diagram 9-Slide North Slope Gas Hydrate
-  Slides 2026-06-15`.
-- Current diagram layouts are the V5 completion pass:
+  The V5.2 copy is also in Drive as
+  [V5.2 FULL WORKFLOW ML DIAGRAM North Slope Gas Hydrate Slides 2026-06-15](https://docs.google.com/presentation/d/1w9eqANgOc89c1wCUC0xi9eZoBup-3JNllSUI923skgA).
+- Current diagram layouts are the V5.2 refresh:
   - `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/full_project_ml_workflow_flowchart.png`
     is the readable slide-sized overview.
   - `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/full_project_ml_workflow_flowchart_expanded.png`
@@ -93,12 +94,13 @@ The public repo should not contain:
 - Role: current research overview document.
 - Needs next pass after parameter/source logic is made clearer.
 - Diagram companion for the current workflow discussion:
-  `docs/project_blueprints/North_Slope_Gas_Hydrate_Full_ML_Workflow_Diagram_2026-06-15.docx`.
+  `docs/project_blueprints/V5_2_North_Slope_Gas_Hydrate_Full_ML_Workflow_Companion_2026-06-15.docx`.
   This is a public-safe one-map explanation of the current public/OSL,
   stability, feature, leakage, occurrence, saturation, validation, and export
-  path.
-  The V5 completion copy is also in Drive as
-  `V5 COMPLETION North Slope Gas Hydrate Full ML Workflow Diagram 2026-06-15`.
+  path, with research source anchors, current ML architecture decisions, and
+  the variable fingerprint/intake validator contract.
+  The V5.2 copy is also in Drive as
+  [V5.2 North Slope Gas Hydrate Full ML Workflow Companion 2026-06-15](https://docs.google.com/document/d/1dWBNYmwGerBV8steCo0v37PbhpIAZzqNQ-Psl78Ypa8).
 
 ### Current Method / Readiness Docs
 
@@ -127,7 +129,7 @@ The public repo should not contain:
 - `docs/APPROVED_DATA_INTAKE_READINESS_REPORT_2026-06-15.md`
 - `docs/OSL_APPROVED_DATA_HEADER_AUDIT_RUNBOOK_2026-06-15.md`
 
-These are the active public-safe readiness artifacts after the V5 diagram
+These are the active public-safe readiness artifacts after the V5.2 diagram
 package. They define and now test the field roles, approved-data intake
 contract, first model experiment shape, runtime templates, CLI header audits,
 OSL-safe summary handoff, and mentor decisions without exposing approved rows
@@ -581,7 +583,7 @@ python 01_pipeline/build_public_stability_products.py
 Fresh-chat handoff as of 2026-06-15:
 
 - Latest repository sync for the other PC: start with `git pull origin main`,
-  then verify the V5 completion workflow images above exist.
+  then verify the V5.2 workflow images and deck/doc above exist.
 - Previous OSL-derived public-product baseline commit:
   `aedd734 Rebuild stability products with complete G10015 profiles`.
 - OpenScienceLab full source bundle is now complete enough for the current
@@ -797,7 +799,7 @@ Before each commit:
 
 Current top-priority handoff for the PC:
 
-1. Use the completed V5 workflow package as the explanation foundation, but do
+1. Use the completed V5.2 workflow package as the explanation foundation, but do
    not redesign it unless an obvious bug is found.
 2. Review the mentor packet in
    `docs/MENTOR_DECISION_REQUESTS_2026-06-15.md` and

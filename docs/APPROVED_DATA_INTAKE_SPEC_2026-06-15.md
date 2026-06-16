@@ -12,6 +12,12 @@ approved rows in the public repo.
 This document is public-safe. It contains header names, roles, unit rules,
 blocked conditions, and output schema expectations only.
 
+The V5.2 slide deck and Word companion now use this intake contract as the
+public explanation layer. The slide deck embeds both the expanded architecture
+map and the ML runtime detail, while the companion explains the current ML
+architecture decisions, variable fingerprint validator, and research source
+anchors without exposing approved rows.
+
 ## Public Boundary
 
 Public GitHub and Streamlit may show:

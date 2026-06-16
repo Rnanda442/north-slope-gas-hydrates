@@ -44,8 +44,8 @@ wireline machine-learning project.
   - Public-safe planning brief only. It does not contain approved log/core
     rows, trained model results, hydrate proof, saturation results, or
     sweet-spot ranking.
-- `North_Slope_Gas_Hydrate_Full_ML_Workflow_Diagram_2026-06-15.docx`
-  - Word companion for the V5 workflow package requested after review of the
+- `V5_2_North_Slope_Gas_Hydrate_Full_ML_Workflow_Companion_2026-06-15.docx`
+  - Word companion for the V5.2 workflow package requested after review of the
     first stability/ML slide remake.
   - Embeds the readable slide overview, the expanded poster reference, and the
     ML runtime detail while explaining source/schema controls,
@@ -64,6 +64,9 @@ wireline machine-learning project.
   - V5 completion copy with the expanded poster and six mentor decisions was
     imported to the connected Google Drive account as
     [V5 COMPLETION North Slope Gas Hydrate Full ML Workflow Diagram 2026-06-15](https://docs.google.com/document/d/17vxNmye93_W0_VEszEwMWCd7oDuCNLJxmADn9pzw6_Y).
+  - V5.2 copy with research source anchors, current ML architecture decisions,
+    and the variable fingerprint/intake validator contract was imported as
+    [V5.2 North Slope Gas Hydrate Full ML Workflow Companion 2026-06-15](https://docs.google.com/document/d/1dWBNYmwGerBV8steCo0v37PbhpIAZzqNQ-Psl78Ypa8).
 - `North_Slope_Gas_Hydrate_Mentor_Status_Package_V5_Workflow_2026-06-15.docx`
   - Short mentor-facing status package built from
     `docs/MENTOR_PROJECT_STATUS_PACKAGE_V5_WORKFLOW_2026-06-15.md`.
@@ -137,15 +140,21 @@ wireline machine-learning project.
     hydrate proof, saturation, sweet-spot ranking, or validated ML output.
   - User review on 2026-06-15 rejected this as the next direction because it did
     not show the whole project in one connected workflow.
-- `FULL_WORKFLOW_ML_DIAGRAM_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`
-  - Active V5 workflow package generated after the user asked for one connected
+- `V5_2_FULL_WORKFLOW_ML_DIAGRAM_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`
+  - Active V5.2 workflow package generated after the user asked for one connected
     ML workflow with all inputs, stability logic, feature engineering, leakage
     barrier, occurrence classification, saturation regression, validation, and
     public-safe exports connected.
-  - Current slide 3 uses a readable V5 mentor-scale workflow summary instead
-    of a shrunken poster: source/schema controls, stability context, feature
-    engineering, leakage-safe ML, reviewed outputs, a public/OSL boundary band,
-    and a red target-only rail.
+  - Slide 1 is now project-specific rather than a personal/about-me cover.
+    Slide 2 keeps the methane hydrate intro in the Gmail visual format. Slide 3
+    uses a readable V5.2 mentor-scale workflow summary: source/schema controls,
+    stability context, feature engineering, leakage-safe ML, reviewed outputs,
+    a public/OSL boundary band, and a red target-only rail.
+  - Slide 4 embeds `full_project_ml_workflow_flowchart_expanded.png` inside the
+    deck as the expanded architecture reference. Slide 7 embeds
+    `ml_pipeline_network_detail_v5.png` inside the deck as the ML runtime
+    detail. Slides 5, 6, 8, and 9 explain the stability, fingerprint,
+    model-decision, and mentor-decision details in readable zoom panels.
   - The same asset folder also preserves
     `full_project_ml_workflow_flowchart_expanded.png`, the detailed
     poster-scale V5 architecture map with public/source and approved-OSL
@@ -176,6 +185,8 @@ wireline machine-learning project.
     [REVISED V5 FULL WORKFLOW ML DIAGRAM 9-SLIDE North Slope Gas Hydrate Slides 2026-06-15](https://docs.google.com/presentation/d/1VjVXmaIckAIl6JptU06NYM8Y7qgfGMF-Xupbd1JkwK0).
   - V5 completion copy was imported to the connected Google Drive account as
     [V5 COMPLETION Full Workflow ML Diagram 9-Slide North Slope Gas Hydrate Slides 2026-06-15](https://docs.google.com/presentation/d/1Tz_jpQByug6-RhsDwEKsA3AyPHMZdn8d6vnSS1Ndor0).
+  - V5.2 copy was imported to the connected Google Drive account as
+    [V5.2 FULL WORKFLOW ML DIAGRAM North Slope Gas Hydrate Slides 2026-06-15](https://docs.google.com/presentation/d/1w9eqANgOc89c1wCUC0xi9eZoBup-3JNllSUI923skgA).
 - `build_ml_revamp_powerpoint.py`
   - Reproducible builder for the current 9-slide visual-first ML parameter
     architecture PowerPoint.
@@ -215,7 +226,7 @@ For the current approved-data readiness layer outside the deck builders, use
 `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md`,
 `docs/MENTOR_DECISION_REQUESTS_2026-06-15.md`, and
 `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`.
-Those files define the next method step after the completed V5 workflow
+Those files define the next method step after the completed V5.2 workflow
 package; they do not contain approved rows or trained model results.
 
 ## Boundary

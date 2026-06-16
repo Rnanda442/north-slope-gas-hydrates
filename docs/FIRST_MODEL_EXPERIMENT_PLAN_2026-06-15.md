@@ -20,6 +20,11 @@ saturation label rows and no training-ready public rows.
 The first real experiment waits for approved LAS/CSV/core/NMR/workbook rows in
 the authorized runtime.
 
+The V5.2 deck and Word companion are the current mentor-facing explanation of
+this plan. They show occurrence classification and saturation regression as
+linked but separate future tasks, with stability retained as context,
+confidence, caveat, mask, or blocked reason only.
+
 The public repo now has a tested intake validator in
 `dashboard/approved_data_intake.py`. It is a header/metadata check only: it can
 say whether an approved-runtime dataset has the required column families,

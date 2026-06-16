@@ -81,7 +81,7 @@ The intake contract is now operationalized in
 `tests/test_approved_data_intake.py` and schema-only public templates under
 `data/public_ml_products/approved_data_intake_template_2026-06-15.csv`,
 `approved_data_intake_validation_schema_2026-06-15.csv`, and
-`first_model_output_schema_2026-06-15.csv`. The V5.1 skeleton adds explicit
+`first_model_output_schema_2026-06-15.csv`. The V5.2 skeleton keeps explicit
 variable-fingerprint templates, source-column registry, well-depth index,
 `X_allowed`, `Y_target_registry`, and first-output schema templates under the
 same public-safe folder. The header audit can now be run from
@@ -91,7 +91,7 @@ CSV/JSON readiness summaries under
 `data/public_ml_products/intake_readiness_reports/`, and is documented for OSL
 use in `docs/OSL_APPROVED_DATA_HEADER_AUDIT_RUNBOOK_2026-06-15.md`.
 
-The active workflow-diagram package is now the V5 completion pass under
+The active workflow-diagram package is now the V5.2 refresh under
 `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/`.
 Use `full_project_ml_workflow_flowchart.png` as the readable slide-sized
 workflow summary, `full_project_ml_workflow_flowchart_expanded.png` as the
@@ -99,9 +99,17 @@ detailed poster-scale architecture map with source counts, stability equations,
 feature families, target-only labels, validation, outputs, and caveats, and
 `ml_pipeline_network_detail_v5.png` as the model-runtime detail. The Streamlit
 site points to these under Analyze Hydrates > Schema Coverage & Architecture,
-and the V5 PPTX plus Word companion are regenerated from
-`docs/project_blueprints/build_full_workflow_diagram_deliverables.py`. Do not
-reopen OSL unless a source/product rebuild is actually needed.
+and the V5.2 PPTX plus Word companion are regenerated from
+`docs/project_blueprints/build_full_workflow_diagram_deliverables.py`.
+The current local deliverables are
+`docs/project_blueprints/V5_2_FULL_WORKFLOW_ML_DIAGRAM_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx`
+and
+`docs/project_blueprints/V5_2_North_Slope_Gas_Hydrate_Full_ML_Workflow_Companion_2026-06-15.docx`.
+The V5.2 Drive imports are:
+`https://docs.google.com/presentation/d/1w9eqANgOc89c1wCUC0xi9eZoBup-3JNllSUI923skgA`
+and
+`https://docs.google.com/document/d/1dWBNYmwGerBV8steCo0v37PbhpIAZzqNQ-Psl78Ypa8`.
+Do not reopen OSL unless a source/product rebuild is actually needed.
 
 ## Current ML Architecture Decisions And Open Mentor Questions
 
@@ -478,7 +486,7 @@ the authorized runtime environment.
 The current ordered plan is maintained in
 `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md`.
 
-Immediate 2026-06-15 handoff: use the completed V5 diagram package as the
+Immediate 2026-06-15 handoff: use the completed V5.2 diagram package as the
 explanation foundation and the tested approved-data intake validator as the
 runtime contract. The next approved-runtime step is to run the header/schema
 validator against approved workbook/LAS/CSV/core/NMR sources using the
@@ -765,3 +773,12 @@ blockers, and next activities in the architecture/activity map.
   intake and output schema templates, and an expanded Schema Coverage website
   section for required column families, leakage rules, blocked conditions, and
   downloads.
+- 2026-06-15: Refreshed the workflow package to V5.2. The PPTX now has a
+  project-specific cover, embeds the expanded architecture map on slide 4 and
+  the ML runtime detail on slide 7, and adds readable decision-box slides for
+  variable fingerprints, X allowed/Y-only labels, train-only scaling, depth
+  policy, caliper-first QC, missing-log adapters, and model order. The Word
+  companion now includes current ML architecture decisions, the variable
+  fingerprint/intake validator contract, and research source anchors. Native
+  Google Slides/Docs imports were verified in Drive without adding approved
+  rows or ML-result claims.

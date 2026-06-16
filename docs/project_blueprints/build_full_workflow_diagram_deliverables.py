@@ -17,8 +17,8 @@ ROOT = Path(__file__).resolve().parents[2]
 BLUEPRINT_DIR = ROOT / "docs" / "project_blueprints"
 ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "full_workflow_diagram_2026_06_15"
 SOURCE_DECK = BLUEPRINT_DIR / "CURRENT_GMAIL_VISUAL_REVISION_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-11.pptx"
-OUT_DECK = BLUEPRINT_DIR / "FULL_WORKFLOW_ML_DIAGRAM_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx"
-OUT_DOCX = BLUEPRINT_DIR / "North_Slope_Gas_Hydrate_Full_ML_Workflow_Diagram_2026-06-15.docx"
+OUT_DECK = BLUEPRINT_DIR / "V5_2_FULL_WORKFLOW_ML_DIAGRAM_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx"
+OUT_DOCX = BLUEPRINT_DIR / "V5_2_North_Slope_Gas_Hydrate_Full_ML_Workflow_Companion_2026-06-15.docx"
 OUT_CONTACT_SHEET = ASSET_DIR / "full_workflow_deck_contact_sheet.png"
 PUBLIC_PRODUCTS = ROOT / "data" / "public_stability_products"
 
@@ -289,7 +289,7 @@ def workflow_slide_summary_panel(values: dict[str, str]) -> Path:
     draw = ImageDraw.Draw(img)
     title(
         draw,
-        "Full Project ML Workflow V5",
+        "Full Project ML Workflow V5.2",
         "Mentor-scale map: public source context and approved OSL data feed a leakage-safe path to occurrence and saturation outputs.",
     )
 
@@ -385,10 +385,10 @@ def workflow_slide_summary_panel(values: dict[str, str]) -> Path:
 
     top_y = 160
     cards = [
-        ((58, top_y, 323, 555), "Source And Schema Controls", ["Public: DNR wells, GGD223, G10015, USGS AU.", "Approved later: LAS, core, NMR, workbook labels.", "Original headers and units are preserved first."], TEAL, ICE_LIGHT, "sources", "public vs OSL boundary"),
+        ((58, top_y, 323, 555), "Source And Schema Controls", ["Public: DNR wells, GGD223, G10015, USGS AU.", "Approved later: LAS, core, NMR, workbook labels.", "Variable fingerprints preserve units and roles."], TEAL, ICE_LIGHT, "sources", "public vs OSL boundary"),
         ((368, top_y, 633, 555), "Stability Context", ["Hydrostatic pressure + G10015 temperature.", "Methane 5 ppt phase lookup.", "Outputs status, interval, confidence, and blocked reason."], BLUE, BLUE_LIGHT, "stability", "admissibility only"),
-        ((678, top_y, 943, 555), "Feature Engineering", ["Measured logs and core context.", "Derived physics: Vsh, porosity, AI, elastic terms.", "QC, depth alignment, and stability context join the table."], GREEN, GREEN_LIGHT, "features", "X allowed only"),
-        ((988, top_y, 1253, 555), "Leakage-Safe ML", ["Target labels bypass predictors.", "Whole-well split before transforms.", "Baseline checks first; tree or ANN only after controls pass."], PURPLE, PURPLE_LIGHT, "model", "split before fit"),
+        ((678, top_y, 943, 555), "Feature Engineering", ["Measured logs and core context.", "Depth is alignment/context unless approved.", "Caliper coverage comes before washout filtering."], GREEN, GREEN_LIGHT, "features", "X allowed only"),
+        ((988, top_y, 1253, 555), "Leakage-Safe ML", ["Target labels bypass predictors.", "Split before 0-1 scaling and selection.", "Baselines first; tree/boosting second; ANN third."], PURPLE, PURPLE_LIGHT, "model", "split before fit"),
         ((1298, top_y, 1563, 555), "Reviewed Outputs", ["Occurrence probability P(hydrate).", "Saturation estimate Sh pred.", "Uncertainty, QC, mimic, caveat, and public-safe export review."], AMBER, AMBER_LIGHT, "outputs", "validated later"),
     ]
 
@@ -439,7 +439,7 @@ def full_workflow_panel() -> Path:
     draw.rectangle((0, 0, 34, EXPANDED_H), fill=TEAL)
     draw.rectangle((0, 0, EXPANDED_W, 214), fill=(246, 251, 252))
     draw.line((84, 214, EXPANDED_W - 84, 214), fill=LINE, width=4)
-    text(draw, (92, 48), "North Slope Gas Hydrate ML Workflow V5", 64, NAVY, True)
+    text(draw, (92, 48), "North Slope Gas Hydrate ML Workflow V5.2", 64, NAVY, True)
     text(
         draw,
         (96, 126),
@@ -578,9 +578,9 @@ def full_workflow_panel() -> Path:
     # Source/schema lane.
     node("public_sources", 0, 390, 170, "Public context bundle", ["Alaska DNR wells + GGD223 controls", "G10015 profiles + USGS hydrate AUs", "methane 5 ppt phase-curve source"], TEAL, ICE_LIGHT)
     node("approved_inputs", 0, 630, 170, "Approved OSL inputs later", ["LAS and CSV logs", "core, NMR, workbook labels", "authorized runtime only"], GREEN, GREEN_LIGHT)
-    node("role_registry", 0, 870, 180, "Header and role registry", ["preserve original headers first", "role = input / derived / QC / target"], TEAL)
-    node("unit_depth", 0, 1130, 180, "Unit and depth normalization", ["depth_ft -> depth_m", "density, sonic, porosity, resistivity"], GREEN)
-    node("qc_gate", 0, 1390, 180, "QC gate", ["missingness | washout/caliper", "outliers | depth mismatch | confidence"], AMBER, AMBER_LIGHT, "fail closed")
+    node("role_registry", 0, 870, 180, "Variable fingerprint registry", ["original header + unit shown", "role + X permission + leakage risk"], TEAL)
+    node("unit_depth", 0, 1130, 180, "Units and depth axis", ["units visible beside source headers", "depth = alignment/context unless approved"], GREEN)
+    node("qc_gate", 0, 1390, 180, "Caliper-first QC gate", ["check caliper/CAL1 coverage first", "missing coverage -> QC flag, not filter"], AMBER, AMBER_LIGHT, "fail closed")
     node(
         "coverage",
         0,
@@ -621,9 +621,9 @@ def full_workflow_panel() -> Path:
     node("target_registry", 3, 390, 210, "Target registry", ["Sgh, S_h, Sh, NMR_SAT", "Hydrate Saturation, Swr", "phase/core labels"], RED, RED_LIGHT, "Y only")
     node("leakage_barrier", 3, 660, 190, "Leakage barrier", ["labels bypass X allowed", "occurrence evidence is target/validation only", "core/NMR/log/seismic evidence"], RED, WHITE)
     node("split", 3, 920, 170, "Validation split", ["whole well / compartment / geography", "split before preprocessing"], BLUE, BLUE_LIGHT)
-    node("preprocess", 3, 1170, 198, "Train-only preprocessing", ["fit imputation/scaling/feature selection on train", "apply frozen transform to val/test"], PURPLE, PURPLE_LIGHT)
+    node("preprocess", 3, 1170, 198, "Train-only preprocessing", ["0-1 scaling after split only", "fit imputation/selection on train"], PURPLE, PURPLE_LIGHT)
     node("baselines", 3, 1440, 170, "Baseline models", ["physics/simple baselines first", "check if ML beats transparent rules"], AMBER, AMBER_LIGHT)
-    node("candidates", 3, 1690, 170, "Candidate models", ["tree/boosting | ANN/Keras", "only after leakage controls pass"], PURPLE)
+    node("candidates", 3, 1690, 170, "Candidate models", ["tree/boosting second", "ANN/Keras third; adapters require approval"], PURPLE)
     node("model_heads", 3, 1940, 210, "Two model heads", ["occurrence classifier -> P(hydrate)", "saturation regressor -> Sh pred", "linked, separate tasks"], PURPLE, PURPLE_LIGHT)
 
     # Output lane.
@@ -633,7 +633,7 @@ def full_workflow_panel() -> Path:
     node("residuals", 4, 1170, 230, "Residual and mimic review", ["by well, depth, lithology, QC", "source confidence and mimic risk", "mimics: shale, ice, gas, cement, washout"], AMBER, AMBER_LIGHT)
     node("exports", 4, 1480, 198, "Approved runtime exports later", ["probability, Sh pred, uncertainty", "reason flags and blocked reasons"], GREEN, GREEN_LIGHT)
     node("public_review", 4, 1760, 210, "Public-safe outputs now", ["diagrams, counts, schema, caveats", "website shows method/readiness", "not final ML results"], TEAL, ICE_LIGHT)
-    node("mentor_decisions", 4, 2050, 230, "Mentor decisions", ["methane 5 ppt vs scenario curves", "target authority | validation split", "missing G10015 | public outputs"], RED, RED_LIGHT)
+    node("mentor_decisions", 4, 2050, 230, "Mentor decisions", ["methane 5 ppt vs scenarios", "target authority | validation split", "missing G10015 | adapters | public outputs"], RED, RED_LIGHT)
 
     # Vertical lane flows.
     arrow([bottom("approved_inputs"), top("role_registry")], GREEN, width=5)
@@ -851,11 +851,11 @@ def ml_network_detail_panel() -> Path:
     draw.rectangle((0, 0, 24, NETWORK_H), fill=PURPLE)
     draw.rectangle((0, 0, NETWORK_W, 145), fill=(246, 251, 252))
     draw.line((60, 145, NETWORK_W - 60, 145), fill=LINE, width=3)
-    text(draw, (70, 32), "ML Runtime Detail V5", 48, NAVY, True)
+    text(draw, (70, 32), "ML Runtime Detail V5.2", 48, NAVY, True)
     text(
         draw,
         (72, 91),
-        "Readable architecture view: measured and derived inputs build X allowed; target labels stay on a separate Y-only rail for training and validation.",
+        "Readable architecture view: fingerprints and feature families build X allowed; target labels stay on a separate Y-only rail for training and validation.",
         23,
         MUTED,
         width=2240,
@@ -915,7 +915,7 @@ def ml_network_detail_panel() -> Path:
         x1, y1, x2, y2 = box
         card(draw, box, fill=WHITE, outline=GREEN, radius=14, width=2)
         text(draw, (x1 + 15, y1 + 14), "X allowed matrix", 22, GREEN, True, width=x2 - x1 - 30, align="center")
-        text(draw, (x1 + 28, y1 + 48), "rows = depth samples, columns = allowed inputs", 16, MUTED, True, width=x2 - x1 - 56, align="center")
+        text(draw, (x1 + 28, y1 + 48), "rows = depth-aligned samples, columns = approved inputs", 16, MUTED, True, width=x2 - x1 - 56, align="center")
         start_x, start_y = x1 + 54, y1 + 92
         cell = 25
         for r in range(9):
@@ -985,8 +985,8 @@ def ml_network_detail_panel() -> Path:
     feature_cards = [
         ("Measured logs", ["GR, RHOB, Rt, Vp, Vs, NMRPHI"], TEAL, ICE_LIGHT),
         ("Derived physics", ["Vsh, porosity, AI, elastic terms"], GREEN, GREEN_LIGHT),
-        ("QC and alignment", ["caliper, missingness, depth mismatch"], AMBER, AMBER_LIGHT),
-        ("Stability context", ["context/mask only", "confidence, caveat, blocked reason"], BLUE, BLUE_LIGHT),
+        ("QC and alignment", ["caliper coverage first; missing-QC flag"], AMBER, AMBER_LIGHT),
+        ("Stability context", ["context/mask/confidence only", "not occurrence or saturation"], BLUE, BLUE_LIGHT),
         ("Core and NMR context", ["calibration later, not public rows"], PURPLE, PURPLE_LIGHT),
     ]
     feature_midpoints: list[tuple[int, int]] = []
@@ -1003,8 +1003,8 @@ def ml_network_detail_panel() -> Path:
     arrow_line((765, 475), (765, 535), GREEN, width=4)
 
     small_card((1035, 250, 1415, 390), "Validation split", ["whole well / compartment / geography", "split before preprocessing"], BLUE, BLUE_LIGHT)
-    small_card((1035, 440, 1415, 610), "Train-only preprocessing", ["fit imputation, scaling, selection on train", "apply frozen transforms to validation/test"], PURPLE, PURPLE_LIGHT)
-    small_card((1035, 660, 1415, 805), "Baseline gate", ["transparent physics/simple rules first", "ML must beat baseline checks"], AMBER, AMBER_LIGHT)
+    small_card((1035, 440, 1415, 610), "Train-only preprocessing", ["0-1 scaling after split only", "fit imputation and selection on train"], PURPLE, PURPLE_LIGHT)
+    small_card((1035, 660, 1415, 805), "Baseline gate", ["transparent physics/simple rules first", "tree/boosting then ANN/Keras"], AMBER, AMBER_LIGHT)
     arrow_line((945, 695), (1035, 695), GREEN)
     arrow_line((1225, 390), (1225, 440), BLUE)
     arrow_line((1225, 610), (1225, 660), PURPLE)
@@ -1042,7 +1042,7 @@ def ml_network_detail_panel() -> Path:
     text(
         draw,
         (102, 1342),
-        "Guardrail: this is architecture only. Real training waits for approved labels, source-resolved units, complete-well splits, and mentor-approved target authority.",
+        "Guardrail: this is architecture only. Missing-log adapters are optional and mentor-approved; real training waits for approved labels, units, split policy, and target authority.",
         22,
         MUTED,
         True,
@@ -1055,8 +1055,184 @@ def ml_network_detail_panel() -> Path:
     return path
 
 
+def project_cover_slide(values: dict[str, str]) -> Path:
+    img = canvas(False)
+    draw = ImageDraw.Draw(img)
+    text(draw, (62, 58), "North Slope Gas Hydrate ML Workflow V5.2", 52, NAVY, True, width=1220)
+    text(
+        draw,
+        (66, 126),
+        "Project status deck: public scaffold, stability-admissibility context, approved-data intake, and leakage-safe ML architecture.",
+        23,
+        MUTED,
+        width=1260,
+    )
+
+    # Quiet North Slope layer sketch.
+    frame = (930, 145, 1518, 660)
+    card(draw, frame, fill=(246, 251, 252), outline=LINE, radius=22, width=2)
+    for idx, color in enumerate([(187, 225, 238), (209, 236, 220), (236, 222, 190)]):
+        y = 212 + idx * 78
+        pts = [
+            (frame[0] + 34, y + 34),
+            (frame[0] + 136, y - 2),
+            (frame[0] + 274, y + 24),
+            (frame[0] + 410, y - 14),
+            (frame[2] - 34, y + 26),
+        ]
+        draw.line(pts, fill=color, width=30, joint="curve")
+    draw.polygon(
+        [(frame[0] + 60, 510), (frame[0] + 205, 416), (frame[0] + 378, 458), (frame[2] - 68, 394), (frame[2] - 28, 632), (frame[0] + 28, 632)],
+        fill=(157, 105, 163),
+        outline=(118, 78, 133),
+    )
+    draw.polygon(
+        [(frame[0] + 74, 475), (frame[0] + 218, 398), (frame[0] + 389, 435), (frame[2] - 82, 375), (frame[2] - 68, 414), (frame[0] + 380, 470), (frame[0] + 210, 438), (frame[0] + 78, 516)],
+        fill=(45, 156, 126),
+        outline=(45, 156, 126),
+    )
+    for px, py in [(1000, 318), (1085, 268), (1195, 310), (1325, 250), (1430, 298)]:
+        draw.line((px, py - 38, px, py + 170), fill=(82, 103, 112), width=3)
+        draw.ellipse((px - 9, py - 9, px + 9, py + 9), fill=TEAL, outline=WHITE, width=2)
+    text(draw, (958, 166), "Public regional context -> approved runtime analysis", 21, TEAL, True, width=520)
+
+    goal_box = (70, 230, 850, 410)
+    card(draw, goal_box, fill=ICE_LIGHT, outline=TEAL, radius=22, width=2)
+    text(draw, (104, 260), "Goal", 25, TEAL, True)
+    text(
+        draw,
+        (104, 300),
+        "Use public-safe methods and approved-runtime data later to predict hydrate occurrence and saturation without leaking target labels or private rows.",
+        25,
+        NAVY,
+        True,
+        width=690,
+    )
+
+    stats = [
+        ("public wells", values["wells"], TEAL),
+        ("GGD223 controls", values["ggd_controls"], BLUE),
+        ("G10015 profiles", values["profiles"], GREEN),
+        ("baseline intervals", values["screen_calculated"], AMBER),
+    ]
+    x = 70
+    for label_value, count, color in stats:
+        card(draw, (x, 455, x + 178, 575), fill=WHITE, outline=color, radius=18, width=2)
+        text(draw, (x + 20, 480), count, 31, color, True, width=138, align="center")
+        text(draw, (x + 18, 525), label_value, 15, MUTED, True, width=142, align="center")
+        x += 205
+
+    path_cards = [
+        ((70, 635, 430, 760), "Public GitHub / Streamlit", ["methods, counts, schemas", "diagrams and caveats"], TEAL, ICE_LIGHT),
+        ((470, 635, 830, 760), "OSL / Approved Runtime", ["real LAS, core, NMR later", "training and validation"], PURPLE, PURPLE_LIGHT),
+        ((870, 635, 1230, 760), "Current Guardrail", ["stability = admissibility", "not proof or saturation"], RED, RED_LIGHT),
+    ]
+    for box, heading, rows, accent, fill in path_cards:
+        node(draw, box, heading, rows, fill, accent)
+    arrow(draw, (430, 698), (470, 698), TEAL)
+    arrow(draw, (830, 698), (870, 698), PURPLE)
+    footer(draw, "V5.2 refresh: the expanded architecture map and ML runtime detail are now included inside the slide deck.")
+    return save(img, "slide_01_project_cover_v5_2.png")
+
+
+def diagram_reference_slide(source_path: Path, filename: str, footer_note: str) -> Path:
+    img = Image.new("RGB", (W, H), WHITE)
+    if not source_path.exists():
+        raise FileNotFoundError(source_path)
+    with Image.open(source_path).convert("RGB") as source:
+        scale = min((W - 40) / source.width, H / source.height)
+        new_w = int(source.width * scale)
+        new_h = int(source.height * scale)
+        resized = source.resize((new_w, new_h), Image.Resampling.LANCZOS)
+        img.paste(resized, ((W - new_w) // 2, (H - new_h) // 2))
+    draw = ImageDraw.Draw(img)
+    draw.rectangle((0, H - 36, W, H), fill=(246, 251, 252))
+    text(draw, (58, H - 29), footer_note, 13, MUTED, True, width=1480)
+    return save(img, filename)
+
+
+def variable_fingerprint_decisions_slide() -> Path:
+    img = canvas(False)
+    draw = ImageDraw.Draw(img)
+    title(
+        draw,
+        "Variable Fingerprint Before X Allowed",
+        "V5.2 decision boxes: headers keep their units and roles before any feature enters the approved-runtime matrix.",
+    )
+
+    cards = [
+        ((70, 170, 505, 360), "Fingerprint fields", ["original header + unit", "normalized name + role", "allowed in X? + leakage risk"], TEAL, ICE_LIGHT),
+        ((585, 170, 1020, 360), "Depth policy", ["alignment/context axis", "not automatically normalized predictor", "well/depth split comes first"], BLUE, BLUE_LIGHT),
+        ((1100, 170, 1535, 360), "Train-only scaling", ["numeric predictors use 0-1 scaling", "fit only on training wells", "freeze for validation/test"], PURPLE, PURPLE_LIGHT),
+        ((70, 430, 505, 620), "Caliper gate", ["check caliper/CAL1 coverage first", "washout filter only if supported", "otherwise missing-QC flag"], AMBER, AMBER_LIGHT),
+        ((585, 430, 1020, 620), "X allowed", ["measured logs", "derived physics features", "QC/context/stability caveats"], GREEN, GREEN_LIGHT),
+        ((1100, 430, 1535, 620), "Y-only labels", ["Sgh, S_h, Sh, NMR_SAT", "Hydrate Saturation, Swr", "phase/core labels"], RED, RED_LIGHT),
+    ]
+    for box, heading, rows, accent, fill in cards:
+        node(draw, box, heading, rows, fill, accent)
+
+    arrow(draw, (505, 265), (585, 265), TEAL)
+    arrow(draw, (1020, 265), (1100, 265), BLUE)
+    arrow(draw, (505, 525), (585, 525), AMBER)
+    arrow(draw, (1020, 525), (1100, 525), RED)
+
+    card(draw, (70, 700, 1535, 795), fill=LIGHT, outline=LINE, radius=18, width=2)
+    text(draw, (104, 727), "Operational validator", 20, TEAL, True)
+    text(
+        draw,
+        (328, 720),
+        "dashboard/approved_data_intake.py and 01_pipeline/validate_approved_data_headers.py audit headers only, report unknowns/leakage/blocked reasons, and never expose approved row values.",
+        23,
+        NAVY,
+        True,
+        width=1140,
+    )
+    footer(draw, "Decision rule: target columns and occurrence labels supervise/validate the model; they do not become predictors.")
+    return save(img, "slide_06_variable_fingerprint_decisions.png")
+
+
+def model_decision_boxes_slide() -> Path:
+    img = canvas(False)
+    draw = ImageDraw.Draw(img)
+    title(
+        draw,
+        "Modeling Decisions: Linked Outputs, Separate Claims",
+        "The first approved-runtime experiment stays leakage-safe and baseline-controlled before ANN/Keras candidates are tested.",
+    )
+
+    cards = [
+        ((70, 170, 505, 365), "Occurrence classifier", ["P(hydrate) or class", "core/NMR/log/seismic evidence", "not measured by stability"], BLUE, BLUE_LIGHT),
+        ((585, 170, 1020, 365), "Saturation regressor", ["Sh_pred only where labels exist", "Sgh/S_h/Sh/NMR_SAT authority needed", "fraction vs percent required"], GREEN, GREEN_LIGHT),
+        ((1100, 170, 1535, 365), "Validation split", ["whole well / compartment / geography", "split before preprocessing", "random depth-row final split rejected"], AMBER, AMBER_LIGHT),
+        ((70, 445, 505, 640), "Model order", ["baselines first", "tree/boosting second", "ANN/Keras third"], PURPLE, PURPLE_LIGHT),
+        ((585, 445, 1020, 640), "Missing-log strategy", ["alternate log combinations first", "Vp/RHOB adapters optional", "mentor approval + validation required"], RED, RED_LIGHT),
+        ((1100, 445, 1535, 640), "Research anchors", ["Chong 2024: ANN pattern", "Singh: MTE/IGS case wells", "MDPI: adapter background"], TEAL, ICE_LIGHT),
+    ]
+    for box, heading, rows, accent, fill in cards:
+        node(draw, box, heading, rows, fill, accent)
+
+    arrow(draw, (505, 268), (585, 268), TEAL, label="linked")
+    arrow(draw, (1020, 268), (1100, 268), AMBER)
+    arrow(draw, (505, 543), (585, 543), PURPLE)
+    arrow(draw, (1020, 543), (1100, 543), TEAL)
+
+    card(draw, (70, 714, 1535, 805), fill=(255, 247, 247), outline=RED, radius=18, width=2)
+    text(draw, (105, 738), "Guardrail", 21, RED, True)
+    text(
+        draw,
+        (262, 732),
+        "No occurrence probabilities, saturation predictions, trained metrics, or sweet-spot outputs exist yet. Public slides show architecture and readiness only.",
+        24,
+        NAVY,
+        True,
+        width=1190,
+    )
+    footer(draw, "Stability can be context, mask, confidence, caveat, or blocked reason only if approved by mentor.")
+    return save(img, "slide_08_model_decision_boxes.png")
+
+
 def overview_slide_panel() -> Path:
-    # Reuse the full workflow image as the main slide panel.
+    # Reuse the readable workflow image as the main slide panel.
     return full_workflow_panel()
 
 
@@ -1179,7 +1355,7 @@ def slide_09_status_decisions() -> Path:
     values = summaries()
     img = canvas(False)
     draw = ImageDraw.Draw(img)
-    title(draw, "What The Diagram Says About Where We Are Now", "The project has a defensible workflow map; it does not yet have approved-data hydrate predictions.")
+    title(draw, "V5.2 Status And Mentor Decisions", "The project has a defensible workflow map, validator, and handoff contract; it does not yet have approved-data hydrate predictions.")
 
     columns = [
         (
@@ -1187,7 +1363,7 @@ def slide_09_status_decisions() -> Path:
             [
                 "public / OSL boundary",
                 "8,084-well public scaffold",
-                "schema registry + V5 package",
+                "schema registry + V5.2 deck/doc",
             ],
             GREEN_LIGHT,
             GREEN,
@@ -1207,7 +1383,7 @@ def slide_09_status_decisions() -> Path:
             [
                 f"{values['screen_blocked']} blocked screen rows",
                 "approved logs/core/NMR rows",
-                "trained metrics and final outputs",
+                "validated ML outputs",
             ],
             RED_LIGHT,
             RED,
@@ -1228,7 +1404,7 @@ def slide_09_status_decisions() -> Path:
     text(
         draw,
         (280, 698),
-        "methane 5 ppt only vs scenarios; target authority; whole-well vs compartment vs geographic holdout; missing G10015 handling; stability as context/mask only; acceptable public website outputs before validation.",
+        "methane 5 ppt only vs scenarios; target authority; validation split; missing G10015 policy; stability as context/mask only; missing-log adapters; acceptable public website outputs before validation.",
         22,
         NAVY,
         True,
@@ -1257,16 +1433,27 @@ def preserve_source_slide_panel(slide_number: int, name: str) -> Path:
     return path
 
 
-def build_panels() -> list[Path]:
+def build_panels(network_path: Path) -> list[Path]:
+    values = summaries()
+    overview = overview_slide_panel()
+    expanded = ASSET_DIR / "full_project_ml_workflow_flowchart_expanded.png"
     return [
-        preserve_source_slide_panel(1, "slide_01_locked_from_current_gmail_deck.png"),
+        project_cover_slide(values),
         preserve_source_slide_panel(2, "slide_02_locked_from_current_gmail_deck.png"),
-        overview_slide_panel(),
-        slide_04_inputs_boundary(),
+        overview,
+        diagram_reference_slide(
+            expanded,
+            "slide_04_expanded_architecture_map.png",
+            "Expanded architecture reference inside the deck; slides 5, 6, 8, and 9 provide readable zoom explanations.",
+        ),
         slide_05_stability_branch(),
-        slide_06_features(),
-        slide_07_leakage_modeling(),
-        slide_08_outputs_validation(),
+        variable_fingerprint_decisions_slide(),
+        diagram_reference_slide(
+            network_path,
+            "slide_07_ml_runtime_detail.png",
+            "ML runtime detail inside the deck: X allowed, Y-only rail, split controls, output heads, validation, and reviewed outputs.",
+        ),
+        model_decision_boxes_slide(),
         slide_09_status_decisions(),
     ]
 
@@ -1353,16 +1540,18 @@ def build_word_companion(diagram_path: Path, network_path: Path) -> Path:
     section.right_margin = Inches(0.55)
 
     props = document.core_properties
-    props.title = "North Slope Gas Hydrate Full ML Workflow Diagram"
-    props.subject = "Diagram-first explanation of the public, OSL, stability, and ML workflow"
+    props.title = "V5.2 North Slope Gas Hydrate Full ML Workflow Companion"
+    props.subject = "V5.2 explanation of the public, OSL, stability, intake-validator, and ML workflow"
     props.author = "North Slope Gas Hydrates project"
 
-    document.add_heading("North Slope Gas Hydrate Full ML Workflow Diagram", level=0)
+    document.add_heading("V5.2 North Slope Gas Hydrate Full ML Workflow Companion", level=0)
     document.add_paragraph(
-        "This companion page explains the V5 diagram package requested for the slide refresh. "
+        "This companion page explains the V5.2 diagram package requested for the slide refresh. "
         "The package connects source and schema controls, OpenScienceLab and approved-runtime inputs, "
         "the guarded pressure-temperature stability branch, well-log physics equations, the leakage "
-        "barrier, occurrence classification, saturation regression, validation, and reviewed exports."
+        "barrier, occurrence classification, saturation regression, validation, and reviewed exports. "
+        "The refreshed slide deck includes both complex architecture diagrams inside the presentation: "
+        "the expanded full workflow map and the ML runtime/network detail."
     )
 
     values = summaries()
@@ -1385,14 +1574,70 @@ def build_word_companion(diagram_path: Path, network_path: Path) -> Path:
     document.add_heading("Three Visual Levels", level=1)
     for item in [
         "Slide 3 is the readable mentor-scale overview for a live presentation.",
-        "The expanded poster is the detailed architecture map with sources, equations, gates, features, targets, validation, outputs, and caveats.",
-        "The ML runtime detail focuses on X allowed, the Y-only label rail, split/preprocess/model controls, output heads, and validation.",
+        "Slide 4 embeds the expanded poster as the detailed architecture map with sources, equations, gates, features, targets, validation, outputs, and caveats.",
+        "Slide 7 embeds the ML runtime detail focused on X allowed, the Y-only label rail, split/preprocess/model controls, output heads, and validation.",
+        "Slides 5, 6, 8, and 9 are readable zoom slides that explain stability context, variable fingerprints, modeling decisions, and mentor decisions without cramming poster text into one slide.",
     ]:
         document.add_paragraph(item, style="List Bullet")
 
+    document.add_heading("Current ML Architecture Decisions", level=1)
+    for item in [
+        "Occurrence classification and saturation regression are linked but separate outputs. Occurrence uses approved evidence labels; saturation regression uses an approved saturation target field only after authority and units are confirmed.",
+        "Numeric predictors use train-only 0-1 scaling after a whole-well, compartment, or geographic split. Depth remains the alignment and context axis unless a mentor explicitly approves depth as a predictor.",
+        "The model ladder is baseline models first, tree or boosting models second, and ANN/Keras third. A candidate ANN is an architecture option, not a trained project result.",
+        "Stability may enter X allowed only as context, mask, confidence, caveat, or blocked reason if approved. It cannot create occurrence labels, saturation targets, or validated predictions.",
+        "Caliper coverage is checked before washout filtering. If caliper, CAL1, or differential caliper coverage is insufficient, the runtime carries a missing-QC flag instead of silently filtering rows.",
+        "Missing-log adapters for Vp or RHOB remain optional and mentor-approved; alternate log combinations are the default lower-risk strategy until adapters are validated on North Slope data.",
+    ]:
+        document.add_paragraph(item, style="List Bullet")
+
+    document.add_heading("Variable Fingerprint And Intake Validator", level=1)
+    document.add_paragraph(
+        "Before a source column can enter X allowed, it needs a variable fingerprint: original header, "
+        "unit, normalized name, role, normalized-or-raw status, feature-matrix permission, leakage risk, "
+        "public-safe display status, and unresolved mentor question. This keeps origin headers such as "
+        "DEPTH, GR, RHOB, Rt, Sgh, S_h, Sh, and NMR_SAT visible instead of hiding them behind aliases."
+    )
+    document.add_paragraph(
+        "The public-safe validator in dashboard/approved_data_intake.py and the CLI runner in "
+        "01_pipeline/validate_approved_data_headers.py audit headers only. They can report recognized "
+        "headers, unknown headers, missing required fields, target-only leakage, unresolved units, "
+        "caliper-gate status, missing-log adapter status, occurrence/saturation target authority, "
+        "blocked reasons, and training readiness without reading or printing approved row values."
+    )
+
+    document.add_heading("Research Source Anchors", level=1)
+    document.add_paragraph(
+        "Chong et al. 2024 / USGS supports the architecture pattern of ANN-style hydrate occurrence "
+        "classification and saturation prediction from well-log inputs. It classifies hydrate occurrence "
+        "types and predicts saturation in a marine hydrate setting, so this project uses it as a model-"
+        "architecture anchor rather than as North Slope performance evidence: "
+        "https://pubs.usgs.gov/publication/70250169"
+    )
+    document.add_paragraph(
+        "Occurrence is treated here as a target or validation label, not something measured or proven "
+        "by the pressure-temperature stability screen. In the approved runtime, occurrence evidence can "
+        "come from core or pressure-core observations, NMR/core-derived saturation, validated multi-log "
+        "interpretation, or documented seismic indicators. Each occurrence label needs source, interval, "
+        "confidence, and caveat metadata before model training or validation."
+    )
+    document.add_paragraph(
+        "The Singh/NETL source identifies Well-MTE as the Mt. Elbert Stratigraphic Test Well and "
+        "Well-IGS as the Ignik Sikumi Test Well in the Alaska North Slope / Eileen Gas Hydrate Trend "
+        "case-study context. The public workbook headers MTE_refined and IGS_refined should remain "
+        "blue mentor questions until approved metadata confirms whether they are raw/refined processing "
+        "stages: https://www.osti.gov/servlets/purl/1893637"
+    )
+    document.add_paragraph(
+        "The MDPI missing-log study supports the general plausibility of using machine learning to "
+        "estimate missing Vp and bulk density logs in marine hydrate settings. It does not automatically "
+        "validate missing-log adapters for North Slope permafrost sediments, so any Vp/RHOB adapter must "
+        "be optional, mentor-approved, and validated before use: https://www.mdpi.com/1996-1073/16/23/7709"
+    )
+
     document.add_heading("What Is Complete Outside Stability", level=1)
     for item in [
-        "The public/runtime data boundary is documented and reflected in the V5 workflow diagrams.",
+        "The public/runtime data boundary is documented and reflected in the V5.2 workflow diagrams.",
         "The approved-data schema coverage matrix preserves original headers and separates measured inputs, derived features, QC/alignment fields, calibration/reference fields, target-only fields, and unresolved fields.",
         "The target registry and leakage guardrails keep Sgh, S_h, Sh, NMR_SAT, hydrate-saturation fields, Swr, S_wr, and phase labels out of the predictor matrix.",
         "The Analyze Hydrates page includes Schema Coverage & Architecture, Public ML Readiness, and Target Registry & Leakage views without exposing approved rows or model metrics.",
@@ -1429,7 +1674,7 @@ def build_word_companion(diagram_path: Path, network_path: Path) -> Path:
         document.add_paragraph(item, style="List Number")
 
     document.add_heading("Slide 3 Mentor Overview", level=1)
-    document.add_paragraph("This version stays presentation-readable and leaves detailed evidence to the poster and later slides.")
+    document.add_paragraph("This version stays presentation-readable and leaves detailed evidence to the poster, runtime-detail slide, and later zoom slides.")
     document.add_picture(str(diagram_path), width=Inches(9.9))
 
     expanded_path = ASSET_DIR / "full_project_ml_workflow_flowchart_expanded.png"
@@ -1444,7 +1689,7 @@ def build_word_companion(diagram_path: Path, network_path: Path) -> Path:
 
     document.add_heading("ML Architecture Detail", level=1)
     document.add_paragraph(
-        "The companion architecture visual expands the modeling block into feature groups, "
+        "The companion architecture visual is embedded in slide 7 and expands the modeling block into feature groups, "
         "QC, the X allowed matrix, whole-well split controls, train-only preprocessing, "
         "a simplified candidate model, two output heads, and the target-only rail used "
         "for training labels and validation overlays."
@@ -1509,8 +1754,8 @@ def build_word_companion(diagram_path: Path, network_path: Path) -> Path:
 
 
 def main() -> None:
-    panels = build_panels()
     network = ml_network_detail_panel()
+    panels = build_panels(network)
     deck = rebuild_deck(panels)
     verify_deck(deck)
     contact_sheet = build_contact_sheet(panels)

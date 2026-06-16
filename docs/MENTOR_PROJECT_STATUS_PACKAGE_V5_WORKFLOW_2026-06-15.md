@@ -1,10 +1,10 @@
-# Mentor Project Status Package: V5 Workflow Diagrams
+# Mentor Project Status Package: V5.2 Workflow Diagrams
 
 Created: 2026-06-15
 
 ## Purpose
 
-This is a short public-safe mentor update around the V5 workflow diagrams. It
+This is a short public-safe mentor update around the V5.2 workflow diagrams. It
 summarizes where the project stands, what has been completed, what remains
 blocked by approved data and label authority, and which mentor decisions are
 needed before the workflow becomes a results-bearing ML project.
@@ -19,7 +19,7 @@ The project is now organized as a two-surface workflow. OpenScienceLab is the
 heavy-data workbench for source bundles, approved inputs, guarded calculations,
 and later ML execution. GitHub and Streamlit are the public delivery surface
 for diagrams, source-backed documentation, public scaffold counts, public-safe
-CSV summaries, and website views. The V5 workflow diagrams now connect the
+CSV summaries, and website views. The V5.2 workflow diagrams now connect the
 public scaffold, the stability-admissibility screen, schema coverage, feature
 engineering, target leakage controls, future occurrence classification,
 saturation regression, validation, and reviewed outputs in one architecture.
@@ -32,7 +32,7 @@ occurrence or saturation result is reported.
 
 ## What Has Been Completed
 
-- Built the V5 full workflow diagram and ML architecture detail visual.
+- Built the V5.2 full workflow diagram and ML architecture detail visual.
 - Generated the diagram-first 9-slide PowerPoint companion and Word companion.
 - Confirmed the current public scaffold has 8,084 wells.
 - Preserved the guarded baseline methane 5 ppt stability screen with 22
@@ -97,7 +97,7 @@ occurrence or saturation result is reported.
 
 ## Weekday Report Bullets
 
-- Monday: Locked the public/OSL boundary and used the V5 package as the project
+- Monday: Locked the public/OSL boundary and used the V5.2 package as the project
   explanation foundation.
 - Tuesday: Preserved the methane 5 ppt stability screen as admissibility
   context only, with calculated, no-interval, and blocked rows separated.

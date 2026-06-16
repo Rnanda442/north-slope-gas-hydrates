@@ -4,7 +4,7 @@ Created: 2026-06-15
 
 ## Purpose
 
-This file records the source language for the V5 workflow-diagram package used
+This file records the source language for the V5.2 workflow-diagram package used
 for the Word document and nine-slide mentor deck. The package has three levels:
 a readable slide-sized overview, a detailed expanded poster, and a focused ML
 runtime detail.
@@ -34,7 +34,7 @@ Slide-sized workflow summary image:
 docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/full_project_ml_workflow_flowchart.png
 ```
 
-Expanded V5 visual architecture poster image for website review and mentor
+Expanded V5.2 visual architecture poster image for website review and mentor
 discussion:
 
 ```text
@@ -47,16 +47,16 @@ ML architecture detail image:
 docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/ml_pipeline_network_detail_v5.png
 ```
 
-V5 PowerPoint package:
+V5.2 PowerPoint package:
 
 ```text
-docs/project_blueprints/FULL_WORKFLOW_ML_DIAGRAM_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx
+docs/project_blueprints/V5_2_FULL_WORKFLOW_ML_DIAGRAM_North_Slope_Gas_Hydrate_Slides_2026-06-15.pptx
 ```
 
 Word companion:
 
 ```text
-docs/project_blueprints/North_Slope_Gas_Hydrate_Full_ML_Workflow_Diagram_2026-06-15.docx
+docs/project_blueprints/V5_2_North_Slope_Gas_Hydrate_Full_ML_Workflow_Companion_2026-06-15.docx
 ```
 
 Revised Drive review copies:
@@ -77,6 +77,16 @@ https://docs.google.com/presentation/d/1Tz_jpQByug6-RhsDwEKsA3AyPHMZdn8d6vnSS1Nd
 
 V5 COMPLETION North Slope Gas Hydrate Full ML Workflow Diagram 2026-06-15
 https://docs.google.com/document/d/17vxNmye93_W0_VEszEwMWCd7oDuCNLJxmADn9pzw6_Y
+```
+
+V5.2 Drive copies:
+
+```text
+V5.2 FULL WORKFLOW ML DIAGRAM North Slope Gas Hydrate Slides 2026-06-15
+https://docs.google.com/presentation/d/1w9eqANgOc89c1wCUC0xi9eZoBup-3JNllSUI923skgA
+
+V5.2 North Slope Gas Hydrate Full ML Workflow Companion 2026-06-15
+https://docs.google.com/document/d/1dWBNYmwGerBV8steCo0v37PbhpIAZzqNQ-Psl78Ypa8
 ```
 
 Mentor status package around the V5 workflow:
@@ -167,9 +177,9 @@ flowchart LR
 
 ### A. Ready to encode now
 
-- Keep slide 3 as the readable V5 overview. V5.1 implementation details belong
-  in slide zoom-ins, the expanded poster, the Word companion, the website
-  readiness panel, and the intake-validator docs.
+- Keep slide 3 as the readable V5.2 overview. V5.2 implementation details
+  belong in slide zoom-ins, the expanded poster, the Word companion, the
+  website readiness panel, and the intake-validator docs.
 - Train two linked outputs in the approved runtime: occurrence classification
   and saturation regression. Stability remains context/admissibility only and
   does not create either label.
@@ -229,19 +239,20 @@ acoustic impedance, lambda-rho, mu-rho, NMR-density separation, and any
 Archie-style saturation baseline are feature or check producers. They do not
 create proof by themselves.
 
-The current V5 slide export is a mentor-scale workflow summary. It keeps the
-same V5 logic but uses five readable cards: source/schema controls, stability
+The current V5.2 slide export is a mentor-scale workflow summary. It keeps the
+same workflow logic but uses five readable cards: source/schema controls, stability
 context, feature engineering, leakage-safe ML, and reviewed outputs. The data
 boundary band distinguishes public GitHub/Streamlit communication from OSL or
 approved-runtime execution, and the red target-only rail shows that Sgh, Sh,
 NMR SAT, and phase labels are Y-side labels rather than predictors.
 
-The expanded V5 poster is the detailed reference. It carries the public counts,
+The expanded V5.2 poster is the detailed reference. It carries the public counts,
 approved-OSL boundary, stability equations and caveats, measured/derived/QC and
 context feature families, target-only occurrence and saturation labels, split
 and train-only preprocessing controls, baseline-before-ML logic, validation
 expectations, runtime/public output rules, and mentor decisions. Use it when the
-reader needs the full architecture, not as the main slide-scale view.
+reader needs the full architecture. It is now embedded in slide 4 of the V5.2
+deck and supported by readable zoom slides.
 
 The companion ML architecture visual expands the modeling lane into feature/QC
 groups, the X allowed matrix, whole-well split and train-only preprocessing
@@ -286,11 +297,15 @@ does not mean no hydrate.
 
 ## Slide Use
 
-Use the generated deck as the active V5 workflow package for mentor review.
-Slides 1 and 2 are preserved from the current Gmail authority deck. Slide 3 is
-the readable workflow summary; the expanded poster remains a separate detailed
-reference. Slides 4 through 8 are zoom-ins for the same map, and slide 9
-summarizes what is complete, calculated, blocked, and pending mentor decision.
+Use the generated deck as the active V5.2 workflow package for mentor review.
+Slide 1 is now project-specific rather than a personal/about-me cover. Slide 2
+keeps the methane hydrate intro in the Gmail visual format. Slide 3 is the
+readable workflow summary. Slide 4 embeds the expanded architecture map. Slide
+5 explains stability as context only. Slide 6 shows the variable fingerprint,
+depth, normalization, caliper, X-allowed, and Y-only rules. Slide 7 embeds the
+ML runtime/network detail. Slide 8 gives the occurrence/saturation, split,
+missing-log, and model-order decision boxes. Slide 9 summarizes what is
+complete, calculated, blocked, and pending mentor decision.
 
 ## Word Use
 
@@ -306,7 +321,7 @@ are needed before final ML claims can be made.
 
 ## Mentor Decisions
 
-The V5 package should keep these questions visible:
+The V5.2 package should keep these questions visible:
 
 1. Phase-curve policy: keep methane 5 ppt as the only official baseline, or add
    a labeled scenario table?
