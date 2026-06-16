@@ -98,6 +98,8 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
   source-backed pipeline decisions.
 - `docs/SOURCE_VISUAL_INVENTORY_2026-06-16.md` - current slide/website visual
   provenance and QA layer.
+- `docs/ANACONDA_DEPENDENCY_REQUEST_2026-06-16.md` - DOE/Anaconda environment
+  package request for website, GIS, slides/docs, and future approved runtime.
 
 ## Current Authoritative Slide and Doc Assets
 
