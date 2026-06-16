@@ -96,6 +96,8 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
 - `docs/SCIENCE_TO_ML_LOGIC_LADDER.md` and
   `docs/ML_PIPELINE_BASELINE_SOURCE_LEDGER.md` - science-to-ML narrative and
   source-backed pipeline decisions.
+- `docs/SOURCE_VISUAL_INVENTORY_2026-06-16.md` - current slide/website visual
+  provenance and QA layer.
 
 ## Current Authoritative Slide and Doc Assets
 
@@ -139,6 +141,7 @@ Primary Streamlit sections in `dashboard/app.py`:
   - `Target Registry & Leakage`
   - `Interval Review`
   - `Runtime Readiness`
+  - `Presentation Exports`
   - `Methods & Evidence`
 - `Project Plan`
 
@@ -151,6 +154,7 @@ Legacy aliases still route into these sections, including `Welcome`,
 Public ML products in `data/public_ml_products/`:
 
 - `public_parameter_evidence_registry_2026-06-16.csv`
+- `source_visual_inventory_2026-06-16.csv`
 - `approved_schema_coverage_matrix_2026-06-15.csv`
 - `approved_data_field_role_table_2026-06-15.csv`
 - `approved_data_intake_template_2026-06-15.csv`
@@ -194,8 +198,9 @@ Run the full suite before committing meaningful changes:
 python -m pytest
 ```
 
-Expected current result: `111 passed` as of the 2026-06-16 parameter evidence
-board update. Update this count only after verifying it locally.
+Expected current result: `114 passed` as of the 2026-06-16 presentation export
+and source-visual inventory update. Update this count only after verifying it
+locally.
 
 Current test files:
 
@@ -209,6 +214,7 @@ Current test files:
 - `tests/test_approved_data_intake.py`
 - `tests/test_approved_data_intake_cli.py`
 - `tests/test_parameter_evidence_registry.py`
+- `tests/test_source_visual_inventory.py`
 
 ## Current Guardrails
 

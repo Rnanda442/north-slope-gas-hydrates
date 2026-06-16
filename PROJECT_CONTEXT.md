@@ -113,6 +113,14 @@ stability, reservoir quality, hydrate-response logs, QC, and Y-only targets;
 marks numeric values as working screening envelopes rather than final DOE
 cutoffs; and keeps the guardrails that stability, high resistivity, low GR, and
 target labels are not hydrate proof.
+The slide/website visual layer now has a public-safe source inventory at
+`data/public_ml_products/source_visual_inventory_2026-06-16.csv`, with QA logic
+in `dashboard/source_visual_inventory.py`, tests in
+`tests/test_source_visual_inventory.py`, and a Streamlit display under Analyze
+Hydrates > Presentation Exports. Use this inventory before changing deck or
+Word visuals: it tracks V5.3 slide panels, website captures, expanded
+architecture diagrams, and the contact sheet, and it flags uncited or
+AI-looking visuals before they enter the mentor-facing package.
 
 The active mentor-facing workflow package is now the V5.3 refresh under
 `docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_16_v5_3/`.

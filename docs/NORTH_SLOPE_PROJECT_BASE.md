@@ -212,6 +212,15 @@ screening envelopes, mimics, ML role, and guardrails for stability, GR,
 porosity/density, NMR separation, resistivity, sonic/elastic response, caliper
 QC, and Y-only targets.
 
+The slide and website visual provenance layer is now tracked in
+`data/public_ml_products/source_visual_inventory_2026-06-16.csv`, documented in
+`docs/SOURCE_VISUAL_INVENTORY_2026-06-16.md`, loaded by
+`dashboard/source_visual_inventory.py`, and displayed under Analyze Hydrates >
+Presentation Exports. Use it to choose V5.3 slide-ready panels, website
+captures, expanded architecture diagrams, and contact sheets before revising a
+deck or Word document. It intentionally flags uncited or AI-looking visuals and
+keeps all outputs public-safe.
+
 ## Current ML Architecture Decisions And Open Mentor Questions
 
 ### A. Ready to encode now

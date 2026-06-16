@@ -34,6 +34,15 @@ targets. Numeric ranges are working screening envelopes from the project
 synthesis, not final DOE cutoffs; directional rows stay directional until
 source recovery and approved-data calibration confirm thresholds.
 
+`source_visual_inventory_2026-06-16.csv`
+
+This is the public-safe visual provenance and QA inventory for the V5.3 website,
+slide, and Word visual layer. It tracks slide panels, website captures,
+expanded architecture diagrams, and contact sheets with source status,
+provenance, allowed use, QA status, replacement flags, and guardrails. It is
+displayed in Analyze Hydrates > Presentation Exports and is tested by
+`tests/test_source_visual_inventory.py`.
+
 `approved_data_field_role_table_2026-06-15.csv`
 
 This is the public-safe header role table used by
