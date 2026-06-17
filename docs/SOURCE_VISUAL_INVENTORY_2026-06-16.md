@@ -57,23 +57,25 @@ Use these visuals first:
 - North Slope map/context:
   `docs/project_blueprints/presentation_assets/v5_3_website_captures/02_explore_regional_map.png`
 - hydrate context:
-  `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/slide_02_source_context_v5_5.png`
+  `docs/project_blueprints/presentation_assets/v5_5_slide3_signal_response_update_2026_06_17/slide_02_source_context_v5_5.png`
 - Slide 2 source bundle:
   `docs/evidence/slide02_source_bundle_2026_06_17/`
-- parameter ranges:
-  `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/slide_03_parameter_ranges_v5_5.png`
+- Slide 3 signal-response stack:
+  `docs/project_blueprints/presentation_assets/v5_5_slide3_signal_response_update_2026_06_17/slide_03_signal_response_v5_5.png`
+- Slide 3 local source package:
+  `docs/project_blueprints/presentation_assets/slide_03_signal_response_sources_2026_06_17/`
 - DOE three-dataset prototype and model-run card:
-  `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/slide_05_doe_three_dataset_prototype_v5_5.png`
+  `docs/project_blueprints/presentation_assets/v5_5_slide3_signal_response_update_2026_06_17/slide_05_doe_three_dataset_prototype_v5_5.png`
 - equations and unit gate:
-  `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/slide_06_equations_feature_unit_gate_v5_5.png`
+  `docs/project_blueprints/presentation_assets/v5_5_slide3_signal_response_update_2026_06_17/slide_06_equations_feature_unit_gate_v5_5.png`
 - full complex workflow:
-  `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/slide_04_full_complex_project_workflow_v5_5.png`
+  `docs/project_blueprints/presentation_assets/v5_5_slide3_signal_response_update_2026_06_17/slide_04_full_complex_project_workflow_v5_5.png`
 - stability-to-ML overlay:
-  `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/slide_08_stability_to_ml_overlay_v5_5.png`
+  `docs/project_blueprints/presentation_assets/v5_5_slide3_signal_response_update_2026_06_17/slide_08_stability_to_ml_overlay_v5_5.png`
 - ML runtime detail:
-  `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/slide_07_complex_ml_runtime_architecture_v5_5.png`
+  `docs/project_blueprints/presentation_assets/v5_5_slide3_signal_response_update_2026_06_17/slide_07_complex_ml_runtime_architecture_v5_5.png`
 - done / not claimed / next:
-  `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/slide_09_done_not_claimed_next_v5_5.png`
+  `docs/project_blueprints/presentation_assets/v5_5_slide3_signal_response_update_2026_06_17/slide_09_done_not_claimed_next_v5_5.png`
 
 Do not add untracked slide visuals to a final deck without updating this
 inventory and rerunning tests.

@@ -109,16 +109,16 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
 
 ## Current Authoritative Slide and Doc Assets
 
-- Current V5.5 Slide 2 source update mentor-facing deck:
-  `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`
-- Current V5.5 Slide 2 source update mentor-facing companion:
-  `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`
-- Current V5.5 Slide 2 source update slide panels and contact sheet:
-  `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/`
+- Current V5.5 Slide 3 signal-response update mentor-facing deck:
+  `docs/project_blueprints/V5_5_SLIDE3_SIGNAL_RESPONSE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`
+- Current V5.5 Slide 3 signal-response update mentor-facing companion:
+  `docs/project_blueprints/V5_5_SLIDE3_SIGNAL_RESPONSE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`
+- Current V5.5 Slide 3 signal-response update slide panels and contact sheet:
+  `docs/project_blueprints/presentation_assets/v5_5_slide3_signal_response_update_2026_06_17/`
 - Verified native Google Slides/Docs review copies:
-  <https://docs.google.com/presentation/d/1-35vfTIXAnWCiyKTLooJy80HBYliMBliE_z4CbggJC0>
+  <https://docs.google.com/presentation/d/1BMUhHLYWr6OTHByzfnV_o7f4A1qQpaeDbQuVD4HuHUc>
   and
-  <https://docs.google.com/document/d/1CyZkRgfAUSOOaRxXni0mcmFN2OQcc5pNOw8TOv44f0Q>
+  <https://docs.google.com/document/d/1w_Ca7nYorJQpdq9IxbziKH57XXU8ELougIiQNN4lUc8>
 - Slide 2 source bundle:
   `docs/evidence/slide02_source_bundle_2026_06_17/`
 - V5.4 corrected slide panels and contact sheet are now the source baseline

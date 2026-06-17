@@ -143,12 +143,12 @@ FULL_WORKFLOW_ASSET_DIR = (
     / "docs"
     / "project_blueprints"
     / "presentation_assets"
-    / "v5_5_slide2_source_update_2026_06_17"
+    / "v5_5_slide3_signal_response_update_2026_06_17"
 )
 FULL_WORKFLOW_FLOWCHART = FULL_WORKFLOW_ASSET_DIR / "slide_04_full_complex_project_workflow_v5_5.png"
 FULL_WORKFLOW_EXPANDED_FLOWCHART = FULL_WORKFLOW_ASSET_DIR / "slide_04_full_complex_project_workflow_v5_5.png"
 FULL_WORKFLOW_ML_NETWORK = FULL_WORKFLOW_ASSET_DIR / "slide_07_complex_ml_runtime_architecture_v5_5.png"
-FULL_WORKFLOW_CONTACT_SHEET = FULL_WORKFLOW_ASSET_DIR / "v5_5_slide2_source_update_contact_sheet.png"
+FULL_WORKFLOW_CONTACT_SHEET = FULL_WORKFLOW_ASSET_DIR / "v5_5_slide3_signal_response_update_contact_sheet.png"
 V5_3_WEBSITE_CAPTURE_DIR = (
     PROJECT_ROOT
     / "docs"
@@ -160,16 +160,16 @@ FULL_WORKFLOW_DECK = (
     PROJECT_ROOT
     / "docs"
     / "project_blueprints"
-    / "V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx"
+    / "V5_5_SLIDE3_SIGNAL_RESPONSE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx"
 )
 FULL_WORKFLOW_WORD = (
     PROJECT_ROOT
     / "docs"
     / "project_blueprints"
-    / "V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx"
+    / "V5_5_SLIDE3_SIGNAL_RESPONSE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx"
 )
-FULL_WORKFLOW_DRIVE_SLIDES_URL = "https://docs.google.com/presentation/d/1-35vfTIXAnWCiyKTLooJy80HBYliMBliE_z4CbggJC0"
-FULL_WORKFLOW_DRIVE_DOC_URL = "https://docs.google.com/document/d/1CyZkRgfAUSOOaRxXni0mcmFN2OQcc5pNOw8TOv44f0Q"
+FULL_WORKFLOW_DRIVE_SLIDES_URL = "https://docs.google.com/presentation/d/1BMUhHLYWr6OTHByzfnV_o7f4A1qQpaeDbQuVD4HuHUc"
+FULL_WORKFLOW_DRIVE_DOC_URL = "https://docs.google.com/document/d/1w_Ca7nYorJQpdq9IxbziKH57XXU8ELougIiQNN4lUc8"
 SOURCE_VISUAL_INVENTORY = default_source_visual_inventory_path(PROJECT_ROOT)
 APPROVED_DATA_FIELD_ROLE_TABLE = (
     PROJECT_ROOT
@@ -5354,10 +5354,10 @@ def render_presentation_exports() -> None:
             "hydrate_context",
         ),
         (
-            "Parameter Ranges",
-            FULL_WORKFLOW_ASSET_DIR / "slide_03_parameter_ranges_v5_5.png",
-            "Slide-scale bars for parameter direction and working ranges",
-            "parameter_ranges",
+            "Signal Response Stack",
+            FULL_WORKFLOW_ASSET_DIR / "slide_03_signal_response_v5_5.png",
+            "Depth-aligned hydrate signal response stack with stability context, log/core movements, mimic guardrails, and Y-only targets",
+            "signal_response_stack",
         ),
         (
             "DOE Prototype Run Card",

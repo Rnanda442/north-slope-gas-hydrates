@@ -68,14 +68,14 @@ deck remain provenance. Do not delete or archive them until cleanup is
 explicitly approved.
 The current mentor-facing rebuild is V5.5. It keeps the original Gmail-style
 personal/about-me opener, keeps source-backed USGS/public hydrate and North
-Slope visuals, keeps slide 3 as a parameter-range board, restores the complex
-project workflow on slide 4, adds a cleaned DOE three-dataset prototype and
-visual model-run card on slide 5, centers equations and unit gates on slide 6,
-restores the complex ML runtime architecture on slide 7, adds a
-stability-to-ML overlay on slide 8, and closes with a clear what-done /
-what-not-claimed / what-next section on slide 9. It keeps stability as
-context/admissibility only rather than proof or prediction, and it frames DOE
-prototype metrics as training-fit/runtime proof only.
+Slope visuals, rebuilds slide 3 as a co-moving signal-response stack across
+depth, restores the complex project workflow on slide 4, adds a cleaned DOE
+three-dataset prototype and visual model-run card on slide 5, centers equations
+and unit gates on slide 6, restores the complex ML runtime architecture on
+slide 7, adds a stability-to-ML overlay on slide 8, and closes with a clear
+what-done / what-not-claimed / what-next section on slide 9. It keeps stability
+as context/admissibility only rather than proof or prediction, and it frames
+DOE prototype metrics as training-fit/runtime proof only.
 The
 2026-06-15 pipeline status Word brief remains the plain-language review draft
 for explaining where the project stands now and how the approved-data ML
@@ -149,9 +149,10 @@ website captures, source-backed figures, authority diagrams, and contact
 sheets, and it flags uncited or AI-looking visuals before they enter the
 mentor-facing package.
 
-The active mentor-facing workflow package is now the V5.5 Slide 2 source update
+The active mentor-facing workflow package is now the V5.5 Slide 3
+signal-response update
 under
-`docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/`.
+`docs/project_blueprints/presentation_assets/v5_5_slide3_signal_response_update_2026_06_17/`.
 Use `slide_04_full_complex_project_workflow_v5_5.png` as the full project
 architecture plate, `slide_07_complex_ml_runtime_architecture_v5_5.png` as
 the ML runtime plate, `slide_05_doe_three_dataset_prototype_v5_5.png` as the
@@ -161,16 +162,23 @@ Slide 2 context panel was rebuilt from the selected USGS/DOE source screenshot
 and curve crop, the project website regional map, and the project digitized
 methane 5 ppt CSV inset. It explicitly says stability is
 pressure-temperature admissibility context only, not hydrate proof,
-occurrence evidence, or saturation evidence. The V5.5 PPTX plus Word companion
-are regenerated from `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`.
+occurrence evidence, or saturation evidence. Slide 3 is rebuilt from the local
+Slide 3 signal-response source package with a public-safe depth stack, CSV
+methane 5 ppt stability inset, USGS public-domain log/QC references, and
+source badges for Mount Elbert/Milne Point, Eileen/Tarn, and PBU L-Pad
+context. It explains co-moving GR, caliper, porosity/RHOB, Rt, Vp, Vs/mu-rho,
+and NMR/core movements while keeping stability as context and Sgh, S_h, Sh,
+Hydrate Saturation, NMR_SAT, Swr, and phase labels on the Y-only rail. The
+V5.5 PPTX plus Word companion are regenerated from
+`docs/project_blueprints/build_full_workflow_diagram_deliverables.py`.
 The current local deliverables are
-`docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`
+`docs/project_blueprints/V5_5_SLIDE3_SIGNAL_RESPONSE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`
 and
-`docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`.
+`docs/project_blueprints/V5_5_SLIDE3_SIGNAL_RESPONSE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`.
 The verified native Google Slides/Docs imports are:
-`https://docs.google.com/presentation/d/1-35vfTIXAnWCiyKTLooJy80HBYliMBliE_z4CbggJC0`
+`https://docs.google.com/presentation/d/1BMUhHLYWr6OTHByzfnV_o7f4A1qQpaeDbQuVD4HuHUc`
 and
-`https://docs.google.com/document/d/1CyZkRgfAUSOOaRxXni0mcmFN2OQcc5pNOw8TOv44f0Q`.
+`https://docs.google.com/document/d/1w_Ca7nYorJQpdq9IxbziKH57XXU8ELougIiQNN4lUc8`.
 Do not reopen OSL unless a source/product rebuild is actually needed.
 
 ## Current ML Architecture Decisions And Open Mentor Questions
@@ -249,21 +257,23 @@ V5.4 as the source baseline and V5.3 as flawed reference only.
   present.
 - Two working Word drafts and a rebuilt 2026-06-13 local research-overview
   Word/PPT deliverable pair are present in `docs/project_blueprints/`.
-- The current local presentation baseline is the V5.5 Slide 2 source update
+- The current local presentation baseline is the V5.5 Slide 3 signal-response
+  update
   workflow deck rebuilt from `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`:
-  `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`.
+  `docs/project_blueprints/V5_5_SLIDE3_SIGNAL_RESPONSE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`.
   It keeps the agreed nine-slide spine, restores the personal/about-me opener,
   rebuilds Slide 2 with selected USGS/DOE source-backed stability visuals,
   the project website map, methane/Structure I baseline language, and the
-  stability-not-proof guardrail, makes slide 3 a parameter-range board,
-  restores complex workflow and ML runtime architecture plates on slides 4 and
-  7, adds a DOE three-dataset prototype/model-run card on slide 5, adds a
-  stability-to-ML overlay on slide 8, and closes with what is done, what is not
-  claimed, and what is next on slide 9. The current deck and companion were
+  stability-not-proof guardrail, rebuilds Slide 3 as a co-moving signal
+  response stack with mimic/QC/Y-only guardrails, restores complex workflow and
+  ML runtime architecture plates on slides 4 and 7, adds a DOE three-dataset
+  prototype/model-run card on slide 5, adds a stability-to-ML overlay on slide
+  8, and closes with what is done, what is not claimed, and what is next on
+  slide 9. The current deck and companion were
   imported to Drive as native Google Slides/Docs:
-  <https://docs.google.com/presentation/d/1-35vfTIXAnWCiyKTLooJy80HBYliMBliE_z4CbggJC0>
+  <https://docs.google.com/presentation/d/1BMUhHLYWr6OTHByzfnV_o7f4A1qQpaeDbQuVD4HuHUc>
   and
-  <https://docs.google.com/document/d/1CyZkRgfAUSOOaRxXni0mcmFN2OQcc5pNOw8TOv44f0Q>.
+  <https://docs.google.com/document/d/1w_Ca7nYorJQpdq9IxbziKH57XXU8ELougIiQNN4lUc8>.
 - The 2026-06-13 science-to-ML local DOCX/PPTX rebuild was imported to the
   connected Google Drive account as native files:
   [SCIENCE-TO-ML North Slope Gas Hydrate Research Overview 2026-06-13](https://docs.google.com/document/d/1Ft0wgKV3p8HK1F7X4_WYVAp1jOtBYuCntdRP-Z84e5k)

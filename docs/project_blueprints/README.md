@@ -67,8 +67,25 @@ wireline machine-learning project.
   - V5.2 copy with research source anchors, current ML architecture decisions,
     and the variable fingerprint/intake validator contract was imported as
     [V5.2 North Slope Gas Hydrate Full ML Workflow Companion 2026-06-15](https://docs.google.com/document/d/1dWBNYmwGerBV8steCo0v37PbhpIAZzqNQ-Psl78Ypa8).
-- `V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`
+- `V5_5_SLIDE3_SIGNAL_RESPONSE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`
   - Current mentor-facing V5.5 companion generated with
+    `build_full_workflow_diagram_deliverables.py`.
+  - Explains the targeted Slide 3 rebuild: a depth-aligned, source-backed
+    signal-response stack that shows stability/BGHS context, GR, caliper QC,
+    porosity/RHOB, Rt, Vp, Vs/mu-rho, NMR/core, hydrate-compatible clean sand,
+    free-gas/resistive mimic, bad-hole QC, and target-only leakage rails.
+  - Retains the Slide 2 source-backed hydrate/North Slope context, DOE
+    prototype/model-run card, stability-to-ML overlay, and done/not-claimed/next
+    guardrails.
+  - Public-safe planning artifact only. It does not include approved rows,
+    trained model metrics, hydrate proof, saturation outputs, occurrence
+    predictions, or sweet-spot ranking.
+  - Imported to Drive as native Google Docs:
+    [V5.5 Slide 3 Signal Response Update North Slope Gas Hydrate ML Workflow Companion 2026-06-17](https://docs.google.com/document/d/1w_Ca7nYorJQpdq9IxbziKH57XXU8ELougIiQNN4lUc8).
+  - Companion deck imported to Drive as native Google Slides:
+    [V5.5 Slide 3 Signal Response Update North Slope Gas Hydrate ML Workflow Slides 2026-06-17](https://docs.google.com/presentation/d/1BMUhHLYWr6OTHByzfnV_o7f4A1qQpaeDbQuVD4HuHUc).
+- `V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`
+  - Previous mentor-facing V5.5 companion generated with
     `build_full_workflow_diagram_deliverables.py`.
   - Explains the targeted Slide 2 source rebuild: selected USGS/DOE page-3
     stability screenshot/crop as the primary phase visual, project website map
@@ -82,6 +99,8 @@ wireline machine-learning project.
     [V5.5 SLIDE2 SOURCE UPDATE North Slope Gas Hydrate ML Workflow Companion 2026-06-17](https://docs.google.com/document/d/1CyZkRgfAUSOOaRxXni0mcmFN2OQcc5pNOw8TOv44f0Q).
   - Companion deck imported to Drive as native Google Slides:
     [V5.5 SLIDE2 SOURCE UPDATE North Slope Gas Hydrate ML Workflow Slides 2026-06-17](https://docs.google.com/presentation/d/1-35vfTIXAnWCiyKTLooJy80HBYliMBliE_z4CbggJC0).
+  - Superseded by the V5.5 Slide 3 signal-response update companion for mentor
+    review.
 - `V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`
   - Previous mentor-facing V5.5 companion generated with
     `build_full_workflow_diagram_deliverables.py`.
@@ -91,8 +110,8 @@ wireline machine-learning project.
     done/not-claimed/next guardrails.
   - Public-safe planning artifact only. It does not include approved rows,
     trained model metrics, hydrate proof, saturation outputs, occurrence
-    predictions, or sweet-spot ranking. Superseded by the V5.5 Slide 2 source
-    update companion for mentor review.
+    predictions, or sweet-spot ranking. Superseded by the V5.5 Slide 3
+    signal-response update companion for mentor review.
 - `V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx`
   - Previous corrected companion retained as the source baseline for V5.5.
   - Imported to the connected Google Drive account as a reference copy:
@@ -182,8 +201,31 @@ wireline machine-learning project.
     hydrate proof, saturation, sweet-spot ranking, or validated ML output.
   - User review on 2026-06-15 rejected this as the next direction because it did
     not show the whole project in one connected workflow.
+- `V5_5_SLIDE3_SIGNAL_RESPONSE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`
+  - Current V5.5 Slide 3 signal-response mentor-facing workflow deck generated
+    from `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`.
+  - Preserves the original personal/about-me opener and the nine-slide V5.5
+    spine. Slide 2 remains source-backed from the selected USGS/DOE stability
+    source screenshot/crop, project website map, and digitized methane 5 ppt
+    CSV inset.
+  - Rebuilds Slide 3 from local source-package materials as a co-moving
+    signal-response stack, not a parameter-range table. It shows stability/BGHS
+    context, GR, caliper QC, porosity/RHOB, Rt, Vp, Vs/mu-rho, NMR/core,
+    hydrate-compatible clean sand, free-gas/resistive mimic, bad-hole QC, and
+    Y-only target exclusions.
+  - Keeps the complex project workflow on slide 4, DOE prototype/model-run card
+    on slide 5, equations/unit gates on slide 6, complex ML runtime
+    architecture on slide 7, stability-to-ML overlay on slide 8, and
+    done/not-claimed/next on slide 9.
+  - Generated panels and the contact sheet are under
+    `docs/project_blueprints/presentation_assets/v5_5_slide3_signal_response_update_2026_06_17/`.
+  - Public-safe planning artifact only. It does not include approved rows,
+    final trained model metrics, hydrate proof, saturation outputs, occurrence
+    predictions, row-level predictions, or sweet-spot ranking.
+  - Imported to the connected Google Drive account as:
+    [V5.5 Slide 3 Signal Response Update North Slope Gas Hydrate ML Workflow Slides 2026-06-17](https://docs.google.com/presentation/d/1BMUhHLYWr6OTHByzfnV_o7f4A1qQpaeDbQuVD4HuHUc).
 - `V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`
-  - Current V5.5 Slide 2 source update mentor-facing workflow deck generated from
+  - Previous V5.5 Slide 2 source update mentor-facing workflow deck generated from
     `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`.
   - Preserves the original personal/about-me opener and the nine-slide V5.5
     spine. Slide 2 is rebuilt from the selected USGS/DOE stability source
@@ -203,10 +245,13 @@ wireline machine-learning project.
     predictions, row-level predictions, or sweet-spot ranking.
   - Imported to the connected Google Drive account as:
     [V5.5 SLIDE2 SOURCE UPDATE North Slope Gas Hydrate ML Workflow Slides 2026-06-17](https://docs.google.com/presentation/d/1-35vfTIXAnWCiyKTLooJy80HBYliMBliE_z4CbggJC0).
+  - Superseded by the V5.5 Slide 3 signal-response update deck for mentor
+    review.
 - `V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`
   - Previous V5.5 mentor-facing workflow deck retained as provenance before
     the targeted Slide 2 source rebuild.
-  - Superseded by the V5.5 Slide 2 source update deck for mentor review.
+  - Superseded by the V5.5 Slide 3 signal-response update deck for mentor
+    review.
 - `V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`
   - Previous corrected mentor-facing workflow deck retained as the source
     baseline for V5.5.
