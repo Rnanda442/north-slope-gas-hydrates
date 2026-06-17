@@ -30,6 +30,8 @@ IDENTIFIER_AND_CONTEXT_COLUMNS = {
 }
 CLASSIFICATION_NAME_HINTS = ("occurrence", "class", "label", "phase", "hydratepresent")
 REGRESSION_NAME_HINTS = ("saturation", "sat", "sgh", "shyd", "nmr_sat")
+CONTEXT_OR_HELPER_EXACT = {"index", "row", "rowindex", "depth", "depthm", "depthft", "dept", "md", "tvd"}
+CONTEXT_OR_HELPER_PARTS = ("depth", "unit", "units")
 
 
 @dataclass(frozen=True)
@@ -119,6 +121,17 @@ def header_role_hint(header: object) -> str:
     if canonical is not None:
         return "candidate_feature_or_context"
     return "unmapped_review"
+
+
+def is_context_or_helper_column(column: object) -> bool:
+    normalized = normalize_header_name(column)
+    canonical = canonical_name_for_header(column)
+    return (
+        normalized.startswith("unnamed")
+        or normalized in CONTEXT_OR_HELPER_EXACT
+        or any(part in normalized for part in CONTEXT_OR_HELPER_PARTS)
+        or canonical in {"well_alias", "depth_m"}
+    )
 
 
 def read_first_nonempty_excel_sheet(path: Path, sheet_name: str | None = None) -> tuple[pd.DataFrame, str]:
@@ -443,7 +456,15 @@ def make_feature_matrix(frame: pd.DataFrame, *, target_columns: set[str]) -> tup
     selected_columns: list[str] = []
     for column in features.columns:
         column_name = str(column)
-        if column_name in excluded or column_name in IDENTIFIER_AND_CONTEXT_COLUMNS or target_like_column(column_name):
+        canonical_name = canonical_name_for_header(column_name)
+        is_raw_alias_duplicate = canonical_name is not None and canonical_name != column_name and canonical_name in features.columns
+        if (
+            column_name in excluded
+            or column_name in IDENTIFIER_AND_CONTEXT_COLUMNS
+            or is_context_or_helper_column(column_name)
+            or is_raw_alias_duplicate
+            or target_like_column(column_name)
+        ):
             continue
         if pd.api.types.is_bool_dtype(features[column]):
             values = clean_numeric_series(features[column].astype(int))

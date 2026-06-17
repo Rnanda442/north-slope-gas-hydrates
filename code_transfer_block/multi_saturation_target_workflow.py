@@ -29,21 +29,23 @@ SATURATION_WORDS = ("sat", "saturation")
 NOT_SATURATION_WORDS = ("porosity", "density", "sample", "station", "status")
 FEATURE_ALIASES = {
     "well_alias": ("well_alias", "well", "wellname", "well_name", "uwi", "api"),
-    "depth_m": ("depth_m", "depth", "depthm", "md", "mdm", "tvd", "tvdm"),
+    "depth_m": ("depth_m", "depth", "depthm", "depthft", "dept", "md", "mdm", "tvd", "tvdm"),
     "gr_api": ("gr_api", "gr", "gamma", "gammaray", "gamma_ray"),
     "rt_ohm_m": ("rt_ohm_m", "rt", "res", "rdep", "resdeep", "ild", "deepresistivity"),
-    "rhob_g_cc": ("rhob_g_cc", "rhob", "density", "den", "rho_b", "bulk_density"),
-    "density_porosity_vv": ("density_porosity_vv", "dphi", "phid", "denpor", "densityporosity"),
-    "neutron_porosity_vv": ("neutron_porosity_vv", "nphi", "tnph", "neutronporosity"),
+    "rhob_g_cc": ("rhob_g_cc", "rhob", "density", "densitygpcc", "densitygcc", "den", "rho_b", "bulk_density"),
+    "density_porosity_vv": ("density_porosity_vv", "dphi", "phid", "phiden", "denpor", "densityporosity"),
+    "neutron_porosity_vv": ("neutron_porosity_vv", "nphi", "tnph", "phineut", "neutronporosity"),
     "dt_us_ft": ("dt_us_ft", "dt", "dtc", "ac"),
     "dts_us_ft": ("dts_us_ft", "dts", "dtsm"),
     "vp_km_s": ("vp_km_s", "vpkms"),
     "vs_km_s": ("vs_km_s", "vskms"),
     "vp_m_s": ("vp_m_s", "vp", "velp", "vpmps"),
     "vs_m_s": ("vs_m_s", "vs", "vs1", "vels", "vsmps"),
-    "nmr_porosity_vv": ("nmr_porosity_vv", "nmrphi", "tcmr", "cmrp", "nmrporosity"),
+    "nmr_porosity_vv": ("nmr_porosity_vv", "nmrphi", "phinmr", "tcmr", "cmrp", "nmrporosity"),
     "caliper_in": ("caliper_in", "caliper", "cali", "cal1"),
 }
+CONTEXT_OR_HELPER_EXACT = {"index", "row", "rowindex", "depth", "depthm", "depthft", "dept", "md", "tvd"}
+CONTEXT_OR_HELPER_PARTS = ("depth", "unit", "units")
 
 
 def normalize_header(value: object) -> str:
@@ -85,6 +87,17 @@ def canonical_feature_name(header: object) -> str | None:
             if normalized == normalize_header(alias):
                 return canonical
     return None
+
+
+def is_context_or_helper_header(header: object) -> bool:
+    normalized = normalize_header(header)
+    canonical = canonical_feature_name(header)
+    return (
+        normalized.startswith("unnamed")
+        or normalized in CONTEXT_OR_HELPER_EXACT
+        or any(part in normalized for part in CONTEXT_OR_HELPER_PARTS)
+        or canonical in {"well_alias", "depth_m"}
+    )
 
 
 def sheet_key(sheet_name: str) -> str:
@@ -150,10 +163,12 @@ def feature_table(frame: pd.DataFrame, saturation_columns: set[str]) -> tuple[pd
     for column in canonical.columns:
         name = str(column)
         canonical_name = canonical_feature_name(name)
+        is_raw_alias_duplicate = canonical_name is not None and canonical_name != name and canonical_name in canonical.columns
         if (
             name in saturation_columns
             or name in IDENTIFIER_COLUMNS
-            or canonical_name in {"well_alias", "depth_m"}
+            or is_context_or_helper_header(name)
+            or is_raw_alias_duplicate
             or is_saturation_header(name)
         ):
             continue

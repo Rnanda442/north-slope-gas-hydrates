@@ -18,6 +18,9 @@ def write_dataset(path: Path, *, well: str, start_depth: int, rows: int, offset:
         {
             "WELL": [well] * rows,
             "DEPTH": depths,
+            "depths_unitD": ["m"] * rows,
+            "Unnamed: 12": [index for index in range(rows)],
+            "gr_api": [41 + (index % 5) for index in range(rows)],
             "GR": [42 + (index % 5) for index in range(rows)],
             "RT": [0 if index == 0 else 35 + offset + index * 1.5 for index in range(rows)],
             "RHOB": [2.24 - index * 0.006 for index in range(rows)],
@@ -57,6 +60,11 @@ def test_three_dataset_pipeline_trains_on_dataset1_and_scores_two_external_tests
     assert (test_metrics["rows_scored"] > 0).all()
     assert "Sgh" not in set(features["feature_column"])
     assert "depth_m" not in set(features["feature_column"])
+    assert "DEPTH" not in set(features["feature_column"])
+    assert "depths_unitD" not in set(features["feature_column"])
+    assert "Unnamed: 12" not in set(features["feature_column"])
+    assert "GR" not in set(features["feature_column"])
+    assert "gr_api" in set(features["feature_column"])
     assert (run_dir / "predictions_curated_dataset2.csv").exists()
     assert (run_dir / "predictions_curated_dataset3.csv").exists()
 
