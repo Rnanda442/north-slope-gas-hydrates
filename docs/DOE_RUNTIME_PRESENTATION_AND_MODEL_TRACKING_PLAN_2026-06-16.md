@@ -30,10 +30,18 @@ shows:
 - run folders detected;
 - trained target runs;
 - target column, model kind, feature count, and training-fit metrics;
+- run-to-run comparison across multiple local runtime folders;
+- target-by-target review cards for each saturation or occurrence head that ran;
 - feature families used by each target;
 - excluded columns and exclusion reasons;
+- whether external/whole-workbook validation metrics exist or whether the run is
+  training-fit only;
+- what remains before any final model claim can be made;
+- placeholder stability-join status for each run/target;
 - dataset/sheet inventory summaries;
-- stability-to-ML contract.
+- stability-to-ML contract;
+- a downloadable public-safe summary CSV with no approved workbook rows,
+  row-level predictions, fitted model paths, or runtime manifests.
 
 The tracker is intentionally local-runtime aware. GitHub carries the code and
 templates. DOE carries the actual workbook rows, row-level predictions, fitted
@@ -87,7 +95,8 @@ What is ready:
 - multi-saturation target handling;
 - cleaned feature matrix;
 - exclusion audit;
-- website tracker for local run summaries;
+- website tracker for local run summaries, target cards, run comparisons,
+  validation status, final-claim blockers, and public-safe summary export;
 - source-backed public stability context.
 
 What is not ready:
@@ -129,7 +138,9 @@ from proof-of-plumbing to reviewable science outputs:
    removed.
 5. Run the Streamlit app locally in DOE and open `Analyze Hydrates > Model Run
    Tracker`.
-6. Use the tracker for mentor discussion, but do not copy raw predictions,
+6. Download `local_model_run_public_safe_summary.csv` only if a row-free
+   summary is needed for mentor-facing notes.
+7. Use the tracker for mentor discussion, but do not copy raw predictions,
    fitted models, or approved workbook rows back to GitHub.
 
 ## Commands

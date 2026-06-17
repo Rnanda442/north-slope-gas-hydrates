@@ -136,10 +136,16 @@ the run story in a presentable way:
 - which run folders exist;
 - which target columns trained;
 - model kind, training rows, feature count, and training-fit metrics;
+- run-to-run comparison across multiple local output folders;
+- target-by-target cards that keep training-fit metrics separate from
+  external/whole-workbook validation status;
 - feature families used;
 - excluded columns and why they were excluded;
 - sheet/dataset inventory;
-- how the public stability screen may enter the DOE workflow.
+- placeholder stability-join status and how the public stability screen may
+  enter the DOE workflow;
+- a public-safe summary download with no row-level predictions, fitted models,
+  approved workbook rows, or runtime manifest contents.
 
 Training-fit metrics are runtime proof only. Final model claims require
 whole-well validation or a locked test set.

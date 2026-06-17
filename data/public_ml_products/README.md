@@ -53,7 +53,10 @@ displayed in Analyze Hydrates > Presentation Exports and is tested by
 These are public-safe templates for the DOE local model-run tracker. The
 website can read actual ignored runtime summaries from `outputs_runtime/` inside
 the approved environment, while GitHub carries only the expected summary shape,
-feature/exclusion audit shape, and stability-join contract. Do not populate
+feature/exclusion audit shape, and stability-join contract. The tracker summary
+template is row-free: it records run/target status, feature-family counts,
+validation status, stability-join placeholder, and final-claim blockers without
+prediction rows or fitted model paths. Do not populate
 these templates with approved workbook rows, row-level predictions, fitted
 models, or final performance claims.
 

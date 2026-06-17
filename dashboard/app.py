@@ -3630,6 +3630,9 @@ def render_model_run_tracker() -> None:
     exclusions = tracker.get("exclusions", pd.DataFrame())
     datasets = tracker.get("datasets", pd.DataFrame())
     test_metrics = tracker.get("test_metrics", pd.DataFrame())
+    target_cards = tracker.get("target_cards", pd.DataFrame())
+    run_comparison = tracker.get("run_comparison", pd.DataFrame())
+    public_safe_summary = tracker.get("public_safe_summary", pd.DataFrame())
 
     st.markdown("#### Stability-To-ML Contract")
     st.dataframe(stability_runtime_integration_plan_frame(), use_container_width=True, hide_index=True)
@@ -3654,11 +3657,79 @@ def render_model_run_tracker() -> None:
     trained_targets = int(summary["status"].astype(str).str.eq("trained").sum()) if not summary.empty else 0
     feature_count = int(features["feature_column"].nunique()) if "feature_column" in features else 0
     excluded_count = int((exclusions["decision"].astype(str) == "excluded").sum()) if "decision" in exclusions else 0
-    metrics = st.columns(4)
+    external_validation_count = (
+        int(target_cards["has_external_or_whole_workbook_validation"].astype(bool).sum())
+        if "has_external_or_whole_workbook_validation" in target_cards
+        else 0
+    )
+    metrics = st.columns(5)
     metrics[0].metric("Local run folders", f"{run_count:,}")
     metrics[1].metric("Trained target runs", f"{trained_targets:,}")
     metrics[2].metric("Unique feature columns", f"{feature_count:,}")
     metrics[3].metric("Excluded columns audited", f"{excluded_count:,}")
+    metrics[4].metric("Validated target runs", f"{external_validation_count:,}")
+
+    if not run_comparison.empty:
+        st.markdown("#### Run Comparison")
+        st.dataframe(run_comparison, use_container_width=True, hide_index=True)
+        validation_counts = (
+            run_comparison["validation_statuses"]
+            .fillna("unknown")
+            .value_counts()
+            .rename_axis("validation_status")
+            .reset_index(name="runs")
+        )
+        figure = go.Figure(
+            go.Bar(
+                x=validation_counts["runs"],
+                y=validation_counts["validation_status"],
+                orientation="h",
+                marker={"color": "#475569"},
+                hovertemplate="%{y}<br>Runs: %{x:,}<extra></extra>",
+            )
+        )
+        figure.update_layout(
+            height=260,
+            xaxis_title="Run count",
+            yaxis_title="",
+            margin={"l": 20, "r": 20, "t": 12, "b": 20},
+        )
+        st.plotly_chart(figure, use_container_width=True)
+
+    if not target_cards.empty:
+        st.markdown("#### Target-By-Target Review Cards")
+        st.caption(
+            "Each target card is a row-free summary: what trained, which feature families entered, "
+            "what was excluded, whether external validation exists, and what blocks a final claim."
+        )
+        card_columns = [
+            column
+            for column in [
+                "run_name",
+                "target_column",
+                "target_sheet",
+                "status",
+                "model_kind",
+                "training_rows",
+                "feature_count",
+                "unique_feature_families",
+                "feature_family_counts",
+                "excluded_column_count",
+                "train_r2",
+                "metric_scope",
+                "validation_status",
+                "has_external_or_whole_workbook_validation",
+                "stability_join_status",
+                "final_claim_ready",
+                "final_claim_needed",
+            ]
+            if column in target_cards.columns
+        ]
+        st.dataframe(target_cards[card_columns], use_container_width=True, hide_index=True)
+        st.error(
+            "Any `train_r2` shown here is a training-fit/runtime check unless the validation status "
+            "explicitly says external or whole-workbook metrics are present."
+        )
 
     if not summary.empty:
         st.markdown("#### Run Summary")
@@ -3676,6 +3747,10 @@ def render_model_run_tracker() -> None:
                 "train_rmse",
                 "train_r2",
                 "test_status",
+                "metric_scope",
+                "validation_status",
+                "has_external_or_whole_workbook_validation",
+                "stability_join_status",
                 "prediction_file_count",
                 "guardrail",
             ]
@@ -3724,6 +3799,16 @@ def render_model_run_tracker() -> None:
             hide_index=True,
         )
 
+        if "target_id" in features.columns:
+            st.markdown("#### Feature Families By Target")
+            by_target = (
+                features.groupby(["run_name", "target_id", "feature_family"], dropna=False)
+                .size()
+                .reset_index(name="columns")
+                .sort_values(["run_name", "target_id", "columns"], ascending=[True, True, False])
+            )
+            st.dataframe(by_target, use_container_width=True, hide_index=True)
+
     if not exclusions.empty:
         st.markdown("#### Feature Exclusion Audit")
         if "reason" in exclusions.columns:
@@ -3742,7 +3827,25 @@ def render_model_run_tracker() -> None:
         st.markdown("#### Dataset/Sheet Inventory")
         st.dataframe(datasets, use_container_width=True, hide_index=True)
 
-    cols = st.columns(3)
+    if not target_cards.empty:
+        st.markdown("#### Final-Claim Checklist")
+        checklist = target_cards[
+            [
+                column
+                for column in [
+                    "run_name",
+                    "target_column",
+                    "validation_status",
+                    "stability_join_status",
+                    "final_claim_ready",
+                    "final_claim_needed",
+                ]
+                if column in target_cards.columns
+            ]
+        ].drop_duplicates()
+        st.dataframe(checklist, use_container_width=True, hide_index=True)
+
+    cols = st.columns(4)
     if not summary.empty:
         cols[0].download_button(
             "Download run summary CSV",
@@ -3766,6 +3869,14 @@ def render_model_run_tracker() -> None:
             "local_model_run_exclusions.csv",
             "text/csv",
             key="download_local_model_run_exclusions",
+        )
+    if not public_safe_summary.empty:
+        cols[3].download_button(
+            "Download public-safe tracker summary CSV",
+            csv_bytes(public_safe_summary),
+            "local_model_run_public_safe_summary.csv",
+            "text/csv",
+            key="download_local_model_run_public_safe_summary",
         )
 
 

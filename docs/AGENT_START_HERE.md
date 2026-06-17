@@ -216,8 +216,8 @@ Run the full suite before committing meaningful changes:
 python -m pytest
 ```
 
-Expected current result: `116 passed, 2 skipped` as of the 2026-06-16 mentor
-review dashboard update. Update this count only after verifying it locally.
+Expected current result: `123 passed` as of the 2026-06-16 DOE model-run
+tracker review-board update. Update this count only after verifying it locally.
 
 Current test files:
 
