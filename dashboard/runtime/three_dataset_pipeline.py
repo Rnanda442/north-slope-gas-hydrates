@@ -18,6 +18,7 @@ from dashboard.runtime.validation import readiness_frame, validate_log_table
 
 DEFAULT_TRAIN_FILE = "curated_dataset1.xlsx"
 DEFAULT_TEST_FILES = ("curated_dataset2.xlsx", "curated_dataset3.xlsx")
+MAX_MODEL_ABS_VALUE = 1.0e12
 IDENTIFIER_AND_CONTEXT_COLUMNS = {
     "well_alias",
     "depth_m",
@@ -59,6 +60,20 @@ def normalize_header_name(column: object) -> str:
 def sanitize_label(label: str) -> str:
     sanitized = re.sub(r"[^A-Za-z0-9_.-]+", "_", label.strip()).strip("._-")
     return sanitized[:100] or "dataset"
+
+
+def clean_numeric_series(values: pd.Series) -> pd.Series:
+    numeric = pd.to_numeric(values, errors="coerce")
+    numeric = numeric.replace([np.inf, -np.inf], np.nan)
+    numeric = numeric.mask(numeric.abs() > MAX_MODEL_ABS_VALUE)
+    return numeric
+
+
+def clean_numeric_frame(frame: pd.DataFrame) -> pd.DataFrame:
+    cleaned = frame.copy()
+    for column in cleaned.columns:
+        cleaned[column] = clean_numeric_series(cleaned[column])
+    return cleaned
 
 
 def target_alias_lookup() -> dict[str, tuple[str, str]]:
@@ -431,9 +446,9 @@ def make_feature_matrix(frame: pd.DataFrame, *, target_columns: set[str]) -> tup
         if column_name in excluded or column_name in IDENTIFIER_AND_CONTEXT_COLUMNS or target_like_column(column_name):
             continue
         if pd.api.types.is_bool_dtype(features[column]):
-            values = features[column].astype(int)
+            values = clean_numeric_series(features[column].astype(int))
         else:
-            values = pd.to_numeric(features[column], errors="coerce")
+            values = clean_numeric_series(features[column])
         if values.notna().sum() == 0:
             continue
         features[column_name] = values
@@ -449,7 +464,7 @@ def make_feature_matrix(frame: pd.DataFrame, *, target_columns: set[str]) -> tup
                 "normalized_by_pipeline": True,
             }
         )
-    return features[selected_columns].copy(), pd.DataFrame(rows)
+    return clean_numeric_frame(features[selected_columns].copy()), pd.DataFrame(rows)
 
 
 def dataset_inventory_frame(datasets: list[WorkbookDataset]) -> pd.DataFrame:
@@ -535,8 +550,8 @@ def evaluate_predictions(y_true: pd.Series, y_pred: np.ndarray, *, task: str) ->
         }
     from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
-    y_numeric = pd.to_numeric(y_true, errors="coerce")
-    pred_numeric = pd.to_numeric(pd.Series(y_pred), errors="coerce")
+    y_numeric = clean_numeric_series(y_true)
+    pred_numeric = clean_numeric_series(pd.Series(y_pred))
     rmse = float(np.sqrt(mean_squared_error(y_numeric, pred_numeric)))
     return {
         "rows_scored": int(len(y_numeric)),
@@ -559,10 +574,10 @@ def prepare_supervised_table(
     for column in feature_columns:
         if column not in X_all.columns:
             X_all[column] = np.nan
-    X = X_all[feature_columns].copy()
+    X = clean_numeric_frame(X_all[feature_columns].copy())
     y_raw = frame[target.column]
     if target.task == "regression":
-        y = pd.to_numeric(y_raw, errors="coerce")
+        y = clean_numeric_series(y_raw)
     else:
         y = y_raw.astype("string")
     mask = y.notna() & X.notna().any(axis=1)
@@ -579,7 +594,7 @@ def prepare_feature_only_table(
     for column in feature_columns:
         if column not in X_all.columns:
             X_all[column] = np.nan
-    X = X_all[feature_columns].copy()
+    X = clean_numeric_frame(X_all[feature_columns].copy())
     mask = X.notna().any(axis=1)
     return X.loc[mask].reset_index(drop=True), frame.loc[mask].reset_index(drop=True)
 

@@ -19,9 +19,9 @@ def write_dataset(path: Path, *, well: str, start_depth: int, rows: int, offset:
             "WELL": [well] * rows,
             "DEPTH": depths,
             "GR": [42 + (index % 5) for index in range(rows)],
-            "RT": [35 + offset + index * 1.5 for index in range(rows)],
+            "RT": [0 if index == 0 else 35 + offset + index * 1.5 for index in range(rows)],
             "RHOB": [2.24 - index * 0.006 for index in range(rows)],
-            "DTC": [92 - index * 0.25 for index in range(rows)],
+            "DTC": [0 if index == 1 else 92 - index * 0.25 for index in range(rows)],
             "DTS": [180 - index * 0.35 for index in range(rows)],
             "Sgh": [0.18 + offset * 0.002 + index * 0.01 for index in range(rows)],
         }

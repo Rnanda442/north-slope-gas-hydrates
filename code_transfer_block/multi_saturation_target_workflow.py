@@ -12,6 +12,7 @@ import pandas as pd
 
 DEFAULT_WORKBOOKS = ("curated_dataset1.xlsx", "curated_dataset2.xlsx", "curated_dataset3.xlsx")
 IDENTIFIER_COLUMNS = {"well_alias", "depth_m", "source_workbook", "source_sheet", "row_index"}
+MAX_MODEL_ABS_VALUE = 1.0e12
 SATURATION_EXACT = {
     "sgh",
     "sh",
@@ -52,6 +53,20 @@ def normalize_header(value: object) -> str:
 def sanitize_label(value: object) -> str:
     sanitized = re.sub(r"[^A-Za-z0-9_.-]+", "_", str(value).strip()).strip("._-")
     return sanitized[:90] or "target"
+
+
+def clean_numeric_series(values: pd.Series) -> pd.Series:
+    numeric = pd.to_numeric(values, errors="coerce")
+    numeric = numeric.replace([np.inf, -np.inf], np.nan)
+    numeric = numeric.mask(numeric.abs() > MAX_MODEL_ABS_VALUE)
+    return numeric
+
+
+def clean_numeric_frame(frame: pd.DataFrame) -> pd.DataFrame:
+    cleaned = frame.copy()
+    for column in cleaned.columns:
+        cleaned[column] = clean_numeric_series(cleaned[column])
+    return cleaned
 
 
 def is_saturation_header(header: object) -> bool:
@@ -99,29 +114,33 @@ def canonicalize_features(frame: pd.DataFrame) -> pd.DataFrame:
         if column == "well_alias":
             output[column] = output[column].astype(str)
             continue
-        numeric = pd.to_numeric(output[column], errors="coerce")
+        numeric = clean_numeric_series(output[column])
         if numeric.notna().any():
             output[column] = numeric
 
     if "rhob_g_cc" in output and "density_porosity_vv" not in output:
-        output["density_porosity_vv"] = ((2.65 - pd.to_numeric(output["rhob_g_cc"], errors="coerce")) / (2.65 - 1.03)).clip(0, 0.7)
+        output["density_porosity_vv"] = ((2.65 - clean_numeric_series(output["rhob_g_cc"])) / (2.65 - 1.03)).clip(0, 0.7)
     if "gr_api" in output:
-        output["vshale"] = ((pd.to_numeric(output["gr_api"], errors="coerce") - 30) / (105 - 30)).clip(0, 1)
+        output["vshale"] = ((clean_numeric_series(output["gr_api"]) - 30) / (105 - 30)).clip(0, 1)
     if "dt_us_ft" in output and "vp_km_s" not in output:
-        output["vp_km_s"] = 304.8 / pd.to_numeric(output["dt_us_ft"], errors="coerce")
+        with np.errstate(divide="ignore", invalid="ignore"):
+            output["vp_km_s"] = 304.8 / clean_numeric_series(output["dt_us_ft"])
     if "dts_us_ft" in output and "vs_km_s" not in output:
-        output["vs_km_s"] = 304.8 / pd.to_numeric(output["dts_us_ft"], errors="coerce")
+        with np.errstate(divide="ignore", invalid="ignore"):
+            output["vs_km_s"] = 304.8 / clean_numeric_series(output["dts_us_ft"])
     if "vp_m_s" in output and "vp_km_s" not in output:
-        output["vp_km_s"] = pd.to_numeric(output["vp_m_s"], errors="coerce") / 1000.0
+        output["vp_km_s"] = clean_numeric_series(output["vp_m_s"]) / 1000.0
     if "vs_m_s" in output and "vs_km_s" not in output:
-        output["vs_km_s"] = pd.to_numeric(output["vs_m_s"], errors="coerce") / 1000.0
+        output["vs_km_s"] = clean_numeric_series(output["vs_m_s"]) / 1000.0
     if {"vp_km_s", "vs_km_s"}.issubset(output.columns):
-        output["vp_vs_ratio"] = pd.to_numeric(output["vp_km_s"], errors="coerce") / pd.to_numeric(output["vs_km_s"], errors="coerce")
+        with np.errstate(divide="ignore", invalid="ignore"):
+            output["vp_vs_ratio"] = clean_numeric_series(output["vp_km_s"]) / clean_numeric_series(output["vs_km_s"])
     if {"density_porosity_vv", "rt_ohm_m"}.issubset(output.columns):
-        phi = pd.to_numeric(output["density_porosity_vv"], errors="coerce").clip(0.04)
-        rt = pd.to_numeric(output["rt_ohm_m"], errors="coerce")
-        output["archie_hydrate_proxy"] = (1 - ((0.12 / ((phi**2) * rt)) ** 0.5)).clip(0, 1)
-    return output
+        phi = clean_numeric_series(output["density_porosity_vv"]).clip(0.04)
+        rt = clean_numeric_series(output["rt_ohm_m"])
+        with np.errstate(divide="ignore", invalid="ignore"):
+            output["archie_hydrate_proxy"] = (1 - ((0.12 / ((phi**2) * rt)) ** 0.5)).clip(0, 1)
+    return output.replace([np.inf, -np.inf], np.nan)
 
 
 def feature_table(frame: pd.DataFrame, saturation_columns: set[str]) -> tuple[pd.DataFrame, list[str]]:
@@ -138,12 +157,12 @@ def feature_table(frame: pd.DataFrame, saturation_columns: set[str]) -> tuple[pd
             or is_saturation_header(name)
         ):
             continue
-        values = pd.to_numeric(canonical[column], errors="coerce")
+        values = clean_numeric_series(canonical[column])
         if values.notna().sum() == 0:
             continue
         selected.append(name)
         feature_values[name] = values
-    return pd.DataFrame(feature_values), selected
+    return clean_numeric_frame(pd.DataFrame(feature_values)), selected
 
 
 def read_workbook_sheets(data_dir: Path, workbook_names: tuple[str, ...]) -> list[dict[str, object]]:
@@ -171,7 +190,7 @@ def saturation_target_inventory(sheets: list[dict[str, object]]) -> pd.DataFrame
         for column in frame.columns:
             if not is_saturation_header(column):
                 continue
-            values = pd.to_numeric(frame[column], errors="coerce")
+            values = clean_numeric_series(frame[column])
             rows.append(
                 {
                     "workbook": sheet["workbook"],
@@ -291,9 +310,9 @@ def fit_and_predict_all_saturations(
 
         saturation_columns = {str(column) for column in training_frame.columns if is_saturation_header(column)}
         X_train_all, feature_columns = feature_table(training_frame, saturation_columns)
-        y = pd.to_numeric(training_frame[target_column], errors="coerce")
+        y = clean_numeric_series(training_frame[target_column])
         mask = y.notna() & X_train_all.notna().any(axis=1)
-        X_train = X_train_all.loc[mask].reset_index(drop=True)
+        X_train = clean_numeric_frame(X_train_all.loc[mask].reset_index(drop=True))
         y_train = y.loc[mask].reset_index(drop=True)
         if len(X_train) < min_training_rows:
             summary_rows.append(
@@ -336,7 +355,7 @@ def fit_and_predict_all_saturations(
             for feature in feature_columns:
                 if feature not in X_all:
                     X_all[feature] = np.nan
-            X_pred = X_all[feature_columns]
+            X_pred = clean_numeric_frame(X_all[feature_columns])
             row_mask = X_pred.notna().any(axis=1)
             if not row_mask.any():
                 continue
@@ -359,7 +378,7 @@ def fit_and_predict_all_saturations(
             if "depth_m" in canonicalize_features(source_rows):
                 prediction["depth_m"] = canonicalize_features(source_rows)["depth_m"]
             if target_column in source_rows:
-                y_true = pd.to_numeric(source_rows[target_column], errors="coerce")
+                y_true = clean_numeric_series(source_rows[target_column])
                 valid = y_true.notna()
                 prediction.loc[valid, "y_true"] = y_true.loc[valid]
                 prediction.loc[valid, "prediction_status"] = "scored_with_target"

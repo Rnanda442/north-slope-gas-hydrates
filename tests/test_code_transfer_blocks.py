@@ -20,8 +20,9 @@ def test_multi_saturation_transfer_workflow_trains_targets_from_dataset3(tmp_pat
             "WELL": ["MTE"] * rows_one,
             "DEPTH": [500 + index for index in range(rows_one)],
             "GR": [40 + index % 3 for index in range(rows_one)],
-            "RT": [25 + index for index in range(rows_one)],
+            "RT": [0 if index == 0 else 25 + index for index in range(rows_one)],
             "RHOB": [2.22 - index * 0.004 for index in range(rows_one)],
+            "DT": [0 if index == 1 else 90 - index * 0.2 for index in range(rows_one)],
         }
     )
     log_two = pd.DataFrame(
@@ -29,8 +30,9 @@ def test_multi_saturation_transfer_workflow_trains_targets_from_dataset3(tmp_pat
             "WELL": ["IGS"] * rows_two,
             "DEPTH": [550 + index for index in range(rows_two)],
             "GR": [45 + index % 4 for index in range(rows_two)],
-            "RT": [30 + index for index in range(rows_two)],
+            "RT": [0 if index == 0 else 30 + index for index in range(rows_two)],
             "RHOB": [2.18 - index * 0.003 for index in range(rows_two)],
+            "DTS": [0 if index == 1 else 180 - index * 0.3 for index in range(rows_two)],
         }
     )
     log_one.to_excel(tmp_path / "curated_dataset1.xlsx", sheet_name="#1 well logs", index=False)
