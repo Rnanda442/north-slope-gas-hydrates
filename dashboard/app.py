@@ -239,6 +239,10 @@ APPROVED_DATA_INTAKE_READINESS_REPORT = (
     PROJECT_ROOT / "docs" / "APPROVED_DATA_INTAKE_READINESS_REPORT_2026-06-15.md"
 )
 OSL_HEADER_AUDIT_RUNBOOK = PROJECT_ROOT / "docs" / "OSL_APPROVED_DATA_HEADER_AUDIT_RUNBOOK_2026-06-15.md"
+DOE_THREE_DATASET_RUNBOOK = PROJECT_ROOT / "docs" / "DOE_THREE_DATASET_ML_PIPELINE_RUNBOOK_2026-06-16.md"
+DOE_RUNTIME_TRACKING_PLAN = (
+    PROJECT_ROOT / "docs" / "DOE_RUNTIME_PRESENTATION_AND_MODEL_TRACKING_PLAN_2026-06-16.md"
+)
 IGNORED_DIRS = {
     ".git",
     ".ipynb_checkpoints",
@@ -3765,6 +3769,327 @@ def render_model_run_tracker() -> None:
         )
 
 
+def render_mentor_review_dashboard() -> None:
+    st.subheader("Project Status / Mentor Review Dashboard")
+    st.caption(
+        "Mentor-facing, public-safe summary of what the website and runtime scaffolds can show now."
+    )
+    st.info(
+        "North star: build a defensible North Slope workflow that combines public geology and "
+        "stability context with approved-runtime well-log ML for future occurrence classification "
+        "and saturation regression."
+    )
+
+    boundary = pd.DataFrame(
+        [
+            {
+                "Surface": "Public GitHub / Streamlit",
+                "Can show": "public maps, stability-admissibility summaries, schemas, templates, diagrams, source inventory, synthetic examples",
+                "Must not show": "approved rows, private workbook values, row-level predictions, trained models, final ML metrics",
+            },
+            {
+                "Surface": "DOE / approved runtime",
+                "Can show": "approved logs/core/NMR rows, three-workbook prototype runs, fitted scalers/models, local tracker summaries",
+                "Must not show": "unreviewed private rows or sensitive row-level outputs outside the approved environment",
+            },
+        ]
+    )
+    st.markdown("##### Public vs DOE Runtime Boundary")
+    st.dataframe(boundary, use_container_width=True, hide_index=True)
+
+    done = pd.DataFrame(
+        [
+            {
+                "Track": "Public delivery",
+                "Current status": "GitHub/Streamlit public surface, source inventory, and V5.4 mentor package are in place.",
+            },
+            {
+                "Track": "Stability context",
+                "Current status": "Methane 5 ppt public stability-admissibility screen exists with guardrails.",
+            },
+            {
+                "Track": "ML/schema readiness",
+                "Current status": "Header roles, leakage barrier, templates, and approved-data intake checks are encoded.",
+            },
+            {
+                "Track": "DOE runtime skeleton",
+                "Current status": "Three-dataset runner and Model Run Tracker can read ignored local outputs in DOE.",
+            },
+        ]
+    )
+    not_claimed = pd.DataFrame(
+        [
+            {"Not claimed": "hydrate proof or final stability"},
+            {"Not claimed": "validated occurrence predictions"},
+            {"Not claimed": "validated saturation predictions or final performance metrics"},
+            {"Not claimed": "public release of approved/private rows, fitted models, or row-level outputs"},
+        ]
+    )
+    next_unlocked = pd.DataFrame(
+        [
+            {"Next item": "Rerun the three-dataset workflow inside DOE with approved workbooks."},
+            {"Next item": "Review target authority across Sgh, S_h, Sh, NMR_SAT, and related labels."},
+            {"Next item": "Lock whole-well or geography-aware validation wells before metric claims."},
+            {"Next item": "Bring back only reviewed public-safe run summaries and caveat counts."},
+        ]
+    )
+    status_cols = st.columns(3)
+    with status_cols[0]:
+        st.markdown("##### Done")
+        st.dataframe(done, use_container_width=True, hide_index=True)
+    with status_cols[1]:
+        st.markdown("##### Not Claimed")
+        st.dataframe(not_claimed, use_container_width=True, hide_index=True)
+    with status_cols[2]:
+        st.markdown("##### Next Unlocked")
+        st.dataframe(next_unlocked, use_container_width=True, hide_index=True)
+
+    screen = cached_stability_screen(str(PROJECT_ROOT))
+    summary = stability_screen_summary_frame(screen) if not screen.empty else pd.DataFrame()
+    summary_lookup = dict(zip(summary["metric"], summary["value"], strict=False)) if not summary.empty else {}
+    calculated = int(summary_lookup.get("Calculated stability intervals", 0))
+    no_interval = int(summary_lookup.get("No stable interval found", 0))
+    blocked = int(summary_lookup.get("Blocked rows", 0))
+    screen_rows = int(summary_lookup.get("Screen rows", len(screen)))
+    temperature_matches = int(screen["temperature_profile_code"].notna().sum()) if "temperature_profile_code" in screen else 0
+
+    st.markdown("##### Current Public Stability Counts")
+    metric_cols = st.columns(5)
+    metric_cols[0].metric("Public screen rows", f"{screen_rows:,}")
+    metric_cols[1].metric("Admissibility intervals", f"{calculated:,}")
+    metric_cols[2].metric("No stable interval", f"{no_interval:,}")
+    metric_cols[3].metric("Blocked rows", f"{blocked:,}")
+    metric_cols[4].metric("Temp-profile matches", f"{temperature_matches:,}")
+    st.warning(
+        "Stability is context only: physically admissible under assumptions, not occurrence, "
+        "not saturation, not hydrate proof, and not a final sweet-spot rank."
+    )
+
+    source_counts = pd.DataFrame(
+        [
+            {
+                "Public product": "Arctic Slope public well scaffold",
+                "Current count": "8,084",
+                "Use": "map and stability-screen row universe",
+            },
+            {
+                "Public product": "GGD223 permafrost controls",
+                "Current count": "43",
+                "Use": "permafrost context/control points",
+            },
+            {
+                "Public product": "G10015 temperature profiles",
+                "Current count": "184",
+                "Use": "temperature-gradient/profile source inventory",
+            },
+            {
+                "Public product": "Temperature-profile matches",
+                "Current count": f"{temperature_matches:,}",
+                "Use": "public wells matched to a temperature profile for context",
+            },
+        ]
+    )
+    st.dataframe(source_counts, use_container_width=True, hide_index=True)
+
+    st.markdown("##### Approved-Runtime Three-Dataset Prototype")
+    prototype = pd.DataFrame(
+        [
+            {
+                "Runtime element": "Available subset",
+                "Current status": "About 3 of the expected 71 datasets are available for approved-runtime prototyping.",
+                "Guardrail": "Enough for schema/architecture checks, not final training or public metrics.",
+            },
+            {
+                "Runtime element": "Prototype shape",
+                "Current status": "Use curated_dataset1 as training source and curated_dataset2/curated_dataset3 as external tests where compatible targets exist.",
+                "Guardrail": "Split policy must be whole-well or geography-aware before any result claim.",
+            },
+            {
+                "Runtime element": "Targets",
+                "Current status": "Occurrence classification and saturation regression are separate outputs; saturation values are handled as 0-1 fractions while original units stay recorded.",
+                "Guardrail": "Target-only fields supervise training but never enter the feature matrix.",
+            },
+            {
+                "Runtime element": "Runtime outputs",
+                "Current status": "Run summaries, feature audits, exclusions, and caveat counts can be reviewed in the tracker.",
+                "Guardrail": "Approved rows, fitted models, and row-level predictions stay in ignored DOE folders.",
+            },
+        ]
+    )
+    st.dataframe(prototype, use_container_width=True, hide_index=True)
+
+    tracker = cached_local_model_run_tracker(str(PROJECT_ROOT))
+    runs = tracker.get("runs", pd.DataFrame())
+    summary_runs = tracker.get("summary", pd.DataFrame())
+    features = tracker.get("features", pd.DataFrame())
+    exclusions = tracker.get("exclusions", pd.DataFrame())
+    tracker_cols = st.columns(4)
+    tracker_cols[0].metric("Local run folders", f"{len(runs):,}")
+    tracker_cols[1].metric(
+        "Trained target runs",
+        f"{int(summary_runs['status'].astype(str).str.eq('trained').sum()) if not summary_runs.empty and 'status' in summary_runs else 0:,}",
+    )
+    tracker_cols[2].metric(
+        "Feature columns audited",
+        f"{int(features['feature_column'].nunique()) if not features.empty and 'feature_column' in features else 0:,}",
+    )
+    tracker_cols[3].metric(
+        "Excluded columns audited",
+        f"{int((exclusions['decision'].astype(str) == 'excluded').sum()) if not exclusions.empty and 'decision' in exclusions else 0:,}",
+    )
+    if runs.empty:
+        st.info(
+            "No ignored DOE runtime folders are present in this public checkout. "
+            "Inside DOE, rerun the approved workflow and this tracker will summarize local run folders without exposing rows."
+        )
+    else:
+        st.dataframe(summary_runs, use_container_width=True, hide_index=True)
+        st.caption(
+            "Any training-fit values here are runtime checks only unless tied to an approved whole-well or locked-test validation row."
+        )
+
+    st.markdown("##### Mentor Decisions Needed")
+    decisions = pd.DataFrame(
+        [
+            {
+                "Decision": "Authoritative target",
+                "Why it matters": "Choose how to prioritize Sgh, S_h, Sh, NMR_SAT, hydrate saturation, Swr/S_wr, and interpreted labels when multiple exist.",
+            },
+            {
+                "Decision": "Occurrence-label policy",
+                "Why it matters": "Decide whether occurrence comes from mentor-reviewed intervals, phase labels, saturation thresholds, or source-documented observations.",
+            },
+            {
+                "Decision": "Blind validation wells",
+                "Why it matters": "Lock which wells or geographic groups are held out before scaling and model selection.",
+            },
+            {
+                "Decision": "Stability use in ML",
+                "Why it matters": "Confirm whether stability enters as context, mask, confidence, caveat, or reason flag only.",
+            },
+            {
+                "Decision": "Missing-log adapters",
+                "Why it matters": "Approve or block literature-style Vp/RHOB adapters before filling missing curves in North Slope data.",
+            },
+            {
+                "Decision": "Public release level",
+                "Why it matters": "Define which aggregate summaries, maps, and caveat counts can leave DOE after review.",
+            },
+        ]
+    )
+    st.dataframe(decisions, use_container_width=True, hide_index=True)
+
+    st.markdown("##### V5.4 Deliverables And Runbooks")
+    artifact_specs = [
+        (
+            "V5.4 Google Slides",
+            None,
+            "Drive review link",
+            FULL_WORKFLOW_DRIVE_SLIDES_URL,
+            "Native Google Slides review copy",
+            "",
+            "drive_slides",
+        ),
+        (
+            "V5.4 Google Doc",
+            None,
+            "Drive review link",
+            FULL_WORKFLOW_DRIVE_DOC_URL,
+            "Native Google Docs review copy",
+            "",
+            "drive_doc",
+        ),
+        (
+            "V5.4 PPTX",
+            FULL_WORKFLOW_DECK,
+            "Local download",
+            "",
+            "Mentor-facing slide deck",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "v54_pptx",
+        ),
+        (
+            "V5.4 Word companion",
+            FULL_WORKFLOW_WORD,
+            "Local download",
+            "",
+            "Mentor-facing companion document",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "v54_docx",
+        ),
+        (
+            "DOE three-dataset runbook",
+            DOE_THREE_DATASET_RUNBOOK,
+            "Local download",
+            "",
+            "Approved-runtime command guide",
+            "text/markdown",
+            "three_dataset_runbook",
+        ),
+        (
+            "DOE tracker plan",
+            DOE_RUNTIME_TRACKING_PLAN,
+            "Local download",
+            "",
+            "Model Run Tracker and presentation tracking plan",
+            "text/markdown",
+            "tracker_plan",
+        ),
+        (
+            "Header-audit runbook",
+            OSL_HEADER_AUDIT_RUNBOOK,
+            "Local download",
+            "",
+            "Public-safe approved-data header audit guide",
+            "text/markdown",
+            "header_audit_runbook",
+        ),
+        (
+            "Source visual inventory",
+            SOURCE_VISUAL_INVENTORY,
+            "Local download",
+            "",
+            "Slide/website visual provenance table",
+            "text/csv",
+            "source_visual_inventory",
+        ),
+    ]
+    artifact_table = pd.DataFrame(
+        [
+            {
+                "Artifact": label,
+                "Type": artifact_type,
+                "Status": "link" if url else ("available" if path and path.exists() else "missing"),
+                "Path or URL": url or (project_relative_or_absolute(path) if path else ""),
+                "Use": use,
+            }
+            for label, path, artifact_type, url, use, _mime, _key in artifact_specs
+        ]
+    )
+    st.dataframe(artifact_table, use_container_width=True, hide_index=True)
+
+    link_cols = st.columns(2)
+    link_cols[0].link_button("Open V5.4 Google Slides", FULL_WORKFLOW_DRIVE_SLIDES_URL)
+    link_cols[1].link_button("Open V5.4 Google Doc", FULL_WORKFLOW_DRIVE_DOC_URL)
+
+    download_specs = [spec for spec in artifact_specs if spec[1] is not None]
+    for offset in range(0, len(download_specs), 3):
+        for column, (label, path, _artifact_type, _url, _use, mime, key) in zip(
+            st.columns(3),
+            download_specs[offset : offset + 3],
+        ):
+            if path and path.exists():
+                column.download_button(
+                    f"Download {label}",
+                    path.read_bytes(),
+                    path.name,
+                    mime,
+                    key=f"mentor_review_download_{key}",
+                )
+            else:
+                column.button(f"Download {label}", disabled=True, key=f"mentor_review_download_{key}_missing")
+
+
 def render_ml_visual_architecture() -> None:
     st.subheader("Topic 5: ML Evidence and Well-Log Scaffold")
     st.caption(
@@ -5716,6 +6041,7 @@ def render_analyze_hydrates() -> None:
     tabs = st.tabs(
         [
             "Public ML Readiness",
+            "Mentor Review",
             "Schema Coverage & Architecture",
             "Target Registry & Leakage",
             "Interval Review",
@@ -5728,12 +6054,14 @@ def render_analyze_hydrates() -> None:
     with tabs[0]:
         render_public_ml_readiness()
     with tabs[1]:
-        render_schema_coverage_architecture()
+        render_mentor_review_dashboard()
     with tabs[2]:
-        render_public_ml_target_registry()
+        render_schema_coverage_architecture()
     with tabs[3]:
-        render_interval_review(logs, intervals)
+        render_public_ml_target_registry()
     with tabs[4]:
+        render_interval_review(logs, intervals)
+    with tabs[5]:
         col1, col2 = st.columns(2)
         with col1:
             render_processing_sketch(
@@ -5752,11 +6080,11 @@ def render_analyze_hydrates() -> None:
                 height=280,
             )
         render_runtime_readiness(logs)
-    with tabs[5]:
-        render_model_run_tracker()
     with tabs[6]:
-        render_presentation_exports()
+        render_model_run_tracker()
     with tabs[7]:
+        render_presentation_exports()
+    with tabs[8]:
         render_ml_visual_architecture()
         render_source_anchors()
         with st.expander("Header and track blueprint", expanded=True):
