@@ -23,6 +23,7 @@ from dashboard.processing_visuals import render_processing_sketch
 from dashboard.source_visual_inventory import (
     default_source_visual_inventory_path,
     load_source_visual_inventory,
+    source_card_frame,
     source_visual_inventory_summary_frame,
     validate_source_visual_inventory,
 )
@@ -700,6 +701,46 @@ def apply_styles() -> None:
         .atlas-card h4 {
             color: #123447;
             margin: 0.1rem 0 0.4rem;
+        }
+        .source-card {
+            background: #ffffff;
+            border: 1px solid #d9e7e8;
+            border-radius: 8px;
+            min-height: 340px;
+            padding: 1rem 1.05rem;
+            margin-bottom: 0.85rem;
+        }
+        .source-card h4 {
+            color: #123447;
+            font-size: 1.02rem;
+            line-height: 1.25;
+            margin: 0.22rem 0 0.55rem;
+        }
+        .source-card p {
+            color: #334155;
+            font-size: 0.9rem;
+            line-height: 1.36;
+            margin: 0.34rem 0;
+        }
+        .source-card-meta {
+            color: #167d8d;
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .source-card code {
+            background: #edf7f8;
+            border-radius: 4px;
+            color: #123447;
+            display: inline-block;
+            font-size: 0.78rem;
+            line-height: 1.28;
+            margin-top: 0.15rem;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            padding: 0.08rem 0.25rem;
+            white-space: normal;
         }
         .atlas-step {
             background: #edf7f8;
@@ -3394,6 +3435,97 @@ def render_data_library(files: list[dict[str, object]]) -> None:
     )
 
 
+def source_card_html(row: pd.Series) -> str:
+    title = escape(str(row["source_title"]))
+    category = escape(str(row["source_category"]))
+    visual_status = escape(str(row["visual_status"]))
+    claim = escape(str(row["project_claim_supported"]))
+    allowed = escape(str(row["allowed_use"]))
+    not_allowed = escape(str(row["not_allowed_use"]))
+    related = escape(str(row["related_slide_website_section"]))
+    status = escape(str(row["source_status"]))
+    path = escape(str(row["public_safe_link_or_path"]))
+    return f"""
+    <div class="source-card">
+        <div class="source-card-meta">{category} &middot; {visual_status}</div>
+        <h4>{title}</h4>
+        <p><strong>Supports:</strong> {claim}</p>
+        <p><strong>Allowed use:</strong> {allowed}</p>
+        <p><strong>Not allowed:</strong> {not_allowed}</p>
+        <p><strong>Related section:</strong> {related}</p>
+        <p><strong>Source status:</strong> {status}</p>
+        <p><strong>Public-safe link/path:</strong><br><code>{path}</code></p>
+    </div>
+    """
+
+
+def render_source_card_library(
+    inventory: pd.DataFrame,
+    key_prefix: str,
+    card_limit: int = 8,
+) -> None:
+    cards = source_card_frame(inventory)
+    if cards.empty:
+        st.info("No source-card rows are available yet.")
+        return
+
+    controls = st.columns([1.2, 1.2, 1.6])
+    categories = sorted(cards["source_category"].dropna().unique())
+    statuses = sorted(cards["source_status"].dropna().unique())
+    selected_categories = controls[0].multiselect(
+        "Source category",
+        categories,
+        default=categories,
+        key=f"{key_prefix}_source_category",
+    )
+    selected_statuses = controls[1].multiselect(
+        "Source status",
+        statuses,
+        default=statuses,
+        key=f"{key_prefix}_source_status",
+    )
+    query = controls[2].text_input(
+        "Search title, claim, section, or path",
+        key=f"{key_prefix}_source_query",
+    ).strip().lower()
+
+    filtered = cards[
+        cards["source_category"].isin(selected_categories)
+        & cards["source_status"].isin(selected_statuses)
+    ].copy()
+    if query:
+        searchable = filtered[
+            [
+                "source_title",
+                "project_claim_supported",
+                "related_slide_website_section",
+                "public_safe_link_or_path",
+            ]
+        ].apply(lambda column: column.astype(str).str.lower())
+        filtered = filtered[searchable.apply(lambda row: query in " ".join(row), axis=1)]
+
+    st.caption(f"Showing {len(filtered):,} of {len(cards):,} public-safe source cards.")
+    preview = filtered.head(card_limit)
+    for index in range(0, len(preview), 2):
+        columns = st.columns(2)
+        for column, (_, row) in zip(columns, preview.iloc[index : index + 2].iterrows()):
+            with column:
+                st.markdown(source_card_html(row), unsafe_allow_html=True)
+
+    if len(filtered) > card_limit:
+        st.caption(f"{len(filtered) - card_limit:,} more rows are available in the full table.")
+
+    with st.expander("Full source-card table", expanded=False):
+        st.dataframe(filtered, use_container_width=True, hide_index=True)
+        st.download_button(
+            "Download source-card table CSV",
+            csv_bytes(filtered),
+            "source_card_library_2026-06-16.csv",
+            "text/csv",
+            key=f"{key_prefix}_download_source_cards",
+        )
+
+
 def render_framework() -> None:
     st.markdown('<div class="atlas-kicker">Manuscript blueprint</div>', unsafe_allow_html=True)
     st.title("Research Framework")
@@ -4678,6 +4810,16 @@ def render_explore_north_slope(files: list[dict[str, object]]) -> None:
             "Source categories are separated before users reach file tables.",
             height=300,
         )
+        st.markdown("#### Source Cards")
+        st.caption(
+            "Reusable public-safe source rows that explain what each visual or method supports, "
+            "where it belongs, and what it must not be used to claim."
+        )
+        render_source_card_library(
+            cached_source_visual_inventory(str(PROJECT_ROOT)),
+            "explore_source_cards",
+            card_limit=6,
+        )
         with st.expander("Layer catalog and repository browser", expanded=True):
             render_data_library(files)
 
@@ -5420,6 +5562,8 @@ def render_presentation_exports() -> None:
         use_container_width=True,
         hide_index=True,
     )
+    st.markdown("##### Source reuse cards")
+    render_source_card_library(inventory, "presentation_source_cards", card_limit=8)
     display_columns = [
         "visual_id",
         "slide_or_site_use",

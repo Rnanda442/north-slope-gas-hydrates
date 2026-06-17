@@ -33,6 +33,34 @@ def is_table_separator(line: str) -> bool:
     return bool(parts) and all(part and set(part) <= {"-", ":"} for part in parts)
 
 
+def is_numbered_list_item(text: str) -> bool:
+    return len(text) > 3 and text[0].isdigit() and ". " in text[:4]
+
+
+def is_markdown_block_start(text: str) -> bool:
+    return (
+        text.startswith("```")
+        or text.startswith("# ")
+        or text.startswith("## ")
+        or text.startswith("### ")
+        or text.startswith("|")
+        or text.startswith("- ")
+        or is_numbered_list_item(text)
+    )
+
+
+def wrapped_text(lines: list[str], start: int, first_text: str) -> tuple[str, int]:
+    parts = [first_text]
+    i = start + 1
+    while i < len(lines):
+        stripped = lines[i].strip()
+        if not stripped or is_markdown_block_start(stripped):
+            break
+        parts.append(stripped)
+        i += 1
+    return " ".join(parts), i
+
+
 def table_rows(lines: list[str], start: int) -> tuple[list[list[str]], int]:
     rows: list[list[str]] = []
     i = start
@@ -71,8 +99,8 @@ def apply_document_style(document: Document) -> None:
 
 def add_metadata(document: Document) -> None:
     props = document.core_properties
-    props.title = "North Slope Gas Hydrate ML Pipeline Status And Forward Workflow"
-    props.subject = "Current project status and source-backed ML pipeline plan"
+    props.title = "North Slope Gas Hydrate Mentor Companion Brief"
+    props.subject = "Current project status, DOE prototype audit trail, and source-backed ML workflow"
     props.author = "North Slope Gas Hydrates project"
     props.keywords = "gas hydrate, North Slope, stability screen, machine learning, well logs"
 
@@ -145,11 +173,20 @@ def add_markdown(document: Document, text: str) -> None:
         elif stripped.startswith("### "):
             document.add_heading(stripped[4:].strip(), level=2)
         elif stripped.startswith("- "):
-            document.add_paragraph(stripped[2:].strip(), style="List Bullet")
-        elif len(stripped) > 3 and stripped[0].isdigit() and ". " in stripped[:4]:
-            document.add_paragraph(stripped.split(". ", 1)[1].strip(), style="List Number")
+            text, next_i = wrapped_text(lines, i, stripped[2:].strip())
+            document.add_paragraph(text, style="List Bullet")
+            i = next_i
+            continue
+        elif is_numbered_list_item(stripped):
+            text, next_i = wrapped_text(lines, i, stripped.split(". ", 1)[1].strip())
+            document.add_paragraph(text, style="List Number")
+            i = next_i
+            continue
         else:
-            document.add_paragraph(stripped)
+            text, next_i = wrapped_text(lines, i, stripped)
+            document.add_paragraph(text)
+            i = next_i
+            continue
 
         i += 1
 
