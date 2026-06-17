@@ -143,12 +143,12 @@ FULL_WORKFLOW_ASSET_DIR = (
     / "docs"
     / "project_blueprints"
     / "presentation_assets"
-    / "v5_4_corrected_2026_06_16"
+    / "v5_5_mentor_update_2026_06_17"
 )
-FULL_WORKFLOW_FLOWCHART = FULL_WORKFLOW_ASSET_DIR / "slide_04_full_complex_project_workflow_v5_4.png"
-FULL_WORKFLOW_EXPANDED_FLOWCHART = FULL_WORKFLOW_ASSET_DIR / "slide_04_full_complex_project_workflow_v5_4.png"
-FULL_WORKFLOW_ML_NETWORK = FULL_WORKFLOW_ASSET_DIR / "slide_07_complex_ml_runtime_architecture_v5_4.png"
-FULL_WORKFLOW_CONTACT_SHEET = FULL_WORKFLOW_ASSET_DIR / "v5_4_corrected_contact_sheet.png"
+FULL_WORKFLOW_FLOWCHART = FULL_WORKFLOW_ASSET_DIR / "slide_04_full_complex_project_workflow_v5_5.png"
+FULL_WORKFLOW_EXPANDED_FLOWCHART = FULL_WORKFLOW_ASSET_DIR / "slide_04_full_complex_project_workflow_v5_5.png"
+FULL_WORKFLOW_ML_NETWORK = FULL_WORKFLOW_ASSET_DIR / "slide_07_complex_ml_runtime_architecture_v5_5.png"
+FULL_WORKFLOW_CONTACT_SHEET = FULL_WORKFLOW_ASSET_DIR / "v5_5_mentor_update_contact_sheet.png"
 V5_3_WEBSITE_CAPTURE_DIR = (
     PROJECT_ROOT
     / "docs"
@@ -160,16 +160,16 @@ FULL_WORKFLOW_DECK = (
     PROJECT_ROOT
     / "docs"
     / "project_blueprints"
-    / "V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx"
+    / "V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx"
 )
 FULL_WORKFLOW_WORD = (
     PROJECT_ROOT
     / "docs"
     / "project_blueprints"
-    / "V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx"
+    / "V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx"
 )
-FULL_WORKFLOW_DRIVE_SLIDES_URL = "https://docs.google.com/presentation/d/1olavI9-nUSSvYtEm-TjYVOte-Cg-1UgaO9GMl6skDt0"
-FULL_WORKFLOW_DRIVE_DOC_URL = "https://docs.google.com/document/d/1sgl7cyGHOyJyWGoVC9e7LHb0JFnriPIDAmRizyf5wIg"
+FULL_WORKFLOW_DRIVE_SLIDES_URL = ""
+FULL_WORKFLOW_DRIVE_DOC_URL = ""
 SOURCE_VISUAL_INVENTORY = default_source_visual_inventory_path(PROJECT_ROOT)
 APPROVED_DATA_FIELD_ROLE_TABLE = (
     PROJECT_ROOT
@@ -3912,7 +3912,7 @@ def render_mentor_review_dashboard() -> None:
         [
             {
                 "Track": "Public delivery",
-                "Current status": "GitHub/Streamlit public surface, source inventory, and V5.4 mentor package are in place.",
+                "Current status": "GitHub/Streamlit public surface, source inventory, and V5.5 mentor package are in place.",
             },
             {
                 "Track": "Stability context",
@@ -4090,43 +4090,43 @@ def render_mentor_review_dashboard() -> None:
     )
     st.dataframe(decisions, use_container_width=True, hide_index=True)
 
-    st.markdown("##### V5.4 Deliverables And Runbooks")
+    st.markdown("##### V5.5 Deliverables And Runbooks")
     artifact_specs = [
         (
-            "V5.4 Google Slides",
+            "V5.5 Google Slides",
             None,
-            "Drive review link",
+            "Drive review link pending",
             FULL_WORKFLOW_DRIVE_SLIDES_URL,
-            "Native Google Slides review copy",
+            "No verified V5.5 Drive import yet",
             "",
-            "drive_slides",
+            "v55_drive_slides",
         ),
         (
-            "V5.4 Google Doc",
+            "V5.5 Google Doc",
             None,
-            "Drive review link",
+            "Drive review link pending",
             FULL_WORKFLOW_DRIVE_DOC_URL,
-            "Native Google Docs review copy",
+            "No verified V5.5 Drive import yet",
             "",
-            "drive_doc",
+            "v55_drive_doc",
         ),
         (
-            "V5.4 PPTX",
+            "V5.5 PPTX",
             FULL_WORKFLOW_DECK,
             "Local download",
             "",
             "Mentor-facing slide deck",
             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-            "v54_pptx",
+            "v55_pptx",
         ),
         (
-            "V5.4 Word companion",
+            "V5.5 Word companion",
             FULL_WORKFLOW_WORD,
             "Local download",
             "",
             "Mentor-facing companion document",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "v54_docx",
+            "v55_docx",
         ),
         (
             "DOE three-dataset runbook",
@@ -4170,7 +4170,11 @@ def render_mentor_review_dashboard() -> None:
             {
                 "Artifact": label,
                 "Type": artifact_type,
-                "Status": "link" if url else ("available" if path and path.exists() else "missing"),
+                "Status": (
+                    "link"
+                    if url
+                    else ("pending Drive import" if path is None else ("available" if path.exists() else "missing"))
+                ),
                 "Path or URL": url or (project_relative_or_absolute(path) if path else ""),
                 "Use": use,
             }
@@ -4179,9 +4183,14 @@ def render_mentor_review_dashboard() -> None:
     )
     st.dataframe(artifact_table, use_container_width=True, hide_index=True)
 
-    link_cols = st.columns(2)
-    link_cols[0].link_button("Open V5.4 Google Slides", FULL_WORKFLOW_DRIVE_SLIDES_URL)
-    link_cols[1].link_button("Open V5.4 Google Doc", FULL_WORKFLOW_DRIVE_DOC_URL)
+    if FULL_WORKFLOW_DRIVE_SLIDES_URL or FULL_WORKFLOW_DRIVE_DOC_URL:
+        link_cols = st.columns(2)
+        if FULL_WORKFLOW_DRIVE_SLIDES_URL:
+            link_cols[0].link_button("Open V5.5 Google Slides", FULL_WORKFLOW_DRIVE_SLIDES_URL)
+        if FULL_WORKFLOW_DRIVE_DOC_URL:
+            link_cols[1].link_button("Open V5.5 Google Doc", FULL_WORKFLOW_DRIVE_DOC_URL)
+    else:
+        st.caption("V5.5 Drive review links are pending import and connector readback verification.")
 
     download_specs = [spec for spec in artifact_specs if spec[1] is not None]
     for offset in range(0, len(download_specs), 3):
@@ -5226,9 +5235,9 @@ def render_full_workflow_map_panel() -> None:
     cols[3].metric("Model outputs", "Future")
 
     st.info(
-        "Use the V5.4 corrected deck and companion as the mentor-facing roadmap: stability is a context/admissibility branch, "
-        "target fields bypass the feature matrix, and occurrence plus saturation outputs wait for "
-        "approved labels and whole-well validation."
+        "Use the V5.5 mentor update deck and companion as the current roadmap: stability is a context/admissibility branch, "
+        "DOE three-dataset prototype metrics are training-fit/runtime proof only, target fields bypass the feature matrix, "
+        "and occurrence plus saturation outputs wait for approved labels and whole-well validation."
     )
 
     download_specs = [
@@ -5310,8 +5319,8 @@ def render_presentation_export_image_card(
 def render_presentation_exports() -> None:
     st.subheader("Presentation Exports")
     st.caption(
-        "Slide-ready, public-safe panels for the current V5.4 corrected deck and Word companion. "
-        "These previews reuse current website captures, generated V5.4 panels, and source-backed visuals; "
+        "Slide-ready, public-safe panels for the current V5.5 mentor update deck and Word companion. "
+        "These previews reuse current website captures, generated V5.5 panels, V5.2 authority plates, and source-backed visuals; "
         "they do not include approved rows, trained-model outputs, occurrence predictions, or saturation predictions."
     )
 
@@ -5340,31 +5349,31 @@ def render_presentation_exports() -> None:
         ),
         (
             "Hydrate Context",
-            FULL_WORKFLOW_ASSET_DIR / "slide_02_source_context_v5_4.png",
+            FULL_WORKFLOW_ASSET_DIR / "slide_02_source_context_v5_5.png",
             "Source-backed hydrate context panel with USGS image, methane 5 ppt curve, and public map capture",
             "hydrate_context",
         ),
         (
             "Parameter Ranges",
-            FULL_WORKFLOW_ASSET_DIR / "slide_03_parameter_ranges_v5_4.png",
+            FULL_WORKFLOW_ASSET_DIR / "slide_03_parameter_ranges_v5_5.png",
             "Slide-scale bars for parameter direction and working ranges",
             "parameter_ranges",
         ),
         (
-            "Parameter Behavior",
-            FULL_WORKFLOW_ASSET_DIR / "slide_05_parameter_behavior_v5_4.png",
-            "Why each parameter range matters, where it fails, and which mimics/masks can fool it",
-            "parameter_behavior",
+            "DOE Prototype Run Card",
+            FULL_WORKFLOW_ASSET_DIR / "slide_05_doe_three_dataset_prototype_v5_5.png",
+            "Cleaned DOE three-dataset prototype explanation with targets, excluded leakage/helper columns, and training-fit disclaimer",
+            "doe_prototype_run_card",
         ),
         (
             "Equations And Unit Gate",
-            FULL_WORKFLOW_ASSET_DIR / "slide_06_equations_feature_unit_gate_v5_4.png",
+            FULL_WORKFLOW_ASSET_DIR / "slide_06_equations_feature_unit_gate_v5_5.png",
             "Equation features, unit checks, QC gates, stability context, and leakage stop",
             "equations_unit_gate",
         ),
         (
             "Full Complex Workflow",
-            FULL_WORKFLOW_ASSET_DIR / "slide_04_full_complex_project_workflow_v5_4.png",
+            FULL_WORKFLOW_ASSET_DIR / "slide_04_full_complex_project_workflow_v5_5.png",
             "Full public/OSL/stability/feature/leakage/model/validation architecture plate",
             "full_complex_workflow",
         ),
@@ -5375,16 +5384,16 @@ def render_presentation_exports() -> None:
             "ml_runtime_detail",
         ),
         (
-            "Validation Outputs",
-            FULL_WORKFLOW_ASSET_DIR / "slide_08_validation_uncertainty_outputs_v5_4.png",
-            "Planned validation and uncertainty outputs with no fake results",
-            "validation_outputs",
+            "Stability-To-ML Overlay",
+            FULL_WORKFLOW_ASSET_DIR / "slide_08_stability_to_ml_overlay_v5_5.png",
+            "Allowed stability overlay roles: context, mask, confidence, and caveat only",
+            "stability_to_ml_overlay",
         ),
         (
-            "Status And Mentor Decisions",
-            FULL_WORKFLOW_ASSET_DIR / "slide_09_status_mentor_decisions_v5_4.png",
-            "Current public scaffold status, mentor decisions, and OSL next action",
-            "status_mentor_decisions",
+            "Done Not Claimed Next",
+            FULL_WORKFLOW_ASSET_DIR / "slide_09_done_not_claimed_next_v5_5.png",
+            "Mentor-facing summary of what is complete, what is not claimed, and what comes next",
+            "done_not_claimed_next",
         ),
     ]
 
@@ -5472,17 +5481,17 @@ def render_schema_coverage_architecture() -> None:
 
     render_parameter_evidence_board()
 
-    st.markdown("##### Latest V5.3 deck and companion roles")
+    st.markdown("##### Latest V5.5 deck and companion roles")
     latest_roles = [
         {
-            "Artifact": "V5.3 slide deck",
-            "Role": "Mentor-readable presentation with source-backed hydrate/North Slope context, parameter-range visuals, simplified workflow, stability context, beginner ML architecture, validation outputs, and intact appendix architecture plates.",
+            "Artifact": "V5.5 slide deck",
+            "Role": "Mentor-readable update with personal opener, source-backed hydrate/North Slope context, parameter ranges, intact complex workflow and ML runtime plates, DOE three-dataset prototype card, stability overlay, and done/not-claimed/next close.",
             "Local file": project_relative_or_absolute(FULL_WORKFLOW_DECK),
             "Drive link": FULL_WORKFLOW_DRIVE_SLIDES_URL or "pending Drive import",
         },
         {
-            "Artifact": "V5.3 Word companion",
-            "Role": "Research/source-backed explanation of the same workflow, including project purpose, public/OSL boundary, parameter evidence, stability method, ML workflow, website outputs, and mentor decisions.",
+            "Artifact": "V5.5 Word companion",
+            "Role": "Source-backed explanation of the same update, including public/approved-runtime boundary, DOE prototype guardrails, stability-as-context overlay, and visual provenance.",
             "Local file": project_relative_or_absolute(FULL_WORKFLOW_WORD),
             "Drive link": FULL_WORKFLOW_DRIVE_DOC_URL or "pending Drive import",
         },
@@ -5491,9 +5500,9 @@ def render_schema_coverage_architecture() -> None:
     if FULL_WORKFLOW_DRIVE_SLIDES_URL or FULL_WORKFLOW_DRIVE_DOC_URL:
         link_parts = []
         if FULL_WORKFLOW_DRIVE_SLIDES_URL:
-            link_parts.append(f"[Open V5.4 Google Slides]({FULL_WORKFLOW_DRIVE_SLIDES_URL})")
+            link_parts.append(f"[Open V5.5 Google Slides]({FULL_WORKFLOW_DRIVE_SLIDES_URL})")
         if FULL_WORKFLOW_DRIVE_DOC_URL:
-            link_parts.append(f"[Open V5.4 Google Doc]({FULL_WORKFLOW_DRIVE_DOC_URL})")
+            link_parts.append(f"[Open V5.5 Google Doc]({FULL_WORKFLOW_DRIVE_DOC_URL})")
         st.markdown(" | ".join(link_parts))
 
     st.markdown("##### Current public counts")

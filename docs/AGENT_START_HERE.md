@@ -1,6 +1,6 @@
 # Agent Start Here
 
-Last updated: 2026-06-16
+Last updated: 2026-06-17
 
 Use this file as the first read for future Codex, PC, and OpenScienceLab
 sessions. It should be updated only when the project orientation,
@@ -79,12 +79,12 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
 - `docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md` -
   required before uploading, deleting, archiving, or renaming Word/PPT/Drive
   deliverables.
-- `docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md` - current V5.4 corrected
+- `docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md` - current V5.5 mentor update
   workflow package source language, generated file paths, and slide-use rules.
 - `docs/FINAL_NINE_SLIDE_GAP_AND_DIAGRAM_REUSE_PLAN_2026-06-15.md`,
   `docs/FINAL_NEW_SLIDE_DECK_CREATION_PROMPT_2026-06-15.md`, and
   `docs/GMAIL_STYLE_V5_2_SLIDE_REMAKE_PROMPT_2026-06-15.md` - provenance for
-  the corrected V5.4 visual/topic decisions and the older Gmail/V5.2 spine.
+  the corrected V5.4/V5.5 visual/topic decisions and the older Gmail/V5.2 spine.
 - `docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`,
   `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`, and
   `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md` - current ML/schema
@@ -109,15 +109,19 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
 
 ## Current Authoritative Slide and Doc Assets
 
-- Current V5.4 corrected mentor-facing deck:
-  `docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`
-- Native V5.4 Google Slides review copy:
+- Current V5.5 mentor-facing deck:
+  `docs/project_blueprints/V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`
+- Current V5.5 mentor-facing companion:
+  `docs/project_blueprints/V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`
+- Current V5.5 slide panels and contact sheet:
+  `docs/project_blueprints/presentation_assets/v5_5_mentor_update_2026_06_17/`
+- Previous V5.4 corrected Google Slides/Docs review copies remain reference
+  only until a V5.5 Drive import is explicitly created and verified:
   <https://docs.google.com/presentation/d/1olavI9-nUSSvYtEm-TjYVOte-Cg-1UgaO9GMl6skDt0>
-- Current V5.4 corrected mentor-facing companion:
-  `docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx`
-- Native V5.4 Google Docs review copy:
+  and
   <https://docs.google.com/document/d/1sgl7cyGHOyJyWGoVC9e7LHb0JFnriPIDAmRizyf5wIg>
-- Current V5.4 slide panels and contact sheet:
+- V5.4 corrected slide panels and contact sheet are now the source baseline
+  for V5.5:
   `docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/`
 - V5.3 mentor-facing workflow package is a flawed intermediate/reference,
   not the active mentor deck. Use it only for current counts, website captures,
@@ -216,8 +220,9 @@ Run the full suite before committing meaningful changes:
 python -m pytest
 ```
 
-Expected current result: `123 passed` as of the 2026-06-16 DOE model-run
-tracker review-board update. Update this count only after verifying it locally.
+Expected current result: `117 passed, 2 skipped` as of the 2026-06-17 V5.5
+deck update on top of the DOE model-run tracker review board. Update this count
+only after verifying it locally.
 
 Current test files:
 

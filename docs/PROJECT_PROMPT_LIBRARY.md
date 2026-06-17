@@ -1,6 +1,6 @@
 # Project Prompt Library
 
-Last updated: 2026-06-16
+Last updated: 2026-06-17
 
 Use these prompts as reusable starting points. Each prompt intentionally starts
 by reading `docs/AGENT_START_HERE.md`; keep that requirement when copying or
@@ -18,10 +18,11 @@ docs/FINAL_NINE_SLIDE_GAP_AND_DIAGRAM_REUSE_PLAN_2026-06-15.md,
 docs/FINAL_NEW_SLIDE_DECK_CREATION_PROMPT_2026-06-15.md, and
 docs/GMAIL_STYLE_V5_2_SLIDE_REMAKE_PROMPT_2026-06-15.md.
 
-Task: rebuild or revise the current V5.3 mentor-facing deck. Keep the nine main
-audience topic slides, preserve the complex workflow and ML runtime diagrams as
-whole appendix plates when needed, use website/source-backed visuals, and keep
-the explanation clear for non-ML/non-hydrate audiences.
+Task: rebuild or revise the current V5.5 mentor-facing deck. Keep the nine main
+audience topic slides, preserve the complex workflow and ML runtime diagrams in
+the main sequence, use website/source-backed visuals, and keep the explanation
+clear for non-ML/non-hydrate audiences. Treat V5.4 as the source baseline and
+V5.3 as flawed reference only.
 
 Guardrails: do not expose approved/private rows; do not claim hydrate proof,
 final stability, final top/base/thickness, trained ML metrics, occurrence
@@ -49,11 +50,11 @@ docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md,
 docs/STABILITY_CALCULATION_PLAN.md, docs/SCIENCE_TO_ML_LOGIC_LADDER.md, and
 docs/ML_PIPELINE_BASELINE_SOURCE_LEDGER.md.
 
-Task: rebuild or revise the V5.3 Word companion so it explains the current
+Task: rebuild or revise the V5.5 Word companion so it explains the current
 public/OSL boundary, stability-admissibility layer, parameter evidence logic,
-approved-data intake contract, leakage-safe ML workflow, occurrence
-classification path, saturation regression path, validation plan, and mentor
-decisions.
+approved-data intake contract, DOE three-dataset prototype, leakage-safe ML
+workflow, occurrence classification path, saturation regression path, validation
+plan, stability-to-ML overlay, visual provenance, and mentor decisions.
 
 Guardrails: public-safe planning artifact only. Do not include approved rows,
 trained metrics, hydrate proof, final stability top/base/thickness, occurrence

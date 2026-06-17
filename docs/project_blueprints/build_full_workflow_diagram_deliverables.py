@@ -15,11 +15,12 @@ from pptx import Presentation
 
 ROOT = Path(__file__).resolve().parents[2]
 BLUEPRINT_DIR = ROOT / "docs" / "project_blueprints"
-ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "v5_4_corrected_2026_06_16"
+V54_ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "v5_4_corrected_2026_06_16"
+ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "v5_5_mentor_update_2026_06_17"
 SOURCE_DECK = BLUEPRINT_DIR / "CURRENT_GMAIL_VISUAL_REVISION_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-11.pptx"
-OUT_DECK = BLUEPRINT_DIR / "V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx"
-OUT_DOCX = BLUEPRINT_DIR / "V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx"
-OUT_CONTACT_SHEET = ASSET_DIR / "v5_4_corrected_contact_sheet.png"
+OUT_DECK = BLUEPRINT_DIR / "V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx"
+OUT_DOCX = BLUEPRINT_DIR / "V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx"
+OUT_CONTACT_SHEET = ASSET_DIR / "v5_5_mentor_update_contact_sheet.png"
 PUBLIC_PRODUCTS = ROOT / "data" / "public_stability_products"
 PUBLIC_ML_PRODUCTS = ROOT / "data" / "public_ml_products"
 WEBSITE_CAPTURE_DIR = BLUEPRINT_DIR / "presentation_assets" / "v5_3_website_captures"
@@ -3523,15 +3524,411 @@ def v54_build_word_companion(panel_paths: list[Path], contact_sheet: Path) -> Pa
     return OUT_DOCX
 
 
+def v55_copy_v54_panel(filename: str, output_name: str) -> Path:
+    return v54_copy_authority_panel(V54_ASSET_DIR / filename, output_name)
+
+
+def v55_slide_personal_opener() -> Path:
+    return v55_copy_v54_panel("slide_01_personal_about_me_v5_4.png", "slide_01_personal_about_me_v5_5.png")
+
+
+def v55_slide_context() -> Path:
+    return v55_copy_v54_panel("slide_02_source_context_v5_4.png", "slide_02_source_context_v5_5.png")
+
+
+def v55_slide_parameter_ranges() -> Path:
+    return v55_copy_v54_panel("slide_03_parameter_ranges_v5_4.png", "slide_03_parameter_ranges_v5_5.png")
+
+
+def v55_slide_full_workflow() -> Path:
+    return v54_copy_authority_panel(
+        V52_ASSET_DIR / "slide_04_expanded_architecture_map.png",
+        "slide_04_full_complex_project_workflow_v5_5.png",
+        "Full Complex Project Workflow V5.5",
+        "The complete architecture stays in the main sequence: public sources, approved runtime later, stability context, feature engineering, target rail, split controls, validation, and exports.",
+    )
+
+
+def v55_slide_equations_unit_gate() -> Path:
+    return v55_copy_v54_panel("slide_06_equations_feature_unit_gate_v5_4.png", "slide_06_equations_feature_unit_gate_v5_5.png")
+
+
+def v55_slide_ml_runtime() -> Path:
+    return v54_copy_authority_panel(
+        V52_ASSET_DIR / "slide_07_ml_runtime_detail.png",
+        "slide_07_complex_ml_runtime_architecture_v5_5.png",
+        "Complex ML Runtime Architecture V5.5",
+        "Feature groups, X_allowed, target-only rail, whole-well split, train-only preprocessing, baselines, ANN/Keras candidate, dual heads, validation, and reviewed outputs remain intact.",
+    )
+
+
+def v55_small_header(draw: ImageDraw.ImageDraw, xy: tuple[int, int], label: str, color: tuple[int, int, int]) -> None:
+    x, y = xy
+    card(draw, (x, y, x + 180, y + 32), fill=WHITE, outline=color, radius=10, width=2)
+    text(draw, (x + 12, y + 8), label, 12, color, True, width=156, align="center")
+
+
+def v55_feature_chip(
+    draw: ImageDraw.ImageDraw,
+    box: tuple[int, int, int, int],
+    label: str,
+    body: str,
+    color: tuple[int, int, int],
+) -> None:
+    card(draw, box, fill=WHITE, outline=color, radius=8, width=2)
+    x1, y1, x2, _ = box
+    text(draw, (x1 + 14, y1 + 10), label, 14, color, True, width=x2 - x1 - 28)
+    text(draw, (x1 + 14, y1 + 34), body, 11, NAVY, True, width=x2 - x1 - 28, gap=2)
+
+
+def v55_slide_doe_three_dataset_prototype() -> Path:
+    img = canvas(False)
+    draw = ImageDraw.Draw(img)
+    v53_panel_title(
+        draw,
+        "DOE Three-Dataset Prototype",
+        "What ran: a local approved-runtime plumbing test. What it proves: target leakage control and feature audit, not final science.",
+    )
+
+    data_cards = [
+        ((70, 150, 380, 305), "curated_dataset1.xlsx", "training workbook", "fits prototype saturation regressors when a target is selected", GREEN),
+        ((70, 375, 380, 530), "curated_dataset2.xlsx", "external review workbook", "scored or evaluated separately from dataset 1", BLUE),
+        ((70, 600, 380, 755), "curated_dataset3.xlsx", "external review or alternate train", "can train only if this is where approved labels exist", PURPLE),
+    ]
+    for box, heading, tag, body, color in data_cards:
+        card(draw, box, fill=(248, 252, 253), outline=color, radius=10, width=2)
+        text(draw, (box[0] + 20, box[1] + 18), heading, 20, color, True, width=box[2] - box[0] - 40)
+        pill(draw, (box[0] + 20, box[1] + 58, box[2] - 20, box[1] + 90), tag, WHITE, color)
+        text(draw, (box[0] + 20, box[1] + 105), body, 14, NAVY, True, width=box[2] - box[0] - 40, gap=4)
+
+    arrow(draw, (390, 227), (510, 285), GREEN, width=4, label="train")
+    arrow(draw, (390, 452), (510, 410), BLUE, width=4, label="score")
+    arrow(draw, (390, 677), (510, 535), PURPLE, width=4, label="review")
+
+    clean_box = (520, 150, 1015, 755)
+    card(draw, clean_box, fill=(247, 252, 250), outline=TEAL, radius=10, width=2)
+    text(draw, (548, 178), "Cleaned feature matrix", 24, TEAL, True, width=420)
+    text(draw, (548, 218), "Allowed X comes from cleaned numeric predictors after target-only, depth/helper, unnamed, and duplicate raw-alias exclusions.", 16, NAVY, True, width=420, gap=5)
+    chips = [
+        ("Measured logs", "GR, RHOB, RES, VP, VS only after canonical cleaning", GREEN),
+        ("Derived physics", "log resistivity, Vp/Vs, impedance, elastic attributes", BLUE),
+        ("QC/context", "missingness, source confidence, optional stability context", AMBER),
+        ("Train-only fit", "impute, scale, and model on the training workbook only", PURPLE),
+    ]
+    chip_positions = [(550, 300, 770, 405), (790, 300, 985, 405), (550, 435, 770, 540), (790, 435, 985, 540)]
+    for chip_box, chip_data in zip(chip_positions, chips):
+        v55_feature_chip(draw, chip_box, *chip_data)
+
+    exclude_box = (548, 590, 988, 720)
+    card(draw, exclude_box, fill=RED_LIGHT, outline=RED, radius=10, width=2)
+    text(draw, (574, 612), "Excluded from X_allowed", 20, RED, True, width=380)
+    text(
+        draw,
+        (574, 652),
+        "S_h, S_wr, Sh, Swr, occurrence/phase labels, Depth_ft, DEPT, depths_unit*, Unnamed:*, spreadsheet helper fields, and duplicate raw aliases.",
+        14,
+        NAVY,
+        True,
+        width=380,
+        gap=4,
+    )
+
+    run_box = (1060, 150, 1530, 755)
+    card(draw, run_box, fill=WHITE, outline=AMBER, radius=10, width=2)
+    text(draw, (1090, 178), "Visual model-run card", 24, AMBER, True, width=410)
+    run_rows = [
+        ("Targets", "S_h, S_wr, Sh, Swr stay Y-only", RED),
+        ("Features", "cleaned canonical logs + derived physics + QC/context", TEAL),
+        ("Runtime output", "ignored outputs_runtime/ and models_runtime/ folders", BLUE),
+        ("Metric status", "training-fit/runtime proof only; no final validation claim", RED),
+        ("Review surface", "Analyze Hydrates > Model Run Tracker reads local summaries", PURPLE),
+    ]
+    y = 235
+    for heading, body, color in run_rows:
+        card(draw, (1092, y, 1498, y + 78), fill=(248, 252, 253), outline=color, radius=8, width=2)
+        text(draw, (1112, y + 12), heading, 16, color, True, width=120)
+        text(draw, (1238, y + 12), body, 13, NAVY, True, width=238, gap=3)
+        y += 96
+
+    card(draw, (1060, 672, 1530, 755), fill=(255, 248, 248), outline=RED, radius=10, width=2)
+    text(draw, (1090, 696), "Training-fit disclaimer", 18, RED, True, width=180)
+    text(draw, (1285, 692), "Do not present R2 or row predictions as validated project results.", 14, NAVY, True, width=205, gap=4)
+
+    footer(
+        draw,
+        "Sources: DOE_THREE_DATASET_ML_PIPELINE_RUNBOOK, DOE_RUNTIME_PRESENTATION_AND_MODEL_TRACKING_PLAN, code_transfer_block multi-saturation workflow, and Model Run Tracker templates.",
+    )
+    return save(img, "slide_05_doe_three_dataset_prototype_v5_5.png")
+
+
+def v55_slide_stability_ml_overlay(values: dict[str, str]) -> Path:
+    img = canvas(False)
+    draw = ImageDraw.Draw(img)
+    v53_panel_title(
+        draw,
+        "Stability-To-ML Overlay",
+        "Stability can help review the model as context, mask, confidence, and caveat. It is not occurrence proof or a saturation label.",
+    )
+
+    source_box = (70, 155, 430, 720)
+    card(draw, source_box, fill=(248, 252, 253), outline=BLUE, radius=10, width=2)
+    text(draw, (98, 180), "Public stability screen", 23, BLUE, True, width=300)
+    stats = [
+        (values["screen_rows"], "public screen rows"),
+        (values["screen_calculated"], "calculated admissibility intervals"),
+        (values["screen_no_interval"], "no-stable rows"),
+        (values["screen_blocked"], "blocked rows"),
+    ]
+    y = 240
+    for number, label in stats:
+        card(draw, (100, y, 400, y + 70), fill=WHITE, outline=LINE, radius=8, width=2)
+        text(draw, (120, y + 12), number, 21, BLUE if label != "blocked rows" else RED, True, width=90)
+        text(draw, (220, y + 15), label, 13, NAVY, True, width=155, gap=3)
+        y += 90
+    text(draw, (98, 625), "Methane 5 ppt phase curve + hydrostatic pressure + G10015 temperature model under locked public assumptions.", 13, MUTED, True, width=300, gap=4)
+
+    overlay_box = (500, 155, 1110, 720)
+    card(draw, overlay_box, fill=WHITE, outline=TEAL, radius=10, width=2)
+    text(draw, (530, 180), "Allowed overlay roles", 24, TEAL, True, width=520)
+    role_boxes = [
+        ((535, 245, 795, 355), "Context", "Add stability status beside logs and predictions.", TEAL),
+        ((825, 245, 1080, 355), "Mask", "Filter or flag rows outside the current admissible screen.", BLUE),
+        ((535, 395, 795, 505), "Confidence", "Carry source-control labels: high, medium, low, blocked.", GREEN),
+        ((825, 395, 1080, 505), "Caveat", "Explain phase, temperature, pressure, and blocked reasons.", AMBER),
+    ]
+    for box, heading, body, color in role_boxes:
+        card(draw, box, fill=(248, 252, 253), outline=color, radius=9, width=2)
+        text(draw, (box[0] + 18, box[1] + 14), heading, 20, color, True, width=box[2] - box[0] - 36)
+        text(draw, (box[0] + 18, box[1] + 48), body, 14, NAVY, True, width=box[2] - box[0] - 36, gap=4)
+    for start, end, color in [
+        ((430, 438), (535, 300), BLUE),
+        ((430, 438), (535, 450), GREEN),
+        ((430, 438), (825, 300), TEAL),
+        ((430, 438), (825, 450), AMBER),
+    ]:
+        arrow(draw, start, end, color, width=4)
+
+    block_box = (535, 565, 1080, 680)
+    card(draw, block_box, fill=RED_LIGHT, outline=RED, radius=10, width=2)
+    text(draw, (565, 590), "Blocked uses", 20, RED, True, width=160)
+    text(draw, (745, 585), "Do not use stability as occurrence, saturation, hydrate-present target, negative label for blocked rows, or proof.", 16, NAVY, True, width=300, gap=5)
+
+    ml_box = (1180, 155, 1530, 720)
+    card(draw, ml_box, fill=(248, 252, 253), outline=PURPLE, radius=10, width=2)
+    text(draw, (1208, 180), "Model review layer", 23, PURPLE, True, width=290)
+    cards = [
+        ("Approved logs/targets", "drive model fit", GREEN),
+        ("Occurrence classifier", "future P(hydrate)", TEAL),
+        ("Saturation regressor", "future Sh_pred", BLUE),
+        ("Stability overlay", "context only", AMBER),
+        ("Public summary", "reviewed later", RED),
+    ]
+    y = 245
+    for heading, body, color in cards:
+        card(draw, (1210, y, 1500, y + 66), fill=WHITE, outline=color, radius=8, width=2)
+        text(draw, (1230, y + 10), heading, 15, color, True, width=120)
+        text(draw, (1360, y + 11), body, 13, NAVY, True, width=110, gap=3)
+        if heading != "Public summary":
+            arrow(draw, (1355, y + 70), (1355, y + 84), color, width=3)
+        y += 86
+
+    footer(
+        draw,
+        "Sources: STABILITY_CALCULATION_PLAN, public stability screen, DOE runtime tracking plan, and first model experiment plan. Stability remains admissibility context only.",
+    )
+    return save(img, "slide_08_stability_to_ml_overlay_v5_5.png")
+
+
+def v55_slide_done_not_claimed_next(values: dict[str, str]) -> Path:
+    img = canvas(False)
+    draw = ImageDraw.Draw(img)
+    v53_panel_title(
+        draw,
+        "What We Have Done, What Is Not Claimed, What Is Next",
+        "V5.5 makes the current contribution explicit while keeping every result claim inside the approved-runtime guardrails.",
+    )
+
+    columns = [
+        (
+            (70, 150, 505, 700),
+            "What we have done",
+            TEAL,
+            [
+                "V5.4 deck updated into a V5.5 mentor sequence.",
+                "Personal opener and source-backed hydrate/North Slope visuals preserved.",
+                "Full complex workflow and ML runtime diagrams kept in the main sequence.",
+                "DOE three-dataset prototype, cleaned feature audit, and Model Run Tracker explained.",
+                "Stability overlay framed as context, mask, confidence, and caveat only.",
+            ],
+        ),
+        (
+            (585, 150, 1020, 700),
+            "What is not claimed",
+            RED,
+            [
+                "No hydrate proof.",
+                "No final stability top/base/thickness claim.",
+                "No public row-level approved data.",
+                "No occurrence prediction or saturation prediction.",
+                "No final trained ML metrics, sweet spots, producibility ranking, or target authority.",
+            ],
+        ),
+        (
+            (1095, 150, 1530, 700),
+            "What is next",
+            AMBER,
+            [
+                "Run DOE workflow in the approved runtime and keep outputs ignored until review.",
+                "Confirm target priority for S_h, S_wr, Sh, Swr and fraction-vs-percent policy.",
+                "Review feature exclusions and stability overlay settings with mentor.",
+                "Assign whole-well or compartment validation before final metrics.",
+                "Bring back only public-safe summaries after data-owner review.",
+            ],
+        ),
+    ]
+    for box, heading, color, items in columns:
+        card(draw, box, fill=(248, 252, 253), outline=color, radius=10, width=2)
+        text(draw, (box[0] + 26, box[1] + 24), heading, 24, color, True, width=box[2] - box[0] - 52)
+        y = box[1] + 85
+        for idx, item in enumerate(items, start=1):
+            draw.ellipse((box[0] + 28, y + 2, box[0] + 54, y + 28), fill=color)
+            text(draw, (box[0] + 37, y + 6), str(idx), 11, WHITE, True)
+            y = text(draw, (box[0] + 70, y), item, 14, NAVY, True, width=box[2] - box[0] - 100, gap=4) + 14
+
+    card(draw, (70, 735, 1530, 812), fill=WHITE, outline=LINE, radius=10, width=2)
+    text(draw, (98, 758), "Source/provenance trail", 18, TEAL, True, width=210)
+    text(
+        draw,
+        (330, 755),
+        "V5.5 panels are generated by build_full_workflow_diagram_deliverables.py from V5.4 panels, V5.2 authority plates, public stability products, DOE runbook/tracker docs, and source_visual_inventory.",
+        16,
+        NAVY,
+        True,
+        width=1110,
+        gap=5,
+    )
+    footer(draw, f"Public scaffold: {values['screen_rows']} stability rows; {values['screen_calculated']} calculated admissibility intervals; about 3/71 approved datasets visible for schema/runtime prototyping.")
+    return save(img, "slide_09_done_not_claimed_next_v5_5.png")
+
+
+def v55_build_panels() -> list[Path]:
+    values = summaries()
+    return [
+        v55_slide_personal_opener(),
+        v55_slide_context(),
+        v55_slide_parameter_ranges(),
+        v55_slide_full_workflow(),
+        v55_slide_doe_three_dataset_prototype(),
+        v55_slide_equations_unit_gate(),
+        v55_slide_ml_runtime(),
+        v55_slide_stability_ml_overlay(values),
+        v55_slide_done_not_claimed_next(values),
+    ]
+
+
+def v55_build_word_companion(panel_paths: list[Path], contact_sheet: Path) -> Path:
+    values = summaries()
+    document = Document()
+    apply_doc_style(document)
+    section = document.sections[0]
+    section.top_margin = Inches(0.6)
+    section.bottom_margin = Inches(0.6)
+    section.left_margin = Inches(0.65)
+    section.right_margin = Inches(0.65)
+
+    props = document.core_properties
+    props.title = "V5.5 Mentor Update North Slope Gas Hydrate ML Workflow Companion"
+    props.subject = "Mentor-facing V5.5 slide companion"
+    props.author = "North Slope Gas Hydrates project"
+
+    document.add_heading("V5.5 Mentor Update North Slope Gas Hydrate ML Workflow Companion", level=0)
+    document.add_paragraph(
+        "This companion explains the V5.5 revision built from the V5.4 corrected source-baseline deck. It keeps the "
+        "personal/about-me opener, source-backed hydrate and North Slope context, the full complex workflow "
+        "diagram, and the complex ML runtime architecture in the main nine-slide sequence. The update adds a "
+        "clean DOE three-dataset prototype explanation, a visual model-run card, a stability-to-ML overlay, "
+        "and a clearer done/not-claimed/next status section."
+    )
+
+    document.add_heading("Current Public And Runtime Position", level=1)
+    document.add_paragraph(
+        f"The public scaffold tracks {values['wells']} Arctic Slope public wells, {values['profiles']} G10015 "
+        f"temperature profiles, {values['temp_matches']} temperature-profile matches, and "
+        f"{values['screen_calculated']} methane 5 ppt calculated stability-admissibility intervals. The public "
+        "side still supports schema/runtime prototyping, source-backed visuals, and guardrail documentation, not "
+        "public approved-data rows or final model results."
+    )
+    document.add_paragraph(
+        "The DOE side now has a public-safe runtime path for the three curated workbooks. Dataset 1 can train "
+        "prototype saturation regressors, datasets 2 and 3 are treated as external review or alternate training "
+        "sets depending on target availability, and row-level outputs, predictions, fitted models, and manifests "
+        "remain in ignored runtime folders."
+    )
+
+    document.add_heading("What V5.5 Adds", level=1)
+    for item in [
+        "Slide 5 explains the cleaned DOE three-dataset prototype and model-run card: targets S_h, S_wr, Sh, and Swr are Y-only; cleaned canonical features enter X_allowed; depth/helper/raw-alias columns are excluded; training-fit metrics are runtime proof only.",
+        "Slide 8 makes the stability overlay explicit: context, mask, confidence, and caveat are allowed uses; occurrence proof, saturation, hydrate-present labels, and negative labels for blocked rows are not allowed.",
+        "Slide 9 closes with what has been done, what is not claimed, and what must happen next before final ML or stability claims.",
+    ]:
+        document.add_paragraph(item, style="List Bullet")
+
+    document.add_heading("Guardrail Language", level=1)
+    for item in [
+        "Use 'training-fit/runtime proof only' for current DOE prototype metrics, not final model performance.",
+        "Use 'stability-admissibility context' for the public screen, not hydrate proof, occurrence, or saturation.",
+        "Keep S_h, S_wr, Sh, Swr, Sgh, NMR_SAT, hydrate saturation, occurrence labels, and phase labels out of X_allowed.",
+        "Bring back only public-safe summaries after mentor, data-owner, and release review.",
+    ]:
+        document.add_paragraph(item, style="List Bullet")
+
+    slide_notes = [
+        ("Slide 1 - Personal/about-me opener", "Preserved from V5.4 to keep the agreed mentor-facing opener style."),
+        ("Slide 2 - Source-backed hydrate and North Slope context", "Preserved V5.4 USGS hydrate, methane 5 ppt phase-curve, and public map provenance. No AI-looking hydrate/PT art is added."),
+        ("Slide 3 - Parameters and expected hydrate ranges", "Preserved the registry-backed range board: working envelopes, mimics, roles, and Y-only labels."),
+        ("Slide 4 - Full complex project workflow", "Kept the whole complex architecture as a main-sequence plate, not an appendix-only reference."),
+        ("Slide 5 - DOE three-dataset prototype", "Adds the cleaned prototype story, feature exclusions, target-only saturation variants, and training-fit disclaimer."),
+        ("Slide 6 - Equations, feature engineering, and unit gate", "Preserves the unit/QC/leakage gate for equation features."),
+        ("Slide 7 - Complex ML runtime architecture", "Keeps the complete ML runtime plate in the main sequence."),
+        ("Slide 8 - Stability-to-ML overlay", "Shows stability as context, mask, confidence, and caveat only."),
+        ("Slide 9 - Done / not claimed / next", "Closes with current accomplishments, explicit non-claims, and next approved-runtime steps."),
+    ]
+    document.add_heading("Slide-By-Slide Companion", level=1)
+    for idx, (heading, body) in enumerate(slide_notes):
+        document.add_heading(heading, level=2)
+        document.add_paragraph(body)
+        if idx < len(panel_paths) and panel_paths[idx].exists():
+            document.add_picture(str(panel_paths[idx]), width=Inches(6.7))
+
+    document.add_heading("Contact Sheet", level=1)
+    if contact_sheet.exists():
+        document.add_picture(str(contact_sheet), width=Inches(6.7))
+
+    document.add_heading("Source And Visual Provenance", level=1)
+    anchors = [
+        "docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/ for the active V5.4 source panels.",
+        "docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/ for the V5.2 complex workflow and ML runtime authority plates.",
+        "data/public_ml_products/source_visual_inventory_2026-06-16.csv for slide and website visual provenance.",
+        "docs/DOE_THREE_DATASET_ML_PIPELINE_RUNBOOK_2026-06-16.md and docs/DOE_RUNTIME_PRESENTATION_AND_MODEL_TRACKING_PLAN_2026-06-16.md for the DOE prototype language.",
+        "docs/STABILITY_CALCULATION_PLAN.md and public stability products for the stability overlay.",
+    ]
+    for item in anchors:
+        document.add_paragraph(item, style="List Bullet")
+
+    OUT_DOCX.parent.mkdir(parents=True, exist_ok=True)
+    document.save(OUT_DOCX)
+    return OUT_DOCX
+
+
 def main() -> None:
-    panels = v54_build_panels()
+    panels = v55_build_panels()
     if len(panels) != 9:
-        raise ValueError(f"V5.4 must have exactly 9 slides, found {len(panels)}")
+        raise ValueError(f"V5.5 must have exactly 9 slides, found {len(panels)}")
     deck = rebuild_deck(panels)
     verify_deck(deck)
     contact_sheet = build_contact_sheet(panels)
-    docx = v54_build_word_companion(panels, contact_sheet)
-    print(f"Wrote {len(panels)} V5.4 panels")
+    docx = v55_build_word_companion(panels, contact_sheet)
+    print(f"Wrote {len(panels)} V5.5 panels")
     print(f"Wrote {contact_sheet}")
     print(f"Wrote {deck}")
     print(f"Wrote {docx}")
