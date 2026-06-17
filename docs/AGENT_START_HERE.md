@@ -103,6 +103,9 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
 - `docs/DOE_THREE_DATASET_ML_PIPELINE_RUNBOOK_2026-06-16.md` - approved-runtime
   command guide for using `curated_dataset1.xlsx` as training and
   `curated_dataset2.xlsx` / `curated_dataset3.xlsx` as external tests.
+- `docs/DOE_RUNTIME_PRESENTATION_AND_MODEL_TRACKING_PLAN_2026-06-16.md` -
+  current plan for showing DOE local model runs, feature exclusions, stability
+  context, and package-unlocked next steps in a mentor-readable website view.
 
 ## Current Authoritative Slide and Doc Assets
 
@@ -151,6 +154,7 @@ Primary Streamlit sections in `dashboard/app.py`:
   - `Target Registry & Leakage`
   - `Interval Review`
   - `Runtime Readiness`
+  - `Model Run Tracker`
   - `Presentation Exports`
   - `Methods & Evidence`
 - `Project Plan`
@@ -176,6 +180,9 @@ Public ML products in `data/public_ml_products/`:
 - `approved_data_y_target_registry_template_2026-06-15.csv`
 - `first_model_output_schema_template_2026-06-15.csv`
 - `variable_fingerprint_template_2026-06-15.csv`
+- `model_run_tracker_summary_template_2026-06-16.csv`
+- `model_run_feature_audit_template_2026-06-16.csv`
+- `model_run_stability_join_template_2026-06-16.csv`
 - `intake_readiness_reports/demo_header_audit_2026-06-15.csv`
 - `intake_readiness_reports/demo_header_audit_2026-06-15.json`
 
@@ -208,8 +215,8 @@ Run the full suite before committing meaningful changes:
 python -m pytest
 ```
 
-Expected current result: `120 passed` as of the 2026-06-16 three-dataset
-runtime-pipeline update. Update this count only after verifying it locally.
+Expected current result: `122 passed` as of the 2026-06-16 DOE model-run
+tracker update. Update this count only after verifying it locally.
 
 Current test files:
 
@@ -226,6 +233,7 @@ Current test files:
 - `tests/test_parameter_evidence_registry.py`
 - `tests/test_source_visual_inventory.py`
 - `tests/test_three_dataset_ml_pipeline.py`
+- `tests/test_model_run_tracker.py`
 
 ## Current Guardrails
 

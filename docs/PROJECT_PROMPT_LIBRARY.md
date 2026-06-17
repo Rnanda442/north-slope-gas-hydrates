@@ -79,7 +79,7 @@ Overview, Explore North Slope, Analyze Hydrates, and Project Plan. Keep Explore
 North Slope focused on Regional Map, 3D Structure, and Data & Sources. Keep
 Analyze Hydrates focused on Public ML Readiness, Schema Coverage &
 Architecture, Target Registry & Leakage, Interval Review, Runtime Readiness,
-and Methods & Evidence.
+Model Run Tracker, Presentation Exports, and Methods & Evidence.
 
 Guardrails: the website is public delivery and skeleton transfer surface only.
 It must not load approved rows, private identifiers, trained model artifacts,

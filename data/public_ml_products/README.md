@@ -44,6 +44,19 @@ provenance, allowed use, QA status, replacement flags, and guardrails. It is
 displayed in Analyze Hydrates > Presentation Exports and is tested by
 `tests/test_source_visual_inventory.py`.
 
+`model_run_tracker_summary_template_2026-06-16.csv`
+
+`model_run_feature_audit_template_2026-06-16.csv`
+
+`model_run_stability_join_template_2026-06-16.csv`
+
+These are public-safe templates for the DOE local model-run tracker. The
+website can read actual ignored runtime summaries from `outputs_runtime/` inside
+the approved environment, while GitHub carries only the expected summary shape,
+feature/exclusion audit shape, and stability-join contract. Do not populate
+these templates with approved workbook rows, row-level predictions, fitted
+models, or final performance claims.
+
 `approved_data_field_role_table_2026-06-15.csv`
 
 This is the public-safe header role table used by
@@ -74,6 +87,9 @@ The schema-only templates are:
 - `approved_data_y_target_registry_template_2026-06-15.csv`
 - `first_model_output_schema_template_2026-06-15.csv`
 - `variable_fingerprint_template_2026-06-15.csv`
+- `model_run_tracker_summary_template_2026-06-16.csv`
+- `model_run_feature_audit_template_2026-06-16.csv`
+- `model_run_stability_join_template_2026-06-16.csv`
 
 These files are headers/schema only. They do not contain approved LAS/CSV/core
 rows, private workbook rows, occurrence probabilities, saturation predictions,

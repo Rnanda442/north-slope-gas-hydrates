@@ -27,6 +27,10 @@ from dashboard.source_visual_inventory import (
     validate_source_visual_inventory,
 )
 from dashboard.runtime.feature_engineering import add_standard_features
+from dashboard.runtime.model_run_tracker import (
+    load_local_model_run_tracker,
+    stability_runtime_integration_plan_frame,
+)
 from dashboard.runtime.schemas import (
     CHONG_ML_FEATURE_COLUMNS,
     PROJECT_COHORT_ASSUMPTIONS,
@@ -1220,6 +1224,11 @@ def cached_stability_temperature_model(project_root: str) -> pd.DataFrame:
 @st.cache_data
 def cached_methane_phase_curve(project_root: str) -> pd.DataFrame:
     return load_methane_phase_curve(Path(project_root))
+
+
+@st.cache_data
+def cached_local_model_run_tracker(project_root: str) -> dict[str, pd.DataFrame]:
+    return load_local_model_run_tracker(Path(project_root))
 
 
 def project_relative_or_absolute(path: Path) -> str:
@@ -3604,6 +3613,158 @@ def render_runtime_readiness(logs: pd.DataFrame) -> None:
         st.dataframe(issues, use_container_width=True, hide_index=True)
 
 
+def render_model_run_tracker() -> None:
+    st.subheader("Local Model Run Tracker")
+    st.caption(
+        "This panel reads ignored local files under outputs_runtime. It is meant "
+        "for DOE/approved-runtime review and does not require raw workbook rows in GitHub."
+    )
+    tracker = cached_local_model_run_tracker(str(PROJECT_ROOT))
+    runs = tracker.get("runs", pd.DataFrame())
+    summary = tracker.get("summary", pd.DataFrame())
+    features = tracker.get("features", pd.DataFrame())
+    exclusions = tracker.get("exclusions", pd.DataFrame())
+    datasets = tracker.get("datasets", pd.DataFrame())
+    test_metrics = tracker.get("test_metrics", pd.DataFrame())
+
+    st.markdown("#### Stability-To-ML Contract")
+    st.dataframe(stability_runtime_integration_plan_frame(), use_container_width=True, hide_index=True)
+    st.warning(
+        "Stability can become context, mask, confidence, and caveat. It cannot become "
+        "hydrate proof, occurrence, saturation, or final sweet-spot rank."
+    )
+
+    if runs.empty:
+        st.info(
+            "No local runtime folders were found yet. In DOE, rerun the three-dataset "
+            "workflow or the multi-saturation workflow, then refresh this page."
+        )
+        st.code(
+            "python code_transfer_block\\multi_saturation_target_workflow.py "
+            "--data-dir \"%USERPROFILE%\\Downloads\\Northslopedatasets06052026\"",
+            language="bash",
+        )
+        return
+
+    run_count = len(runs)
+    trained_targets = int(summary["status"].astype(str).str.eq("trained").sum()) if not summary.empty else 0
+    feature_count = int(features["feature_column"].nunique()) if "feature_column" in features else 0
+    excluded_count = int((exclusions["decision"].astype(str) == "excluded").sum()) if "decision" in exclusions else 0
+    metrics = st.columns(4)
+    metrics[0].metric("Local run folders", f"{run_count:,}")
+    metrics[1].metric("Trained target runs", f"{trained_targets:,}")
+    metrics[2].metric("Unique feature columns", f"{feature_count:,}")
+    metrics[3].metric("Excluded columns audited", f"{excluded_count:,}")
+
+    if not summary.empty:
+        st.markdown("#### Run Summary")
+        display_columns = [
+            column
+            for column in [
+                "run_name",
+                "run_type",
+                "target_column",
+                "status",
+                "model_kind",
+                "training_rows",
+                "feature_count",
+                "train_mae",
+                "train_rmse",
+                "train_r2",
+                "test_status",
+                "prediction_file_count",
+                "guardrail",
+            ]
+            if column in summary.columns
+        ]
+        st.dataframe(summary[display_columns], use_container_width=True, hide_index=True)
+        st.caption(
+            "Training metrics show that the runtime executes. They are not final "
+            "model performance unless a whole-well validation or locked test row says so."
+        )
+
+    if not test_metrics.empty:
+        st.markdown("#### External/Whole-Workbook Test Metrics")
+        st.dataframe(test_metrics, use_container_width=True, hide_index=True)
+
+    if not features.empty:
+        st.markdown("#### Feature Families Used")
+        family_counts = (
+            features["feature_family"]
+            .fillna("unknown")
+            .value_counts()
+            .rename_axis("feature_family")
+            .reset_index(name="columns")
+        )
+        figure = go.Figure(
+            go.Bar(
+                x=family_counts["columns"],
+                y=family_counts["feature_family"],
+                orientation="h",
+                marker={"color": "#0891b2"},
+                hovertemplate="%{y}<br>Columns: %{x:,}<extra></extra>",
+            )
+        )
+        figure.update_layout(
+            height=320,
+            xaxis_title="Feature-column count",
+            yaxis_title="",
+            margin={"l": 20, "r": 20, "t": 20, "b": 20},
+        )
+        st.plotly_chart(figure, use_container_width=True)
+        st.dataframe(
+            features[["run_name", "target_id", "feature_column", "feature_family"]].drop_duplicates()
+            if "target_id" in features.columns
+            else features.drop_duplicates(),
+            use_container_width=True,
+            hide_index=True,
+        )
+
+    if not exclusions.empty:
+        st.markdown("#### Feature Exclusion Audit")
+        if "reason" in exclusions.columns:
+            st.dataframe(
+                exclusions["reason"]
+                .fillna("unknown")
+                .value_counts()
+                .rename_axis("exclusion_reason")
+                .reset_index(name="columns"),
+                use_container_width=True,
+                hide_index=True,
+            )
+        st.dataframe(exclusions.head(200), use_container_width=True, hide_index=True)
+
+    if not datasets.empty:
+        st.markdown("#### Dataset/Sheet Inventory")
+        st.dataframe(datasets, use_container_width=True, hide_index=True)
+
+    cols = st.columns(3)
+    if not summary.empty:
+        cols[0].download_button(
+            "Download run summary CSV",
+            csv_bytes(summary),
+            "local_model_run_summary.csv",
+            "text/csv",
+            key="download_local_model_run_summary",
+        )
+    if not features.empty:
+        cols[1].download_button(
+            "Download feature audit CSV",
+            csv_bytes(features),
+            "local_model_run_features.csv",
+            "text/csv",
+            key="download_local_model_run_features",
+        )
+    if not exclusions.empty:
+        cols[2].download_button(
+            "Download exclusions CSV",
+            csv_bytes(exclusions),
+            "local_model_run_exclusions.csv",
+            "text/csv",
+            key="download_local_model_run_exclusions",
+        )
+
+
 def render_ml_visual_architecture() -> None:
     st.subheader("Topic 5: ML Evidence and Well-Log Scaffold")
     st.caption(
@@ -5559,6 +5720,7 @@ def render_analyze_hydrates() -> None:
             "Target Registry & Leakage",
             "Interval Review",
             "Runtime Readiness",
+            "Model Run Tracker",
             "Presentation Exports",
             "Methods & Evidence",
         ]
@@ -5591,8 +5753,10 @@ def render_analyze_hydrates() -> None:
             )
         render_runtime_readiness(logs)
     with tabs[5]:
-        render_presentation_exports()
+        render_model_run_tracker()
     with tabs[6]:
+        render_presentation_exports()
+    with tabs[7]:
         render_ml_visual_architecture()
         render_source_anchors()
         with st.expander("Header and track blueprint", expanded=True):

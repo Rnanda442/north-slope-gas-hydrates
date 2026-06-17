@@ -93,6 +93,57 @@ python 01_pipeline/run_three_dataset_ml_pipeline.py --data-dir "%USERPROFILE%\Do
 Use TensorFlow/Keras later only after the environment package request is
 approved and the baseline feature/target tables are confirmed.
 
+## Multi-Saturation Prototype Command
+
+If the available labels are all saturation variants, use the standalone transfer
+workflow. It treats every saturation-like column as a separate Y-only target and
+writes a feature/exclusion audit for each target:
+
+```bash
+python code_transfer_block\multi_saturation_target_workflow.py --data-dir "%USERPROFILE%\Downloads\Northslopedatasets06052026"
+```
+
+The cleaned run folder should start with:
+
+```text
+outputs_runtime\multi_saturation_clean_features_...
+```
+
+Review these files:
+
+- `run_summary.csv` - one row per trained or blocked saturation target;
+- `feature_columns_by_target.csv` - cleaned canonical X columns by target;
+- `excluded_feature_columns_by_target.csv` - target-only, depth, unit/helper,
+  unnamed, and raw-alias exclusions;
+- `sheet_inventory.csv` - workbook/sheet row and column counts.
+
+The cleaned feature file should not include `Depth_ft`, `DEPT`,
+`depths_unit*`, `Unnamed:*`, raw `GR`, raw `RES`, raw `RHOB`, raw `VP`, or raw
+`VS` as model inputs. If those appear, the old notebook cell or an older script
+was run.
+
+## Website Review Surface
+
+After running either workflow, open the website and use:
+
+```text
+Analyze Hydrates > Model Run Tracker
+```
+
+This tab reads ignored local runtime folders under `outputs_runtime/` and shows
+the run story in a presentable way:
+
+- which run folders exist;
+- which target columns trained;
+- model kind, training rows, feature count, and training-fit metrics;
+- feature families used;
+- excluded columns and why they were excluded;
+- sheet/dataset inventory;
+- how the public stability screen may enter the DOE workflow.
+
+Training-fit metrics are runtime proof only. Final model claims require
+whole-well validation or a locked test set.
+
 ## Expected Local Outputs
 
 Each run writes a new ignored folder with:
