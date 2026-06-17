@@ -76,7 +76,9 @@ def test_multi_saturation_transfer_workflow_trains_targets_from_dataset3(tmp_pat
     output_dir = Path(result["output_dir"])
     summary = pd.read_csv(output_dir / "run_summary.csv")
     features = pd.read_csv(output_dir / "feature_columns_by_target.csv")
+    audit = pd.read_csv(output_dir / "excluded_feature_columns_by_target.csv")
 
+    assert result["feature_policy_version"] == "clean_feature_matrix_v3_2026_06_16"
     assert result["trained_target_count"] == 2
     assert set(summary["target_column"]) == {"S_h", "Sh"}
     assert set(summary["alignment_method"]) == {"row_order_aligned"}
@@ -95,5 +97,11 @@ def test_multi_saturation_transfer_workflow_trains_targets_from_dataset3(tmp_pat
     assert "VS" not in feature_names
     assert {"gr_api", "rt_ohm_m", "caliper_in", "vp_km_s", "vs_km_s", "vp_vs_ratio"}.issubset(feature_names)
     assert {"density_porosity_vv", "neutron_porosity_vv", "nmr_porosity_vv"}.issubset(feature_names)
+    excluded = audit[audit["decision"] == "excluded"]
+    assert {"Depth_ft", "DEPT", "depths_unitD", "Unnamed: 14", "GR", "RES", "RHOB", "VP", "VS"}.issubset(
+        set(excluded["column"])
+    )
+    assert "raw_alias_duplicate_of_gr_api" in set(excluded["reason"])
+    assert "context_depth_unit_or_spreadsheet_helper" in set(excluded["reason"])
     assert any(output_dir.glob("*/predictions_curated_dataset1_*.csv"))
     assert any(output_dir.glob("*/predictions_curated_dataset2_*.csv"))

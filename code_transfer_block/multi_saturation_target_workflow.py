@@ -11,6 +11,7 @@ import pandas as pd
 
 
 DEFAULT_WORKBOOKS = ("curated_dataset1.xlsx", "curated_dataset2.xlsx", "curated_dataset3.xlsx")
+FEATURE_POLICY_VERSION = "clean_feature_matrix_v3_2026_06_16"
 IDENTIFIER_COLUMNS = {"well_alias", "depth_m", "source_workbook", "source_sheet", "row_index"}
 MAX_MODEL_ABS_VALUE = 1.0e12
 SATURATION_EXACT = {
@@ -100,6 +101,20 @@ def is_context_or_helper_header(header: object) -> bool:
     )
 
 
+def feature_exclusion_reason(name: str, saturation_columns: set[str], canonical_columns: set[str]) -> str:
+    canonical_name = canonical_feature_name(name)
+    is_raw_alias_duplicate = canonical_name is not None and canonical_name != name and canonical_name in canonical_columns
+    if name in saturation_columns or is_saturation_header(name):
+        return "target_only_saturation"
+    if name in IDENTIFIER_COLUMNS:
+        return "identifier_or_runtime_context"
+    if is_context_or_helper_header(name):
+        return "context_depth_unit_or_spreadsheet_helper"
+    if is_raw_alias_duplicate:
+        return f"raw_alias_duplicate_of_{canonical_name}"
+    return ""
+
+
 def sheet_key(sheet_name: str) -> str:
     normalized = normalize_header(sheet_name)
     if "1" in normalized:
@@ -158,19 +173,12 @@ def canonicalize_features(frame: pd.DataFrame) -> pd.DataFrame:
 
 def feature_table(frame: pd.DataFrame, saturation_columns: set[str]) -> tuple[pd.DataFrame, list[str]]:
     canonical = canonicalize_features(frame)
+    canonical_columns = set(str(column) for column in canonical.columns)
     selected: list[str] = []
     feature_values: dict[str, pd.Series] = {}
     for column in canonical.columns:
         name = str(column)
-        canonical_name = canonical_feature_name(name)
-        is_raw_alias_duplicate = canonical_name is not None and canonical_name != name and canonical_name in canonical.columns
-        if (
-            name in saturation_columns
-            or name in IDENTIFIER_COLUMNS
-            or is_context_or_helper_header(name)
-            or is_raw_alias_duplicate
-            or is_saturation_header(name)
-        ):
+        if feature_exclusion_reason(name, saturation_columns, canonical_columns):
             continue
         values = clean_numeric_series(canonical[column])
         if values.notna().sum() == 0:
@@ -178,6 +186,30 @@ def feature_table(frame: pd.DataFrame, saturation_columns: set[str]) -> tuple[pd
         selected.append(name)
         feature_values[name] = values
     return clean_numeric_frame(pd.DataFrame(feature_values)), selected
+
+
+def feature_policy_audit(frame: pd.DataFrame, saturation_columns: set[str], target_id: str) -> pd.DataFrame:
+    canonical = canonicalize_features(frame)
+    canonical_columns = set(str(column) for column in canonical.columns)
+    rows: list[dict[str, object]] = []
+    for column in canonical.columns:
+        name = str(column)
+        reason = feature_exclusion_reason(name, saturation_columns, canonical_columns)
+        values = clean_numeric_series(canonical[column])
+        if not reason and values.notna().sum() == 0:
+            reason = "non_numeric_or_empty"
+        rows.append(
+            {
+                "target_id": target_id,
+                "feature_policy_version": FEATURE_POLICY_VERSION,
+                "column": name,
+                "canonical_feature": canonical_feature_name(name) or "",
+                "decision": "excluded" if reason else "included",
+                "reason": reason,
+                "numeric_rows": int(values.notna().sum()),
+            }
+        )
+    return pd.DataFrame(rows)
 
 
 def read_workbook_sheets(data_dir: Path, workbook_names: tuple[str, ...]) -> list[dict[str, object]]:
@@ -275,7 +307,7 @@ def fit_and_predict_all_saturations(
     from sklearn.preprocessing import MinMaxScaler
 
     data_dir = data_dir.expanduser()
-    output_dir = output_dir or Path.cwd() / "outputs_runtime" / f"multi_saturation_run_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    output_dir = output_dir or Path.cwd() / "outputs_runtime" / f"multi_saturation_clean_features_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     sheets = read_workbook_sheets(data_dir, workbook_names)
@@ -297,6 +329,7 @@ def fit_and_predict_all_saturations(
 
     summary_rows: list[dict[str, object]] = []
     feature_rows: list[dict[str, object]] = []
+    feature_audit_rows: list[pd.DataFrame] = []
     if target_inventory.empty:
         (output_dir / "run_summary.csv").write_text("status,message\nblocked,no saturation targets found\n", encoding="utf-8")
         return {"status": "blocked", "message": "no saturation targets found", "output_dir": str(output_dir)}
@@ -325,6 +358,7 @@ def fit_and_predict_all_saturations(
 
         saturation_columns = {str(column) for column in training_frame.columns if is_saturation_header(column)}
         X_train_all, feature_columns = feature_table(training_frame, saturation_columns)
+        feature_audit_rows.append(feature_policy_audit(training_frame, saturation_columns, target_id))
         y = clean_numeric_series(training_frame[target_column])
         mask = y.notna() & X_train_all.notna().any(axis=1)
         X_train = clean_numeric_frame(X_train_all.loc[mask].reset_index(drop=True))
@@ -436,9 +470,12 @@ def fit_and_predict_all_saturations(
     run_summary = pd.DataFrame(summary_rows)
     run_summary.to_csv(output_dir / "run_summary.csv", index=False)
     pd.DataFrame(feature_rows).to_csv(output_dir / "feature_columns_by_target.csv", index=False)
+    if feature_audit_rows:
+        pd.concat(feature_audit_rows, ignore_index=True).to_csv(output_dir / "excluded_feature_columns_by_target.csv", index=False)
     manifest = {
         "status": "complete",
         "output_dir": str(output_dir),
+        "feature_policy_version": FEATURE_POLICY_VERSION,
         "target_count": int(len(target_inventory)),
         "trained_target_count": int((run_summary["status"] == "trained").sum()) if not run_summary.empty else 0,
         "guardrail": "All saturation-like columns are treated as target-only Y variables, not model inputs.",
@@ -466,10 +503,12 @@ def main() -> None:
         min_training_rows=args.min_training_rows,
     )
     print(json.dumps(result, indent=2))
+    print(f"\nFeature policy version: {FEATURE_POLICY_VERSION}")
     print("\nOpen these files in the output folder:")
     print("saturation_target_inventory.csv")
     print("run_summary.csv")
     print("feature_columns_by_target.csv")
+    print("excluded_feature_columns_by_target.csv")
 
 
 if __name__ == "__main__":
