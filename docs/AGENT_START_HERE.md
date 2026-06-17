@@ -300,6 +300,8 @@ Preferred language: `public-safe scaffold`, `schema readiness`,
   `data/public_stability_snapshot/`.
 - Raw heavy source bundles and approved runtime inputs:
   ignored OSL/runtime folders described in `docs/opensciencelab_runtime_layout.md`.
+- Short copy/paste handoff snippets for DOE/Jupyter:
+  `code_transfer_block/`.
 - Reusable prompts:
   `docs/PROJECT_PROMPT_LIBRARY.md` for short reusable prompts, or a dated
   `docs/*_PROMPT_YYYY-MM-DD.md` file for long one-off build prompts.

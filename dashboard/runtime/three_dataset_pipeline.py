@@ -109,27 +109,29 @@ def header_role_hint(header: object) -> str:
 def read_first_nonempty_excel_sheet(path: Path, sheet_name: str | None = None) -> tuple[pd.DataFrame, str]:
     if not path.exists():
         raise FileNotFoundError(f"Workbook does not exist: {path}")
-    excel = pd.ExcelFile(path)
-    sheet_names = [sheet_name] if sheet_name else list(excel.sheet_names)
+    with pd.ExcelFile(path) as excel:
+        excel_sheet_names = list(excel.sheet_names)
+    sheet_names = [sheet_name] if sheet_name else excel_sheet_names
     for candidate in sheet_names:
-        if candidate not in excel.sheet_names:
+        if candidate not in excel_sheet_names:
             raise ValueError(f"Sheet {candidate!r} is not present in {path.name}.")
-        frame = pd.read_excel(excel, sheet_name=candidate)
+        frame = pd.read_excel(path, sheet_name=candidate)
         if not frame.empty and len(frame.columns):
             return frame, str(candidate)
-    first_sheet = str(excel.sheet_names[0])
-    return pd.read_excel(excel, sheet_name=first_sheet), first_sheet
+    first_sheet = str(excel_sheet_names[0])
+    return pd.read_excel(path, sheet_name=first_sheet), first_sheet
 
 
 def scan_workbook_headers(path: Path, *, sample_rows: int = 25) -> tuple[pd.DataFrame, pd.DataFrame]:
     if not path.exists():
         raise FileNotFoundError(f"Workbook does not exist: {path}")
-    excel = pd.ExcelFile(path)
+    with pd.ExcelFile(path) as excel:
+        sheet_names = list(excel.sheet_names)
     sheet_rows: list[dict[str, Any]] = []
     column_rows: list[dict[str, Any]] = []
-    for sheet_name in excel.sheet_names:
-        sample = pd.read_excel(excel, sheet_name=sheet_name, nrows=sample_rows)
-        full_header = pd.read_excel(excel, sheet_name=sheet_name, nrows=0)
+    for sheet_name in sheet_names:
+        sample = pd.read_excel(path, sheet_name=sheet_name, nrows=sample_rows)
+        full_header = pd.read_excel(path, sheet_name=sheet_name, nrows=0)
         sheet_rows.append(
             {
                 "workbook": path.name,

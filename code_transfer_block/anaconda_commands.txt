@@ -1,0 +1,13 @@
+REM Run these from the inner north-slope-gas-hydrates-main repo folder.
+
+REM Inspect workbook sheets/headers/possible target columns:
+python code_transfer_block\inspect_three_dataset_headers_standalone.py
+
+REM If you copied only the standalone script into the repo root:
+python inspect_three_dataset_headers_standalone.py
+
+REM Run the real three-dataset ML pipeline after choosing the target:
+python 01_pipeline\run_three_dataset_ml_pipeline.py --data-dir "C:\Users\rohan.nanda\Downloads\Northslopedatasets06052026" --target "EXACT_HEADER" --target-task regression
+
+REM If the target is a class/label/occurrence field:
+python 01_pipeline\run_three_dataset_ml_pipeline.py --data-dir "C:\Users\rohan.nanda\Downloads\Northslopedatasets06052026" --target "EXACT_HEADER" --target-task classification
