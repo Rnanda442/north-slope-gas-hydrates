@@ -208,7 +208,7 @@ Run the full suite before committing meaningful changes:
 python -m pytest
 ```
 
-Expected current result: `119 passed` as of the 2026-06-16 three-dataset
+Expected current result: `120 passed` as of the 2026-06-16 three-dataset
 runtime-pipeline update. Update this count only after verifying it locally.
 
 Current test files:
@@ -222,6 +222,7 @@ Current test files:
 - `tests/test_stability_screen_diagnostics.py`
 - `tests/test_approved_data_intake.py`
 - `tests/test_approved_data_intake_cli.py`
+- `tests/test_code_transfer_blocks.py`
 - `tests/test_parameter_evidence_registry.py`
 - `tests/test_source_visual_inventory.py`
 - `tests/test_three_dataset_ml_pipeline.py`

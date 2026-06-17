@@ -74,5 +74,5 @@ are limited to `active`, `superseded`, `reference`, and `needs review`.
 | Hydrate ML/physics sources | `references/hydrate-ml-physics-sources/2026-06-13/` | Public/official source package and manifest | reference | Yes | Do not add restricted or credentialed source files. |
 | ML sources | `references/ml-sources/2026-06-11/` | Direct ML/source reference package | reference | Yes | Public-safe source package. |
 | Email screenshot evidence | `docs/evidence/email_screenshots_2026_06_12/` | User-supplied header/equation/project screenshot evidence | reference | No unless adding verified evidence | Treat as origin evidence; do not replace with generic summaries. |
-| Full pytest suite | `tests/` | Project verification suite | active | Yes | Expected current count: `119 passed` with `python -m pytest`. |
+| Full pytest suite | `tests/` | Project verification suite | active | Yes | Expected current count: `120 passed` with `python -m pytest`. |
 | OSL runtime layout | `docs/opensciencelab_runtime_layout.md` | Ignored runtime folder and boundary instructions | active | Yes | Use before any OSL/runtime data handling. |
