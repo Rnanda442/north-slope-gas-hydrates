@@ -71,6 +71,13 @@ If the target column is known:
 python 01_pipeline/run_three_dataset_ml_pipeline.py --data-dir "%USERPROFILE%\Downloads\Northslopedatasets06052026" --target Sgh --target-task regression
 ```
 
+If the scanner finds the target only in `curated_dataset3.xlsx`, use dataset 3
+as training and datasets 1/2 as unlabeled prediction/external-review sets:
+
+```bash
+python 01_pipeline/run_three_dataset_ml_pipeline.py --data-dir "%USERPROFILE%\Downloads\Northslopedatasets06052026" --train curated_dataset3.xlsx --test curated_dataset1.xlsx curated_dataset2.xlsx --target S_h --target-task regression
+```
+
 If the approved target is an occurrence or phase label:
 
 ```bash
@@ -101,6 +108,11 @@ Each run writes a new ignored folder with:
 - `test_metrics.csv` - separate test metrics for dataset 2 and dataset 3;
 - `predictions_curated_dataset*.csv` - local-only row-level predictions;
 - `run_manifest.json` - target, model, feature, and output summary.
+
+When a test workbook has features but no target column, the script writes
+predictions and marks that workbook as `predicted_unlabeled` in
+`test_metrics.csv`. That status means the model scored rows, but no held-out
+metric can be claimed for that workbook.
 
 If no target column is detected, the script still writes inventory, readiness,
 target-detection, feature-column, and manifest outputs, then reports

@@ -116,12 +116,16 @@ def scan_workbooks(data_dir: Path, workbook_names: list[str], sample_rows: int, 
 
     suggested_commands: list[str] = []
     if not target_hints.empty:
-        first_target = str(target_hints.iloc[0]["original_header"])
+        first_hint = target_hints.iloc[0]
+        first_target = str(first_hint["original_header"])
+        train_workbook = str(first_hint["workbook"])
+        test_workbooks = [name for name in workbook_names if name != train_workbook]
         normalized = normalize_header(first_target)
         task = "classification" if "class" in normalized or "label" in normalized else "regression"
+        split_args = f"--train {train_workbook} --test {' '.join(test_workbooks)} " if train_workbook != workbook_names[0] else ""
         suggested_commands.append(
             'python 01_pipeline\\run_three_dataset_ml_pipeline.py --data-dir '
-            f'"{data_dir}" --target "{first_target}" --target-task {task}'
+            f'"{data_dir}" {split_args}--target "{first_target}" --target-task {task}'
         )
     command_path.write_text("\n".join(suggested_commands), encoding="utf-8")
 
@@ -154,7 +158,8 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=Path.cwd() / "outputs_runtime" / f"standalone_header_scan_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
     )
-    return parser.parse_args()
+    args, _unknown = parser.parse_known_args()
+    return args
 
 
 def main() -> None:

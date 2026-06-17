@@ -215,9 +215,13 @@ def scan_three_dataset_headers(
     if not target_hints.empty:
         first = target_hints.iloc[0]
         task = first.get("suggested_target_task") or "regression"
+        train_file = str(first["workbook"])
+        test_files = [file_name for file_name in files if file_name != train_file]
+        split_args = f"--train {train_file} --test {' '.join(test_files)} " if train_file != DEFAULT_TRAIN_FILE else ""
         suggestions.append(
             "python 01_pipeline\\run_three_dataset_ml_pipeline.py "
             f"--data-dir \"{Path(data_dir).expanduser()}\" "
+            f"{split_args}"
             f"--target \"{first['original_header']}\" --target-task {task}"
         )
     suggestions_path = run_dir / "suggested_commands.txt"
@@ -565,6 +569,21 @@ def prepare_supervised_table(
     return X.loc[mask].reset_index(drop=True), y.loc[mask].reset_index(drop=True), frame.loc[mask].reset_index(drop=True)
 
 
+def prepare_feature_only_table(
+    frame: pd.DataFrame,
+    *,
+    feature_columns: list[str],
+    target_columns: set[str],
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    X_all, _ = make_feature_matrix(frame, target_columns=target_columns)
+    for column in feature_columns:
+        if column not in X_all.columns:
+            X_all[column] = np.nan
+    X = X_all[feature_columns].copy()
+    mask = X.notna().any(axis=1)
+    return X.loc[mask].reset_index(drop=True), frame.loc[mask].reset_index(drop=True)
+
+
 def prediction_frame(
     source_frame: pd.DataFrame,
     *,
@@ -713,6 +732,38 @@ def run_three_dataset_pipeline(
 
             for dataset in datasets[1:]:
                 if target.column not in dataset.frame.columns:
+                    X_test, test_rows = prepare_feature_only_table(
+                        dataset.frame,
+                        feature_columns=feature_columns,
+                        target_columns=target_columns,
+                    )
+                    if not X_test.empty:
+                        test_pred = model.predict(X_test)
+                        prediction_path = run_dir / f"predictions_{sanitize_label(dataset.label)}.csv"
+                        prediction_frame(
+                            test_rows,
+                            y_true=None,
+                            y_pred=test_pred,
+                            task=target.task,
+                            model=model,
+                            X=X_test,
+                            target_column=target.column or "",
+                        ).to_csv(prediction_path, index=False)
+                        written[f"predictions_{dataset.label}"] = str(prediction_path)
+                        test_metrics_rows.append(
+                            {
+                                "dataset": dataset.label,
+                                "split": "test",
+                                "task": target.task,
+                                "target_column": target.column,
+                                "model_kind": model_kind,
+                                "feature_count": len(feature_columns),
+                                "rows_scored": int(len(X_test)),
+                                "status": "predicted_unlabeled",
+                                "blocked_reason": "target column not present in test workbook; predictions written without test metrics",
+                            }
+                        )
+                        continue
                     test_metrics_rows.append(
                         {
                             "dataset": dataset.label,
@@ -723,7 +774,7 @@ def run_three_dataset_pipeline(
                             "feature_count": len(feature_columns),
                             "rows_scored": 0,
                             "status": "blocked",
-                            "blocked_reason": "target column not present in test workbook",
+                            "blocked_reason": "target column not present and no feature rows available for unlabeled prediction",
                         }
                     )
                     continue

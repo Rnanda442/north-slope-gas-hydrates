@@ -89,6 +89,51 @@ def test_three_dataset_pipeline_writes_readiness_when_no_target_is_available(tmp
     assert (run_dir / "feature_columns.csv").exists()
 
 
+def test_three_dataset_pipeline_can_train_on_labeled_dataset3_and_predict_unlabeled_others(tmp_path: Path) -> None:
+    feature_frame = pd.DataFrame(
+        {
+            "WELL": ["MTE"] * 12,
+            "DEPTH": [500 + index * 2 for index in range(12)],
+            "GR": [40 + (index % 4) for index in range(12)],
+            "RT": [20 + index for index in range(12)],
+            "RHOB": [2.22 - index * 0.005 for index in range(12)],
+        }
+    )
+    feature_frame.to_excel(tmp_path / "curated_dataset1.xlsx", index=False)
+    feature_frame.assign(WELL="IGS", RT=lambda frame: frame["RT"] + 5).to_excel(
+        tmp_path / "curated_dataset2.xlsx",
+        index=False,
+    )
+    feature_frame.assign(
+        WELL="Labeled",
+        S_h=[0.15 + index * 0.02 for index in range(12)],
+    ).to_excel(tmp_path / "curated_dataset3.xlsx", index=False)
+
+    result = run_three_dataset_pipeline(
+        data_dir=tmp_path,
+        train_file="curated_dataset3.xlsx",
+        test_files=("curated_dataset1.xlsx", "curated_dataset2.xlsx"),
+        requested_target="S_h",
+        requested_task="regression",
+        output_root=tmp_path / "outputs_runtime",
+        model_root=tmp_path / "models_runtime",
+        run_label="dataset3_train_run",
+    )
+
+    run_dir = Path(result["run_dir"])
+    test_metrics = pd.read_csv(run_dir / "test_metrics.csv")
+    predictions = pd.read_csv(run_dir / "predictions_curated_dataset1.csv")
+
+    assert result["status"] == "trained"
+    assert result["target"]["column"] == "S_h"
+    assert set(test_metrics["status"]) == {"predicted_unlabeled"}
+    assert set(test_metrics["dataset"]) == {"curated_dataset1", "curated_dataset2"}
+    assert (test_metrics["rows_scored"] > 0).all()
+    assert "y_pred" in predictions.columns
+    assert "y_true" not in predictions.columns
+    assert (run_dir / "predictions_curated_dataset2.csv").exists()
+
+
 def test_three_dataset_header_scan_finds_target_hints_across_workbook_sheets(tmp_path: Path) -> None:
     for index in range(1, 4):
         workbook_path = tmp_path / f"curated_dataset{index}.xlsx"
@@ -127,3 +172,21 @@ def test_three_dataset_header_scan_finds_target_hints_across_workbook_sheets(tmp
     assert (run_dir / "suggested_commands.txt").read_text(encoding="utf-8").startswith(
         "python 01_pipeline\\run_three_dataset_ml_pipeline.py"
     )
+
+
+def test_three_dataset_header_scan_suggests_training_workbook_that_has_target(tmp_path: Path) -> None:
+    logs = pd.DataFrame({"WELL": ["MTE"], "DEPTH": [500], "GR": [42], "RT": [35], "RHOB": [2.2]})
+    logs.to_excel(tmp_path / "curated_dataset1.xlsx", index=False)
+    logs.to_excel(tmp_path / "curated_dataset2.xlsx", index=False)
+    logs.assign(S_h=[0.25]).to_excel(tmp_path / "curated_dataset3.xlsx", index=False)
+
+    result = scan_three_dataset_headers(
+        tmp_path,
+        output_root=tmp_path / "outputs_runtime",
+        run_label="dataset3_target_scan",
+    )
+
+    command = (Path(result["run_dir"]) / "suggested_commands.txt").read_text(encoding="utf-8")
+    assert "--train curated_dataset3.xlsx" in command
+    assert "--test curated_dataset1.xlsx curated_dataset2.xlsx" in command
+    assert '--target "S_h"' in command

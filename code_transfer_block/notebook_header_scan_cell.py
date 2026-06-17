@@ -132,11 +132,15 @@ target_hints.to_csv(OUTPUT_ROOT / "target_header_hints.csv", index=False)
 
 suggested_commands = []
 if not target_hints.empty:
-    first_target = target_hints.iloc[0]["original_header"]
+    first_hint = target_hints.iloc[0]
+    first_target = first_hint["original_header"]
+    train_workbook = first_hint["workbook"]
+    test_workbooks = [name for name in WORKBOOKS if name != train_workbook]
     task = "classification" if "class" in normalize_header(first_target) or "label" in normalize_header(first_target) else "regression"
+    split_args = f"--train {train_workbook} --test {' '.join(test_workbooks)} " if train_workbook != WORKBOOKS[0] else ""
     suggested_commands.append(
         'python 01_pipeline\\run_three_dataset_ml_pipeline.py --data-dir '
-        f'"{DATA_DIR}" --target "{first_target}" --target-task {task}'
+        f'"{DATA_DIR}" {split_args}--target "{first_target}" --target-task {task}'
     )
 
 (OUTPUT_ROOT / "suggested_commands.txt").write_text("\n".join(suggested_commands), encoding="utf-8")
