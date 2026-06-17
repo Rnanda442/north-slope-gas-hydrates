@@ -3,8 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 
 from dashboard.source_visual_inventory import (
+    SOURCE_CARD_COLUMNS,
     SOURCE_VISUAL_INVENTORY_COLUMNS,
     load_source_visual_inventory,
+    source_card_frame,
     source_visual_inventory_summary_frame,
     validate_source_visual_inventory,
 )
@@ -52,3 +54,23 @@ def test_source_visual_inventory_summary_tracks_review_and_website_captures():
     assert lookup["Inventory validation"] == "pass"
     assert lookup["Website capture visuals"] >= 5
     assert lookup["Project-generated visuals"] >= 10
+
+
+def test_source_cards_expose_reuse_claims_and_guardrails():
+    inventory = load_source_visual_inventory(PROJECT_ROOT)
+    cards = source_card_frame(inventory)
+
+    assert set(SOURCE_CARD_COLUMNS).issubset(cards.columns)
+    assert len(cards) == len(inventory)
+    assert cards[SOURCE_CARD_COLUMNS].replace("", None).notna().all().all()
+
+    methane_curve = cards[
+        cards["public_safe_link_or_path"].str.contains(
+            "phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv",
+            regex=False,
+        )
+    ].iloc[0]
+    assert methane_curve["source_category"] == "Source-backed data"
+    assert "admissibility" in methane_curve["not_allowed_use"].lower()
+    assert "occurrence" in methane_curve["not_allowed_use"].lower()
+    assert "saturation" in methane_curve["not_allowed_use"].lower()

@@ -7,9 +7,10 @@ website, V5.5 mentor update slide deck, and V5.5 Word companion.
 
 - Inventory CSV:
   `data/public_ml_products/source_visual_inventory_2026-06-16.csv`
-- Loader and QA checks:
+- Loader, source-card transform, and QA checks:
   `dashboard/source_visual_inventory.py`
-- Website surface:
+- Website surfaces:
+  `Explore North Slope > Data & Sources` and
   `Analyze Hydrates > Presentation Exports`
 - Tests:
   `tests/test_source_visual_inventory.py`
@@ -27,9 +28,18 @@ reference panels, and the V5.5 contact sheet with:
 - source status;
 - provenance;
 - allowed use;
+- project claim supported;
+- not allowed use;
+- related slide or website section;
 - QA status;
 - replacement flag;
 - project guardrail.
+
+The Streamlit source-card layer turns each inventory row into a reusable card
+with source title, category, supported claim, allowed use, not-allowed use,
+related section, source status, visual status, and public-safe path or link.
+The goal is to explain why each visual or method exists, not just list a
+citation.
 
 ## Current QA Rule
 
