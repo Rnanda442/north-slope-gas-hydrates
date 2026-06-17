@@ -16,11 +16,11 @@ from pptx import Presentation
 ROOT = Path(__file__).resolve().parents[2]
 BLUEPRINT_DIR = ROOT / "docs" / "project_blueprints"
 V54_ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "v5_4_corrected_2026_06_16"
-ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "v5_5_mentor_update_2026_06_17"
+ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "v5_5_slide2_source_update_2026_06_17"
 SOURCE_DECK = BLUEPRINT_DIR / "CURRENT_GMAIL_VISUAL_REVISION_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-11.pptx"
-OUT_DECK = BLUEPRINT_DIR / "V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx"
-OUT_DOCX = BLUEPRINT_DIR / "V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx"
-OUT_CONTACT_SHEET = ASSET_DIR / "v5_5_mentor_update_contact_sheet.png"
+OUT_DECK = BLUEPRINT_DIR / "V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx"
+OUT_DOCX = BLUEPRINT_DIR / "V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx"
+OUT_CONTACT_SHEET = ASSET_DIR / "v5_5_slide2_source_update_contact_sheet.png"
 PUBLIC_PRODUCTS = ROOT / "data" / "public_stability_products"
 PUBLIC_ML_PRODUCTS = ROOT / "data" / "public_ml_products"
 WEBSITE_CAPTURE_DIR = BLUEPRINT_DIR / "presentation_assets" / "v5_3_website_captures"
@@ -29,6 +29,11 @@ V52_ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "full_workflow_diagram_2
 PROCESSING_ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "processing_revisions_2026_06_11"
 PARAMETER_EVIDENCE_REGISTRY = PUBLIC_ML_PRODUCTS / "public_parameter_evidence_registry_2026-06-16.csv"
 PHASE_CURVE_METHANE_5PPT = PUBLIC_PRODUCTS / "phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv"
+SLIDE02_SOURCE_DIR = ROOT / "docs" / "evidence" / "slide02_source_bundle_2026_06_17"
+SLIDE02_USGS_PAGE = SLIDE02_SOURCE_DIR / "slide02_selected_01_usgs_hydrate_context_page3.png"
+SLIDE02_USGS_CURVE = SLIDE02_SOURCE_DIR / "slide02_selected_02_usgs_hydrate_stability_curve_crop.png"
+SLIDE02_DIGITIZED_CURVE = SLIDE02_SOURCE_DIR / "slide02_selected_03_project_digitized_methane_5ppt_curve.csv"
+SLIDE02_MAP = SLIDE02_SOURCE_DIR / "slide02_selected_04_project_website_regional_map_reference.png"
 
 W, H = 1600, 900
 EXPANDED_W, EXPANDED_H = 5200, 3000
@@ -2842,6 +2847,54 @@ def v54_source_label(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int], 
     text(draw, (x1 + 10, y2 - 21), label, 10, WHITE, True, width=x2 - x1 - 20, gap=1)
 
 
+def v55_slide02_path(primary: Path, fallback: Path) -> Path:
+    return primary if primary.exists() else fallback
+
+
+def v55_slide02_curve_inset(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int]) -> None:
+    card(draw, box, fill=WHITE, outline=LINE, radius=8, width=2)
+    x1, y1, x2, y2 = box
+    text(draw, (x1 + 14, y1 + 10), "Digitized methane 5 ppt input", 14, NAVY, True, width=x2 - x1 - 28)
+    rows: list[tuple[float, float]] = []
+    csv_path = v55_slide02_path(SLIDE02_DIGITIZED_CURVE, PHASE_CURVE_METHANE_5PPT)
+    if csv_path.exists():
+        with csv_path.open(newline="", encoding="utf-8") as fh:
+            for row in csv.DictReader(fh):
+                try:
+                    rows.append((float(row["equilibrium_temperature_c"]), float(row["pressure_mpa_absolute"])))
+                except (KeyError, TypeError, ValueError):
+                    continue
+
+    ax = (x1 + 44, y1 + 48, x2 - 24, y2 - 40)
+    draw.line((ax[0], ax[3], ax[2], ax[3]), fill=MUTED, width=2)
+    draw.line((ax[0], ax[3], ax[0], ax[1]), fill=MUTED, width=2)
+    for i in range(1, 4):
+        gx = ax[0] + i * (ax[2] - ax[0]) // 4
+        gy = ax[3] - i * (ax[3] - ax[1]) // 4
+        draw.line((gx, ax[1], gx, ax[3]), fill=(226, 238, 241), width=1)
+        draw.line((ax[0], gy, ax[2], gy), fill=(226, 238, 241), width=1)
+    if rows:
+        temps = [r[0] for r in rows]
+        pressures = [r[1] for r in rows]
+        t_min, t_max = min(temps) - 1.0, max(temps) + 1.0
+        p_min, p_max = min(pressures) - 0.4, max(pressures) + 0.4
+
+        def project(t: float, p: float) -> tuple[int, int]:
+            px = ax[0] + int((t - t_min) / (t_max - t_min) * (ax[2] - ax[0]))
+            py = ax[3] - int((p - p_min) / (p_max - p_min) * (ax[3] - ax[1]))
+            return px, py
+
+        pts = [project(t, p) for t, p in rows]
+        if len(pts) > 1:
+            draw.line(pts, fill=TEAL, width=3)
+        for pt in pts[:: max(1, len(pts) // 10)]:
+            draw.ellipse((pt[0] - 2, pt[1] - 2, pt[0] + 2, pt[1] + 2), fill=TEAL)
+        text(draw, (ax[0] + 12, ax[1] + 8), "admissibility only", 11, TEAL, True, width=130)
+    else:
+        text(draw, (ax[0] + 20, ax[1] + 20), "CSV missing", 13, RED, True, width=ax[2] - ax[0] - 40)
+    v54_source_label(draw, box, "Project digitized methane 5 ppt CSV curve, stability-admissibility only")
+
+
 def v54_phase_curve(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int]) -> None:
     card(draw, box, fill=WHITE, outline=LINE, radius=10, width=2)
     x1, y1, x2, y2 = box
@@ -3533,7 +3586,112 @@ def v55_slide_personal_opener() -> Path:
 
 
 def v55_slide_context() -> Path:
-    return v55_copy_v54_panel("slide_02_source_context_v5_4.png", "slide_02_source_context_v5_5.png")
+    img = canvas(False)
+    draw = ImageDraw.Draw(img)
+    v53_panel_title(
+        draw,
+        "Gas Hydrate And North Slope Context",
+        "Source-backed visuals explain hydrate physics, the project scaffold, and why methane stability is context only.",
+    )
+
+    # A. North Slope context map and current public scaffold counts.
+    map_panel = (60, 140, 700, 445)
+    card(draw, map_panel, fill=WHITE, outline=LINE, radius=8, width=2)
+    text(draw, (82, 158), "North Slope public scaffold", 22, NAVY, True)
+    map_box = (82, 190, 432, 425)
+    card(draw, (map_box[0] - 2, map_box[1] - 2, map_box[2] + 2, map_box[3] + 2), fill=LIGHT, outline=LINE, radius=6, width=1)
+    map_path = v55_slide02_path(SLIDE02_MAP, WEBSITE_CAPTURE_DIR / "02_explore_regional_map.png")
+    if not v53_paste(img, map_path, map_box, crop=(500, 360, 1055, 670), mode="cover"):
+        v53_placeholder_image(draw, map_box, "Project website regional map unavailable")
+    v54_source_label(draw, map_box, "Project website regional map / public scaffold context")
+    count_cards = [
+        ((455, 190, 678, 238), "8,084", "public Arctic Slope wells", TEAL),
+        ((455, 250, 678, 298), "483", "temperature-profile matches", BLUE),
+        ((455, 310, 678, 358), "374", "phase-curve input rows", GREEN),
+        ((455, 370, 678, 425), "22", "calculated intervals; not hydrate proof", RED),
+    ]
+    for box, value, label, color in count_cards:
+        if label:
+            card(draw, box, fill=(248, 252, 253), outline=color, radius=7, width=2)
+            text(draw, (box[0] + 10, box[1] + 8), value, 18, color, True, width=58)
+            text(draw, (box[0] + 72, box[1] + 9), label, 12, NAVY, width=box[2] - box[0] - 82, gap=1)
+        else:
+            text(draw, (box[0] + 2, box[1] - 1), value, 11, RED, True, width=box[2] - box[0] - 4, align="center", gap=1)
+
+    # B. Source-backed phase/stability visual.
+    stability_panel = (725, 140, 1070, 790)
+    card(draw, stability_panel, fill=WHITE, outline=LINE, radius=8, width=2)
+    text(draw, (748, 158), "Source phase/stability visual", 21, NAVY, True, width=294)
+    graph_box = (760, 190, 1035, 657)
+    card(draw, (graph_box[0] - 4, graph_box[1] - 4, graph_box[2] + 4, graph_box[3] + 4), fill=WHITE, outline=LINE, radius=6, width=1)
+    if not v53_paste(img, v55_slide02_path(SLIDE02_USGS_CURVE, SLIDE02_USGS_PAGE), graph_box, mode="contain"):
+        v53_placeholder_image(draw, graph_box, "Selected USGS/DOE stability graph unavailable")
+    v54_source_label(draw, graph_box, "Selected USGS/DOE North Slope hydrate stability source screenshot, page 3")
+    card(draw, (750, 678, 1045, 726), fill=ICE_LIGHT, outline=TEAL, radius=8, width=2)
+    text(draw, (768, 691), "Methane / methane-dominant baseline", 14, TEAL, True, width=260, gap=2)
+    card(draw, (750, 734, 1045, 780), fill=RED_LIGHT, outline=RED, radius=8, width=2)
+    text(draw, (768, 746), "Admissibility only, not occurrence proof.", 12, RED, True, width=260, gap=2)
+
+    # C. Structure/type explanation without generic cage art.
+    structure_panel = (60, 465, 700, 790)
+    card(draw, structure_panel, fill=WHITE, outline=LINE, radius=8, width=2)
+    text(draw, (82, 485), "Hydrate structure/type context", 22, NAVY, True)
+    text(
+        draw,
+        (82, 520),
+        "Gas hydrates are ice-like water-cage solids that trap gas molecules under suitable pressure-temperature conditions.",
+        15,
+        MUTED,
+        width=578,
+        gap=3,
+    )
+    structures = [
+        ((82, 585, 265, 696), "Structure I", "CH4", "methane-dominant; project baseline", TEAL, ICE_LIGHT),
+        ((282, 585, 465, 696), "Structure II", "C2-C4", "larger guests can occur; sensitivity only", PURPLE, PURPLE_LIGHT),
+        ((482, 585, 665, 696), "Structure H", "heavy+", "heavier guests possible; not baseline", AMBER, AMBER_LIGHT),
+    ]
+    for box, heading, badge, body, color, fill in structures:
+        card(draw, box, fill=fill, outline=color, radius=8, width=2)
+        text(draw, (box[0] + 14, box[1] + 13), heading, 15, color, True, width=box[2] - box[0] - 28)
+        card(draw, (box[0] + 14, box[1] + 42, box[0] + 80, box[1] + 70), fill=WHITE, outline=color, radius=7, width=1)
+        text(draw, (box[0] + 21, box[1] + 48), badge, 12, color, True, width=52, align="center")
+        text(draw, (box[0] + 14, box[1] + 76), body, 11, NAVY, width=box[2] - box[0] - 28, gap=1)
+    card(draw, (82, 718, 665, 760), fill=(248, 252, 253), outline=LINE, radius=8, width=1)
+    text(
+        draw,
+        (100, 730),
+        "North Slope baseline remains methane-focused unless mentor approves variable gas composition.",
+        14,
+        NAVY,
+        True,
+        width=548,
+        gap=2,
+    )
+
+    # D. Project use and guardrail.
+    use_panel = (1095, 140, 1540, 790)
+    card(draw, use_panel, fill=WHITE, outline=LINE, radius=8, width=2)
+    text(draw, (1120, 158), "Project use", 22, NAVY, True)
+    steps = [
+        ((1120, 198, 1515, 262), "Baseline curve", "100% methane / methane-dominant, 5 ppt salinity.", TEAL, ICE_LIGHT),
+        ((1120, 294, 1515, 358), "Stability screen", "Pressure-temperature admissibility mask and context.", BLUE, BLUE_LIGHT),
+        ((1120, 390, 1515, 462), "Not claimed", "Not hydrate proof, occurrence evidence, or saturation evidence.", RED, RED_LIGHT),
+        ((1120, 502, 1515, 574), "Separate ML evidence", "Logs, core, NMR, and approved labels define occurrence and saturation targets.", GREEN, GREEN_LIGHT),
+    ]
+    for box, heading, body, color, fill in steps:
+        card(draw, box, fill=fill, outline=color, radius=8, width=2)
+        text(draw, (box[0] + 16, box[1] + 11), heading, 15, color, True, width=box[2] - box[0] - 32)
+        text(draw, (box[0] + 16, box[1] + 34), body, 13, NAVY, width=box[2] - box[0] - 32, gap=2)
+    arrow(draw, (1318, 264), (1318, 292), fill=TEAL, width=3)
+    arrow(draw, (1318, 360), (1318, 388), fill=BLUE, width=3)
+    arrow(draw, (1318, 464), (1318, 500), fill=GREEN, width=3)
+    v55_slide02_curve_inset(draw, (1120, 608, 1515, 760))
+
+    v53_footer(
+        draw,
+        "Slide 2 sources: selected USGS/DOE page-3 stability screenshot/crop; project digitized methane 5 ppt CSV; project website regional map. Stability is not hydrate proof.",
+    )
+    return save(img, "slide_02_source_context_v5_5.png")
 
 
 def v55_slide_parameter_ranges() -> Path:
@@ -3837,13 +3995,15 @@ def v55_build_word_companion(panel_paths: list[Path], contact_sheet: Path) -> Pa
     section.right_margin = Inches(0.65)
 
     props = document.core_properties
-    props.title = "V5.5 Mentor Update North Slope Gas Hydrate ML Workflow Companion"
-    props.subject = "Mentor-facing V5.5 slide companion"
+    props.title = "V5.5 Slide 2 Source Update North Slope Gas Hydrate ML Workflow Companion"
+    props.subject = "Mentor-facing V5.5 slide companion with rebuilt source-backed Slide 2"
     props.author = "North Slope Gas Hydrates project"
 
-    document.add_heading("V5.5 Mentor Update North Slope Gas Hydrate ML Workflow Companion", level=0)
+    document.add_heading("V5.5 Slide 2 Source Update North Slope Gas Hydrate ML Workflow Companion", level=0)
     document.add_paragraph(
-        "This companion explains the V5.5 revision built from the V5.4 corrected source-baseline deck. It keeps the "
+        "This companion explains the V5.5 revision built from the V5.4 corrected source-baseline deck, with Slide 2 "
+        "rebuilt from the selected USGS/DOE source screenshot, its cropped stability graph, the project website map, "
+        "and the digitized methane 5 ppt project CSV inset. It keeps the "
         "personal/about-me opener, source-backed hydrate and North Slope context, the full complex workflow "
         "diagram, and the complex ML runtime architecture in the main nine-slide sequence. The update adds a "
         "clean DOE three-dataset prototype explanation, a visual model-run card, a stability-to-ML overlay, "
@@ -3853,7 +4013,8 @@ def v55_build_word_companion(panel_paths: list[Path], contact_sheet: Path) -> Pa
     document.add_heading("Current Public And Runtime Position", level=1)
     document.add_paragraph(
         f"The public scaffold tracks {values['wells']} Arctic Slope public wells, {values['profiles']} G10015 "
-        f"temperature profiles, {values['temp_matches']} temperature-profile matches, and "
+        f"temperature profiles, {values['temp_matches']} temperature-profile matches, 374 rows ready for "
+        f"phase-curve inputs, and "
         f"{values['screen_calculated']} methane 5 ppt calculated stability-admissibility intervals. The public "
         "side still supports schema/runtime prototyping, source-backed visuals, and guardrail documentation, not "
         "public approved-data rows or final model results."
@@ -3867,11 +4028,18 @@ def v55_build_word_companion(panel_paths: list[Path], contact_sheet: Path) -> Pa
 
     document.add_heading("What V5.5 Adds", level=1)
     for item in [
+        "Slide 2 now uses the selected USGS/DOE page-3 hydrate stability source screenshot/crop as the primary stability visual, the project website regional map as North Slope context, and the digitized methane 5 ppt CSV only as a project input inset.",
         "Slide 5 explains the cleaned DOE three-dataset prototype and model-run card: targets S_h, S_wr, Sh, and Swr are Y-only; cleaned canonical features enter X_allowed; depth/helper/raw-alias columns are excluded; training-fit metrics are runtime proof only.",
         "Slide 8 makes the stability overlay explicit: context, mask, confidence, and caveat are allowed uses; occurrence proof, saturation, hydrate-present labels, and negative labels for blocked rows are not allowed.",
         "Slide 9 closes with what has been done, what is not claimed, and what must happen next before final ML or stability claims.",
     ]:
         document.add_paragraph(item, style="List Bullet")
+    document.add_paragraph(
+        "Slide 2 structure language is intentionally narrow: Structure I methane-dominant hydrate is the project "
+        "baseline. Structure II and Structure H can occur with larger hydrocarbons such as ethane, propane, butane, "
+        "or heavier components, but they are not the current North Slope baseline claim. Variable gas composition "
+        "stays a mentor-approved sensitivity path."
+    )
 
     document.add_heading("Guardrail Language", level=1)
     for item in [
@@ -3884,7 +4052,7 @@ def v55_build_word_companion(panel_paths: list[Path], contact_sheet: Path) -> Pa
 
     slide_notes = [
         ("Slide 1 - Personal/about-me opener", "Preserved from V5.4 to keep the agreed mentor-facing opener style."),
-        ("Slide 2 - Source-backed hydrate and North Slope context", "Preserved V5.4 USGS hydrate, methane 5 ppt phase-curve, and public map provenance. No AI-looking hydrate/PT art is added."),
+        ("Slide 2 - Source-backed hydrate and North Slope context", "Rebuilt with the selected USGS/DOE page-3 stability source screenshot/crop as the primary stability visual, a project website regional map for North Slope context, and the project digitized methane 5 ppt CSV only as a small input inset. The slide explains that Structure I methane-dominant hydrate is the current baseline; Structure II and Structure H can occur with larger hydrocarbons such as ethane, propane, butane, or heavier guests, but they are not the current claim. Stability remains a pressure-temperature admissibility screen only; occurrence and saturation evidence must come from approved logs, core, NMR, and mentor-reviewed labels."),
         ("Slide 3 - Parameters and expected hydrate ranges", "Preserved the registry-backed range board: working envelopes, mimics, roles, and Y-only labels."),
         ("Slide 4 - Full complex project workflow", "Kept the whole complex architecture as a main-sequence plate, not an appendix-only reference."),
         ("Slide 5 - DOE three-dataset prototype", "Adds the cleaned prototype story, feature exclusions, target-only saturation variants, and training-fit disclaimer."),
@@ -3906,7 +4074,12 @@ def v55_build_word_companion(panel_paths: list[Path], contact_sheet: Path) -> Pa
 
     document.add_heading("Source And Visual Provenance", level=1)
     anchors = [
-        "docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/ for the active V5.4 source panels.",
+        "docs/evidence/slide02_source_bundle_2026_06_17/ for the rebuilt Slide 2 source bundle.",
+        "Original selected USGS/PDF page screenshot: https://drive.google.com/file/d/17T48zhoJKvxB21dJUovXhN-6V8DEgzf7/view?usp=drivesdk",
+        "Cropped hydrate stability curve: https://drive.google.com/file/d/1_edIg2LrifTnCL2GP23fcWfnpvIGulYn/view?usp=drivesdk",
+        "Digitized methane 5 ppt CSV inset: https://drive.google.com/file/d/1O7hFSgt3eEjaYt3FocJUlFhAZuswwlm3/view?usp=drivesdk",
+        "Website regional map reference: https://drive.google.com/file/d/1CmfuViTiplCB9ayYOjSgLOiQlZaFGCx9/view?usp=drivesdk",
+        "docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/ for the V5.4 reference panels.",
         "docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/ for the V5.2 complex workflow and ML runtime authority plates.",
         "data/public_ml_products/source_visual_inventory_2026-06-16.csv for slide and website visual provenance.",
         "docs/DOE_THREE_DATASET_ML_PIPELINE_RUNBOOK_2026-06-16.md and docs/DOE_RUNTIME_PRESENTATION_AND_MODEL_TRACKING_PLAN_2026-06-16.md for the DOE prototype language.",

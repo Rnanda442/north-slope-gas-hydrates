@@ -109,17 +109,18 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
 
 ## Current Authoritative Slide and Doc Assets
 
-- Current V5.5 mentor-facing deck:
-  `docs/project_blueprints/V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`
-- Current V5.5 mentor-facing companion:
-  `docs/project_blueprints/V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`
-- Current V5.5 slide panels and contact sheet:
-  `docs/project_blueprints/presentation_assets/v5_5_mentor_update_2026_06_17/`
-- Previous V5.4 corrected Google Slides/Docs review copies remain reference
-  only until a V5.5 Drive import is explicitly created and verified:
-  <https://docs.google.com/presentation/d/1olavI9-nUSSvYtEm-TjYVOte-Cg-1UgaO9GMl6skDt0>
+- Current V5.5 Slide 2 source update mentor-facing deck:
+  `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`
+- Current V5.5 Slide 2 source update mentor-facing companion:
+  `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`
+- Current V5.5 Slide 2 source update slide panels and contact sheet:
+  `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/`
+- Verified native Google Slides/Docs review copies:
+  <https://docs.google.com/presentation/d/1-35vfTIXAnWCiyKTLooJy80HBYliMBliE_z4CbggJC0>
   and
-  <https://docs.google.com/document/d/1sgl7cyGHOyJyWGoVC9e7LHb0JFnriPIDAmRizyf5wIg>
+  <https://docs.google.com/document/d/1CyZkRgfAUSOOaRxXni0mcmFN2OQcc5pNOw8TOv44f0Q>
+- Slide 2 source bundle:
+  `docs/evidence/slide02_source_bundle_2026_06_17/`
 - V5.4 corrected slide panels and contact sheet are now the source baseline
   for V5.5:
   `docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/`
