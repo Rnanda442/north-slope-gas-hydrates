@@ -3705,7 +3705,7 @@ def v55_slide_parameter_ranges() -> Path:
     v53_panel_title(
         draw,
         "Hydrate Signals Move Together Across Depth",
-        "Interpretation depends on co-moving log, NMR/core, QC, and stability context. One curve is never proof.",
+        "Read the cleaned well logs as a pattern: host rock, electrical response, stiffness, fluid/core checks, and stability context.",
     )
 
     stack_box = (58, 132, 1128, 720)
@@ -3716,28 +3716,26 @@ def v55_slide_parameter_ranges() -> Path:
     text(
         draw,
         (82, 184),
-        "Synthetic direction sketch from local public source package. It shows movement logic only, not approved well rows.",
+        "Public-safe sketch distilled from source papers and project CSV/website products. It teaches movement logic only, not approved well rows.",
         13,
         MUTED,
-        width=780,
+        width=820,
         gap=3,
     )
 
     plot_left, plot_top, plot_bottom = 84, 250, 650
-    track_w, gap = 92, 28
+    track_w, gap = 106, 31
     tracks = [
-        ("Stability\nBGHS", TEAL, "stable"),
-        ("GR", GREEN, "gr"),
-        ("Caliper\nQC", AMBER, "cal"),
-        ("Phi /\nRHOB", BLUE, "phi"),
-        ("Rt", RED, "rt"),
-        ("Vp", PURPLE, "vp"),
-        ("Vs /\nmu-rho", PURPLE, "vs"),
-        ("NMR /\ncore", TEAL, "nmr"),
+        ("Stability\n(P-T/BGHS)", TEAL, "stable"),
+        ("Clean sand\n(GR/gamma)", GREEN, "gr"),
+        ("Pore space\n(phi/RHOB)", BLUE, "phi"),
+        ("Resistivity\n(Rt)", RED, "rt"),
+        ("P-wave\nspeed (Vp)", PURPLE, "vp"),
+        ("Rigidity\n(Vs/mu-rho)", PURPLE, "vs"),
+        ("Fluid check\n(NMR/core)", TEAL, "nmr"),
     ]
     depth_min, depth_max = 550, 920
     hydrate = (610, 660)
-    washout = (705, 735)
     gas = (742, 790)
     bghs = 835
 
@@ -3752,13 +3750,10 @@ def v55_slide_parameter_ranges() -> Path:
         base = 0.50 + 0.11 * math.sin(depth / 19.0) + 0.06 * math.sin(depth / 7.0)
         in_hydrate = hydrate[0] <= depth <= hydrate[1]
         in_gas = gas[0] <= depth <= gas[1]
-        in_wash = washout[0] <= depth <= washout[1]
         if kind == "stable":
             return 0.76 if depth < bghs else 0.26
         if kind == "gr":
             return 0.24 if in_hydrate or in_gas else 0.68 + 0.08 * math.sin(depth / 13.0)
-        if kind == "cal":
-            return 0.36 if not in_wash else 0.90
         if kind == "phi":
             return 0.72 if in_hydrate or in_gas else 0.44 + 0.08 * math.sin(depth / 15.0)
         if kind == "rt":
@@ -3773,7 +3768,7 @@ def v55_slide_parameter_ranges() -> Path:
 
     for depth in range(550, 921, 50):
         y = ypix(depth)
-        draw.line((plot_left - 24, y, 1085, y), fill=(225, 233, 236), width=1)
+        draw.line((plot_left - 24, y, 1065, y), fill=(225, 233, 236), width=1)
         text(draw, (plot_left - 58, y - 8), str(depth), 12, MUTED, True)
     text(draw, (plot_left - 62, plot_top - 42), "Depth\n(m)", 11, NAVY, True, width=52, gap=1)
 
@@ -3785,34 +3780,43 @@ def v55_slide_parameter_ranges() -> Path:
         for frac in (0.25, 0.5, 0.75):
             x = int(x0 + frac * track_w)
             draw.line((x, plot_top, x, plot_bottom), fill=(237, 242, 244), width=1)
-        for interval, fill in [(hydrate, ICE_LIGHT), (washout, (235, 238, 239)), (gas, RED_LIGHT)]:
+        for interval, fill in [(hydrate, ICE_LIGHT), (gas, RED_LIGHT)]:
             draw.rectangle((x0 + 1, ypix(interval[0]), x1 - 1, ypix(interval[1])), fill=fill)
-        for yy in range(ypix(washout[0]) - 20, ypix(washout[1]) + 35, 12):
-            draw.line((x0, yy, x1, yy + track_w), fill=(179, 185, 188), width=1)
         draw.line((x0, ypix(bghs), x1, ypix(bghs)), fill=TEAL, width=2)
         points = [(xpix(i, curve_value(kind, depth)), ypix(depth)) for depth in range(depth_min, depth_max + 1, 5)]
         draw.line(points, fill=DEEP, width=3)
 
     labels = [
-        ((938, ypix(hydrate[0]) + 8, 1090, ypix(hydrate[1]) - 4), "hydrate-compatible\nclean sand", TEAL, ICE_LIGHT),
-        ((938, ypix(washout[0]) + 5, 1090, ypix(washout[1]) + 28), "bad-hole QC\nhatch", MUTED, (238, 241, 242)),
-        ((938, ypix(gas[0]) + 5, 1090, ypix(gas[1]) + 28), "free gas /\nresistive mimic", RED, RED_LIGHT),
+        ((912, ypix(hydrate[0]) + 8, 1090, ypix(hydrate[1]) - 4), "hydrate-compatible\nclean sand", TEAL, ICE_LIGHT),
+        ((912, ypix(gas[0]) + 5, 1090, ypix(gas[1]) + 36), "resistive mimic:\nRt high, stiffness/core disagree", RED, RED_LIGHT),
     ]
     for box, label, color, fill in labels:
         card(draw, box, fill=fill, outline=color, radius=7, width=2)
         text(draw, (box[0] + 10, box[1] + 9), label, 11, color, True, width=box[2] - box[0] - 20, gap=1)
 
+    card(draw, (84, 668, 1088, 702), fill=GREEN_LIGHT, outline=GREEN, radius=8, width=1)
+    text(
+        draw,
+        (104, 676),
+        "ML logic: the model should learn co-moving signals across depth, not a single cutoff from one curve.",
+        13,
+        GREEN,
+        True,
+        width=955,
+        align="center",
+    )
+
     text(draw, (1188, 158), "Decoder", 24, TEAL, True, width=310)
     decoder_cards = [
-        ((1188, 205, 1515, 298), "Host gate", "Low GR = clean sand host; porosity means pore volume. Neither proves hydrate.", GREEN, GREEN_LIGHT),
-        ((1188, 318, 1515, 418), "Hydrate response", "High Rt plus higher Vp and Vs/mu-rho supports hydrate-compatible behavior.", TEAL, ICE_LIGHT),
-        ((1188, 438, 1515, 540), "Mimic guardrail", "Free gas, ice, tight/cemented rock, shale, and washout can mimic parts of the signal.", RED, RED_LIGHT),
-        ((1188, 560, 1515, 670), "Calibration rail", "NMR/core calibrate. Sgh, Sh, NMR_SAT, Swr, and phase labels stay Y-only.", PURPLE, PURPLE_LIGHT),
+        ((1188, 205, 1515, 298), "Host rock", "Low gamma ray (GR) plus porosity means clean pore space. It can host hydrate; it does not prove it.", GREEN, GREEN_LIGHT),
+        ((1188, 318, 1515, 418), "Hydrate support", "High resistivity (Rt) is stronger when P-wave and S-wave stiffness rise with it.", TEAL, ICE_LIGHT),
+        ((1188, 438, 1515, 540), "What throws us off", "Free gas, ice, tight/cemented rock, or shale/clay can mimic one or two signals.", RED, RED_LIGHT),
+        ((1188, 560, 1515, 670), "Fluid + target check", "NMR = nuclear magnetic resonance fluid signal; core = sample tie. Saturation labels stay Y-only.", PURPLE, PURPLE_LIGHT),
     ]
     for box, heading, body, color, fill in decoder_cards:
         card(draw, box, fill=fill, outline=color, radius=9, width=2)
-        text(draw, (box[0] + 16, box[1] + 12), heading, 17, color, True, width=120)
-        text(draw, (box[0] + 145, box[1] + 12), body, 12, NAVY, True, width=box[2] - box[0] - 165, gap=3)
+        text(draw, (box[0] + 16, box[1] + 12), heading, 16, color, True, width=118)
+        text(draw, (box[0] + 145, box[1] + 12), body, 12, NAVY, True, width=box[2] - box[0] - 165, gap=2)
 
     source_box = (58, 742, 1542, 832)
     card(draw, source_box, fill=(248, 252, 253), outline=LINE, radius=10, width=2)
@@ -3820,10 +3824,10 @@ def v55_slide_parameter_ranges() -> Path:
     thumb2 = (262, 758, 426, 817)
     if not v53_paste(img, SLIDE03_STABILITY_CURVE, thumb1, mode="cover"):
         v53_placeholder_image(draw, thumb1, "CSV stability curve", TEAL)
-    if not v53_paste(img, SLIDE03_USGS_MULTILOG, thumb2, mode="cover"):
-        v53_placeholder_image(draw, thumb2, "USGS log crop", BLUE)
+    if not v53_paste(img, SLIDE03_SOURCE_DIR / "project_website_regional_map_context.png", thumb2, mode="cover"):
+        v53_placeholder_image(draw, thumb2, "Website map", BLUE)
     text(draw, (78, 817), "CSV methane 5 ppt", 9, TEAL, True, width=164, align="center", gap=1)
-    text(draw, (262, 817), "USGS log/QC reference", 9, BLUE, True, width=164, align="center", gap=1)
+    text(draw, (262, 817), "Project 2D stability map", 9, BLUE, True, width=164, align="center", gap=1)
 
     badges = [
         ("Mount Elbert / Milne Point", GREEN),
@@ -3840,7 +3844,7 @@ def v55_slide_parameter_ranges() -> Path:
     text(
         draw,
         (1230, 762),
-        "Local source package:\nREADME + matrix + public-safe images.\nPublisher/Drive figures stay citation-only unless licensed.",
+        "Starts after QC/washout cleanup.\n100% methane, 5 ppt salinity baseline.\nPaper figures stay citation-only unless licensed.",
         10,
         MUTED,
         True,
@@ -3850,7 +3854,7 @@ def v55_slide_parameter_ranges() -> Path:
 
     footer(
         draw,
-        "Sources: local slide_03_signal_response_sources package, public_parameter_evidence_registry, ML logic ladder, well-log requirements map, Aung/Yoneda/Lee-Collett source notes. Stability is context only.",
+        "Sources: local Slide 3 package, public_parameter_evidence_registry, ML logic ladder, Aung/Yoneda/Lee-Collett/Chong notes, Lijith-Singh geomechanics, Dalvand-Falahat Vs provenance. Stability is context only.",
     )
     return save(img, "slide_03_signal_response_v5_5.png")
 
@@ -4188,7 +4192,7 @@ def v55_build_word_companion(panel_paths: list[Path], contact_sheet: Path) -> Pa
     document.add_heading("What V5.5 Adds", level=1)
     for item in [
         "Slide 2 now uses the selected USGS/DOE page-3 hydrate stability source screenshot/crop as the primary stability visual, the project website regional map as North Slope context, and the digitized methane 5 ppt CSV only as a project input inset.",
-        "Slide 3 now shows a depth-aligned signal-response stack: stability/BGHS context, GR, caliper QC, porosity/RHOB, Rt, Vp, Vs/mu-rho, and NMR/core move together with hydrate-compatible, free-gas-mimic, and bad-hole intervals.",
+        "Slide 3 now shows a cleaned depth-aligned signal-response stack: stability context, clean sand (GR/gamma), pore space (phi/RHOB), resistivity (Rt), P-wave speed (Vp), rigidity (Vs/mu-rho), and fluid/core checks (NMR/core) move together with hydrate-compatible and resistive-mimic intervals.",
         "Slide 5 explains the cleaned DOE three-dataset prototype and model-run card: targets S_h, S_wr, Sh, and Swr are Y-only; cleaned canonical features enter X_allowed; depth/helper/raw-alias columns are excluded; training-fit metrics are runtime proof only.",
         "Slide 8 makes the stability overlay explicit: context, mask, confidence, and caveat are allowed uses; occurrence proof, saturation, hydrate-present labels, and negative labels for blocked rows are not allowed.",
         "Slide 9 closes with what has been done, what is not claimed, and what must happen next before final ML or stability claims.",
@@ -4206,6 +4210,7 @@ def v55_build_word_companion(panel_paths: list[Path], contact_sheet: Path) -> Pa
         "Use 'training-fit/runtime proof only' for current DOE prototype metrics, not final model performance.",
         "Use 'stability-admissibility context' for the public screen, not hydrate proof, occurrence, or saturation.",
         "Keep S_h, S_wr, Sh, Swr, Sgh, NMR_SAT, hydrate saturation, occurrence labels, and phase labels out of X_allowed.",
+        "Treat Slide 3 as starting after well-log QC and washout cleanup; caliper is no longer shown as a live interpretive signal on this slide.",
         "Bring back only public-safe summaries after mentor, data-owner, and release review.",
     ]:
         document.add_paragraph(item, style="List Bullet")
@@ -4213,7 +4218,7 @@ def v55_build_word_companion(panel_paths: list[Path], contact_sheet: Path) -> Pa
     slide_notes = [
         ("Slide 1 - Personal/about-me opener", "Preserved from V5.4 to keep the agreed mentor-facing opener style."),
         ("Slide 2 - Source-backed hydrate and North Slope context", "Rebuilt with the selected USGS/DOE page-3 stability source screenshot/crop as the primary stability visual, a project website regional map for North Slope context, and the project digitized methane 5 ppt CSV only as a small input inset. The slide explains that Structure I methane-dominant hydrate is the current baseline; Structure II and Structure H can occur with larger hydrocarbons such as ethane, propane, butane, or heavier guests, but they are not the current claim. Stability remains a pressure-temperature admissibility screen only; occurrence and saturation evidence must come from approved logs, core, NMR, and mentor-reviewed labels."),
-        ("Slide 3 - Hydrate signal movements across depth", "Rebuilt from the local Slide 3 signal-response source package. The slide uses a public-safe synthetic depth stack plus local CSV-derived stability and USGS public-domain log/QC references to show the interpretation ladder: stability context, clean porous host, electrical and elastic response, NMR/core calibration, and guardrails. It explicitly separates hydrate-compatible clean sand from free gas or resistive mimics and bad-hole QC, while keeping Sgh, S_h, Sh, Hydrate Saturation, NMR_SAT, Swr, and phase labels on the Y-only rail."),
+        ("Slide 3 - Hydrate signal movements across depth", "Rebuilt from the local Slide 3 signal-response source package after the mentor clarification that caliper washouts and bad-hole QC are already handled upstream. The slide now starts from cleaned, normalized well-log inputs and explains the ML logic in beginner-readable terms: clean sand (GR/gamma) and pore space (phi/RHOB) define a possible host, resistivity (Rt) supplies a non-unique electrical response, P-wave and S-wave rigidity (Vp, Vs/mu-rho) add broad geomechanical stiffness support, NMR means nuclear magnetic resonance fluid response, and core means sample/lab calibration. The slide separates a hydrate-compatible interval from a resistive mimic interval and keeps Sgh, S_h, Sh, Hydrate Saturation, NMR_SAT, Swr, and phase labels on the Y-only rail."),
         ("Slide 4 - Full complex project workflow", "Kept the whole complex architecture as a main-sequence plate, not an appendix-only reference."),
         ("Slide 5 - DOE three-dataset prototype", "Adds the cleaned prototype story, feature exclusions, target-only saturation variants, and training-fit disclaimer."),
         ("Slide 6 - Equations, feature engineering, and unit gate", "Preserves the unit/QC/leakage gate for equation features."),
@@ -4235,7 +4240,7 @@ def v55_build_word_companion(panel_paths: list[Path], contact_sheet: Path) -> Pa
     document.add_heading("Source And Visual Provenance", level=1)
     anchors = [
         "docs/evidence/slide02_source_bundle_2026_06_17/ for the rebuilt Slide 2 source bundle.",
-        "docs/project_blueprints/presentation_assets/slide_03_signal_response_sources_2026_06_17/ for the rebuilt Slide 3 local source package, README, source-to-visual matrix, CSV-derived stability inset, USGS public-domain log/QC crops, and public-safe signal-response template.",
+        "docs/project_blueprints/presentation_assets/slide_03_signal_response_sources_2026_06_17/ for the rebuilt Slide 3 local source package, README, source-to-visual matrix, CSV-derived methane 5 ppt stability inset, project website 2D stability map context, and public-safe signal-response template.",
         "Original selected USGS/PDF page screenshot: https://drive.google.com/file/d/17T48zhoJKvxB21dJUovXhN-6V8DEgzf7/view?usp=drivesdk",
         "Cropped hydrate stability curve: https://drive.google.com/file/d/1_edIg2LrifTnCL2GP23fcWfnpvIGulYn/view?usp=drivesdk",
         "Digitized methane 5 ppt CSV inset: https://drive.google.com/file/d/1O7hFSgt3eEjaYt3FocJUlFhAZuswwlm3/view?usp=drivesdk",
@@ -4243,6 +4248,7 @@ def v55_build_word_companion(panel_paths: list[Path], contact_sheet: Path) -> Pa
         "docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/ for the V5.4 reference panels.",
         "docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/ for the V5.2 complex workflow and ML runtime authority plates.",
         "data/public_ml_products/source_visual_inventory_2026-06-16.csv for slide and website visual provenance.",
+        "Lijith, Malagar, and Singh (2019) for broad gas-hydrate geomechanics and stiffness context; Dalvand and Falahat (2021) for measured-versus-estimated Vs provenance language; USGS Fact Sheet 2019-3037 for North Slope hydrate resource context.",
         "docs/DOE_THREE_DATASET_ML_PIPELINE_RUNBOOK_2026-06-16.md and docs/DOE_RUNTIME_PRESENTATION_AND_MODEL_TRACKING_PLAN_2026-06-16.md for the DOE prototype language.",
         "docs/STABILITY_CALCULATION_PLAN.md and public stability products for the stability overlay.",
     ]

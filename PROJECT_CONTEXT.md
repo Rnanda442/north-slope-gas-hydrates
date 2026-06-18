@@ -163,12 +163,15 @@ and curve crop, the project website regional map, and the project digitized
 methane 5 ppt CSV inset. It explicitly says stability is
 pressure-temperature admissibility context only, not hydrate proof,
 occurrence evidence, or saturation evidence. Slide 3 is rebuilt from the local
-Slide 3 signal-response source package with a public-safe depth stack, CSV
-methane 5 ppt stability inset, USGS public-domain log/QC references, and
-source badges for Mount Elbert/Milne Point, Eileen/Tarn, and PBU L-Pad
-context. It explains co-moving GR, caliper, porosity/RHOB, Rt, Vp, Vs/mu-rho,
-and NMR/core movements while keeping stability as context and Sgh, S_h, Sh,
-Hydrate Saturation, NMR_SAT, Swr, and phase labels on the Y-only rail. The
+Slide 3 signal-response source package with a public-safe cleaned depth stack,
+CSV methane 5 ppt stability inset, project website 2D stability map context,
+and source badges for Mount Elbert/Milne Point, Eileen/Tarn, and PBU L-Pad
+context. It explains co-moving stability context, clean sand (GR/gamma), pore
+space (phi/RHOB), resistivity (Rt), P-wave speed (Vp), rigidity
+(Vs/mu-rho), and fluid/core checks (NMR/core) while keeping stability as
+context and Sgh, S_h, Sh, Hydrate Saturation, NMR_SAT, Swr, and phase labels
+on the Y-only rail. Caliper/washout/bad-hole QC is treated as upstream
+preprocessing for this slide rather than a visible interpretation track. The
 V5.5 PPTX plus Word companion are regenerated from
 `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`.
 The current local deliverables are
@@ -176,9 +179,9 @@ The current local deliverables are
 and
 `docs/project_blueprints/V5_5_SLIDE3_SIGNAL_RESPONSE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`.
 The verified native Google Slides/Docs imports are:
-`https://docs.google.com/presentation/d/1BMUhHLYWr6OTHByzfnV_o7f4A1qQpaeDbQuVD4HuHUc`
+`https://docs.google.com/presentation/d/1MuMBhO_IQ0sXGCr5IKcdLRUlEm_CHKsrHWSHCzB3DCA`
 and
-`https://docs.google.com/document/d/1w_Ca7nYorJQpdq9IxbziKH57XXU8ELougIiQNN4lUc8`.
+`https://docs.google.com/document/d/180KwTmIQlkQr2Zbu5MUt78oL1nj9Zh_y-3KahtQbpMw`.
 Do not reopen OSL unless a source/product rebuild is actually needed.
 
 ## Current ML Architecture Decisions And Open Mentor Questions
@@ -271,9 +274,9 @@ V5.4 as the source baseline and V5.3 as flawed reference only.
   8, and closes with what is done, what is not claimed, and what is next on
   slide 9. The current deck and companion were
   imported to Drive as native Google Slides/Docs:
-  <https://docs.google.com/presentation/d/1BMUhHLYWr6OTHByzfnV_o7f4A1qQpaeDbQuVD4HuHUc>
+  <https://docs.google.com/presentation/d/1MuMBhO_IQ0sXGCr5IKcdLRUlEm_CHKsrHWSHCzB3DCA>
   and
-  <https://docs.google.com/document/d/1w_Ca7nYorJQpdq9IxbziKH57XXU8ELougIiQNN4lUc8>.
+  <https://docs.google.com/document/d/180KwTmIQlkQr2Zbu5MUt78oL1nj9Zh_y-3KahtQbpMw>.
 - The 2026-06-13 science-to-ML local DOCX/PPTX rebuild was imported to the
   connected Google Drive account as native files:
   [SCIENCE-TO-ML North Slope Gas Hydrate Research Overview 2026-06-13](https://docs.google.com/document/d/1Ft0wgKV3p8HK1F7X4_WYVAp1jOtBYuCntdRP-Z84e5k)

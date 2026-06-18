@@ -245,7 +245,7 @@ create proof by themselves.
 
 The current V5.5 slide export is a mentor-facing explanation package. It uses
 the original personal/about-me opener, source-backed hydrate and North Slope
-context, a parameter-range board, the full complex project workflow,
+context, a cleaned co-moving signal-response stack, the full complex project workflow,
 equation and unit-gate logic, the full complex ML runtime architecture, a
 cleaned DOE three-dataset prototype card, a stability-to-ML overlay, and a
 plain done / not claimed / next status close. The data boundary distinguishes
