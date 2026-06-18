@@ -25,6 +25,7 @@ OUT_CONTACT_SHEET = ASSET_DIR / "v5_5_slide2_source_update_contact_sheet.png"
 PUBLIC_PRODUCTS = ROOT / "data" / "public_stability_products"
 PUBLIC_ML_PRODUCTS = ROOT / "data" / "public_ml_products"
 WEBSITE_CAPTURE_DIR = BLUEPRINT_DIR / "presentation_assets" / "v5_3_website_captures"
+WEBSITE_WELL_MAP_DIR = BLUEPRINT_DIR / "presentation_assets" / "website_well_maps_2026_06_18"
 REFERENCE_IMAGE_DIR = ROOT / "references" / "presentation-revision-2026-06-11" / "images"
 V52_ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "full_workflow_diagram_2026_06_15"
 PROCESSING_ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "processing_revisions_2026_06_11"
@@ -47,11 +48,20 @@ SLIDE02_DGGS_GEOLOGY_LAYER = (
 SLIDE02_STABILITY_WELL_MAP = (
     SLIDE02_SOURCE_DIR / "slide02_selected_12_stability_screen_status_2d_well_map.png"
 )
+SLIDE02_OSL_GIS_STABILITY_MAP = (
+    WEBSITE_WELL_MAP_DIR / "slide3_correct_2d_well_stability_map_2026_06_18.png"
+)
+SLIDE02_OSL_GIS_STABILITY_CROP = (
+    SLIDE02_SOURCE_DIR / "slide02_selected_13_osl_gis_stability_context_map_crop.png"
+)
 SLIDE02_ANS_CROSS_SECTION = (
     SLIDE02_SOURCE_DIR / "slide02_selected_06_usgs_arctic_alaska_cross_section_fig2_crop.png"
 )
 SLIDE02_STRUCTURE_TYPES = (
     SLIDE02_SOURCE_DIR / "slide02_selected_09_world_atlas_fig1_1_full_structure_types_si_highlighted.png"
+)
+SLIDE02_STRUCTURE_TYPES_CLEAN = (
+    SLIDE02_SOURCE_DIR / "slide02_selected_14_world_atlas_fig1_1_structure_types_clean.png"
 )
 
 W, H = 1600, 900
@@ -3762,6 +3772,93 @@ def v55_generate_slide02_geoscience_orientation_map() -> Path:
     return SLIDE02_GEOSCIENCE_ORIENTATION
 
 
+def v55_generate_slide02_clean_structure_types() -> Path:
+    """Remove the earlier off-target teal oval baked into the structure source crop."""
+    if not SLIDE02_STRUCTURE_TYPES.exists():
+        return SLIDE02_STRUCTURE_TYPES
+    src = Image.open(SLIDE02_STRUCTURE_TYPES).convert("RGB")
+    width, height = src.size
+    pixels = src.load()
+    mask: set[tuple[int, int]] = set()
+    x_start = int(width * 0.58)
+    y_stop = min(height, int(height * 0.38))
+
+    for y in range(y_stop):
+        for x in range(x_start, width):
+            r, g, b = pixels[x, y]
+            is_teal_outline = (
+                r < 95 and 75 <= g <= 180 and 90 <= b <= 190 and g - r > 30 and b - r > 30
+            )
+            is_off_target_tail = (
+                x > int(width * 0.81)
+                or (x > int(width * 0.72) and y < int(height * 0.055))
+                or (x > int(width * 0.77) and y < int(height * 0.12))
+            )
+            if is_teal_outline and is_off_target_tail:
+                mask.add((x, y))
+
+    expanded = set(mask)
+    for x, y in mask:
+        for dy in (-1, 0, 1):
+            for dx in (-1, 0, 1):
+                nx, ny = x + dx, y + dy
+                if x_start <= nx < width and 0 <= ny < y_stop:
+                    expanded.add((nx, ny))
+
+    remaining = set(expanded)
+    for _ in range(32):
+        updates: list[tuple[int, int, tuple[int, int, int]]] = []
+        for x, y in list(remaining):
+            neighbors: list[tuple[int, int, int]] = []
+            for dy in (-1, 0, 1):
+                for dx in (-1, 0, 1):
+                    if dx == 0 and dy == 0:
+                        continue
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < width and 0 <= ny < height and (nx, ny) not in remaining:
+                        neighbors.append(pixels[nx, ny])
+            if neighbors:
+                count = len(neighbors)
+                color = tuple(sum(channel) // count for channel in zip(*neighbors))
+                updates.append((x, y, color))
+        if not updates:
+            break
+        for x, y, color in updates:
+            pixels[x, y] = color
+            remaining.remove((x, y))
+
+    for x, y in remaining:
+        pixels[x, y] = WHITE
+
+    SLIDE02_STRUCTURE_TYPES_CLEAN.parent.mkdir(parents=True, exist_ok=True)
+    src.save(SLIDE02_STRUCTURE_TYPES_CLEAN)
+    return SLIDE02_STRUCTURE_TYPES_CLEAN
+
+
+def v55_generate_slide02_osl_gis_stability_crop() -> Path:
+    """Crop the OSL/website GIS stability map to the evidence-bearing map area."""
+    if not SLIDE02_OSL_GIS_STABILITY_MAP.exists():
+        return SLIDE02_STABILITY_WELL_MAP
+    src = Image.open(SLIDE02_OSL_GIS_STABILITY_MAP).convert("RGB")
+    width, height = src.size
+    crop = (
+        int(width * 0.13),
+        int(height * 0.105),
+        int(width * 0.885),
+        int(height * 0.895),
+    )
+    cropped = src.crop(crop)
+    SLIDE02_OSL_GIS_STABILITY_CROP.parent.mkdir(parents=True, exist_ok=True)
+    cropped.save(SLIDE02_OSL_GIS_STABILITY_CROP)
+    return SLIDE02_OSL_GIS_STABILITY_CROP
+
+
+def v55_slide02_stability_map_path() -> Path:
+    if SLIDE02_OSL_GIS_STABILITY_MAP.exists():
+        return v55_generate_slide02_osl_gis_stability_crop()
+    return v55_generate_slide02_stability_well_map()
+
+
 def v55_generate_slide02_stability_well_map() -> Path:
     """Create the website-aligned 2D stability screen status map for Slide 2."""
     screen_path = PUBLIC_PRODUCTS / "stability_screen_2026-06-14_methane_5ppt_v1.csv"
@@ -3941,7 +4038,8 @@ def v55_generate_slide02_stability_well_map() -> Path:
 
 def v55_slide_context() -> Path:
     v55_generate_slide02_geoscience_orientation_map()
-    v55_generate_slide02_stability_well_map()
+    structure_path = v55_generate_slide02_clean_structure_types()
+    stability_map_path = v55_slide02_stability_map_path()
     img = canvas(False)
     draw = ImageDraw.Draw(img)
     v53_panel_title(
@@ -3977,7 +4075,12 @@ def v55_slide_context() -> Path:
     )
     pill(draw, (84, 228, 370, 260), "methane Structure I = current baseline", (235, 250, 251), TEAL)
     structure_box = (84, 274, 586, 604)
-    if not v53_paste(img, v55_slide02_path(SLIDE02_STRUCTURE_TYPES, SLIDE02_USGS_PAGE), structure_box, mode="contain"):
+    if not v53_paste(
+        img,
+        v55_slide02_path(structure_path, v55_slide02_path(SLIDE02_STRUCTURE_TYPES, SLIDE02_USGS_PAGE)),
+        structure_box,
+        mode="contain",
+    ):
         v53_placeholder_image(draw, structure_box, "Source hydrate-structure figure unavailable")
     draw.ellipse((372, 283, 505, 417), outline=TEAL, width=5)
     v54_source_label(draw, structure_box, "World Atlas Fig. 1.1 after Warrier et al. 2016; sI highlighted")
@@ -3993,35 +4096,52 @@ def v55_slide_context() -> Path:
     text(draw, (84, 732), "Structure II/H are kept as gas-composition sensitivity, not the current baseline.", 11, MUTED, True, width=482, gap=1)
 
     # B. North Slope structure, wells, and public map context.
-    map_panel = (635, 138, 1185, 790)
+    map_panel = (620, 138, 1245, 790)
     card(draw, map_panel, fill=WHITE, outline=LINE, radius=9, width=2)
     section_header(map_panel, "2", "Why the North Slope", BLUE)
-    text(draw, (659, 198), "A public stability-screen well map and Arctic Alaska cross section define the project setting.", 14, MUTED, True, width=482, gap=2)
-    map_box = (659, 238, 1161, 455)
-    map_path = v55_slide02_path(SLIDE02_STABILITY_WELL_MAP, SLIDE02_DGGS_GEOLOGY_LAYER)
-    if not v53_paste(img, map_path, map_box, mode="cover"):
+    text(
+        draw,
+        (644, 198),
+        "The updated 2D stability-screen map uses OSL-staged DNR units, roads, TAPS, communities, and field labels.",
+        13,
+        MUTED,
+        True,
+        width=565,
+        gap=2,
+    )
+    map_box = (632, 238, 1233, 640)
+    map_path = v55_slide02_path(
+        stability_map_path,
+        v55_slide02_path(SLIDE02_STABILITY_WELL_MAP, SLIDE02_DGGS_GEOLOGY_LAYER),
+    )
+    if not v53_paste(img, map_path, map_box, mode="contain"):
         v53_placeholder_image(draw, map_box, "North Slope stability well map unavailable")
-    v54_source_label(draw, map_box, "Project website 2D stability-screen well map; status colors only")
-    cross_box = (659, 492, 1161, 718)
-    if not v53_paste(img, v55_slide02_path(SLIDE02_ANS_CROSS_SECTION, SLIDE02_MAP), cross_box, mode="contain"):
-        v53_placeholder_image(draw, cross_box, "Arctic Alaska cross section unavailable")
-    v54_source_label(draw, cross_box, "USGS Arctic Alaska generalized cross section, Figure 2 crop")
-    text(draw, (659, 738), "These visuals locate the system; they do not claim occurrence or saturation.", 11, RED, True, width=482, gap=1)
+    v54_source_label(draw, map_box, "OSL/website 2D stability-screen map; DNR units + AKDOT roads + TAPS overlays")
+    layer_keys = [
+        ((632, 662, 813, 704), "DNR units", "#"),
+        ((828, 662, 1029, 704), "Dalton + TAPS", "|"),
+        ((1044, 662, 1233, 704), "field labels", "o"),
+    ]
+    for box, label, glyph in layer_keys:
+        card(draw, box, fill=(248, 252, 253), outline=LINE, radius=8, width=1)
+        text(draw, (box[0] + 12, box[1] + 9), glyph, 18, TEAL, True, width=22, align="center")
+        text(draw, (box[0] + 42, box[1] + 13), label, 13, NAVY, True, width=box[2] - box[0] - 52)
+    text(draw, (632, 728), "Map layers locate the public scaffold; they do not claim occurrence or saturation.", 11, RED, True, width=585, gap=1)
 
     # C. Source-backed phase/stability visual and why this matters.
-    stability_panel = (1210, 138, 1540, 790)
+    stability_panel = (1255, 138, 1540, 790)
     card(draw, stability_panel, fill=WHITE, outline=LINE, radius=9, width=2)
     section_header(stability_panel, "3", "P-T gate", GREEN)
-    text(draw, (1234, 198), "Stability screens whether hydrate is physically admissible under the selected assumptions.", 13, MUTED, True, width=270, gap=2)
-    graph_box = (1234, 244, 1516, 496)
+    text(draw, (1273, 198), "Stability screens whether hydrate is physically admissible under the selected assumptions.", 12, MUTED, True, width=230, gap=2)
+    graph_box = (1273, 244, 1518, 496)
     card(draw, (graph_box[0] - 4, graph_box[1] - 4, graph_box[2] + 4, graph_box[3] + 4), fill=WHITE, outline=LINE, radius=6, width=1)
     if not v53_paste(img, v55_slide02_path(SLIDE02_USGS_CURVE, SLIDE02_USGS_PAGE), graph_box, mode="contain"):
         v53_placeholder_image(draw, graph_box, "Selected USGS/DOE stability graph unavailable")
     v54_source_label(draw, graph_box, "Selected USGS/DOE North Slope hydrate stability figure")
     gate_rows = [
-        ((1234, 520, 1516, 580), "Current assumption", "methane / Structure I / 5 ppt", TEAL, ICE_LIGHT),
-        ((1234, 592, 1516, 652), "Meaning", "admissible under assumptions", GREEN, GREEN_LIGHT),
-        ((1234, 664, 1516, 724), "Guardrail", "not proof; not saturation", RED, RED_LIGHT),
+        ((1273, 520, 1518, 580), "Current assumption", "methane / Structure I / 5 ppt", TEAL, ICE_LIGHT),
+        ((1273, 592, 1518, 652), "Meaning", "admissible under assumptions", GREEN, GREEN_LIGHT),
+        ((1273, 664, 1518, 724), "Guardrail", "not proof; not saturation", RED, RED_LIGHT),
     ]
     for box, label, body, color, fill in gate_rows:
         card(draw, box, fill=fill, outline=color, radius=8, width=2)
@@ -4043,7 +4163,7 @@ def v55_slide_context() -> Path:
 
     v53_footer(
         draw,
-        "Slide 2 sources: World Atlas Fig. 1.1 hydrate structure crop; project website 2D stability-screen well map; USGS Arctic Alaska cross section; selected USGS/DOE stability figure. Stability is not hydrate proof.",
+        "Slide 2 sources: World Atlas Fig. 1.1 hydrate structure crop; OSL/website 2D stability-screen map with public GIS overlays; selected USGS/DOE stability figure. Stability is not hydrate proof.",
     )
     return save(img, "slide_02_source_context_v5_5.png")
 
