@@ -149,6 +149,20 @@ website captures, source-backed figures, authority diagrams, and contact
 sheets, and it flags uncited or AI-looking visuals before they enter the
 mentor-facing package.
 
+The 2026-06-18 self-email titled `slide updates for the newest deck` is the
+latest deck-direction layer. It says the attached V5.5 Slide 3 Signal Response
+QC-cleaned PPTX is the best review deck so far, but the attachment remains a
+needs-review Gmail/Drive artifact until it is downloaded, verified, and
+explicitly staged. Use
+`docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md` for the extracted direction
+and copyable delegation prompts. The next deck pass should use larger
+source-backed or data-derived visuals, reduce on-slide citation clutter, keep
+text high-level and editable where practical, combine the website/OSL North
+Slope maps into one clear 2D map, rebuild Slide 3 around log-signal movement
+plus lithology/coring context, replace the three-dataset prototype with an
+equation-only slide, and make Slides 7-9 a guarded results/discussion plan
+without unsupported model or hydrate claims.
+
 The active mentor-facing workflow package is now the V5.5 Slide 2 source update
 under
 `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/`.

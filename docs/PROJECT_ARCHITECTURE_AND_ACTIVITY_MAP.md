@@ -112,7 +112,20 @@ when multiple saturation labels exist, fraction-vs-percent target convention,
 occurrence-label provenance, train/validation/locked-test well assignment,
 caliper coverage sufficiency, and missing-log adapter permission.
 
-Use the V5.5 mentor update deck and companion as the current local
+### C. Latest deck delegation direction
+
+The 2026-06-18 self-email `slide updates for the newest deck` is now captured
+in `docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md`. Use that file before
+delegating slide, website-map, equation-slide, source-research, or PC/OSL sync
+tasks. It keeps the committed V5.5 Slide 2 source update package as the last
+verified repo baseline, but treats the Gmail attachment as a needs-review deck
+that may contain better current visuals. The next work should be delegated by
+topic: unified 2D North Slope map, Slide 2 hydrate/context rebuild, Slide 3
+log-signal/lithology rebuild, simplified ML architecture, equation-only slide,
+Slide 6 cleanup, Slides 7-9 results/discussion plan, four-well source recovery,
+and Word companion science support.
+
+Use the V5.5 Slide 2 source update deck and companion as the current committed
 presentation baseline. V5.4 is the source baseline, and the older Gmail-style
 prompt plus V5.2 diagrams remain provenance and visual authority. Treat V5.3
 as a flawed intermediate/reference, not the active mentor deck.
@@ -161,10 +174,11 @@ Status vocabulary: `Ready`, `In progress`, `Waiting`, `Blocked`, `Partial`,
 ## Current Priority
 
 Start future sessions with `docs/AGENT_START_HERE.md`,
-`docs/CURRENT_ARTIFACT_INDEX.md`, and `docs/PROJECT_PROMPT_LIBRARY.md` before
-diving into the longer project base. These files now define the short handoff
-layer for current state, authoritative files, guardrails, deliverables, tests,
-and reusable prompts.
+`docs/CURRENT_ARTIFACT_INDEX.md`, `docs/PROJECT_PROMPT_LIBRARY.md`, and
+`docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md` before diving into the
+longer project base. These files now define the short handoff layer for current
+state, authoritative files, guardrails, deliverables, tests, reusable prompts,
+and the current deck-delegation direction.
 
 Improvement decisions should follow
 `docs/PROJECT_IMPROVEMENT_STRATEGY.md`. For the next Word, PowerPoint, or
@@ -450,3 +464,4 @@ and approved-data figures become available.
 | 2026-06-17 | Accepted Slide 2 direction and synced North Slope GIS context | Marked the three-column Slide 2 context layout as the accepted baseline, added `Explore North Slope > Regional Map > Geoscience Orientation Map` using public geology/assessment units, 2D seismic lines, 3D seismic footprints, field-area labels, study boundary, and public wells, regenerated the matching Slide 2 GIS asset, PPTX, DOCX, panel PNG, and contact sheet, and kept the stability and GIS layers as context only rather than occurrence or saturation evidence. |
 | 2026-06-18 | Corrected Slide 2 geology-layer and hydrate-structure source treatment | Verified DGGS RI 2018-6 Umiat-Gubik as the strongest public North Slope geology layer candidate for OSL, generated slide/handoff preview PNGs from its public shapefile package, built local ignored OSL upload package `osl_upload_packages/slide2_north_slope_geology_osl_upload_2026_06_18.zip`, recorded the user-reported OSL upload completion, switched the Slide 2 map from the generated orientation view to the DGGS geology-layer preview, recropped the World Atlas Fig. 1.1 hydrate-structure visual so sI/sII/sH are visible with sI highlighted, and documented the OSL/GitHub split without making hydrate occurrence, saturation, or model-output claims. |
 | 2026-06-18 | Hardened the GitHub-safe DOE ML workflow handoff | Expanded `.gitignore` for approved/runtime data, model binaries, local workbook packages, secrets, and DOE-only exports; added `01_pipeline/export_model_run_review_assets.py` for row-free Word/slide review tables and PNGs from ignored runtime summaries; updated the DOE runbooks with header-only, three-dataset, multi-saturation, and review-export commands; and added tests so summary exports avoid row-level predictions and training metrics by default. |
+| 2026-06-18 | Captured latest self-email deck direction and delegation prompts | Added `docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md` from the user's self-email `slide updates for the newest deck`, recorded the Gmail deck attachment as needs review, and split the next work into copyable prompts for PC/OSL sync, Gmail deck intake, Slide 2 hydrate/context, unified website map, Slide 3 log/lithology, simplified ML architecture, equation-only slide, Slide 6 cleanup, Slides 7-9 results plan, four-well source recovery, and Word companion science support. |

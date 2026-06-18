@@ -1,6 +1,6 @@
 # Agent Start Here
 
-Last updated: 2026-06-17
+Last updated: 2026-06-18
 
 Use this file as the first read for future Codex, PC, and OpenScienceLab
 sessions. It should be updated only when the project orientation,
@@ -11,10 +11,12 @@ authoritative artifacts, guardrails, tests, or next actions materially change.
 1. `docs/AGENT_START_HERE.md`
 2. `docs/CURRENT_ARTIFACT_INDEX.md`
 3. `docs/PROJECT_PROMPT_LIBRARY.md` when starting a repeated workflow
-4. `PROJECT_CONTEXT.md`
-5. `docs/NORTH_SLOPE_PROJECT_BASE.md`
-6. `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md`
-7. The technical docs named below for the specific task
+4. `docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md` for current slide and
+   delegated-chat work
+5. `PROJECT_CONTEXT.md`
+6. `docs/NORTH_SLOPE_PROJECT_BASE.md`
+7. `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md`
+8. The technical docs named below for the specific task
 
 Always run `git status --short` before edits and preserve unrelated local
 changes.
@@ -71,6 +73,8 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
 - `docs/CURRENT_ARTIFACT_INDEX.md` - artifact authority, status, and edit
   safety.
 - `docs/PROJECT_PROMPT_LIBRARY.md` - reusable prompts for repeated workflows.
+- `docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md` - latest self-email deck
+  direction and copyable prompts for PC/OSL/delegated Codex chats.
 - `PROJECT_CONTEXT.md` - concise living project memory.
 - `docs/NORTH_SLOPE_PROJECT_BASE.md` - broader project base and deliverable
   inventory.
@@ -140,6 +144,21 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
   `docs/project_blueprints/North_Slope_Gas_Hydrate_ML_Pipeline_Status_And_Forward_Workflow_2026-06-15.docx`
 - Current mentor status package:
   `docs/project_blueprints/North_Slope_Gas_Hydrate_Mentor_Status_Package_V5_Workflow_2026-06-15.docx`
+
+Latest user deck-direction update:
+
+- The 2026-06-18 self-email titled `slide updates for the newest deck`
+  identifies the attached
+  `V5.5 Slide 3 Signal Response QC-Cleaned North Slope Gas Hydrate ML Workflow Slides 2026-06-17 (1).pptx`
+  as the best review deck so far. The attachment is not committed and should
+  be treated as a needs-review Gmail/Drive artifact until a future session
+  explicitly downloads, verifies, and stages it.
+- The next slide pass should follow
+  `docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md`: larger source-backed or
+  data-derived visuals, fewer on-slide source comments, editable high-level
+  text where practical, a unified North Slope map, a rebuilt log-signal/lithology
+  slide, an equation-only slide, and results/discussion slides without
+  unsupported model or hydrate claims.
 
 Do not directly edit generated PPTX/DOCX binaries unless the user explicitly
 asks. Prefer the documented builders and regenerate deliverables reproducibly.
@@ -289,7 +308,9 @@ Preferred language: `public-safe scaffold`, `schema readiness`,
 4. For slides/docs, read
    `docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md`,
    `docs/FINAL_NINE_SLIDE_GAP_AND_DIAGRAM_REUSE_PLAN_2026-06-15.md`, and the
-   relevant prompt in `docs/PROJECT_PROMPT_LIBRARY.md`.
+   relevant prompt in `docs/PROJECT_PROMPT_LIBRARY.md`. For current delegated
+   slide work, also read
+   `docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md`.
 5. For ML/schema work, read the approved-data intake spec, first model plan,
    field-role table, parameter evidence registry, and leakage guardrails.
 6. For stability work, read `docs/STABILITY_CALCULATION_PLAN.md`, the public

@@ -1,10 +1,33 @@
 # Project Prompt Library
 
-Last updated: 2026-06-17
+Last updated: 2026-06-18
 
 Use these prompts as reusable starting points. Each prompt intentionally starts
 by reading `docs/AGENT_START_HERE.md`; keep that requirement when copying or
 editing.
+
+## Current Deck Delegation
+
+```text
+We are working in Rnanda442/north-slope-gas-hydrates.
+
+First read docs/AGENT_START_HERE.md, docs/CURRENT_ARTIFACT_INDEX.md, and
+docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md.
+
+Task: pick one topic prompt from
+docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md and complete only that scoped
+task. Keep the personal PC, OSL, Drive, and GitHub aligned by reporting what
+belongs in GitHub, what belongs in Drive/OSL only, what was generated, and what
+still needs user or mentor review.
+
+Guardrails: do not commit approved/private rows, raw heavy source bundles,
+private email attachments, runtime predictions, trained models, fitted scalers,
+or unsupported slide claims. Keep stability as context only and keep detailed
+source notes in the Word companion/end material rather than crowding slides.
+
+Output: files changed, figures/assets produced, tests/checks run, unresolved
+questions, and the next exact prompt/topic to delegate.
+```
 
 ## Slide Rebuild
 
@@ -12,6 +35,8 @@ editing.
 We are working in Rnanda442/north-slope-gas-hydrates.
 
 First read docs/AGENT_START_HERE.md, then docs/CURRENT_ARTIFACT_INDEX.md.
+Then read docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md for the latest
+self-email deck direction.
 Then read docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md,
 docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md,
 docs/FINAL_NINE_SLIDE_GAP_AND_DIAGRAM_REUSE_PLAN_2026-06-15.md,

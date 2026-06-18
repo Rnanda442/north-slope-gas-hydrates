@@ -47,6 +47,11 @@ The public repo should not contain:
 - The project needs actual ranges, numbers, scientific reasoning, and source backing before major deliverable edits.
 - Earlier Gmail-deck feedback treated slide 1 as close and slides 2-9 as needing
   stronger specifics, formatting, syntax, science, and ML pipeline clarity.
+- The 2026-06-18 self-email `slide updates for the newest deck` is the latest
+  deck-direction layer. It is captured in
+  `docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md` and should be used to
+  delegate current slide, website-map, equation, source-research, and PC/OSL
+  sync tasks.
 - The main audience deck should keep the original nine topic slides; technical
   diagram plates can be appended when explicitly needed to keep complex
   architecture diagrams whole.
@@ -67,18 +72,28 @@ Then use:
   and edit safety.
 - `docs/PROJECT_PROMPT_LIBRARY.md` for reusable slide, Word, website, OSL,
   source research, parameter evidence, stability, and mentor-status prompts.
+- `docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md` for the latest self-email
+  deck direction and copyable topic prompts for PC/OSL/delegated Codex chats.
 - `docs/NORTH_SLOPE_PROJECT_BASE.md` for the broader project base.
 
 ### Slide Authority And Current Deck
 
 - Current mentor-review deck:
-  `docs/project_blueprints/V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`
+  `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`
 - Current native Google Slides review copy:
-  no verified V5.5 Drive import yet; the V5.4 Drive copy remains reference only.
+  <https://docs.google.com/presentation/d/1-35vfTIXAnWCiyKTLooJy80HBYliMBliE_z4CbggJC0>
 - Current Word companion:
-  `docs/project_blueprints/V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`
+  `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`
 - Current native Google Docs review copy:
-  no verified V5.5 Drive import yet; the V5.4 Drive copy remains reference only.
+  <https://docs.google.com/document/d/1CyZkRgfAUSOOaRxXni0mcmFN2OQcc5pNOw8TOv44f0Q>
+
+- Latest self-email deck attachment, needs review before it becomes a repo
+  artifact:
+  Gmail thread `19edc9d8ce7f95f1`, message `19edd022306af325`, attachment
+  `V5.5 Slide 3 Signal Response QC-Cleaned North Slope Gas Hydrate ML Workflow Slides 2026-06-17 (1).pptx`.
+  The user says this is the best deck so far. Do not commit or overwrite any
+  deck with this attachment until a future session downloads, verifies, and
+  explicitly stages it.
 
 - `docs/project_blueprints/CURRENT_GMAIL_VISUAL_REVISION_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-11.pptx`
 - Source: Gmail message `19eba86da8752830`
@@ -113,8 +128,8 @@ Then use:
   runtime diagrams intact as whole-slide plates. The rebuilt deck was imported
   to Drive as native Google Slides for review:
   <https://docs.google.com/presentation/d/1cWG9ZJvBTQ2hLTbIGJHggcBn46geRrdIUpGY7hWYtd8>.
-- Current V5.5 mentor-facing workflow package:
-  `docs/project_blueprints/V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`.
+- Current committed V5.5 Slide 2 source update workflow package:
+  `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`.
   It has the agreed nine-slide spine, restores the original personal/about-me
   opener, uses source-backed hydrate and North Slope context visuals, makes
   slide 3 parameter-range-only, restores the full complex project workflow as
@@ -143,18 +158,18 @@ Then use:
   as superseded unless the user asks to revive it.
   The V5.2 copy is also in Drive as prior provenance:
   [V5.2 FULL WORKFLOW ML DIAGRAM North Slope Gas Hydrate Slides 2026-06-15](https://docs.google.com/presentation/d/1w9eqANgOc89c1wCUC0xi9eZoBup-3JNllSUI923skgA).
-- Current diagram layouts are the V5.5 mentor update refresh:
-  - `docs/project_blueprints/presentation_assets/v5_5_mentor_update_2026_06_17/slide_04_full_complex_project_workflow_v5_5.png`
+- Current diagram layouts are the V5.5 Slide 2 source update refresh:
+  - `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/slide_04_full_complex_project_workflow_v5_5.png`
     is the full complex project workflow architecture plate.
-  - `docs/project_blueprints/presentation_assets/v5_5_mentor_update_2026_06_17/slide_07_complex_ml_runtime_architecture_v5_5.png`
+  - `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/slide_07_complex_ml_runtime_architecture_v5_5.png`
     is the complex ML runtime architecture plate showing feature/QC groups,
     `X_allowed`, validation split, train-only preprocessing, output heads, and
     the target-only rail.
-  - `docs/project_blueprints/presentation_assets/v5_5_mentor_update_2026_06_17/slide_05_doe_three_dataset_prototype_v5_5.png`
+  - `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/slide_05_doe_three_dataset_prototype_v5_5.png`
     is the DOE three-dataset prototype and visual model-run card.
-  - `docs/project_blueprints/presentation_assets/v5_5_mentor_update_2026_06_17/slide_08_stability_to_ml_overlay_v5_5.png`
+  - `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/slide_08_stability_to_ml_overlay_v5_5.png`
     is the stability-as-context/mask/confidence/caveat overlay.
-  - `docs/project_blueprints/presentation_assets/v5_5_mentor_update_2026_06_17/v5_5_mentor_update_contact_sheet.png`
+  - `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/v5_5_slide2_source_update_contact_sheet.png`
     is the current visual QA contact sheet.
   - The generated PPTX and Word companion were rebuilt from
     `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`.
@@ -165,8 +180,8 @@ Then use:
 - Role: current research overview document.
 - Needs next pass after parameter/source logic is made clearer.
 - Diagram companion for the current workflow discussion:
-  `docs/project_blueprints/V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`.
-  This is the current mentor-facing V5.5 companion. It explains the updated
+  `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`.
+  This is the current committed V5.5 companion. It explains the updated
   deck slide by slide and includes short source-backed sections on hydrate
   structures, stability as admissibility only, log-response ambiguity, the DOE
   three-dataset prototype, leakage-safe ML, separate saturation targets, and
@@ -917,22 +932,23 @@ Current top-priority handoff for the PC:
    `docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md`
    before editing, uploading, deleting, or renaming Word/PowerPoint/Drive
    deliverables.
-2. Use the completed V5.5 mentor update workflow package as the explanation
-   foundation, but do not redesign it unless an obvious bug is found.
-3. Review the rebuilt V5.5 presentation at
-   `docs/project_blueprints/V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`
+2. Use `docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md` to split the next
+   work into scoped prompts for the PC, OSL, or delegated Codex chats.
+3. Review the committed V5.5 Slide 2 source update presentation at
+   `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`
    and companion at
-   `docs/project_blueprints/V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`.
-   No V5.5 Drive import has been verified yet. The previous V5.4 native
-   Google Slides and Docs reference copies are
-   <https://docs.google.com/presentation/d/1olavI9-nUSSvYtEm-TjYVOte-Cg-1UgaO9GMl6skDt0>
+   `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`.
+   The verified V5.5 native Google Slides and Docs review copies are
+   <https://docs.google.com/presentation/d/1-35vfTIXAnWCiyKTLooJy80HBYliMBliE_z4CbggJC0>
    and
-   <https://docs.google.com/document/d/1sgl7cyGHOyJyWGoVC9e7LHb0JFnriPIDAmRizyf5wIg>.
+   <https://docs.google.com/document/d/1CyZkRgfAUSOOaRxXni0mcmFN2OQcc5pNOw8TOv44f0Q>.
    V5.5 carries forward the final-deck prompt requirements, restores the
    personal opener, uses source-backed slide 2 visuals, keeps slide 3 as a
    parameter-range board, restores complex workflow/runtime architecture on
    slides 4 and 7, adds the DOE prototype/model-run card, keeps stability as
    context/admissibility only, and closes with done/not-claimed/next.
+   The 2026-06-18 Gmail deck attachment may supersede some visuals after it is
+   downloaded and verified, but it is not committed yet.
    V5.3 is a flawed intermediate/reference, not the active deck.
    Its prior build contracts are `docs/FINAL_NEW_SLIDE_DECK_CREATION_PROMPT_2026-06-15.md`,
    with supporting rules in
