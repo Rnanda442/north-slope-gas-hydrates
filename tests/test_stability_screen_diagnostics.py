@@ -4,8 +4,10 @@ import json
 from pathlib import Path
 
 import pandas as pd
+from shapely.geometry import Polygon
 
 from dashboard.app import (
+    build_unified_north_slope_context_map,
     build_stability_screen_map,
     build_temperature_proxy_map,
     build_selected_well_phase_audit_figure,
@@ -127,6 +129,40 @@ def minimal_screen_frame() -> pd.DataFrame:
     )
 
 
+def minimal_permafrost_points() -> pd.DataFrame:
+    return pd.DataFrame(
+        [
+            {
+                "well_designation": "Synthetic GGD223 Control",
+                "code": "SYN",
+                "latitude": 70.25,
+                "longitude": -149.25,
+                "elevation_m": 8,
+                "permafrost_depth_m": 520,
+            }
+        ]
+    )
+
+
+def minimal_assessment_units() -> pd.DataFrame:
+    return pd.DataFrame(
+        [
+            {
+                "ASSESSNAME": "Synthetic gas hydrate assessment unit",
+                "geometry": Polygon(
+                    [
+                        (-150.4, 69.95),
+                        (-148.1, 69.95),
+                        (-148.1, 70.65),
+                        (-150.4, 70.65),
+                        (-150.4, 69.95),
+                    ]
+                ),
+            }
+        ]
+    )
+
+
 def test_2d_well_maps_add_uploaded_landmark_context(tmp_path: Path) -> None:
     landmark_source = make_landmark_source_dir(tmp_path)
     screen = minimal_screen_frame()
@@ -159,6 +195,33 @@ def test_2d_well_maps_add_uploaded_landmark_context(tmp_path: Path) -> None:
     assert "DNR oil/gas unit outlines" in proxy_trace_names
     assert "Dalton/Deadhorse roads" in proxy_trace_names
     assert "Trans-Alaska Pipeline" in proxy_trace_names
+
+
+def test_unified_context_map_combines_status_source_and_landmark_layers(
+    tmp_path: Path,
+) -> None:
+    landmark_source = make_landmark_source_dir(tmp_path)
+    figure = build_unified_north_slope_context_map(
+        minimal_screen_frame(),
+        minimal_permafrost_points(),
+        minimal_assessment_units(),
+        landmark_source,
+    )
+
+    trace_names = {trace.name for trace in figure.data}
+    assert "DNR oil/gas unit outlines" in trace_names
+    assert "Dalton/Deadhorse roads" in trace_names
+    assert "Trans-Alaska Pipeline" in trace_names
+    assert "USGS hydrate AU outlines" in trace_names
+    assert "GGD223 pf_depth_m controls" in trace_names
+    assert "Calculated screen interval" in trace_names
+    assert "Blocked: missing temperature profile" in trace_names
+    assert figure.layout.title.text == "Unified North Slope Well + Stability Context Map"
+
+    pf_trace = next(
+        trace for trace in figure.data if trace.name == "GGD223 pf_depth_m controls"
+    )
+    assert pf_trace.marker.colorbar.title.text == "pf_depth_m"
 
 
 def test_committed_stability_screen_diagnostics_explain_blanks_and_proxy_tiers() -> None:

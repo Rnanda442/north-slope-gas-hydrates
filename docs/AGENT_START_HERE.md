@@ -205,9 +205,8 @@ Run the full suite before committing meaningful changes:
 python -m pytest
 ```
 
-Expected current result: `114 passed` as of the 2026-06-16 presentation export
-and source-visual inventory update. Update this count only after verifying it
-locally.
+Expected current result: `117 passed` as of the 2026-06-18 unified website map
+update. Update this count only after verifying it locally.
 
 Current test files:
 

@@ -154,6 +154,17 @@ V5_3_WEBSITE_CAPTURE_DIR = (
     / "presentation_assets"
     / "v5_3_website_captures"
 )
+WEBSITE_WELL_MAP_ASSET_DIR = (
+    PROJECT_ROOT
+    / "docs"
+    / "project_blueprints"
+    / "presentation_assets"
+    / "website_well_maps_2026_06_18"
+)
+UNIFIED_CONTEXT_MAP_EXPORT = (
+    WEBSITE_WELL_MAP_ASSET_DIR
+    / "unified_north_slope_well_stability_context_map_2026_06_18.png"
+)
 FULL_WORKFLOW_DECK = (
     PROJECT_ROOT
     / "docs"
@@ -1875,21 +1886,54 @@ def render_sweet_spot_page() -> None:
 
 def render_regional_atlas() -> None:
     st.markdown('<div class="atlas-kicker">Regional context</div>', unsafe_allow_html=True)
-    st.title("Regional Atlas")
+    st.title("Unified North Slope Well + Stability Context Map")
     st.write(
-        "This interactive map is the existing regional visualization from the "
-        "notebook workflow. It brings together the North Slope extent, assessment "
-        "units, 2D seismic lines, 3D seismic footprints, and well locations."
+        "One public-safe map now combines the stability-screen well status, USGS "
+        "hydrate assessment units, GGD223 permafrost-depth controls, DNR unit "
+        "outlines, roads, TAPS, and field labels for North Slope orientation."
     )
     cols = st.columns(3)
-    cols[0].metric("Assessment units", "6")
-    cols[1].metric("2D seismic surveys", "26")
-    cols[2].metric("3D seismic footprints", "36")
-    st.info(
-        "Use the Plotly controls inside the map to zoom and inspect layers. "
-        "The well-color selector switches the active well comparison."
+    screen = cached_stability_screen(str(PROJECT_ROOT))
+    source_root = active_stability_source_path(PROJECT_ROOT)
+    permafrost_points = cached_ggd223_points(str(source_root))
+    assessment_units = cached_hydrate_assessment_units(str(source_root))
+    calculated_count = int(screen["stability_result_status"].eq("calculated").sum())
+    blocked_count = int(
+        screen["stability_result_status"]
+        .fillna("")
+        .str.startswith("blocked")
+        .sum()
     )
-    render_scene(REGIONAL_SCENE, height=870)
+    cols[0].metric("Screen wells", f"{len(screen):,}")
+    cols[1].metric("GGD223 controls", f"{len(permafrost_points):,}")
+    cols[2].metric("Calculated intervals", f"{calculated_count:,}")
+    st.warning(
+        "Context/orientation only. Stability-screen status does not prove hydrate "
+        "occurrence, saturation, or trained-model evidence."
+    )
+    st.caption(
+        f"{blocked_count:,} rows are blocked by public-source gates under the "
+        "current methane 5 ppt screen. Toggle legend groups to compare context "
+        "layers with status categories."
+    )
+    st.caption(map_landmark_source_caption(default_basemap_landmark_source_dir(PROJECT_ROOT)))
+    st.plotly_chart(
+        build_unified_north_slope_context_map(
+            screen,
+            permafrost_points,
+            assessment_units,
+        ),
+        use_container_width=True,
+        config={"displayModeBar": True, "responsive": True},
+        key="regional_unified_context_map",
+    )
+    with st.expander("Reference: legacy geoscience orientation and DGGS source card"):
+        st.caption(
+            "The older notebook scene is retained as reference for public geology, "
+            "seismic coverage, 3D seismic footprints, and the DGGS RI 2018-6 "
+            "geology-source note. It is not the main website map style."
+        )
+        render_scene(REGIONAL_SCENE, height=870)
 
 
 def render_stability_source_bundle() -> None:
@@ -2276,6 +2320,7 @@ def add_geojson_line_trace(
     width: float,
     opacity: float,
     max_points_per_path: int = 650,
+    showlegend: bool = False,
 ) -> None:
     lon_values, lat_values = feature_lon_lat_arrays(features, max_points_per_path)
     if not lon_values:
@@ -2286,7 +2331,8 @@ def add_geojson_line_trace(
             lat=lat_values,
             mode="lines",
             name=name,
-            showlegend=False,
+            legendgroup=name,
+            showlegend=showlegend,
             hoverinfo="skip",
             opacity=opacity,
             line={"color": color, "width": width},
@@ -2450,6 +2496,7 @@ def public_field_label_frame(map_frame: pd.DataFrame, max_labels: int = 10) -> p
 def add_north_slope_basemap_line_layers(
     figure: go.Figure,
     landmarks: dict[str, object],
+    showlegend: bool = False,
 ) -> None:
     add_geojson_line_trace(
         figure,
@@ -2458,6 +2505,7 @@ def add_north_slope_basemap_line_layers(
         "#334155",
         1.15,
         0.55,
+        showlegend=showlegend,
     )
     add_geojson_line_trace(
         figure,
@@ -2467,6 +2515,7 @@ def add_north_slope_basemap_line_layers(
         1,
         0.38,
         max_points_per_path=400,
+        showlegend=showlegend,
     )
     add_geojson_line_trace(
         figure,
@@ -2476,6 +2525,7 @@ def add_north_slope_basemap_line_layers(
         2.6,
         0.74,
         max_points_per_path=900,
+        showlegend=showlegend,
     )
     add_geojson_line_trace(
         figure,
@@ -2485,6 +2535,7 @@ def add_north_slope_basemap_line_layers(
         2.2,
         0.7,
         max_points_per_path=900,
+        showlegend=showlegend,
     )
 
 
@@ -2551,6 +2602,215 @@ def map_landmark_source_caption(landmark_source_dir: Path) -> str:
         "Alaska DNR unit boundaries, AKDOT roads, Census/GNIS place labels, "
         "Trans-Alaska Pipeline geometry, and public well field centroids."
     )
+
+
+def add_hydrate_assessment_unit_mapbox_layers(
+    figure: go.Figure,
+    assessment_units,
+    showlegend: bool = True,
+) -> None:
+    if assessment_units.empty:
+        return
+    show_assessment_legend = showlegend
+    for _, row in assessment_units.iterrows():
+        assessment_name = row.get("ASSESSNAME", "Gas hydrate assessment unit")
+        for polygon in polygon_parts(row.geometry):
+            x, y = polygon.exterior.xy
+            figure.add_trace(
+                go.Scattermapbox(
+                    lon=list(x),
+                    lat=list(y),
+                    mode="lines",
+                    name="USGS hydrate AU outlines",
+                    legendgroup="USGS hydrate AU outlines",
+                    showlegend=show_assessment_legend,
+                    line={"color": "#d97706", "width": 2.2},
+                    opacity=0.78,
+                    hovertemplate=(
+                        f"<b>{escape(str(assessment_name))}</b><br>"
+                        "USGS gas hydrate assessment unit<extra></extra>"
+                    ),
+                )
+            )
+            show_assessment_legend = False
+
+
+def add_ggd223_permafrost_mapbox_layer(
+    figure: go.Figure,
+    permafrost_points: pd.DataFrame,
+) -> None:
+    if permafrost_points.empty:
+        return
+    points = permafrost_points.copy()
+    points["latitude"] = pd.to_numeric(points.get("latitude"), errors="coerce")
+    points["longitude"] = pd.to_numeric(points.get("longitude"), errors="coerce")
+    points["permafrost_depth_m"] = pd.to_numeric(
+        points.get("permafrost_depth_m"),
+        errors="coerce",
+    )
+    points["elevation_m"] = pd.to_numeric(points.get("elevation_m"), errors="coerce")
+    points = points.dropna(subset=["latitude", "longitude", "permafrost_depth_m"])
+    if points.empty:
+        return
+    figure.add_trace(
+        go.Scattermapbox(
+            lon=points["longitude"],
+            lat=points["latitude"],
+            mode="markers",
+            name="GGD223 pf_depth_m controls",
+            legendgroup="GGD223 pf_depth_m controls",
+            marker={
+                "size": 10,
+                "color": points["permafrost_depth_m"],
+                "colorscale": "Viridis",
+                "opacity": 0.88,
+                "colorbar": {"title": {"text": "pf_depth_m"}},
+            },
+            text=points["well_designation"],
+            customdata=points[["code", "permafrost_depth_m", "elevation_m"]],
+            hovertemplate=(
+                "<b>%{text}</b><br>"
+                "Code: %{customdata[0]}<br>"
+                "pf_depth_m: %{customdata[1]} m<br>"
+                "Elevation: %{customdata[2]} m<br>"
+                "Lon/lat: %{lon:.2f}, %{lat:.2f}<extra></extra>"
+            ),
+        )
+    )
+
+
+def add_stability_status_mapbox_layers(
+    figure: go.Figure,
+    map_frame: pd.DataFrame,
+) -> None:
+    statuses = list(STABILITY_SCREEN_STATUS_STYLES)
+    extra_statuses = [
+        status
+        for status in sorted(map_frame["stability_result_status"].dropna().unique())
+        if status not in STABILITY_SCREEN_STATUS_STYLES
+    ]
+    for status in statuses + extra_statuses:
+        style = STABILITY_SCREEN_STATUS_STYLES.get(
+            status,
+            {
+                "label": status,
+                "color": "#475569",
+                "size": 6,
+                "opacity": 0.55,
+            },
+        )
+        subset = map_frame[map_frame["stability_result_status"].eq(status)].copy()
+        if subset.empty:
+            continue
+        hover_text = (
+            "<b>"
+            + subset["well_name"].fillna("Unnamed well").astype(str)
+            + "</b><br>Status: "
+            + subset["stability_result_status"].fillna("missing").astype(str)
+            + "<br>Confidence: "
+            + subset["stability_confidence"].fillna("missing").astype(str)
+            + "<br>TVD: "
+            + subset["tvd_m"].round(1).astype(str)
+            + " m<br>Top/Base: "
+            + subset["stability_top_m"].round(1).astype(str)
+            + " / "
+            + subset["stability_base_m"].round(1).astype(str)
+            + " m<br>Thickness: "
+            + subset["stability_thickness_m"].round(1).astype(str)
+            + " m"
+        )
+        figure.add_trace(
+            go.Scattermapbox(
+                lat=subset["lat"],
+                lon=subset["lon"],
+                mode="markers",
+                name=style["label"],
+                legendgroup="Stability-screen status",
+                marker={
+                    "size": style["size"],
+                    "color": style["color"],
+                    "opacity": style["opacity"],
+                },
+                text=hover_text,
+                hovertemplate="%{text}<extra></extra>",
+            )
+        )
+
+
+def prepared_stability_map_frame(screen: pd.DataFrame) -> pd.DataFrame:
+    map_frame = screen.copy()
+    for column in [
+        "lat",
+        "lon",
+        "stability_top_m",
+        "stability_base_m",
+        "stability_thickness_m",
+        "tvd_m",
+    ]:
+        map_frame[column] = pd.to_numeric(map_frame.get(column), errors="coerce")
+    return map_frame.dropna(subset=["lat", "lon"])
+
+
+def build_unified_north_slope_context_map(
+    screen: pd.DataFrame,
+    permafrost_points: pd.DataFrame,
+    assessment_units,
+    landmark_source_dir: Path | None = None,
+) -> go.Figure:
+    map_frame = prepared_stability_map_frame(screen)
+    figure = go.Figure()
+    if map_frame.empty:
+        figure.update_layout(
+            height=640,
+            margin={"l": 0, "r": 0, "t": 46, "b": 0},
+            annotations=[
+                {
+                    "text": "No latitude/longitude values available for the screen.",
+                    "xref": "paper",
+                    "yref": "paper",
+                    "x": 0.5,
+                    "y": 0.5,
+                    "showarrow": False,
+                }
+            ],
+        )
+        return figure
+
+    source_dir = (
+        Path(landmark_source_dir)
+        if landmark_source_dir
+        else default_basemap_landmark_source_dir(PROJECT_ROOT)
+    )
+    landmarks = cached_basemap_landmark_layers(str(source_dir))
+    add_north_slope_basemap_line_layers(figure, landmarks, showlegend=True)
+    add_hydrate_assessment_unit_mapbox_layers(figure, assessment_units)
+    add_ggd223_permafrost_mapbox_layer(figure, permafrost_points)
+    add_stability_status_mapbox_layers(figure, map_frame)
+    add_north_slope_basemap_label_layers(figure, map_frame, landmarks)
+
+    figure.update_layout(
+        title={
+            "text": "Unified North Slope Well + Stability Context Map",
+            "x": 0,
+            "xanchor": "left",
+        },
+        height=660,
+        margin={"l": 0, "r": 0, "t": 58, "b": 0},
+        legend={
+            "orientation": "h",
+            "yanchor": "bottom",
+            "y": 1.02,
+            "xanchor": "left",
+            "x": 0,
+            "itemsizing": "constant",
+        },
+        mapbox={
+            "style": "carto-positron",
+            "center": {"lat": 70.35, "lon": -150.4},
+            "zoom": 4.35,
+        },
+    )
+    return figure
 
 
 def build_stability_screen_map(
@@ -3535,6 +3795,7 @@ def render_guarded_stability_screen_product() -> None:
 
     source_root = active_stability_source_path(PROJECT_ROOT)
     ggd223_points = cached_ggd223_points(str(source_root))
+    assessment_units = cached_hydrate_assessment_units(str(source_root))
     inventory = cached_g10015_temperature_inventory(str(PROJECT_ROOT))
     control_crosswalk = g10015_temperature_control_crosswalk_frame(inventory, ggd223_points)
     proxy_audit = temperature_proxy_candidate_audit_frame(screen, control_crosswalk)
@@ -3581,18 +3842,38 @@ input. It should not be treated as a G10015 temperature-profile screenshot.
     )
 
     with status_tab:
-        st.markdown("##### 2D Screen Status Map")
+        st.markdown("##### Unified North Slope Well + Stability Context Map")
         st.caption(
-            "Point colors show calculation status only. Blue means the baseline "
-            "screen could calculate an interval for that well; it does not mean "
-            "hydrate was detected."
+            "This replaces the older 2D Screen Status Map with the same status "
+            "categories plus USGS AU outlines, GGD223 pf_depth_m controls, DNR "
+            "units, roads, TAPS, and field labels."
+        )
+        st.warning(
+            "Context/orientation only. Stability-screen status does not prove hydrate "
+            "occurrence, saturation, or trained-model evidence."
         )
         st.caption(map_landmark_source_caption(default_basemap_landmark_source_dir(PROJECT_ROOT)))
         st.plotly_chart(
-            build_stability_screen_map(screen),
+            build_unified_north_slope_context_map(
+                screen,
+                ggd223_points,
+                assessment_units,
+            ),
             use_container_width=True,
             config={"displayModeBar": True, "responsive": True},
+            key="stability_unified_context_map",
         )
+        with st.expander("Reference: status-only 2D screen map"):
+            st.caption(
+                "Status colors are identical to the unified map. This legacy view "
+                "is retained only for before/after comparison."
+            )
+            st.plotly_chart(
+                build_stability_screen_map(screen),
+                use_container_width=True,
+                config={"displayModeBar": True, "responsive": True},
+                key="stability_status_only_reference_map",
+            )
         left, right = st.columns(2)
         left.dataframe(status_counts, use_container_width=True, hide_index=True)
         right.dataframe(confidence_counts, use_container_width=True, hide_index=True)
@@ -4620,7 +4901,7 @@ def render_explore_north_slope(files: list[dict[str, object]]) -> None:
             "Assessment units, seismic coverage, public wells, and missing geometry stay visible before the full map.",
             height=360,
         )
-        with st.expander("Full interactive regional map", expanded=True):
+        with st.expander("Unified well + stability context map", expanded=True):
             render_regional_atlas()
     with tabs[1]:
         render_processing_sketch(
@@ -5305,10 +5586,10 @@ def render_presentation_exports() -> None:
 
     export_specs = [
         (
-            "North Slope Map",
-            V5_3_WEBSITE_CAPTURE_DIR / "02_explore_regional_map.png",
-            "Current website regional-map capture for slide context",
-            "north_slope_map",
+            "Unified North Slope Map",
+            UNIFIED_CONTEXT_MAP_EXPORT,
+            "Slide-ready unified public well, stability-status, GGD223, USGS AU, DNR unit, road, TAPS, and field-label context map",
+            "unified_north_slope_map",
         ),
         (
             "Hydrate Context",
