@@ -19,3 +19,8 @@ docs/project_blueprints/presentation_assets/processing_revisions_2026_06_11/slid
 docs/project_blueprints/presentation_assets/processing_revisions_2026_06_11/processing_panel_contact_sheet.jpg
 references/presentation-revision-2026-06-11/gmail-2026-06-11/
 references/presentation-revision-2026-06-11/drive-thumbnails-2026-06-12/
+# Local-only GIS/PDF source review artifacts; commit only manifests and derived public-safe previews.
+docs/evidence/**/gis_sources_local_only/
+docs/evidence/**/gis_candidate_previews/
+docs/evidence/**/world_atlas_page23_fig1_1_full_page_render.png
+osl_upload_packages/

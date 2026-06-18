@@ -1126,6 +1126,166 @@ def build_geographic_structural_figure(
     return figure
 
 
+def build_north_slope_geoscience_orientation_figure() -> go.Figure:
+    """Build a public GIS orientation map for geoscience review and Slide 2."""
+    context = load_regional_context()
+    figure = go.Figure()
+
+    au_colors = {
+        "Brookian Foreset-Bottomset": "rgba(20, 123, 133, 0.24)",
+        "Brookian Topset": "rgba(52, 144, 220, 0.22)",
+        "Beaufortian Strata North": "rgba(245, 158, 11, 0.22)",
+        "Beaufortian Strata South": "rgba(245, 158, 11, 0.14)",
+        "Ellesmerian Strata North": "rgba(111, 105, 190, 0.20)",
+        "Ellesmerian Strata South": "rgba(111, 105, 190, 0.13)",
+    }
+    au_line_colors = {
+        "Brookian Foreset-Bottomset": "#147b85",
+        "Brookian Topset": "#3490dc",
+        "Beaufortian Strata North": "#d97706",
+        "Beaufortian Strata South": "#b45309",
+        "Ellesmerian Strata North": "#6f69be",
+        "Ellesmerian Strata South": "#5145a0",
+    }
+
+    assessment_units = context[context["layer_name"] == "assessment_units"]
+    for au_name, au_rows in assessment_units.groupby("au_name", dropna=True):
+        showlegend = True
+        for _, rows in au_rows.groupby("feature_id"):
+            rows = sample_rows(rows.sort_values("vertex_order"), 1200)
+            figure.add_trace(
+                go.Scatter(
+                    x=rows["lon"],
+                    y=rows["lat"],
+                    mode="lines",
+                    fill="toself",
+                    name=str(au_name),
+                    showlegend=showlegend,
+                    fillcolor=au_colors.get(str(au_name), "rgba(148, 163, 184, 0.16)"),
+                    line={"color": au_line_colors.get(str(au_name), "#64748b"), "width": 1.2},
+                    hovertemplate=(
+                        "<b>%{fullData.name}</b><br>"
+                        "Public geology / assessment-unit layer<extra></extra>"
+                    ),
+                )
+            )
+            showlegend = False
+
+    seismic_2d = context[context["layer_name"] == "seismic_2d"]
+    for index, (_, rows) in enumerate(seismic_2d.groupby("feature_id")):
+        rows = sample_rows(rows.sort_values("vertex_order"), 650)
+        figure.add_trace(
+            go.Scatter(
+                x=rows["lon"],
+                y=rows["lat"],
+                mode="lines",
+                name="2D seismic line",
+                showlegend=index == 0,
+                line={"color": "rgba(14, 165, 233, 0.34)", "width": 0.7},
+                hovertemplate="<b>2D seismic line</b><extra></extra>",
+            )
+        )
+
+    seismic_3d = context[context["layer_name"] == "seismic_3d_inventory"]
+    for index, (_, rows) in enumerate(seismic_3d.groupby("feature_id")):
+        rows = sample_rows(rows.sort_values("vertex_order"), 500)
+        figure.add_trace(
+            go.Scatter(
+                x=rows["lon"],
+                y=rows["lat"],
+                mode="lines",
+                fill="toself",
+                name="3D seismic footprint",
+                showlegend=index == 0,
+                fillcolor="rgba(249, 115, 22, 0.13)",
+                line={"color": "rgba(234, 88, 12, 0.60)", "width": 1.0},
+                hovertemplate="<b>3D seismic footprint</b><extra></extra>",
+            )
+        )
+
+    wells = sample_rows(load_north_slope_wells().sort_values(["lon", "lat"]), 1800)
+    figure.add_trace(
+        go.Scatter(
+            x=wells["lon"],
+            y=wells["lat"],
+            mode="markers",
+            name="Public wells",
+            marker={"size": 3.0, "color": "rgba(15, 23, 42, 0.62)"},
+            hovertemplate=(
+                "<b>Public well context</b><br>"
+                "Longitude: %{x:.2f}<br>Latitude: %{y:.2f}<extra></extra>"
+            ),
+        )
+    )
+
+    extent = context[context["layer_name"] == "extent"].sort_values("vertex_order")
+    figure.add_trace(
+        go.Scatter(
+            x=extent["lon"],
+            y=extent["lat"],
+            mode="lines",
+            name="North Slope study boundary",
+            line={"color": "#0f172a", "width": 2.8},
+            hovertemplate="<b>North Slope study boundary</b><extra></extra>",
+        )
+    )
+
+    for label, lon, lat, color in [
+        ("Beaufort Sea", -151.0, 71.35, "#2563eb"),
+        ("NPRA", -156.0, 70.25, "#334155"),
+        ("Prudhoe Bay / Eileen trend", -148.6, 70.25, "#0f766e"),
+        ("Brooks Range", -151.8, 68.25, "#7c2d12"),
+        ("ANWR", -143.5, 69.55, "#334155"),
+    ]:
+        figure.add_annotation(
+            x=lon,
+            y=lat,
+            text=label,
+            showarrow=False,
+            font={"size": 12, "color": color},
+            bgcolor="rgba(255,255,255,0.72)",
+            bordercolor="rgba(148,163,184,0.55)",
+            borderpad=3,
+        )
+
+    lon_values = pd.to_numeric(extent["lon"], errors="coerce")
+    lat_values = pd.to_numeric(extent["lat"], errors="coerce")
+    figure.update_layout(
+        title={
+            "text": "North Slope Geoscience Orientation: geology framework, seismic coverage, and public wells",
+            "x": 0.01,
+            "font": {"size": 17},
+        },
+        height=620,
+        margin={"l": 12, "r": 12, "t": 55, "b": 25},
+        paper_bgcolor="white",
+        plot_bgcolor="#f8fbfc",
+        legend={
+            "orientation": "h",
+            "y": -0.08,
+            "x": 0,
+            "font": {"size": 10},
+        },
+        xaxis={
+            "title": "Longitude",
+            "range": [float(lon_values.min()) - 0.7, float(lon_values.max()) + 0.7],
+            "showgrid": True,
+            "gridcolor": "rgba(148,163,184,0.22)",
+            "zeroline": False,
+        },
+        yaxis={
+            "title": "Latitude",
+            "range": [float(lat_values.min()) - 0.4, float(lat_values.max()) + 0.4],
+            "showgrid": True,
+            "gridcolor": "rgba(148,163,184,0.22)",
+            "zeroline": False,
+            "scaleanchor": "x",
+            "scaleratio": 0.55,
+        },
+    )
+    return figure
+
+
 @st.cache_data
 def cached_stability_source_status(bundle_root: str) -> pd.DataFrame:
     return stability_source_status_frame(Path(bundle_root))
@@ -1870,11 +2030,50 @@ def render_regional_atlas() -> None:
     cols[0].metric("Assessment units", "6")
     cols[1].metric("2D seismic surveys", "26")
     cols[2].metric("3D seismic footprints", "36")
+    st.markdown("### Geoscience Orientation Map")
+    st.caption(
+        "This GIS view is for geoscience orientation: public North Slope geology/"
+        "assessment units, 2D seismic lines, 3D seismic footprints, public wells, "
+        "and field-area labels. It is context only, not occurrence or saturation evidence."
+    )
+    st.plotly_chart(
+        build_north_slope_geoscience_orientation_figure(),
+        use_container_width=True,
+        config={"displayModeBar": True, "responsive": True},
+    )
     st.info(
         "Use the Plotly controls inside the map to zoom and inspect layers. "
         "The well-color selector switches the active well comparison."
     )
-    render_scene(REGIONAL_SCENE, height=870)
+    geology_preview = (
+        PROJECT_ROOT
+        / "docs"
+        / "evidence"
+        / "slide02_source_bundle_2026_06_17"
+        / "slide02_selected_10_dggs_umiat_gubik_geology_layer_preview.png"
+    )
+    st.markdown("### OSL-Staged Geology Layer")
+    st.caption(
+        "The Slide 2 update now uses the DGGS RI 2018-6 Umiat-Gubik geologic "
+        "map as the public North Slope geology context. The raw public "
+        "shapefile package is staged through OpenScienceLab; GitHub/Streamlit "
+        "carries this public-safe derived preview, source citation, and "
+        "handoff documentation."
+    )
+    if geology_preview.exists():
+        st.image(str(geology_preview), use_container_width=True)
+    else:
+        st.warning(
+            "DGGS geology-layer preview image is not present in this checkout. "
+            "See docs/OSL_GIS_LAYER_CANDIDATES_FOR_SLIDE2_2026-06-18.md."
+        )
+    st.code("OSL source folder: data/source_library/slide2_north_slope_geology_2026_06_18/")
+    st.caption(
+        "Source: Herriott et al. 2018, Alaska DGGS RI 2018-6, DOI 10.14509/30099. "
+        "Geology context only; not hydrate occurrence, saturation, validation, or ML output."
+    )
+    with st.expander("Original full interactive regional map", expanded=False):
+        render_scene(REGIONAL_SCENE, height=870)
 
 
 def render_stability_source_bundle() -> None:
@@ -4657,8 +4856,7 @@ def render_explore_north_slope(files: list[dict[str, object]]) -> None:
             "Assessment units, seismic coverage, public wells, and missing geometry stay visible before the full map.",
             height=360,
         )
-        with st.expander("Full interactive regional map", expanded=True):
-            render_regional_atlas()
+        render_regional_atlas()
     with tabs[1]:
         render_processing_sketch(
             "structure_stack",

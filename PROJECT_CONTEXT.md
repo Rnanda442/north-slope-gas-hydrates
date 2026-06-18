@@ -1,6 +1,6 @@
 # North Slope Gas Hydrates Project Context
 
-Last updated: 2026-06-17
+Last updated: 2026-06-18
 
 ## Purpose
 
@@ -157,12 +157,21 @@ architecture plate, `slide_07_complex_ml_runtime_architecture_v5_5.png` as
 the ML runtime plate, `slide_05_doe_three_dataset_prototype_v5_5.png` as the
 DOE prototype/model-run card, and
 `slide_08_stability_to_ml_overlay_v5_5.png` as the stability overlay. The
-Slide 2 context panel was rebuilt from the selected USGS/DOE source screenshot
-and curve crop, the project website regional map, and the project digitized
-methane 5 ppt CSV inset. It explicitly says stability is
-pressure-temperature admissibility context only, not hydrate proof,
-occurrence evidence, or saturation evidence. The V5.5 PPTX plus Word companion
-are regenerated from `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`.
+accepted Slide 2 context panel now uses a three-column story: what gas hydrate
+is, why the Alaska North Slope matters, and why pressure-temperature stability
+is a gate. It uses a fuller World Atlas Fig. 1.1 Structure I/II/H visual with
+Structure I highlighted, a DGGS RI 2018-6 Umiat-Gubik central North Slope
+geology-layer preview showing map units, contacts/faults, and fold axes, the
+USGS Arctic Alaska cross section, and the selected USGS/DOE stability curve. It
+explicitly says stability is pressure-temperature admissibility context only,
+not hydrate proof, occurrence evidence, or saturation evidence. The V5.5 PPTX
+plus Word companion are regenerated from
+`docs/project_blueprints/build_full_workflow_diagram_deliverables.py`.
+The DGGS RI 2018-6 geology source package was prepared as an ignored local OSL
+upload zip and the user reported the OSL upload complete on 2026-06-18. The
+GitHub/Streamlit website now carries only the public-safe derived preview,
+source citation, and handoff documentation; raw GIS source packages remain in
+OSL/source-library storage.
 The current local deliverables are
 `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`
 and
@@ -253,9 +262,12 @@ V5.4 as the source baseline and V5.3 as flawed reference only.
   workflow deck rebuilt from `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`:
   `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`.
   It keeps the agreed nine-slide spine, restores the personal/about-me opener,
-  rebuilds Slide 2 with selected USGS/DOE source-backed stability visuals,
-  the project website map, methane/Structure I baseline language, and the
-  stability-not-proof guardrail, makes slide 3 a parameter-range board,
+  rebuilds Slide 2 with the accepted three-column context layout, a
+  DGGS RI 2018-6 Umiat-Gubik North Slope geology-layer preview, source-backed
+  hydrate structure visuals with Structure I highlighted, methane/Structure I
+  baseline language, the USGS Arctic Alaska cross section, selected USGS/DOE
+  stability visuals, and the stability-not-proof guardrail, makes slide 3 a
+  parameter-range board,
   restores complex workflow and ML runtime architecture plates on slides 4 and
   7, adds a DOE three-dataset prototype/model-run card on slide 5, adds a
   stability-to-ML overlay on slide 8, and closes with what is done, what is not

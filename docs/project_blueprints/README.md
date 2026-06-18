@@ -71,9 +71,10 @@ wireline machine-learning project.
   - Current mentor-facing V5.5 companion generated with
     `build_full_workflow_diagram_deliverables.py`.
   - Explains the targeted Slide 2 source rebuild: selected USGS/DOE page-3
-    stability screenshot/crop as the primary phase visual, project website map
-    for North Slope context, digitized methane 5 ppt CSV as a project input
-    inset, Structure I/II/H guardrails, methane-baseline framing, and
+    stability screenshot/crop as the primary phase visual, DGGS RI 2018-6
+    Umiat-Gubik geology-layer preview for North Slope context, digitized
+    methane 5 ppt CSV as a project input inset, World Atlas Structure I/II/H
+    guardrails with Structure I highlighted, methane-baseline framing, and
     stability as pressure-temperature admissibility context only.
   - Public-safe planning artifact only. It does not include approved rows,
     trained model metrics, hydrate proof, saturation outputs, occurrence

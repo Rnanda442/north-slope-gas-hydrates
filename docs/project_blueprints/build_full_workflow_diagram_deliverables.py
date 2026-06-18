@@ -9,6 +9,7 @@ from pathlib import Path
 from docx import Document
 from docx.enum.section import WD_ORIENT
 from docx.shared import Inches, Pt
+import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
 from pptx import Presentation
 
@@ -34,6 +35,21 @@ SLIDE02_USGS_PAGE = SLIDE02_SOURCE_DIR / "slide02_selected_01_usgs_hydrate_conte
 SLIDE02_USGS_CURVE = SLIDE02_SOURCE_DIR / "slide02_selected_02_usgs_hydrate_stability_curve_crop.png"
 SLIDE02_DIGITIZED_CURVE = SLIDE02_SOURCE_DIR / "slide02_selected_03_project_digitized_methane_5ppt_curve.csv"
 SLIDE02_MAP = SLIDE02_SOURCE_DIR / "slide02_selected_04_project_website_regional_map_reference.png"
+SLIDE02_STRUCTURE_EXPLORER_2D = (
+    SLIDE02_SOURCE_DIR / "slide02_selected_05_structure_explorer_2d_wells_seismic.png"
+)
+SLIDE02_GEOSCIENCE_ORIENTATION = (
+    SLIDE02_SOURCE_DIR / "slide02_selected_08_north_slope_geoscience_orientation_map.png"
+)
+SLIDE02_DGGS_GEOLOGY_LAYER = (
+    SLIDE02_SOURCE_DIR / "slide02_selected_11_dggs_umiat_gubik_geology_layer_slide_map.png"
+)
+SLIDE02_ANS_CROSS_SECTION = (
+    SLIDE02_SOURCE_DIR / "slide02_selected_06_usgs_arctic_alaska_cross_section_fig2_crop.png"
+)
+SLIDE02_STRUCTURE_TYPES = (
+    SLIDE02_SOURCE_DIR / "slide02_selected_09_world_atlas_fig1_1_full_structure_types_si_highlighted.png"
+)
 
 W, H = 1600, 900
 EXPANDED_W, EXPANDED_H = 5200, 3000
@@ -3585,111 +3601,267 @@ def v55_slide_personal_opener() -> Path:
     return v55_copy_v54_panel("slide_01_personal_about_me_v5_4.png", "slide_01_personal_about_me_v5_5.png")
 
 
+def v55_generate_slide02_geoscience_orientation_map() -> Path:
+    """Create the public GIS map used in Slide 2 and mirrored by the website."""
+    master_path = ROOT / "03_data_final" / "master_layers" / "north_slope_master_2d_layers.parquet"
+    if not master_path.exists():
+        return SLIDE02_GEOSCIENCE_ORIENTATION
+
+    context = pd.read_parquet(
+        master_path,
+        columns=[
+            "layer_name",
+            "feature_id",
+            "vertex_order",
+            "lon",
+            "lat",
+            "au_name",
+            "name",
+        ],
+    ).dropna(subset=["lon", "lat"])
+
+    extent = context[context["layer_name"] == "extent"].sort_values("vertex_order")
+    if extent.empty:
+        return SLIDE02_GEOSCIENCE_ORIENTATION
+
+    min_lon = float(extent["lon"].min()) - 0.9
+    max_lon = float(extent["lon"].max()) + 0.9
+    min_lat = float(extent["lat"].min()) - 0.45
+    max_lat = float(extent["lat"].max()) + 0.45
+    width, height = 1920, 1090
+    plot = (88, 122, 1832, 952)
+
+    def project(lon: float, lat: float) -> tuple[int, int]:
+        x = plot[0] + int((float(lon) - min_lon) / (max_lon - min_lon) * (plot[2] - plot[0]))
+        y = plot[3] - int((float(lat) - min_lat) / (max_lat - min_lat) * (plot[3] - plot[1]))
+        return x, y
+
+    def rows_to_points(rows: pd.DataFrame, max_points: int = 1600) -> list[tuple[int, int]]:
+        rows = rows.sort_values("vertex_order")
+        if len(rows) > max_points:
+            rows = rows.iloc[:: max(1, len(rows) // max_points)]
+        return [project(row.lon, row.lat) for row in rows.itertuples()]
+
+    img = Image.new("RGB", (width, height), (246, 250, 251))
+    draw = ImageDraw.Draw(img)
+    draw.rectangle(plot, fill=(240, 247, 249), outline=(166, 197, 206), width=3)
+    draw.rectangle((plot[0], plot[1], plot[2], plot[1] + 135), fill=(227, 243, 250))
+    text(draw, (88, 44), "North Slope Geoscience Orientation", 42, NAVY, True)
+    text(
+        draw,
+        (90, 94),
+        "Public geology framework + seismic coverage + public wells; context only, not occurrence or saturation evidence.",
+        22,
+        MUTED,
+        True,
+        width=1420,
+        gap=2,
+    )
+    pill(draw, (1518, 52, 1832, 91), "Slide 2 map source", WHITE, TEAL)
+
+    # Latitude/longitude grid.
+    for lon in range(math.floor(min_lon), math.ceil(max_lon) + 1, 2):
+        x, _ = project(lon, min_lat)
+        draw.line((x, plot[1], x, plot[3]), fill=(211, 226, 231), width=1)
+        text(draw, (x - 28, plot[3] + 10), f"{lon}°", 13, MUTED, width=56, align="center")
+    for lat in range(math.floor(min_lat), math.ceil(max_lat) + 1):
+        _, y = project(min_lon, lat)
+        draw.line((plot[0], y, plot[2], y), fill=(211, 226, 231), width=1)
+        text(draw, (plot[0] - 54, y - 8), f"{lat}°N", 13, MUTED, width=48, align="right")
+
+    overlay = Image.new("RGBA", (width, height), (255, 255, 255, 0))
+    overlay_draw = ImageDraw.Draw(overlay)
+    au_palette = {
+        "Brookian Foreset-Bottomset": ((20, 123, 133, 66), (20, 123, 133, 205)),
+        "Brookian Topset": ((52, 144, 220, 60), (52, 144, 220, 205)),
+        "Beaufortian Strata North": ((245, 158, 11, 58), (217, 119, 6, 205)),
+        "Beaufortian Strata South": ((245, 158, 11, 38), (180, 83, 9, 205)),
+        "Ellesmerian Strata North": ((111, 105, 190, 52), (111, 105, 190, 205)),
+        "Ellesmerian Strata South": ((111, 105, 190, 34), (81, 69, 160, 205)),
+    }
+
+    assessment_units = context[context["layer_name"] == "assessment_units"]
+    for au_name, au_rows in assessment_units.groupby("au_name", dropna=True):
+        fill, line = au_palette.get(str(au_name), ((148, 163, 184, 45), (100, 116, 139, 200)))
+        for _, rows in au_rows.groupby("feature_id"):
+            points = rows_to_points(rows, 1800)
+            if len(points) > 2:
+                overlay_draw.polygon(points, fill=fill, outline=line)
+
+    seismic_3d = context[context["layer_name"] == "seismic_3d_inventory"]
+    for _, rows in seismic_3d.groupby("feature_id"):
+        points = rows_to_points(rows, 800)
+        if len(points) > 2:
+            overlay_draw.polygon(points, fill=(249, 115, 22, 35), outline=(234, 88, 12, 190))
+
+    seismic_2d = context[context["layer_name"] == "seismic_2d"]
+    for _, rows in seismic_2d.groupby("feature_id"):
+        points = rows_to_points(rows, 900)
+        if len(points) > 1:
+            overlay_draw.line(points, fill=(14, 165, 233, 92), width=2)
+
+    extent_points = rows_to_points(extent, 32)
+    if len(extent_points) > 1:
+        overlay_draw.line(extent_points, fill=(15, 23, 42, 255), width=5, joint="curve")
+
+    img = Image.alpha_composite(img.convert("RGBA"), overlay).convert("RGB")
+    draw = ImageDraw.Draw(img)
+
+    wells = context[context["layer_name"] == "wells"].sort_values(["lon", "lat"])
+    if len(wells) > 2200:
+        wells = wells.iloc[:: max(1, len(wells) // 2200)]
+    for row in wells.itertuples():
+        x, y = project(row.lon, row.lat)
+        draw.ellipse((x - 2, y - 2, x + 2, y + 2), fill=(15, 23, 42), outline=None)
+
+    labels = [
+        ("Beaufort Sea", -151.0, 71.35, BLUE),
+        ("NPRA", -156.0, 70.25, MUTED),
+        ("Prudhoe Bay / Eileen trend", -148.6, 70.28, TEAL),
+        ("ANWR", -143.5, 69.55, MUTED),
+        ("Brooks Range", -151.8, 68.24, (124, 45, 18)),
+    ]
+    for label, lon, lat, color in labels:
+        x, y = project(lon, lat)
+        label_w = int(max(116, draw.textlength(label, font=font(17, True)) + 24))
+        card(draw, (x - label_w // 2, y - 19, x + label_w // 2, y + 19), fill=WHITE, outline=LINE, radius=8, width=1)
+        text(draw, (x - label_w // 2 + 12, y - 10), label, 17, color, True, width=label_w - 24, align="center")
+
+    legend_items = [
+        ("Geology / assessment units", TEAL, (223, 244, 248)),
+        ("2D seismic lines", ICE, (231, 246, 253)),
+        ("3D seismic footprints", AMBER, AMBER_LIGHT),
+        ("Public wells", NAVY, WHITE),
+        ("Study boundary", NAVY, LIGHT),
+    ]
+    x = 112
+    y = 980
+    for label, color, fill in legend_items:
+        item_w = int(draw.textlength(label, font=font(15, True)) + 58)
+        card(draw, (x, y, x + item_w, y + 40), fill=fill, outline=color, radius=8, width=2)
+        draw.rectangle((x + 14, y + 13, x + 36, y + 27), fill=color)
+        text(draw, (x + 44, y + 12), label, 15, NAVY, True)
+        x += item_w + 14
+
+    text(
+        draw,
+        (112, 1034),
+        "Public GIS orientation for website and Slide 2. Use as regional context only; it is not a hydrate occurrence map or saturation product.",
+        16,
+        MUTED,
+        True,
+        width=1530,
+        gap=0,
+    )
+
+    SLIDE02_GEOSCIENCE_ORIENTATION.parent.mkdir(parents=True, exist_ok=True)
+    img.save(SLIDE02_GEOSCIENCE_ORIENTATION)
+    return SLIDE02_GEOSCIENCE_ORIENTATION
+
+
 def v55_slide_context() -> Path:
+    v55_generate_slide02_geoscience_orientation_map()
     img = canvas(False)
     draw = ImageDraw.Draw(img)
     v53_panel_title(
         draw,
-        "Gas Hydrate And North Slope Context",
-        "Source-backed visuals explain hydrate physics, the project scaffold, and why methane stability is context only.",
+        "Gas Hydrates And Why The North Slope Matters",
+        "Source-backed context only: hydrate structure, North Slope setting, and the pressure-temperature gate used before any ML claim.",
     )
 
-    # A. North Slope context map and current public scaffold counts.
-    map_panel = (60, 140, 700, 445)
-    card(draw, map_panel, fill=WHITE, outline=LINE, radius=8, width=2)
-    text(draw, (82, 158), "North Slope public scaffold", 22, NAVY, True)
-    map_box = (82, 190, 432, 425)
-    card(draw, (map_box[0] - 2, map_box[1] - 2, map_box[2] + 2, map_box[3] + 2), fill=LIGHT, outline=LINE, radius=6, width=1)
-    map_path = v55_slide02_path(SLIDE02_MAP, WEBSITE_CAPTURE_DIR / "02_explore_regional_map.png")
-    if not v53_paste(img, map_path, map_box, crop=(500, 360, 1055, 670), mode="cover"):
-        v53_placeholder_image(draw, map_box, "Project website regional map unavailable")
-    v54_source_label(draw, map_box, "Project website regional map / public scaffold context")
-    count_cards = [
-        ((455, 190, 678, 238), "8,084", "public Arctic Slope wells", TEAL),
-        ((455, 250, 678, 298), "483", "temperature-profile matches", BLUE),
-        ((455, 310, 678, 358), "374", "phase-curve input rows", GREEN),
-        ((455, 370, 678, 425), "22", "calculated intervals; not hydrate proof", RED),
-    ]
-    for box, value, label, color in count_cards:
-        if label:
-            card(draw, box, fill=(248, 252, 253), outline=color, radius=7, width=2)
-            text(draw, (box[0] + 10, box[1] + 8), value, 18, color, True, width=58)
-            text(draw, (box[0] + 72, box[1] + 9), label, 12, NAVY, width=box[2] - box[0] - 82, gap=1)
-        else:
-            text(draw, (box[0] + 2, box[1] - 1), value, 11, RED, True, width=box[2] - box[0] - 4, align="center", gap=1)
+    def section_header(
+        box: tuple[int, int, int, int],
+        number: str,
+        heading: str,
+        color: tuple[int, int, int],
+    ) -> None:
+        x1, y1, _, _ = box
+        draw.ellipse((x1 + 20, y1 + 20, x1 + 54, y1 + 54), fill=color)
+        text(draw, (x1 + 31, y1 + 26), number, 16, WHITE, True)
+        text(draw, (x1 + 66, y1 + 24), heading, 21, NAVY, True, width=430)
 
-    # B. Source-backed phase/stability visual.
-    stability_panel = (725, 140, 1070, 790)
-    card(draw, stability_panel, fill=WHITE, outline=LINE, radius=8, width=2)
-    text(draw, (748, 158), "Source phase/stability visual", 21, NAVY, True, width=294)
-    graph_box = (760, 190, 1035, 657)
+    # A. Hydrate definition and structure types from source-backed evidence.
+    hydrate_panel = (60, 138, 610, 790)
+    card(draw, hydrate_panel, fill=WHITE, outline=LINE, radius=9, width=2)
+    section_header(hydrate_panel, "1", "What gas hydrate is", TEAL)
+    text(
+        draw,
+        (84, 198),
+        "Water cages can trap gas under cold, high-pressure conditions.",
+        14,
+        MUTED,
+        True,
+        width=480,
+        gap=2,
+    )
+    pill(draw, (84, 228, 370, 260), "methane Structure I = current baseline", (235, 250, 251), TEAL)
+    structure_box = (84, 274, 586, 604)
+    if not v53_paste(img, v55_slide02_path(SLIDE02_STRUCTURE_TYPES, SLIDE02_USGS_PAGE), structure_box, mode="contain"):
+        v53_placeholder_image(draw, structure_box, "Source hydrate-structure figure unavailable")
+    v54_source_label(draw, structure_box, "World Atlas Fig. 1.1 after Warrier et al. 2016; sI highlighted")
+    structure_notes = [
+        ((84, 626, 242, 704), "Structure I", "methane baseline", TEAL, (235, 250, 251)),
+        ((256, 626, 414, 704), "Structure II", "larger gases", AMBER, (255, 246, 222)),
+        ((428, 626, 586, 704), "Structure H", "scenario chemistry", PURPLE, (245, 238, 255)),
+    ]
+    for box, label, body, color, fill in structure_notes:
+        card(draw, box, fill=fill, outline=color, radius=8, width=2)
+        text(draw, (box[0] + 12, box[1] + 10), label, 14, color, True, width=box[2] - box[0] - 24)
+        text(draw, (box[0] + 12, box[1] + 36), body, 11, NAVY, True, width=box[2] - box[0] - 24)
+    text(draw, (84, 732), "Structure II/H are kept as gas-composition sensitivity, not the current baseline.", 11, MUTED, True, width=482, gap=1)
+
+    # B. North Slope structure, wells, and public map context.
+    map_panel = (635, 138, 1185, 790)
+    card(draw, map_panel, fill=WHITE, outline=LINE, radius=9, width=2)
+    section_header(map_panel, "2", "Why the North Slope", BLUE)
+    text(draw, (659, 198), "A public North Slope geologic layer and Arctic Alaska cross section define the project setting.", 14, MUTED, True, width=482, gap=2)
+    map_box = (659, 238, 1161, 455)
+    map_path = v55_slide02_path(SLIDE02_DGGS_GEOLOGY_LAYER, SLIDE02_GEOSCIENCE_ORIENTATION)
+    if not v53_paste(img, map_path, map_box, mode="cover"):
+        v53_placeholder_image(draw, map_box, "North Slope geology layer unavailable")
+    v54_source_label(draw, map_box, "DGGS RI 2018-6 Umiat-Gubik geology layer; map units + faults/folds")
+    cross_box = (659, 492, 1161, 718)
+    if not v53_paste(img, v55_slide02_path(SLIDE02_ANS_CROSS_SECTION, SLIDE02_MAP), cross_box, mode="contain"):
+        v53_placeholder_image(draw, cross_box, "Arctic Alaska cross section unavailable")
+    v54_source_label(draw, cross_box, "USGS Arctic Alaska generalized cross section, Figure 2 crop")
+    text(draw, (659, 738), "These visuals locate the system; they do not claim occurrence or saturation.", 11, RED, True, width=482, gap=1)
+
+    # C. Source-backed phase/stability visual and why this matters.
+    stability_panel = (1210, 138, 1540, 790)
+    card(draw, stability_panel, fill=WHITE, outline=LINE, radius=9, width=2)
+    section_header(stability_panel, "3", "P-T gate", GREEN)
+    text(draw, (1234, 198), "Stability screens whether hydrate is physically admissible under the selected assumptions.", 13, MUTED, True, width=270, gap=2)
+    graph_box = (1234, 244, 1516, 496)
     card(draw, (graph_box[0] - 4, graph_box[1] - 4, graph_box[2] + 4, graph_box[3] + 4), fill=WHITE, outline=LINE, radius=6, width=1)
     if not v53_paste(img, v55_slide02_path(SLIDE02_USGS_CURVE, SLIDE02_USGS_PAGE), graph_box, mode="contain"):
         v53_placeholder_image(draw, graph_box, "Selected USGS/DOE stability graph unavailable")
-    v54_source_label(draw, graph_box, "Selected USGS/DOE North Slope hydrate stability source screenshot, page 3")
-    card(draw, (750, 678, 1045, 726), fill=ICE_LIGHT, outline=TEAL, radius=8, width=2)
-    text(draw, (768, 691), "Methane / methane-dominant baseline", 14, TEAL, True, width=260, gap=2)
-    card(draw, (750, 734, 1045, 780), fill=RED_LIGHT, outline=RED, radius=8, width=2)
-    text(draw, (768, 746), "Admissibility only, not occurrence proof.", 12, RED, True, width=260, gap=2)
-
-    # C. Structure/type explanation without generic cage art.
-    structure_panel = (60, 465, 700, 790)
-    card(draw, structure_panel, fill=WHITE, outline=LINE, radius=8, width=2)
-    text(draw, (82, 485), "Hydrate structure/type context", 22, NAVY, True)
-    text(
-        draw,
-        (82, 520),
-        "Gas hydrates are ice-like water-cage solids that trap gas molecules under suitable pressure-temperature conditions.",
-        15,
-        MUTED,
-        width=578,
-        gap=3,
-    )
-    structures = [
-        ((82, 585, 265, 696), "Structure I", "CH4", "methane-dominant; project baseline", TEAL, ICE_LIGHT),
-        ((282, 585, 465, 696), "Structure II", "C2-C4", "larger guests can occur; sensitivity only", PURPLE, PURPLE_LIGHT),
-        ((482, 585, 665, 696), "Structure H", "heavy+", "heavier guests possible; not baseline", AMBER, AMBER_LIGHT),
+    v54_source_label(draw, graph_box, "Selected USGS/DOE North Slope hydrate stability figure")
+    gate_rows = [
+        ((1234, 520, 1516, 580), "Current assumption", "methane / Structure I / 5 ppt", TEAL, ICE_LIGHT),
+        ((1234, 592, 1516, 652), "Meaning", "admissible under assumptions", GREEN, GREEN_LIGHT),
+        ((1234, 664, 1516, 724), "Guardrail", "not proof; not saturation", RED, RED_LIGHT),
     ]
-    for box, heading, badge, body, color, fill in structures:
+    for box, label, body, color, fill in gate_rows:
         card(draw, box, fill=fill, outline=color, radius=8, width=2)
-        text(draw, (box[0] + 14, box[1] + 13), heading, 15, color, True, width=box[2] - box[0] - 28)
-        card(draw, (box[0] + 14, box[1] + 42, box[0] + 80, box[1] + 70), fill=WHITE, outline=color, radius=7, width=1)
-        text(draw, (box[0] + 21, box[1] + 48), badge, 12, color, True, width=52, align="center")
-        text(draw, (box[0] + 14, box[1] + 76), body, 11, NAVY, width=box[2] - box[0] - 28, gap=1)
-    card(draw, (82, 718, 665, 760), fill=(248, 252, 253), outline=LINE, radius=8, width=1)
+        text(draw, (box[0] + 14, box[1] + 9), label, 12, color, True, width=252)
+        text(draw, (box[0] + 14, box[1] + 30), body, 13, NAVY, True, width=252)
+
+    why_band = (60, 804, 1540, 836)
+    card(draw, why_band, fill=(248, 252, 253), outline=LINE, radius=8, width=1)
     text(
         draw,
-        (100, 730),
-        "North Slope baseline remains methane-focused unless mentor approves variable gas composition.",
-        14,
+        (80, 812),
+        "Why this project: North Slope methane hydrate needs integrated geology + stability + well-log/core evidence before occurrence or saturation ML can make reviewed claims.",
+        12,
         NAVY,
         True,
-        width=548,
-        gap=2,
+        width=1430,
+        gap=0,
     )
-
-    # D. Project use and guardrail.
-    use_panel = (1095, 140, 1540, 790)
-    card(draw, use_panel, fill=WHITE, outline=LINE, radius=8, width=2)
-    text(draw, (1120, 158), "Project use", 22, NAVY, True)
-    steps = [
-        ((1120, 198, 1515, 262), "Baseline curve", "100% methane / methane-dominant, 5 ppt salinity.", TEAL, ICE_LIGHT),
-        ((1120, 294, 1515, 358), "Stability screen", "Pressure-temperature admissibility mask and context.", BLUE, BLUE_LIGHT),
-        ((1120, 390, 1515, 462), "Not claimed", "Not hydrate proof, occurrence evidence, or saturation evidence.", RED, RED_LIGHT),
-        ((1120, 502, 1515, 574), "Separate ML evidence", "Logs, core, NMR, and approved labels define occurrence and saturation targets.", GREEN, GREEN_LIGHT),
-    ]
-    for box, heading, body, color, fill in steps:
-        card(draw, box, fill=fill, outline=color, radius=8, width=2)
-        text(draw, (box[0] + 16, box[1] + 11), heading, 15, color, True, width=box[2] - box[0] - 32)
-        text(draw, (box[0] + 16, box[1] + 34), body, 13, NAVY, width=box[2] - box[0] - 32, gap=2)
-    arrow(draw, (1318, 264), (1318, 292), fill=TEAL, width=3)
-    arrow(draw, (1318, 360), (1318, 388), fill=BLUE, width=3)
-    arrow(draw, (1318, 464), (1318, 500), fill=GREEN, width=3)
-    v55_slide02_curve_inset(draw, (1120, 608, 1515, 760))
 
     v53_footer(
         draw,
-        "Slide 2 sources: selected USGS/DOE page-3 stability screenshot/crop; project digitized methane 5 ppt CSV; project website regional map. Stability is not hydrate proof.",
+        "Slide 2 sources: World Atlas Fig. 1.1 hydrate structure crop; DGGS RI 2018-6 geology layer; USGS Arctic Alaska cross section; selected USGS/DOE stability figure. Stability is not hydrate proof.",
     )
     return save(img, "slide_02_source_context_v5_5.png")
 
@@ -4052,7 +4224,7 @@ def v55_build_word_companion(panel_paths: list[Path], contact_sheet: Path) -> Pa
 
     slide_notes = [
         ("Slide 1 - Personal/about-me opener", "Preserved from V5.4 to keep the agreed mentor-facing opener style."),
-        ("Slide 2 - Source-backed hydrate and North Slope context", "Rebuilt with the selected USGS/DOE page-3 stability source screenshot/crop as the primary stability visual, a project website regional map for North Slope context, and the project digitized methane 5 ppt CSV only as a small input inset. The slide explains that Structure I methane-dominant hydrate is the current baseline; Structure II and Structure H can occur with larger hydrocarbons such as ethane, propane, butane, or heavier guests, but they are not the current claim. Stability remains a pressure-temperature admissibility screen only; occurrence and saturation evidence must come from approved logs, core, NMR, and mentor-reviewed labels."),
+        ("Slide 2 - Source-backed hydrate and North Slope context", "Rebuilt around the original context spine: what gas hydrates are and why the Alaska North Slope matters. This accepted Slide 2 direction uses a fuller World Atlas hydrate-structure figure crop with Structure I highlighted as the methane-dominant baseline assumption, a public DGGS RI 2018-6 Umiat-Gubik North Slope geology-layer preview showing map units, contacts/faults, and fold axes, a USGS Arctic Alaska generalized cross section, and the selected USGS/DOE pressure-temperature stability figure. Stability remains a pressure-temperature admissibility screen only; occurrence and saturation evidence must come from approved logs, core, NMR, and mentor-reviewed labels. The hydrate-structure figure remains marked for rights/caption review before public release."),
         ("Slide 3 - Parameters and expected hydrate ranges", "Preserved the registry-backed range board: working envelopes, mimics, roles, and Y-only labels."),
         ("Slide 4 - Full complex project workflow", "Kept the whole complex architecture as a main-sequence plate, not an appendix-only reference."),
         ("Slide 5 - DOE three-dataset prototype", "Adds the cleaned prototype story, feature exclusions, target-only saturation variants, and training-fit disclaimer."),
@@ -4078,7 +4250,10 @@ def v55_build_word_companion(panel_paths: list[Path], contact_sheet: Path) -> Pa
         "Original selected USGS/PDF page screenshot: https://drive.google.com/file/d/17T48zhoJKvxB21dJUovXhN-6V8DEgzf7/view?usp=drivesdk",
         "Cropped hydrate stability curve: https://drive.google.com/file/d/1_edIg2LrifTnCL2GP23fcWfnpvIGulYn/view?usp=drivesdk",
         "Digitized methane 5 ppt CSV inset: https://drive.google.com/file/d/1O7hFSgt3eEjaYt3FocJUlFhAZuswwlm3/view?usp=drivesdk",
-        "Website regional map reference: https://drive.google.com/file/d/1CmfuViTiplCB9ayYOjSgLOiQlZaFGCx9/view?usp=drivesdk",
+        "DGGS RI 2018-6 geology-layer preview: docs/evidence/slide02_source_bundle_2026_06_17/slide02_selected_11_dggs_umiat_gubik_geology_layer_slide_map.png",
+        "Prior Structure Explorer 2D wells/seismic export retained as provenance: docs/evidence/slide02_source_bundle_2026_06_17/slide02_selected_05_structure_explorer_2d_wells_seismic.png",
+        "USGS Arctic Alaska generalized cross section crop: docs/evidence/slide02_source_bundle_2026_06_17/slide02_selected_06_usgs_arctic_alaska_cross_section_fig2_crop.png",
+        "World Atlas Fig. 1.1 hydrate structure crop with Structure I highlighted: docs/evidence/slide02_source_bundle_2026_06_17/slide02_selected_09_world_atlas_fig1_1_full_structure_types_si_highlighted.png. Use only after rights/caption review in public deliverables.",
         "docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/ for the V5.4 reference panels.",
         "docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/ for the V5.2 complex workflow and ML runtime authority plates.",
         "data/public_ml_products/source_visual_inventory_2026-06-16.csv for slide and website visual provenance.",
