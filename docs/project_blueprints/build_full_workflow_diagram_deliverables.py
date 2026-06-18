@@ -44,6 +44,9 @@ SLIDE02_GEOSCIENCE_ORIENTATION = (
 SLIDE02_DGGS_GEOLOGY_LAYER = (
     SLIDE02_SOURCE_DIR / "slide02_selected_11_dggs_umiat_gubik_geology_layer_slide_map.png"
 )
+SLIDE02_STABILITY_WELL_MAP = (
+    SLIDE02_SOURCE_DIR / "slide02_selected_12_stability_screen_status_2d_well_map.png"
+)
 SLIDE02_ANS_CROSS_SECTION = (
     SLIDE02_SOURCE_DIR / "slide02_selected_06_usgs_arctic_alaska_cross_section_fig2_crop.png"
 )
@@ -3759,8 +3762,186 @@ def v55_generate_slide02_geoscience_orientation_map() -> Path:
     return SLIDE02_GEOSCIENCE_ORIENTATION
 
 
+def v55_generate_slide02_stability_well_map() -> Path:
+    """Create the website-aligned 2D stability screen status map for Slide 2."""
+    screen_path = PUBLIC_PRODUCTS / "stability_screen_2026-06-14_methane_5ppt_v1.csv"
+    if not screen_path.exists():
+        return SLIDE02_STABILITY_WELL_MAP
+
+    columns = [
+        "well_name",
+        "lat",
+        "lon",
+        "stability_result_status",
+        "stability_confidence",
+    ]
+    screen = pd.read_csv(screen_path, usecols=columns)
+    screen["lat"] = pd.to_numeric(screen["lat"], errors="coerce")
+    screen["lon"] = pd.to_numeric(screen["lon"], errors="coerce")
+    screen = screen.dropna(subset=["lat", "lon"])
+    if screen.empty:
+        return SLIDE02_STABILITY_WELL_MAP
+
+    status_styles = {
+        "calculated": ("Calculated interval", (37, 99, 235), 8, 245),
+        "calculated_no_stable_interval": ("No stable interval", (17, 24, 39), 7, 225),
+        "blocked_phase_curve_range_insufficient": ("Phase range blocked", (217, 119, 6), 5, 205),
+        "blocked_missing_temperature_profile": ("Missing temp profile", (148, 163, 184), 3, 92),
+        "blocked_missing_depth": ("Missing depth", (100, 116, 139), 4, 135),
+        "outside_au_context": ("Outside AU context", (124, 58, 237), 4, 160),
+    }
+
+    width, height = 1920, 830
+    plot = (86, 132, 1834, 688)
+    min_lon = float(screen["lon"].quantile(0.001)) - 0.25
+    max_lon = float(screen["lon"].quantile(0.999)) + 0.25
+    min_lat = float(screen["lat"].quantile(0.001)) - 0.08
+    max_lat = float(screen["lat"].quantile(0.999)) + 0.08
+
+    # Keep the full public North Slope footprint visible even when a few far-west
+    # wells would otherwise pull the view too wide for the slide slot.
+    min_lon = min(min_lon, -155.5)
+    max_lon = max(max_lon, -143.1)
+    min_lat = min(min_lat, 69.0)
+    max_lat = max(max_lat, 71.35)
+
+    def project(lon: float, lat: float) -> tuple[int, int]:
+        x = plot[0] + int((float(lon) - min_lon) / (max_lon - min_lon) * (plot[2] - plot[0]))
+        y = plot[3] - int((float(lat) - min_lat) / (max_lat - min_lat) * (plot[3] - plot[1]))
+        return x, y
+
+    img = Image.new("RGB", (width, height), (247, 251, 252))
+    draw = ImageDraw.Draw(img)
+    draw.rectangle((0, 0, width, height), fill=(247, 251, 252))
+    draw.rectangle((0, 0, width, 112), fill=(235, 247, 250))
+    draw.rectangle(plot, fill=(239, 247, 249), outline=(166, 197, 206), width=3)
+    draw.rectangle((plot[0], plot[1], plot[2], plot[1] + 96), fill=(220, 237, 243))
+
+    text(draw, (88, 42), "2D Stability-Screen Well Map", 42, NAVY, True)
+    text(
+        draw,
+        (90, 90),
+        "Public wells colored by calculation status only; blue is a computed interval, not hydrate evidence.",
+        21,
+        MUTED,
+        True,
+        width=1420,
+        gap=1,
+    )
+    summary = screen["stability_result_status"].value_counts().to_dict()
+    calculated = int(summary.get("calculated", 0))
+    no_interval = int(summary.get("calculated_no_stable_interval", 0))
+    pill(
+        draw,
+        (1456, 42, 1834, 87),
+        f"{len(screen):,} wells | {calculated} calculated",
+        WHITE,
+        TEAL,
+    )
+
+    for lon in range(math.floor(min_lon), math.ceil(max_lon) + 1, 2):
+        x, _ = project(lon, min_lat)
+        draw.line((x, plot[1], x, plot[3]), fill=(213, 227, 232), width=1)
+        text(draw, (x - 34, plot[3] + 11), f"{lon} deg", 15, MUTED, width=68, align="center")
+    for lat in range(math.floor(min_lat), math.ceil(max_lat) + 1):
+        _, y = project(min_lon, lat)
+        draw.line((plot[0], y, plot[2], y), fill=(213, 227, 232), width=1)
+        text(draw, (plot[0] - 70, y - 9), f"{lat} deg N", 15, MUTED, width=62, align="right")
+
+    master_path = ROOT / "03_data_final" / "master_layers" / "north_slope_master_2d_layers.parquet"
+    if master_path.exists():
+        context = pd.read_parquet(
+            master_path,
+            columns=["layer_name", "feature_id", "vertex_order", "lon", "lat"],
+        ).dropna(subset=["lon", "lat"])
+        extent = context[context["layer_name"] == "extent"].sort_values("vertex_order")
+        if not extent.empty:
+            points = [project(row.lon, row.lat) for row in extent.itertuples()]
+            if len(points) > 1:
+                overlay = Image.new("RGBA", (width, height), (255, 255, 255, 0))
+                overlay_draw = ImageDraw.Draw(overlay)
+                overlay_draw.line(points, fill=(15, 23, 42, 210), width=6, joint="curve")
+                img = Image.alpha_composite(img.convert("RGBA"), overlay).convert("RGB")
+                draw = ImageDraw.Draw(img)
+
+    labels = [
+        ("NPRA", -153.6, 70.28, MUTED),
+        ("Prudhoe Bay / Eileen", -148.55, 70.31, TEAL),
+        ("Umiat", -152.05, 69.37, AMBER),
+        ("Arctic Coastal Plain", -149.2, 70.95, BLUE),
+    ]
+    for label, lon, lat, color in labels:
+        x, y = project(lon, lat)
+        label_w = int(max(96, draw.textlength(label, font=font(18, True)) + 24))
+        card(draw, (x - label_w // 2, y - 19, x + label_w // 2, y + 19), fill=WHITE, outline=LINE, radius=8, width=1)
+        text(draw, (x - label_w // 2 + 12, y - 10), label, 18, color, True, width=label_w - 24, align="center")
+
+    overlay = Image.new("RGBA", (width, height), (255, 255, 255, 0))
+    overlay_draw = ImageDraw.Draw(overlay)
+    draw_order = [
+        "blocked_missing_temperature_profile",
+        "blocked_missing_depth",
+        "outside_au_context",
+        "blocked_phase_curve_range_insufficient",
+        "calculated_no_stable_interval",
+        "calculated",
+    ]
+    for status in draw_order:
+        _, rgb, size, alpha = status_styles[status]
+        subset = screen[screen["stability_result_status"].eq(status)]
+        for row in subset.itertuples():
+            x, y = project(row.lon, row.lat)
+            overlay_draw.ellipse(
+                (x - size, y - size, x + size, y + size),
+                fill=(*rgb, alpha),
+                outline=(255, 255, 255, min(230, alpha + 20)) if size >= 5 else None,
+            )
+    img = Image.alpha_composite(img.convert("RGBA"), overlay).convert("RGB")
+    draw = ImageDraw.Draw(img)
+
+    legend_y = 720
+    legend_x = 86
+    legend_items = [
+        "calculated",
+        "calculated_no_stable_interval",
+        "blocked_phase_curve_range_insufficient",
+        "blocked_missing_temperature_profile",
+        "blocked_missing_depth",
+        "outside_au_context",
+    ]
+    for status in legend_items:
+        label, rgb, size, _ = status_styles[status]
+        count = int(summary.get(status, 0))
+        item_w = int(draw.textlength(f"{label} {count:,}", font=font(16, True)) + 58)
+        card(draw, (legend_x, legend_y, legend_x + item_w, legend_y + 42), fill=WHITE, outline=rgb, radius=8, width=2)
+        cx, cy = legend_x + 24, legend_y + 21
+        draw.ellipse((cx - size, cy - size, cx + size, cy + size), fill=rgb)
+        text(draw, (legend_x + 44, legend_y + 13), f"{label} {count:,}", 16, NAVY, True)
+        legend_x += item_w + 12
+        if legend_x > 1460:
+            legend_x = 86
+            legend_y += 48
+
+    text(
+        draw,
+        (1180, 775),
+        "Stability context only: not occurrence, not saturation, not a model result.",
+        17,
+        RED,
+        True,
+        width=620,
+        align="right",
+        gap=0,
+    )
+
+    SLIDE02_STABILITY_WELL_MAP.parent.mkdir(parents=True, exist_ok=True)
+    img.save(SLIDE02_STABILITY_WELL_MAP)
+    return SLIDE02_STABILITY_WELL_MAP
+
+
 def v55_slide_context() -> Path:
     v55_generate_slide02_geoscience_orientation_map()
+    v55_generate_slide02_stability_well_map()
     img = canvas(False)
     draw = ImageDraw.Draw(img)
     v53_panel_title(
@@ -3798,6 +3979,7 @@ def v55_slide_context() -> Path:
     structure_box = (84, 274, 586, 604)
     if not v53_paste(img, v55_slide02_path(SLIDE02_STRUCTURE_TYPES, SLIDE02_USGS_PAGE), structure_box, mode="contain"):
         v53_placeholder_image(draw, structure_box, "Source hydrate-structure figure unavailable")
+    draw.ellipse((372, 283, 505, 417), outline=TEAL, width=5)
     v54_source_label(draw, structure_box, "World Atlas Fig. 1.1 after Warrier et al. 2016; sI highlighted")
     structure_notes = [
         ((84, 626, 242, 704), "Structure I", "methane baseline", TEAL, (235, 250, 251)),
@@ -3814,12 +3996,12 @@ def v55_slide_context() -> Path:
     map_panel = (635, 138, 1185, 790)
     card(draw, map_panel, fill=WHITE, outline=LINE, radius=9, width=2)
     section_header(map_panel, "2", "Why the North Slope", BLUE)
-    text(draw, (659, 198), "A public North Slope geologic layer and Arctic Alaska cross section define the project setting.", 14, MUTED, True, width=482, gap=2)
+    text(draw, (659, 198), "A public stability-screen well map and Arctic Alaska cross section define the project setting.", 14, MUTED, True, width=482, gap=2)
     map_box = (659, 238, 1161, 455)
-    map_path = v55_slide02_path(SLIDE02_DGGS_GEOLOGY_LAYER, SLIDE02_GEOSCIENCE_ORIENTATION)
+    map_path = v55_slide02_path(SLIDE02_STABILITY_WELL_MAP, SLIDE02_DGGS_GEOLOGY_LAYER)
     if not v53_paste(img, map_path, map_box, mode="cover"):
-        v53_placeholder_image(draw, map_box, "North Slope geology layer unavailable")
-    v54_source_label(draw, map_box, "DGGS RI 2018-6 Umiat-Gubik geology layer; map units + faults/folds")
+        v53_placeholder_image(draw, map_box, "North Slope stability well map unavailable")
+    v54_source_label(draw, map_box, "Project website 2D stability-screen well map; status colors only")
     cross_box = (659, 492, 1161, 718)
     if not v53_paste(img, v55_slide02_path(SLIDE02_ANS_CROSS_SECTION, SLIDE02_MAP), cross_box, mode="contain"):
         v53_placeholder_image(draw, cross_box, "Arctic Alaska cross section unavailable")
@@ -3861,7 +4043,7 @@ def v55_slide_context() -> Path:
 
     v53_footer(
         draw,
-        "Slide 2 sources: World Atlas Fig. 1.1 hydrate structure crop; DGGS RI 2018-6 geology layer; USGS Arctic Alaska cross section; selected USGS/DOE stability figure. Stability is not hydrate proof.",
+        "Slide 2 sources: World Atlas Fig. 1.1 hydrate structure crop; project website 2D stability-screen well map; USGS Arctic Alaska cross section; selected USGS/DOE stability figure. Stability is not hydrate proof.",
     )
     return save(img, "slide_02_source_context_v5_5.png")
 
