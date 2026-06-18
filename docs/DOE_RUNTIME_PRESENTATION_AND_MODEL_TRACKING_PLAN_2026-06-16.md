@@ -1,6 +1,6 @@
 # DOE Runtime Presentation And Model Tracking Plan
 
-Last updated: 2026-06-16
+Last updated: 2026-06-18
 
 This plan turns the approved three-dataset work into something reviewable on a
 website instead of a loose `R2` screenshot. The goal is to show the mentor what
@@ -42,6 +42,8 @@ shows:
 - stability-to-ML contract;
 - a downloadable public-safe summary CSV with no approved workbook rows,
   row-level predictions, fitted model paths, or runtime manifests.
+- an optional command-line export for Word/slide-ready review tables and PNGs
+  that reads only ignored local summary CSVs.
 
 The tracker is intentionally local-runtime aware. GitHub carries the code and
 templates. DOE carries the actual workbook rows, row-level predictions, fitted
@@ -140,7 +142,9 @@ from proof-of-plumbing to reviewable science outputs:
    Tracker`.
 6. Download `local_model_run_public_safe_summary.csv` only if a row-free
    summary is needed for mentor-facing notes.
-7. Use the tracker for mentor discussion, but do not copy raw predictions,
+7. For Word or slide figures, run
+   `python 01_pipeline/export_model_run_review_assets.py --project-root . --output-dir outputs_runtime/model_run_review_assets_current`.
+8. Use the tracker for mentor discussion, but do not copy raw predictions,
    fitted models, or approved workbook rows back to GitHub.
 
 ## Commands
@@ -163,6 +167,12 @@ If Streamlit is not available yet, open the runtime CSV summaries directly:
 - `feature_columns_by_target.csv`
 - `excluded_feature_columns_by_target.csv`
 - `sheet_inventory.csv`
+
+For the row-free review export:
+
+```bash
+python 01_pipeline/export_model_run_review_assets.py --project-root . --output-dir outputs_runtime/model_run_review_assets_current
+```
 
 ## Public-Safe Templates
 

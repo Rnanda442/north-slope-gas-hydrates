@@ -1,6 +1,6 @@
 # DOE Three-Dataset ML Pipeline Runbook
 
-Last updated: 2026-06-16
+Last updated: 2026-06-18
 
 This runbook is for the approved DOE/Anaconda runtime only. It is designed for
 the currently available three workbook package:
@@ -22,6 +22,9 @@ keeps entire recovered workbook groups separate.
 - Runtime inputs stay in the approved DOE folder or an ignored runtime folder.
 - Runtime outputs stay under `outputs_runtime/` and `models_runtime/`, which
   are ignored by Git.
+- Runtime review exports produced for Word/slides stay under
+  `outputs_runtime/model_run_review_assets_*` unless a public-safe release is
+  explicitly approved.
 - Saturation and occurrence columns are target-only. They must not enter
   `X_allowed`.
 - Depth is retained for alignment/context and output review, not as a default
@@ -93,6 +96,24 @@ python 01_pipeline/run_three_dataset_ml_pipeline.py --data-dir "%USERPROFILE%\Do
 Use TensorFlow/Keras later only after the environment package request is
 approved and the baseline feature/target tables are confirmed.
 
+## Header-Only Public-Safe Audit
+
+If the goal is only to test a header list or workbook-exported header CSV
+without reading row values, use the header validator:
+
+```bash
+python 01_pipeline/validate_approved_data_headers.py --headers "DEPTH,GR,RHOB,Rt,Sgh" --authoritative-saturation-field Sgh --saturation-unit-convention fraction --output-dir outputs_runtime/header_audits --output-prefix header_audit
+```
+
+For a CSV source, require `--header-only`:
+
+```bash
+python 01_pipeline/validate_approved_data_headers.py --source-csv "PATH_TO_LOCAL_EXPORT.csv" --header-only --source-label "approved_runtime_header_only" --output-dir outputs_runtime/header_audits --output-prefix source_header_audit
+```
+
+The validator reads headers only. Do not use `--include-source-name` with a
+private path unless the path itself is cleared for sharing.
+
 ## Multi-Saturation Prototype Command
 
 If the available labels are all saturation variants, use the standalone transfer
@@ -121,6 +142,32 @@ The cleaned feature file should not include `Depth_ft`, `DEPT`,
 `depths_unit*`, `Unnamed:*`, raw `GR`, raw `RES`, raw `RHOB`, raw `VP`, or raw
 `VS` as model inputs. If those appear, the old notebook cell or an older script
 was run.
+
+## Word/Slide-Ready Review Asset Export
+
+After one or more local runtime runs exist, export row-free review assets for
+Word and slide drafting:
+
+```bash
+python 01_pipeline/export_model_run_review_assets.py --project-root . --output-dir outputs_runtime/model_run_review_assets_current
+```
+
+The export writes only summary-level assets:
+
+- `public_safe_model_run_summary.csv`
+- `public_safe_run_comparison.csv`
+- `feature_family_counts.csv`
+- `exclusion_reason_counts.csv`
+- `validation_status_counts.csv`
+- `feature_family_coverage.png`
+- `validation_status_summary.png`
+- `model_run_review_brief.md`
+- `asset_manifest.json`
+
+By default, training-fit metrics such as mean train `R2` are not exported to the
+run-comparison table. If a local review needs them, add
+`--include-training-fit-metrics`; the output still labels them as
+training-fit only, not validated performance.
 
 ## Website Review Surface
 
