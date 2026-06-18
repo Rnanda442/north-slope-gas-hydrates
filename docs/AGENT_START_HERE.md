@@ -11,8 +11,8 @@ authoritative artifacts, guardrails, tests, or next actions materially change.
 1. `docs/AGENT_START_HERE.md`
 2. `docs/CURRENT_ARTIFACT_INDEX.md`
 3. `docs/PROJECT_PROMPT_LIBRARY.md` when starting a repeated workflow
-4. `docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md` for current slide and
-   delegated-chat work
+4. `docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md` for current
+   project/deck revision and delegated-chat work
 5. `PROJECT_CONTEXT.md`
 6. `docs/NORTH_SLOPE_PROJECT_BASE.md`
 7. `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md`
@@ -73,8 +73,9 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
 - `docs/CURRENT_ARTIFACT_INDEX.md` - artifact authority, status, and edit
   safety.
 - `docs/PROJECT_PROMPT_LIBRARY.md` - reusable prompts for repeated workflows.
-- `docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md` - latest self-email deck
-  direction and copyable prompts for PC/OSL/delegated Codex chats.
+- `docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md` - latest self-email
+  project/deck direction, editable-slide rule, four-well ML scope, and copyable
+  prompts for PC/OSL/delegated Codex chats.
 - `PROJECT_CONTEXT.md` - concise living project memory.
 - `docs/NORTH_SLOPE_PROJECT_BASE.md` - broader project base and deliverable
   inventory.
@@ -145,7 +146,7 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
 - Current mentor status package:
   `docs/project_blueprints/North_Slope_Gas_Hydrate_Mentor_Status_Package_V5_Workflow_2026-06-15.docx`
 
-Latest user deck-direction update:
+Latest user project/deck-direction update:
 
 - The 2026-06-18 self-email titled `slide updates for the newest deck`
   identifies the attached
@@ -153,12 +154,18 @@ Latest user deck-direction update:
   as the best review deck so far. The attachment is not committed and should
   be treated as a needs-review Gmail/Drive artifact until a future session
   explicitly downloads, verifies, and stages it.
-- The next slide pass should follow
-  `docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md`: larger source-backed or
-  data-derived visuals, fewer on-slide source comments, editable high-level
-  text where practical, a unified North Slope map, a rebuilt log-signal/lithology
-  slide, an equation-only slide, and results/discussion slides without
-  unsupported model or hydrate claims.
+- The next project/deck pass should follow
+  `docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md`: convert whole-slide
+  screenshot/raster panels into editable slide builds where practical, use
+  larger source-backed or data-derived visuals, reduce on-slide source comments,
+  keep high-level text editable, use a unified North Slope map, rebuild Slide 3
+  around log-signal movement plus lithology/coring context, replace the
+  three-dataset prototype with an equation-only slide, and make Slides 7-9 a
+  guarded results/discussion plan without unsupported model or hydrate claims.
+- The current ML scope is the four wells represented by the three available
+  datasheets/workbooks. Future work must verify the well names/aliases,
+  locations, and core/NMR/pressure-core/lithology evidence for those wells
+  before finalizing the lithology, saturation, website, or model story.
 
 Do not directly edit generated PPTX/DOCX binaries unless the user explicitly
 asks. Prefer the documented builders and regenerate deliverables reproducibly.
@@ -310,7 +317,7 @@ Preferred language: `public-safe scaffold`, `schema readiness`,
    `docs/FINAL_NINE_SLIDE_GAP_AND_DIAGRAM_REUSE_PLAN_2026-06-15.md`, and the
    relevant prompt in `docs/PROJECT_PROMPT_LIBRARY.md`. For current delegated
    slide work, also read
-   `docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md`.
+   `docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md`.
 5. For ML/schema work, read the approved-data intake spec, first model plan,
    field-role table, parameter evidence registry, and leakage guardrails.
 6. For stability work, read `docs/STABILITY_CALCULATION_PLAN.md`, the public

@@ -48,10 +48,19 @@ The public repo should not contain:
 - Earlier Gmail-deck feedback treated slide 1 as close and slides 2-9 as needing
   stronger specifics, formatting, syntax, science, and ML pipeline clarity.
 - The 2026-06-18 self-email `slide updates for the newest deck` is the latest
-  deck-direction layer. It is captured in
-  `docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md` and should be used to
-  delegate current slide, website-map, equation, source-research, and PC/OSL
-  sync tasks.
+  project/deck-direction layer. It is captured in
+  `docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md` and should be used to
+  delegate current slide, website-map, equation, four-well source-recovery,
+  Word companion, and PC/OSL sync tasks.
+- Screenshots of source evidence remain useful, but whole-slide screenshot or
+  raster panels are not the desired final deck format. The user needs the slide
+  itself to be a real editable build wherever practical, with selectable text,
+  labels, callouts, and arrows.
+- The active near-term ML scope is the four wells represented by the three
+  available datasheets/workbooks. Do not keep building the presentation around
+  a broad 71-dataset scope; verify the well names/aliases, locations, coring
+  data, and lithology for those four wells and use that narrower scope to
+  explain hydrate saturation more deeply.
 - The main audience deck should keep the original nine topic slides; technical
   diagram plates can be appended when explicitly needed to keep complex
   architecture diagrams whole.
@@ -72,8 +81,9 @@ Then use:
   and edit safety.
 - `docs/PROJECT_PROMPT_LIBRARY.md` for reusable slide, Word, website, OSL,
   source research, parameter evidence, stability, and mentor-status prompts.
-- `docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md` for the latest self-email
-  deck direction and copyable topic prompts for PC/OSL/delegated Codex chats.
+- `docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md` for the latest
+  self-email project/deck direction, editable-slide rule, four-well ML scope,
+  and copyable topic prompts for PC/OSL/delegated Codex chats.
 - `docs/NORTH_SLOPE_PROJECT_BASE.md` for the broader project base.
 
 ### Slide Authority And Current Deck
@@ -932,7 +942,7 @@ Current top-priority handoff for the PC:
    `docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md`
    before editing, uploading, deleting, or renaming Word/PowerPoint/Drive
    deliverables.
-2. Use `docs/DECK_REVISION_DELEGATION_BASE_2026-06-18.md` to split the next
+2. Use `docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md` to split the next
    work into scoped prompts for the PC, OSL, or delegated Codex chats.
 3. Review the committed V5.5 Slide 2 source update presentation at
    `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`
@@ -949,6 +959,8 @@ Current top-priority handoff for the PC:
    context/admissibility only, and closes with done/not-claimed/next.
    The 2026-06-18 Gmail deck attachment may supersede some visuals after it is
    downloaded and verified, but it is not committed yet.
+   The next pass must avoid whole-slide screenshot panels when the user needs
+   editable text, and must update the story around the four-well ML scope.
    V5.3 is a flawed intermediate/reference, not the active deck.
    Its prior build contracts are `docs/FINAL_NEW_SLIDE_DECK_CREATION_PROMPT_2026-06-15.md`,
    with supporting rules in
