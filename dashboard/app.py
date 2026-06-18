@@ -4,7 +4,9 @@ import base64
 from collections import Counter
 from html import escape
 import json
+import os
 from pathlib import Path
+import unicodedata
 
 import numpy as np
 import pandas as pd
@@ -392,6 +394,32 @@ TEMPERATURE_PROXY_TIER_DETAILS = {
         "opacity": 0.55,
     },
 }
+BASEMAP_LANDMARK_DIR_NAME = "basemap_landmarks_2026_06_18"
+BASEMAP_LANDMARK_BBOX = {
+    "min_lon": -157.5,
+    "max_lon": -144.5,
+    "min_lat": 68.5,
+    "max_lat": 71.7,
+}
+BASEMAP_LANDMARK_FILES = {
+    "units": "alaska_dnr_unit_boundary_current_north_slope_clip.geojson",
+    "roads": "alaska_akdot_roads_north_slope_clip.geojson",
+    "pipeline": "alaska_dnr_trans_alaska_pipeline.geojson",
+    "gnis_places": "usgs_gnis_places_north_slope_clip.geojson",
+    "census_places": "census_tiger_2025_alaska_places.zip",
+}
+FIELD_LABEL_ORDER = [
+    "PRUDHOE BAY",
+    "KUPARUK RIVER",
+    "MILNE POINT",
+    "COLVILLE RIVER",
+    "ENDICOTT",
+    "NIKAITCHUQ",
+    "NORTHSTAR",
+    "PIKKA",
+    "PT THOMSON",
+    "OOOGURUK",
+]
 MASTER_2D = PROJECT_ROOT / "03_data_final" / "master_layers" / "north_slope_master_2d_layers.parquet"
 STRUCTURAL_HORIZONS = ["NStopo", "NSLCU", "NSshublik", "NSbasement"]
 CONTEXT_OVERLAYS = [
@@ -2147,7 +2175,388 @@ def render_stability_input_scaffold_product() -> None:
     )
 
 
-def build_stability_screen_map(screen: pd.DataFrame) -> go.Figure:
+def default_basemap_landmark_source_dir(project_root: Path) -> Path:
+    override = os.environ.get("NORTH_SLOPE_BASEMAP_SOURCE_DIR")
+    if override:
+        return Path(override).expanduser()
+    return project_root / "data" / "source_library" / BASEMAP_LANDMARK_DIR_NAME
+
+
+def clean_map_label(value: object) -> str:
+    text = str(value or "").replace("City of ", "").strip()
+    text = unicodedata.normalize("NFKD", text)
+    text = "".join(character for character in text if not unicodedata.combining(character))
+    return " ".join(text.split())
+
+
+def load_geojson_features(path: Path) -> list[dict[str, object]]:
+    if not path.exists():
+        return []
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    if payload.get("type") != "FeatureCollection":
+        return []
+    return [
+        feature
+        for feature in payload.get("features", [])
+        if isinstance(feature, dict) and isinstance(feature.get("geometry"), dict)
+    ]
+
+
+def geojson_geometry_paths(geometry: dict[str, object]) -> list[list[list[float]]]:
+    geometry_type = geometry.get("type")
+    coordinates = geometry.get("coordinates")
+    if not coordinates:
+        return []
+    if geometry_type == "LineString":
+        return [coordinates]
+    if geometry_type == "MultiLineString":
+        return list(coordinates)
+    if geometry_type == "Polygon":
+        return list(coordinates)
+    if geometry_type == "MultiPolygon":
+        return [ring for polygon in coordinates for ring in polygon]
+    return []
+
+
+def sampled_coordinate_path(
+    coordinates: list[list[float]],
+    max_points: int = 650,
+) -> list[list[float]]:
+    if len(coordinates) <= max_points:
+        return coordinates
+    step = max(1, len(coordinates) // max_points)
+    sampled = coordinates[::step]
+    if sampled[-1] != coordinates[-1]:
+        sampled.append(coordinates[-1])
+    return sampled
+
+
+def feature_lon_lat_arrays(
+    features: list[dict[str, object]],
+    max_points_per_path: int = 650,
+) -> tuple[list[float | None], list[float | None]]:
+    lon_values: list[float | None] = []
+    lat_values: list[float | None] = []
+    for feature in features:
+        for coordinate_path in geojson_geometry_paths(feature.get("geometry", {})):
+            path_lon: list[float] = []
+            path_lat: list[float] = []
+            for point in sampled_coordinate_path(coordinate_path, max_points_per_path):
+                if not isinstance(point, (list, tuple)) or len(point) < 2:
+                    continue
+                try:
+                    lon = float(point[0])
+                    lat = float(point[1])
+                except (TypeError, ValueError):
+                    continue
+                if (
+                    BASEMAP_LANDMARK_BBOX["min_lon"] - 1
+                    <= lon
+                    <= BASEMAP_LANDMARK_BBOX["max_lon"] + 1
+                    and BASEMAP_LANDMARK_BBOX["min_lat"] - 1
+                    <= lat
+                    <= BASEMAP_LANDMARK_BBOX["max_lat"] + 1
+                ):
+                    path_lon.append(lon)
+                    path_lat.append(lat)
+            if path_lon:
+                lon_values.extend(path_lon + [None])
+                lat_values.extend(path_lat + [None])
+    return lon_values, lat_values
+
+
+def add_geojson_line_trace(
+    figure: go.Figure,
+    features: list[dict[str, object]],
+    name: str,
+    color: str,
+    width: float,
+    opacity: float,
+    max_points_per_path: int = 650,
+) -> None:
+    lon_values, lat_values = feature_lon_lat_arrays(features, max_points_per_path)
+    if not lon_values:
+        return
+    figure.add_trace(
+        go.Scattermapbox(
+            lon=lon_values,
+            lat=lat_values,
+            mode="lines",
+            name=name,
+            showlegend=False,
+            hoverinfo="skip",
+            opacity=opacity,
+            line={"color": color, "width": width},
+        )
+    )
+
+
+def road_name_blob(feature: dict[str, object]) -> str:
+    properties = feature.get("properties", {}) or {}
+    fields = [
+        "Route_Name",
+        "Route_Name_Unique",
+        "Route_Name_Desc_1",
+        "Route_Name_Desc_2",
+        "Route_ID",
+    ]
+    return " ".join(str(properties.get(field) or "") for field in fields)
+
+
+def point_coordinates_from_geometry(geometry: dict[str, object]) -> list[tuple[float, float]]:
+    geometry_type = geometry.get("type")
+    coordinates = geometry.get("coordinates")
+    if not coordinates:
+        return []
+    if geometry_type == "Point":
+        coordinates = [coordinates]
+    elif geometry_type != "MultiPoint":
+        return []
+    points = []
+    for point in coordinates:
+        if not isinstance(point, (list, tuple)) or len(point) < 2:
+            continue
+        try:
+            lon = float(point[0])
+            lat = float(point[1])
+        except (TypeError, ValueError):
+            continue
+        points.append((lon, lat))
+    return points
+
+
+def load_gnis_place_labels(source_dir: Path) -> list[dict[str, object]]:
+    features = load_geojson_features(source_dir / BASEMAP_LANDMARK_FILES["gnis_places"])
+    labels: list[dict[str, object]] = []
+    for feature in features:
+        label = clean_map_label((feature.get("properties", {}) or {}).get("gaz_name"))
+        if not label:
+            continue
+        for lon, lat in point_coordinates_from_geometry(feature.get("geometry", {})):
+            labels.append({"label": label, "lat": lat, "lon": lon, "source": "USGS GNIS"})
+    return labels
+
+
+def load_census_place_labels(source_dir: Path) -> list[dict[str, object]]:
+    path = source_dir / BASEMAP_LANDMARK_FILES["census_places"]
+    if not path.exists():
+        return []
+    try:
+        import geopandas as gpd
+
+        places = gpd.read_file(f"zip://{path.resolve()}")
+        if places.crs is not None and places.crs.to_epsg() != 4326:
+            places = places.to_crs("EPSG:4326")
+    except Exception:
+        return []
+
+    labels: list[dict[str, object]] = []
+    for _, row in places.iterrows():
+        label = clean_map_label(row.get("NAME") or row.get("NAMELSAD"))
+        if not label:
+            continue
+        try:
+            lat = float(row.get("INTPTLAT"))
+            lon = float(row.get("INTPTLON"))
+        except (TypeError, ValueError):
+            centroid = row.geometry.centroid if row.geometry is not None else None
+            if centroid is None:
+                continue
+            lat = float(centroid.y)
+            lon = float(centroid.x)
+        if (
+            BASEMAP_LANDMARK_BBOX["min_lon"] <= lon <= BASEMAP_LANDMARK_BBOX["max_lon"]
+            and BASEMAP_LANDMARK_BBOX["min_lat"] <= lat <= BASEMAP_LANDMARK_BBOX["max_lat"]
+        ):
+            labels.append({"label": label, "lat": lat, "lon": lon, "source": "US Census"})
+    return labels
+
+
+def deduplicate_place_labels(labels: list[dict[str, object]]) -> list[dict[str, object]]:
+    deduped: list[dict[str, object]] = []
+    seen: set[str] = set()
+    for label in labels:
+        text = clean_map_label(label.get("label")).lower()
+        if not text or text in seen:
+            continue
+        seen.add(text)
+        deduped.append(label)
+    return deduped
+
+
+def load_basemap_landmark_layers(source_dir: Path) -> dict[str, object]:
+    source_dir = Path(source_dir)
+    roads = load_geojson_features(source_dir / BASEMAP_LANDMARK_FILES["roads"])
+    key_roads = [
+        feature
+        for feature in roads
+        if any(term in road_name_blob(feature).lower() for term in ["dalton", "deadhorse"])
+    ]
+    local_roads = [feature for feature in roads if feature not in key_roads]
+    return {
+        "source_dir": str(source_dir),
+        "units": load_geojson_features(source_dir / BASEMAP_LANDMARK_FILES["units"]),
+        "local_roads": local_roads,
+        "key_roads": key_roads,
+        "pipeline": load_geojson_features(source_dir / BASEMAP_LANDMARK_FILES["pipeline"]),
+        "place_labels": deduplicate_place_labels(
+            load_census_place_labels(source_dir) + load_gnis_place_labels(source_dir)
+        ),
+    }
+
+
+@st.cache_data(show_spinner=False)
+def cached_basemap_landmark_layers(source_dir: str) -> dict[str, object]:
+    return load_basemap_landmark_layers(Path(source_dir))
+
+
+def public_field_label_frame(map_frame: pd.DataFrame, max_labels: int = 10) -> pd.DataFrame:
+    required_columns = {"field", "lat", "lon"}
+    if not required_columns.issubset(map_frame.columns):
+        return pd.DataFrame(columns=["label", "well_count", "lat", "lon"])
+    labels = map_frame[["field", "lat", "lon"]].copy()
+    labels["field"] = labels["field"].fillna("").astype(str).str.strip()
+    labels["lat"] = pd.to_numeric(labels["lat"], errors="coerce")
+    labels["lon"] = pd.to_numeric(labels["lon"], errors="coerce")
+    labels = labels.dropna(subset=["field", "lat", "lon"])
+    labels = labels[
+        labels["field"].ne("")
+        & ~labels["field"].str.startswith("*")
+        & labels["field"].str.lower().ne("nan")
+    ]
+    if labels.empty:
+        return pd.DataFrame(columns=["label", "well_count", "lat", "lon"])
+
+    grouped = (
+        labels.groupby("field", as_index=False)
+        .agg(well_count=("field", "size"), lat=("lat", "median"), lon=("lon", "median"))
+        .sort_values("well_count", ascending=False)
+    )
+    grouped = grouped[
+        grouped["field"].isin(FIELD_LABEL_ORDER) | grouped["well_count"].ge(20)
+    ].copy()
+    if grouped.empty:
+        return pd.DataFrame(columns=["label", "well_count", "lat", "lon"])
+    order_lookup = {name: index for index, name in enumerate(FIELD_LABEL_ORDER)}
+    grouped["sort_order"] = grouped["field"].map(order_lookup).fillna(999).astype(int)
+    grouped["label"] = grouped["field"].str.title()
+    grouped = grouped.sort_values(["sort_order", "well_count"], ascending=[True, False])
+    return grouped[["label", "well_count", "lat", "lon"]].head(max_labels)
+
+
+def add_north_slope_basemap_line_layers(
+    figure: go.Figure,
+    landmarks: dict[str, object],
+) -> None:
+    add_geojson_line_trace(
+        figure,
+        landmarks.get("units", []),
+        "DNR oil/gas unit outlines",
+        "#334155",
+        1.15,
+        0.55,
+    )
+    add_geojson_line_trace(
+        figure,
+        landmarks.get("local_roads", []),
+        "AKDOT local roads",
+        "#94a3b8",
+        1,
+        0.38,
+        max_points_per_path=400,
+    )
+    add_geojson_line_trace(
+        figure,
+        landmarks.get("key_roads", []),
+        "Dalton/Deadhorse roads",
+        "#111827",
+        2.6,
+        0.74,
+        max_points_per_path=900,
+    )
+    add_geojson_line_trace(
+        figure,
+        landmarks.get("pipeline", []),
+        "Trans-Alaska Pipeline",
+        "#b45309",
+        2.2,
+        0.7,
+        max_points_per_path=900,
+    )
+
+
+def add_map_label_trace(
+    figure: go.Figure,
+    frame: pd.DataFrame,
+    name: str,
+    color: str,
+    size: int,
+    textposition: str,
+) -> None:
+    if frame.empty:
+        return
+    figure.add_trace(
+        go.Scattermapbox(
+            lon=frame["lon"],
+            lat=frame["lat"],
+            mode="text",
+            text=frame["label"],
+            name=name,
+            showlegend=False,
+            hovertemplate="%{text}<extra></extra>",
+            textfont={"size": size, "color": color},
+            textposition=textposition,
+        )
+    )
+
+
+def add_north_slope_basemap_label_layers(
+    figure: go.Figure,
+    map_frame: pd.DataFrame,
+    landmarks: dict[str, object],
+) -> None:
+    field_labels = public_field_label_frame(map_frame)
+    add_map_label_trace(
+        figure,
+        field_labels,
+        "Public well field labels",
+        "#111827",
+        14,
+        "top center",
+    )
+    field_label_names = {clean_map_label(label).lower() for label in field_labels["label"]}
+    place_labels = pd.DataFrame(landmarks.get("place_labels", []))
+    if not place_labels.empty:
+        place_labels["label"] = place_labels["label"].map(clean_map_label)
+        place_labels = place_labels[
+            ~place_labels["label"].str.lower().isin(field_label_names)
+        ].head(8)
+        add_map_label_trace(
+            figure,
+            place_labels,
+            "Community labels",
+            "#475569",
+            12,
+            "bottom center",
+        )
+
+
+def map_landmark_source_caption(landmark_source_dir: Path) -> str:
+    return (
+        "Landmark overlays load from "
+        f"`{project_relative_or_absolute(landmark_source_dir)}` when present: "
+        "Alaska DNR unit boundaries, AKDOT roads, Census/GNIS place labels, "
+        "Trans-Alaska Pipeline geometry, and public well field centroids."
+    )
+
+
+def build_stability_screen_map(
+    screen: pd.DataFrame,
+    landmark_source_dir: Path | None = None,
+) -> go.Figure:
     map_frame = screen.copy()
     map_frame["lat"] = pd.to_numeric(map_frame.get("lat"), errors="coerce")
     map_frame["lon"] = pd.to_numeric(map_frame.get("lon"), errors="coerce")
@@ -2183,6 +2592,13 @@ def build_stability_screen_map(screen: pd.DataFrame) -> go.Figure:
 
     center_lat = float(map_frame["lat"].median())
     center_lon = float(map_frame["lon"].median())
+    source_dir = (
+        Path(landmark_source_dir)
+        if landmark_source_dir
+        else default_basemap_landmark_source_dir(PROJECT_ROOT)
+    )
+    landmarks = cached_basemap_landmark_layers(str(source_dir))
+    add_north_slope_basemap_line_layers(figure, landmarks)
     statuses = list(STABILITY_SCREEN_STATUS_STYLES)
     extra_statuses = [
         status
@@ -2234,6 +2650,7 @@ def build_stability_screen_map(screen: pd.DataFrame) -> go.Figure:
                 hovertemplate="%{text}<extra></extra>",
             )
         )
+    add_north_slope_basemap_label_layers(figure, map_frame, landmarks)
 
     figure.update_layout(
         height=560,
@@ -2246,7 +2663,7 @@ def build_stability_screen_map(screen: pd.DataFrame) -> go.Figure:
             "x": 0,
         },
         mapbox={
-            "style": "open-street-map",
+            "style": "carto-positron",
             "center": {"lat": center_lat, "lon": center_lon},
             "zoom": 4.0,
         },
@@ -2355,7 +2772,7 @@ def build_selected_well_phase_audit_figure(
                 x=curve["equilibrium_temperature_c"],
                 y=curve["source_depth_m"],
                 mode="lines",
-                name="Methane 5 ppt phase boundary",
+                name="Methane 5 ppt CSV phase boundary",
                 line={"color": "#111827", "width": 3},
                 hovertemplate=(
                     "Phase boundary<br>Depth: %{y:.1f} m"
@@ -2394,7 +2811,7 @@ def build_selected_well_phase_audit_figure(
                 x=sampled_profile["temperature_c"],
                 y=sampled_profile["depth_m"],
                 mode="lines",
-                name="Sampled measured G10015 profile",
+                name="G10015 measured temperature profile",
                 line={"color": "#16a34a", "width": 3},
                 customdata=sampled_profile[["file_name", "sample_method"]],
                 hovertemplate=(
@@ -2423,7 +2840,7 @@ def build_selected_well_phase_audit_figure(
                 x=model["temperature_model_c"],
                 y=model["depth_m"],
                 mode="lines+markers",
-                name="OSL modeled temperature key depths",
+                name="Modeled well temperature key depths",
                 line={"color": "#2563eb", "width": 3},
                 marker={"size": 9},
                 customdata=model[
@@ -2440,6 +2857,51 @@ def build_selected_well_phase_audit_figure(
                     "<br>Method: %{customdata[1]}"
                     "<br>Status: %{customdata[2]}<extra></extra>"
                 ),
+            )
+        )
+
+    stability_top = pd.to_numeric(
+        pd.Series([screen_row.get("stability_top_m")]),
+        errors="coerce",
+    ).iloc[0]
+    stability_base = pd.to_numeric(
+        pd.Series([screen_row.get("stability_base_m")]),
+        errors="coerce",
+    ).iloc[0]
+    stability_thickness = pd.to_numeric(
+        pd.Series([screen_row.get("stability_thickness_m")]),
+        errors="coerce",
+    ).iloc[0]
+    has_stability_range = (
+        pd.notna(stability_top)
+        and pd.notna(stability_base)
+        and float(stability_base) > float(stability_top)
+    )
+    if has_stability_range:
+        range_label = "Modeled stability-admissibility range"
+        if pd.notna(stability_thickness):
+            range_label = f"{range_label}: {float(stability_thickness):.1f} m"
+        figure.add_hrect(
+            y0=float(stability_top),
+            y1=float(stability_base),
+            fillcolor="rgba(249, 115, 22, 0.14)",
+            line_width=0,
+            layer="below",
+            annotation_text=range_label,
+            annotation_position="top left",
+        )
+        figure.add_trace(
+            go.Scatter(
+                x=[None],
+                y=[None],
+                mode="markers",
+                name="Modeled stability range",
+                marker={
+                    "size": 12,
+                    "color": "rgba(249, 115, 22, 0.35)",
+                    "symbol": "square",
+                },
+                hoverinfo="skip",
             )
         )
 
@@ -2516,6 +2978,8 @@ def build_selected_well_phase_audit_figure(
     max_depth_candidates.extend(float(depth) for depth in plotted_depths if pd.notna(depth))
     if screen_points:
         max_depth_candidates.append(float(pd.DataFrame(screen_points)["depth_m"].max()))
+    if has_stability_range:
+        max_depth_candidates.extend([float(stability_top), float(stability_base)])
     max_depth = max(max_depth_candidates) if max_depth_candidates else 1000.0
 
     figure.update_layout(
@@ -2528,6 +2992,72 @@ def build_selected_well_phase_audit_figure(
     )
     figure.update_yaxes(autorange="reversed", range=[max_depth * 1.03, 0])
     return figure
+
+
+def first_nonempty_column_value(
+    frame: pd.DataFrame,
+    column: str,
+    default: str,
+) -> str:
+    if frame.empty or column not in frame.columns:
+        return default
+    values = frame[column].dropna().astype(str).str.strip()
+    values = values[values.ne("")]
+    if values.empty:
+        return default
+    return values.iloc[0]
+
+
+def stability_screen_source_method_frame(phase_curve: pd.DataFrame) -> pd.DataFrame:
+    citation = first_nonempty_column_value(
+        phase_curve,
+        "source_citation",
+        "Lee et al. 2008 USGS SIR 2008-5175 Fig. 1A",
+    )
+    extraction_method = first_nonempty_column_value(
+        phase_curve,
+        "source_extraction_method",
+        "digitized phase-boundary lookup",
+    ).replace("_", " ")
+    gas_assumption = first_nonempty_column_value(
+        phase_curve,
+        "gas_composition_assumption",
+        "100_percent_methane",
+    ).replace("_", " ")
+    salinity = first_nonempty_column_value(
+        phase_curve,
+        "salinity_ppt_assumption",
+        "5",
+    )
+
+    return pd.DataFrame(
+        [
+            {
+                "Step": "1. Public well scaffold",
+                "Source used": "Alaska DNR public Arctic Slope well locations and public depth fields.",
+                "How the website uses it": "Maps 8,084 public wells and defines the public depth basis for screening.",
+                "Guardrail": "Public scaffold only; no approved runtime rows or hydrate detections are loaded.",
+            },
+            {
+                "Step": "2. Temperature controls",
+                "Source used": "NSIDC G10015 temperature profiles with NSIDC GGD223 permafrost-control context.",
+                "How the website uses it": "Uses matched or representative measured-temperature controls where public-source gates pass; missing controls stay blank.",
+                "Guardrail": "G10015 is the temperature source, not the methane phase-curve CSV/screenshot.",
+            },
+            {
+                "Step": "3. Methane phase curve",
+                "Source used": f"{citation}; {gas_assumption}; {salinity} ppt salinity; {extraction_method}.",
+                "How the website uses it": "Replots the CSV points as the methane 5 ppt phase boundary and compares modeled well temperature against it.",
+                "Guardrail": "The CSV/PNG curve is a phase-boundary input; it is not a G10015 temperature profile and not occurrence evidence.",
+            },
+            {
+                "Step": "4. Stability range",
+                "Source used": "Guarded public stability-screen CSV generated from the public scaffold, temperature model, hydrostatic pressure, and phase curve.",
+                "How the website uses it": "Reports top, base, and thickness where modeled temperature is at or below the methane phase boundary.",
+                "Guardrail": "This is pressure-temperature admissibility only; logs, core, NMR, and labels validate occurrence or saturation separately.",
+            },
+        ]
+    )
 
 
 def stability_blank_reason_summary_frame(screen: pd.DataFrame) -> pd.DataFrame:
@@ -2817,7 +3347,10 @@ def temperature_proxy_tier_summary_frame(audit: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def build_temperature_proxy_map(audit: pd.DataFrame) -> go.Figure:
+def build_temperature_proxy_map(
+    audit: pd.DataFrame,
+    landmark_source_dir: Path | None = None,
+) -> go.Figure:
     map_frame = audit.dropna(subset=["lat", "lon"]).copy()
     figure = go.Figure()
     if map_frame.empty:
@@ -2825,6 +3358,13 @@ def build_temperature_proxy_map(audit: pd.DataFrame) -> go.Figure:
 
     center_lat = float(map_frame["lat"].median())
     center_lon = float(map_frame["lon"].median())
+    source_dir = (
+        Path(landmark_source_dir)
+        if landmark_source_dir
+        else default_basemap_landmark_source_dir(PROJECT_ROOT)
+    )
+    landmarks = cached_basemap_landmark_layers(str(source_dir))
+    add_north_slope_basemap_line_layers(figure, landmarks)
     ordered_tiers = list(TEMPERATURE_PROXY_TIER_DETAILS)
     for tier in ordered_tiers:
         subset = map_frame[map_frame["temperature_proxy_tier"].eq(tier)]
@@ -2858,6 +3398,7 @@ def build_temperature_proxy_map(audit: pd.DataFrame) -> go.Figure:
                 hovertemplate="%{text}<extra></extra>",
             )
         )
+    add_north_slope_basemap_label_layers(figure, map_frame, landmarks)
 
     figure.update_layout(
         height=560,
@@ -2870,7 +3411,7 @@ def build_temperature_proxy_map(audit: pd.DataFrame) -> go.Figure:
             "x": 0,
         },
         mapbox={
-            "style": "open-street-map",
+            "style": "carto-positron",
             "center": {"lat": center_lat, "lon": center_lon},
             "zoom": 4.0,
         },
@@ -3003,6 +3544,32 @@ def render_guarded_stability_screen_product() -> None:
     phase_curve = cached_methane_phase_curve(str(PROJECT_ROOT))
     sampled_profile_points = cached_g10015_temperature_profile_points(str(PROJECT_ROOT))
 
+    with st.expander("Sources And How The Stability Screen Works", expanded=True):
+        st.markdown(
+            """
+The map and selected-well plot show a **stability-admissibility range**, not a
+single hydrate depth. A calculated row has a modeled top, base, and thickness
+where the well-temperature model is cold enough relative to the methane 5 ppt
+phase boundary. That range only says hydrate could be thermodynamically
+allowed; occurrence and saturation still require log, core, NMR, or other
+validated target evidence.
+
+The Drive CSV-curve screenshot belongs to the methane 5 ppt phase-boundary
+input. It should not be treated as a G10015 temperature-profile screenshot.
+"""
+        )
+        st.dataframe(
+            stability_screen_source_method_frame(phase_curve),
+            use_container_width=True,
+            hide_index=True,
+        )
+        st.info(
+            "Current baseline: 100 percent methane / methane-dominant, 5 ppt "
+            "salinity, hydrostatic pressure assumption. Mixed gas composition "
+            "or a different salinity would need a separately sourced curve and "
+            "mentor approval before becoming a baseline screen."
+        )
+
     status_tab, blanks_tab, temperature_tab, intervals_tab, tables_tab = st.tabs(
         [
             "Status Map",
@@ -3020,6 +3587,7 @@ def render_guarded_stability_screen_product() -> None:
             "screen could calculate an interval for that well; it does not mean "
             "hydrate was detected."
         )
+        st.caption(map_landmark_source_caption(default_basemap_landmark_source_dir(PROJECT_ROOT)))
         st.plotly_chart(
             build_stability_screen_map(screen),
             use_container_width=True,
@@ -3075,6 +3643,7 @@ def render_guarded_stability_screen_product() -> None:
             "Proxy tiers are planning labels only. They do not fill blank "
             "top/base/thickness values and are not part of the baseline screen."
         )
+        st.caption(map_landmark_source_caption(default_basemap_landmark_source_dir(PROJECT_ROOT)))
         st.plotly_chart(
             build_temperature_proxy_map(proxy_audit),
             use_container_width=True,
@@ -3104,15 +3673,15 @@ Source anchors: [NSIDC G10015](https://nsidc.org/data/g10015/versions/1),
     with intervals_tab:
         st.markdown("##### Selected Well Temperature/Phase Audit")
         st.caption(
-            "This plot uses committed public products: the methane 5 ppt phase "
-            "boundary, sampled measured G10015 profile points when exported, "
-            "OSL modeled temperature at key depths, and screen top/base "
-            "markers where available."
+            "This plot uses committed public products: the methane 5 ppt CSV "
+            "phase boundary, sampled measured G10015 temperature-profile points "
+            "when exported, modeled well temperature at key depths, and a shaded "
+            "screen top-to-base range where available."
         )
         if sampled_profile_points.empty:
             st.info(
                 "The sampled measured G10015 profile export is not committed yet. "
-                "Run the public stability rebuild in OSL to add full curve traces."
+                "Run the public stability rebuild in OSL to add full temperature-profile traces."
             )
         selection_source = screen.copy()
         selection_source["selection_priority"] = selection_source[
@@ -4994,7 +5563,7 @@ def render_schema_coverage_architecture() -> None:
             {
                 "Blocked item": "Occurrence and saturation labels",
                 "Current handling": "target-only headers visible, zero public target rows",
-                "Decision needed": "official target authority and unit convention",
+                "Decision needed": "official target authority and sheet-level fraction 0-1 verification",
             },
             {
                 "Blocked item": "Validation split",
@@ -5138,7 +5707,7 @@ def render_schema_coverage_architecture() -> None:
             {
                 "Decision box": "Y-only target rule",
                 "Current rule": "Sgh, S_h, Sh, NMR_SAT, Hydrate Saturation, Swr, phase labels, and occurrence labels never enter X_allowed.",
-                "Open point": "Mentor must choose official target authority and unit convention.",
+                "Open point": "Mentor must choose official target authority; saturation targets are expected as fractions 0-1.",
             },
             {
                 "Decision box": "Caliper coverage first",
@@ -5158,7 +5727,7 @@ def render_schema_coverage_architecture() -> None:
             {
                 "Decision box": "Saturation task",
                 "Current rule": "Saturation regression is linked to but separate from occurrence classification.",
-                "Open point": "Choose authoritative saturation field and fraction/percent convention.",
+                "Open point": "Choose authoritative saturation field; preserve fraction 0-1 target convention.",
             },
         ]
     )
@@ -5404,7 +5973,7 @@ def render_schema_coverage_architecture() -> None:
             {
                 "Stage": "Unit and QC layer",
                 "Feature path": "Normalize depth, density, velocity/slowness, porosity, resistivity, and caliper status.",
-                "Target path": "Confirm target units as fraction or percent before labels are used.",
+                "Target path": "Treat saturation targets as fractions 0-1 and verify sheet-level consistency before labels are used.",
             },
             {
                 "Stage": "Leakage barrier",
