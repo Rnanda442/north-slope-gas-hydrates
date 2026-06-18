@@ -141,7 +141,7 @@ download. It also has tabs explaining why rows are blank, the G10015/GGD223
 coordinate crosswalk, nearest located G10015 control distances, proxy-candidate
 tiers, and source anchors. The Calculated Intervals tab has a selected-well
 temperature/phase audit plot using the committed methane 5 ppt phase boundary,
-OSL modeled temperature key-depth product, and screen top/base markers where
+sampled measured G10015 CSV profile points, and screen top/base markers where
 available; it is not the full raw measured G10015 profile. Do not call it
 hydrate proof, saturation, producibility, or a sweet-spot ranking. Do not use
 proxy tiers to fill top/base/thickness unless the mentor approves a separately
@@ -151,9 +151,9 @@ Current sampled temperature-curve export:
 `data/public_stability_products/g10015_temperature_profile_points_sampled_2026-06-14.csv`
 and its summary are committed from OSL. The sampled product has `28,020` rows,
 `184` profiles, `24` well codes, and a maximum of `160` sampled points per
-profile. The selected-well temperature/phase audit plot can now show the
-sampled measured G10015 curve along with the methane 5 ppt phase boundary,
-OSL modeled key-depth temperatures, and screen top/base markers.
+profile. The selected-well temperature/phase audit plot now uses the sampled
+measured G10015 CSV points as the visible temperature trace, along with the
+methane 5 ppt phase boundary and screen top/base markers.
 
 Current public ML feature scaffold:
 `data/public_stability_products/public_ml_feature_scaffold_2026-06-15.csv`,

@@ -2351,7 +2351,6 @@ def build_selected_well_phase_audit_figure(
 ) -> go.Figure:
     figure = go.Figure()
     well_name = str(screen_row.get("well_name", "Selected well"))
-    object_id = screen_row.get("object_id")
 
     curve = phase_curve.copy()
     curve["source_depth_m"] = pd.to_numeric(curve.get("source_depth_m"), errors="coerce")
@@ -2383,13 +2382,17 @@ def build_selected_well_phase_audit_figure(
     if profile_points is not None and not profile_points.empty:
         profile_frame = profile_points.copy()
         if pd.notna(selected_profile_file) and "file_name" in profile_frame.columns:
-            sampled_profile = profile_frame[profile_frame["file_name"].eq(selected_profile_file)]
+            sampled_profile = profile_frame[
+                profile_frame["file_name"].eq(selected_profile_file)
+            ].copy()
         if (
             sampled_profile.empty
             and pd.notna(selected_profile_code)
             and "well_code" in profile_frame.columns
         ):
-            sampled_profile = profile_frame[profile_frame["well_code"].eq(selected_profile_code)]
+            sampled_profile = profile_frame[
+                profile_frame["well_code"].eq(selected_profile_code)
+            ].copy()
         sampled_profile["depth_m"] = pd.to_numeric(
             sampled_profile.get("depth_m"),
             errors="coerce",
@@ -2406,52 +2409,16 @@ def build_selected_well_phase_audit_figure(
             go.Scatter(
                 x=sampled_profile["temperature_c"],
                 y=sampled_profile["depth_m"],
-                mode="lines",
-                name="Sampled measured G10015 profile",
-                line={"color": "#16a34a", "width": 3},
+                mode="lines+markers",
+                name="CSV sampled G10015 temperature points",
+                line={"color": "#16a34a", "width": 2.5},
+                marker={"size": 5, "color": "#16a34a"},
                 customdata=sampled_profile[["file_name", "sample_method"]],
                 hovertemplate=(
-                    "Sampled measured profile<br>Depth: %{y:.1f} m"
+                    "CSV sampled profile point<br>Depth: %{y:.1f} m"
                     "<br>Temperature: %{x:.2f} C"
                     "<br>File: %{customdata[0]}"
                     "<br>Sampling: %{customdata[1]}<extra></extra>"
-                ),
-            )
-        )
-
-    model = temperature_model.copy()
-    if "object_id" in model.columns and pd.notna(object_id):
-        model = model[model["object_id"].eq(object_id)]
-    else:
-        model = model[model["well_name"].eq(well_name)]
-    model["depth_m"] = pd.to_numeric(model.get("depth_m"), errors="coerce")
-    model["temperature_model_c"] = pd.to_numeric(
-        model.get("temperature_model_c"),
-        errors="coerce",
-    )
-    model = model.dropna(subset=["depth_m", "temperature_model_c"]).sort_values("depth_m")
-    if not model.empty:
-        figure.add_trace(
-            go.Scatter(
-                x=model["temperature_model_c"],
-                y=model["depth_m"],
-                mode="lines+markers",
-                name="OSL modeled temperature key depths",
-                line={"color": "#2563eb", "width": 3},
-                marker={"size": 9},
-                customdata=model[
-                    [
-                        "temperature_model_depth_role",
-                        "temperature_model_method",
-                        "temperature_model_status",
-                    ]
-                ],
-                hovertemplate=(
-                    "Temperature model<br>Depth: %{y:.1f} m"
-                    "<br>Temperature: %{x:.2f} C"
-                    "<br>Role: %{customdata[0]}"
-                    "<br>Method: %{customdata[1]}"
-                    "<br>Status: %{customdata[2]}<extra></extra>"
                 ),
             )
         )
@@ -2504,11 +2471,11 @@ def build_selected_well_phase_audit_figure(
             annotation_position="right",
         )
 
-    if curve.empty and model.empty and sampled_profile.empty and not screen_points:
+    if curve.empty and sampled_profile.empty and not screen_points:
         figure.update_layout(
             annotations=[
                 {
-                    "text": "No phase/temperature audit points are available for this well.",
+                    "text": "No CSV temperature or phase audit points are available for this well.",
                     "xref": "paper",
                     "yref": "paper",
                     "x": 0.5,
@@ -2522,7 +2489,6 @@ def build_selected_well_phase_audit_figure(
     for frame, depth_column in [
         (curve, "source_depth_m"),
         (sampled_profile, "depth_m"),
-        (model, "depth_m"),
     ]:
         if not frame.empty:
             max_depth_candidates.append(float(frame[depth_column].max()))
@@ -2534,7 +2500,7 @@ def build_selected_well_phase_audit_figure(
     figure.update_layout(
         height=560,
         margin={"l": 70, "r": 32, "t": 40, "b": 56},
-        title=f"{well_name} temperature-phase audit",
+        title=f"{well_name} CSV-point temperature/phase audit",
         xaxis_title="Temperature (C)",
         yaxis_title="Depth (m)",
         legend={"orientation": "h", "y": 1.08, "x": 0},
@@ -3118,9 +3084,9 @@ Source anchors: [NSIDC G10015](https://nsidc.org/data/g10015/versions/1),
         st.markdown("##### Selected Well Temperature/Phase Audit")
         st.caption(
             "This plot uses committed public products: the methane 5 ppt phase "
-            "boundary, sampled measured G10015 profile points when exported, "
-            "OSL modeled temperature at key depths, and screen top/base "
-            "markers where available."
+            "boundary, CSV-sampled measured G10015 temperature points, and "
+            "screen top/base markers where available. It no longer draws the "
+            "older modeled temperature key-depth curve."
         )
         if sampled_profile_points.empty:
             st.info(

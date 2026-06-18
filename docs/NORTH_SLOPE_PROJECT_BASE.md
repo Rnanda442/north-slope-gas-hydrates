@@ -783,10 +783,10 @@ Fresh-chat handoff as of 2026-06-15:
   located G10015 control, and 4,917 are 50-100 km regional proxy candidates.
   Proxy tiers are planning/sensitivity labels only, not baseline calculations.
 - The Calculated Intervals tab includes a selected-well temperature/phase audit
-  plot using the committed methane 5 ppt phase boundary, the sampled measured
-  G10015 profile points, OSL temperature key-depth product, and screen top/base
-  markers where available. The sampled measured profile product has `28,020`
-  rows across `184` profiles and is a visualization/audit input only.
+  plot using the committed methane 5 ppt phase boundary, sampled measured
+  G10015 CSV profile points, and screen top/base markers where available. The
+  sampled measured profile product has `28,020` rows across `184` profiles and
+  is a visualization/audit input only.
 - The public ML feature scaffold now exists:
   `data/public_stability_products/public_ml_feature_scaffold_2026-06-15.csv`,
   `public_ml_feature_scaffold_summary_2026-06-15.csv`, and

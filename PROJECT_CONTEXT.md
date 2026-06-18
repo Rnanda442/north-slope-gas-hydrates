@@ -814,7 +814,7 @@ blockers, and next activities in the architecture/activity map.
   within 50 km of a located G10015 control, and 4,917 are 50-100 km regional
   candidates. Proxy tiers remain planning/sensitivity labels only.
 - 2026-06-14: Added a selected-well temperature/phase audit plot using the
-  committed methane 5 ppt phase boundary, OSL temperature key-depth product,
+  committed methane 5 ppt phase boundary, sampled G10015 CSV profile points,
   and screen top/base markers where available. It is explicitly not the full
   raw measured G10015 temperature profile.
 - 2026-06-14: Prepared the OSL sampled G10015 profile-point export. The next
