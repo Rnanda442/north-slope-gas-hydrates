@@ -2115,16 +2115,48 @@ def render_regional_atlas() -> None:
     )
     landmark_source_dir = default_basemap_landmark_source_dir(PROJECT_ROOT)
     st.caption(unified_context_map_source_caveat_caption(landmark_source_dir))
-    st.plotly_chart(
-        build_unified_north_slope_context_map(
-            screen,
-            permafrost_points,
-            assessment_units,
+    if UNIFIED_CONTEXT_MAP_EXPORT.exists():
+        st.image(
+            str(UNIFIED_CONTEXT_MAP_EXPORT),
+            use_container_width=True,
+            caption=(
+                "Current combined map export with DNR units, roads, TAPS, "
+                "field labels, GGD223 controls, USGS hydrate AUs, and "
+                "stability-screen status."
+            ),
+        )
+    else:
+        st.info(
+            "The combined static map export is missing in this checkout. "
+            "Showing the interactive rebuild instead."
+        )
+
+    show_interactive_unified_map = st.checkbox(
+        "Show interactive layer-toggle rebuild",
+        value=not UNIFIED_CONTEXT_MAP_EXPORT.exists(),
+        key="show_regional_interactive_unified_context_map",
+        help=(
+            "The interactive rebuild can be slower and may omit local OSL-only "
+            "landmark layers when their source package is not present."
         ),
-        use_container_width=True,
-        config={"displayModeBar": True, "responsive": True},
-        key="regional_unified_context_map",
     )
+    if show_interactive_unified_map:
+        st.caption(
+            "Use this interactive version for legend toggles. If the local OSL "
+            "GIS package is absent, some landmark overlays may be missing even "
+            "though the committed static export above still shows the full "
+            "combined map."
+        )
+        st.plotly_chart(
+            build_unified_north_slope_context_map(
+                screen,
+                permafrost_points,
+                assessment_units,
+            ),
+            use_container_width=True,
+            config={"displayModeBar": True, "responsive": True},
+            key="regional_unified_context_map",
+        )
 
     layer_inventory = unified_context_map_layer_inventory_frame(DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW)
     st.markdown("### Layer stack and slide exports")
@@ -4368,16 +4400,46 @@ It should not be treated as a G10015 temperature-profile screenshot.
             "occurrence, saturation, or trained-model evidence."
         )
         st.caption(map_landmark_source_caption(default_basemap_landmark_source_dir(PROJECT_ROOT)))
-        st.plotly_chart(
-            build_unified_north_slope_context_map(
-                screen,
-                ggd223_points,
-                assessment_units,
+        if UNIFIED_CONTEXT_MAP_EXPORT.exists():
+            st.image(
+                str(UNIFIED_CONTEXT_MAP_EXPORT),
+                use_container_width=True,
+                caption=(
+                    "Current combined map export. Use this view for slide/mentor "
+                    "review because it preserves the full landmark layer stack."
+                ),
+            )
+        else:
+            st.info(
+                "The combined static map export is missing in this checkout. "
+                "Showing the interactive rebuild instead."
+            )
+        show_interactive_stability_map = st.checkbox(
+            "Show interactive layer-toggle rebuild",
+            value=not UNIFIED_CONTEXT_MAP_EXPORT.exists(),
+            key="show_stability_interactive_unified_context_map",
+            help=(
+                "The interactive rebuild can be slower and may omit local OSL-only "
+                "landmark layers when their source package is not present."
             ),
-            use_container_width=True,
-            config={"displayModeBar": True, "responsive": True},
-            key="stability_unified_context_map",
         )
+        if show_interactive_stability_map:
+            st.caption(
+                "Use this interactive version for legend toggles. If the local "
+                "OSL GIS package is absent, some DNR/road/TAPS/community layers "
+                "may be missing even though the committed static export above "
+                "still shows the full combined map."
+            )
+            st.plotly_chart(
+                build_unified_north_slope_context_map(
+                    screen,
+                    ggd223_points,
+                    assessment_units,
+                ),
+                use_container_width=True,
+                config={"displayModeBar": True, "responsive": True},
+                key="stability_unified_context_map",
+            )
         with st.expander("Reference: status-only 2D screen map"):
             st.caption(
                 "Status colors are identical to the unified map. This legacy view "
@@ -6000,8 +6062,14 @@ def render_explore_north_slope(files: list[dict[str, object]]) -> None:
     st.markdown('<div class="atlas-kicker">Public regional context</div>', unsafe_allow_html=True)
     st.title("Explore North Slope")
     st.write("Public GIS and structural layers constrain interpretation; they do not classify hydrate by themselves.")
-    tabs = st.tabs(["Regional Map", "3D Structure", "Data & Sources"])
-    with tabs[0]:
+    selected_view = st.radio(
+        "Explore view",
+        ["Regional Map", "3D Structure", "Data & Sources"],
+        horizontal=True,
+        label_visibility="collapsed",
+        key="explore_north_slope_view",
+    )
+    if selected_view == "Regional Map":
         render_processing_sketch(
             "layer_map",
             {"layers": LAYER_SUMMARY},
@@ -6010,7 +6078,7 @@ def render_explore_north_slope(files: list[dict[str, object]]) -> None:
             height=360,
         )
         render_regional_atlas()
-    with tabs[1]:
+    elif selected_view == "3D Structure":
         render_processing_sketch(
             "structure_stack",
             {"layers": STRUCTURE_LAYERS},
@@ -6020,7 +6088,7 @@ def render_explore_north_slope(files: list[dict[str, object]]) -> None:
         )
         with st.expander("Full 3D structural explorer", expanded=True):
             render_structural_explorer()
-    with tabs[2]:
+    else:
         render_processing_sketch(
             "blocks",
             {
