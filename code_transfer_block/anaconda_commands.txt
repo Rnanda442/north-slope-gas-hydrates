@@ -1,0 +1,19 @@
+REM Run these from the inner north-slope-gas-hydrates-main repo folder.
+
+REM Inspect workbook sheets/headers/possible target columns:
+python code_transfer_block\inspect_three_dataset_headers_standalone.py
+
+REM If you copied only the standalone script into the repo root:
+python inspect_three_dataset_headers_standalone.py
+
+REM Run the real three-dataset ML pipeline after choosing the target:
+python 01_pipeline\run_three_dataset_ml_pipeline.py --data-dir "C:\Users\rohan.nanda\Downloads\Northslopedatasets06052026" --target "EXACT_HEADER" --target-task regression
+
+REM If the target is only in curated_dataset3.xlsx, train on dataset 3 and predict datasets 1 and 2:
+python 01_pipeline\run_three_dataset_ml_pipeline.py --data-dir "C:\Users\rohan.nanda\Downloads\Northslopedatasets06052026" --train curated_dataset3.xlsx --test curated_dataset1.xlsx curated_dataset2.xlsx --target "EXACT_HEADER" --target-task regression
+
+REM If the target is a class/label/occurrence field:
+python 01_pipeline\run_three_dataset_ml_pipeline.py --data-dir "C:\Users\rohan.nanda\Downloads\Northslopedatasets06052026" --target "EXACT_HEADER" --target-task classification
+
+REM Run all saturation-like columns as separate target-only regression runs:
+python code_transfer_block\multi_saturation_target_workflow.py

@@ -9,25 +9,60 @@ from pathlib import Path
 from docx import Document
 from docx.enum.section import WD_ORIENT
 from docx.shared import Inches, Pt
+import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
 from pptx import Presentation
 
 
 ROOT = Path(__file__).resolve().parents[2]
 BLUEPRINT_DIR = ROOT / "docs" / "project_blueprints"
-ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "v5_4_corrected_2026_06_16"
+V54_ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "v5_4_corrected_2026_06_16"
+ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "v5_5_slide2_source_update_2026_06_17"
 SOURCE_DECK = BLUEPRINT_DIR / "CURRENT_GMAIL_VISUAL_REVISION_9_SLIDE_North_Slope_Gas_Hydrate_Slides_2026-06-11.pptx"
-OUT_DECK = BLUEPRINT_DIR / "V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx"
-OUT_DOCX = BLUEPRINT_DIR / "V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx"
-OUT_CONTACT_SHEET = ASSET_DIR / "v5_4_corrected_contact_sheet.png"
+OUT_DECK = BLUEPRINT_DIR / "V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx"
+OUT_DOCX = BLUEPRINT_DIR / "V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx"
+OUT_CONTACT_SHEET = ASSET_DIR / "v5_5_slide2_source_update_contact_sheet.png"
 PUBLIC_PRODUCTS = ROOT / "data" / "public_stability_products"
 PUBLIC_ML_PRODUCTS = ROOT / "data" / "public_ml_products"
 WEBSITE_CAPTURE_DIR = BLUEPRINT_DIR / "presentation_assets" / "v5_3_website_captures"
+WEBSITE_WELL_MAP_DIR = BLUEPRINT_DIR / "presentation_assets" / "website_well_maps_2026_06_18"
 REFERENCE_IMAGE_DIR = ROOT / "references" / "presentation-revision-2026-06-11" / "images"
 V52_ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "full_workflow_diagram_2026_06_15"
 PROCESSING_ASSET_DIR = BLUEPRINT_DIR / "presentation_assets" / "processing_revisions_2026_06_11"
 PARAMETER_EVIDENCE_REGISTRY = PUBLIC_ML_PRODUCTS / "public_parameter_evidence_registry_2026-06-16.csv"
 PHASE_CURVE_METHANE_5PPT = PUBLIC_PRODUCTS / "phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv"
+SLIDE02_SOURCE_DIR = ROOT / "docs" / "evidence" / "slide02_source_bundle_2026_06_17"
+SLIDE02_USGS_PAGE = SLIDE02_SOURCE_DIR / "slide02_selected_01_usgs_hydrate_context_page3.png"
+SLIDE02_USGS_CURVE = SLIDE02_SOURCE_DIR / "slide02_selected_02_usgs_hydrate_stability_curve_crop.png"
+SLIDE02_DIGITIZED_CURVE = SLIDE02_SOURCE_DIR / "slide02_selected_03_project_digitized_methane_5ppt_curve.csv"
+SLIDE02_MAP = SLIDE02_SOURCE_DIR / "slide02_selected_04_project_website_regional_map_reference.png"
+SLIDE02_STRUCTURE_EXPLORER_2D = (
+    SLIDE02_SOURCE_DIR / "slide02_selected_05_structure_explorer_2d_wells_seismic.png"
+)
+SLIDE02_GEOSCIENCE_ORIENTATION = (
+    SLIDE02_SOURCE_DIR / "slide02_selected_08_north_slope_geoscience_orientation_map.png"
+)
+SLIDE02_DGGS_GEOLOGY_LAYER = (
+    SLIDE02_SOURCE_DIR / "slide02_selected_11_dggs_umiat_gubik_geology_layer_slide_map.png"
+)
+SLIDE02_STABILITY_WELL_MAP = (
+    SLIDE02_SOURCE_DIR / "slide02_selected_12_stability_screen_status_2d_well_map.png"
+)
+SLIDE02_OSL_GIS_STABILITY_MAP = (
+    WEBSITE_WELL_MAP_DIR / "slide3_correct_2d_well_stability_map_2026_06_18.png"
+)
+SLIDE02_OSL_GIS_STABILITY_CROP = (
+    SLIDE02_SOURCE_DIR / "slide02_selected_13_osl_gis_stability_context_map_crop.png"
+)
+SLIDE02_ANS_CROSS_SECTION = (
+    SLIDE02_SOURCE_DIR / "slide02_selected_06_usgs_arctic_alaska_cross_section_fig2_crop.png"
+)
+SLIDE02_STRUCTURE_TYPES = (
+    SLIDE02_SOURCE_DIR / "slide02_selected_09_world_atlas_fig1_1_full_structure_types_si_highlighted.png"
+)
+SLIDE02_STRUCTURE_TYPES_CLEAN = (
+    SLIDE02_SOURCE_DIR / "slide02_selected_14_world_atlas_fig1_1_structure_types_clean.png"
+)
 
 W, H = 1600, 900
 EXPANDED_W, EXPANDED_H = 5200, 3000
@@ -2841,6 +2876,54 @@ def v54_source_label(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int], 
     text(draw, (x1 + 10, y2 - 21), label, 10, WHITE, True, width=x2 - x1 - 20, gap=1)
 
 
+def v55_slide02_path(primary: Path, fallback: Path) -> Path:
+    return primary if primary.exists() else fallback
+
+
+def v55_slide02_curve_inset(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int]) -> None:
+    card(draw, box, fill=WHITE, outline=LINE, radius=8, width=2)
+    x1, y1, x2, y2 = box
+    text(draw, (x1 + 14, y1 + 10), "Digitized methane 5 ppt input", 14, NAVY, True, width=x2 - x1 - 28)
+    rows: list[tuple[float, float]] = []
+    csv_path = v55_slide02_path(SLIDE02_DIGITIZED_CURVE, PHASE_CURVE_METHANE_5PPT)
+    if csv_path.exists():
+        with csv_path.open(newline="", encoding="utf-8") as fh:
+            for row in csv.DictReader(fh):
+                try:
+                    rows.append((float(row["equilibrium_temperature_c"]), float(row["pressure_mpa_absolute"])))
+                except (KeyError, TypeError, ValueError):
+                    continue
+
+    ax = (x1 + 44, y1 + 48, x2 - 24, y2 - 40)
+    draw.line((ax[0], ax[3], ax[2], ax[3]), fill=MUTED, width=2)
+    draw.line((ax[0], ax[3], ax[0], ax[1]), fill=MUTED, width=2)
+    for i in range(1, 4):
+        gx = ax[0] + i * (ax[2] - ax[0]) // 4
+        gy = ax[3] - i * (ax[3] - ax[1]) // 4
+        draw.line((gx, ax[1], gx, ax[3]), fill=(226, 238, 241), width=1)
+        draw.line((ax[0], gy, ax[2], gy), fill=(226, 238, 241), width=1)
+    if rows:
+        temps = [r[0] for r in rows]
+        pressures = [r[1] for r in rows]
+        t_min, t_max = min(temps) - 1.0, max(temps) + 1.0
+        p_min, p_max = min(pressures) - 0.4, max(pressures) + 0.4
+
+        def project(t: float, p: float) -> tuple[int, int]:
+            px = ax[0] + int((t - t_min) / (t_max - t_min) * (ax[2] - ax[0]))
+            py = ax[3] - int((p - p_min) / (p_max - p_min) * (ax[3] - ax[1]))
+            return px, py
+
+        pts = [project(t, p) for t, p in rows]
+        if len(pts) > 1:
+            draw.line(pts, fill=TEAL, width=3)
+        for pt in pts[:: max(1, len(pts) // 10)]:
+            draw.ellipse((pt[0] - 2, pt[1] - 2, pt[0] + 2, pt[1] + 2), fill=TEAL)
+        text(draw, (ax[0] + 12, ax[1] + 8), "admissibility only", 11, TEAL, True, width=130)
+    else:
+        text(draw, (ax[0] + 20, ax[1] + 20), "CSV missing", 13, RED, True, width=ax[2] - ax[0] - 40)
+    v54_source_label(draw, box, "Project digitized methane 5 ppt CSV curve, stability-admissibility only")
+
+
 def v54_phase_curve(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int]) -> None:
     card(draw, box, fill=WHITE, outline=LINE, radius=10, width=2)
     x1, y1, x2, y2 = box
@@ -3523,15 +3606,979 @@ def v54_build_word_companion(panel_paths: list[Path], contact_sheet: Path) -> Pa
     return OUT_DOCX
 
 
+def v55_copy_v54_panel(filename: str, output_name: str) -> Path:
+    return v54_copy_authority_panel(V54_ASSET_DIR / filename, output_name)
+
+
+def v55_slide_personal_opener() -> Path:
+    return v55_copy_v54_panel("slide_01_personal_about_me_v5_4.png", "slide_01_personal_about_me_v5_5.png")
+
+
+def v55_generate_slide02_geoscience_orientation_map() -> Path:
+    """Create the public GIS map used in Slide 2 and mirrored by the website."""
+    master_path = ROOT / "03_data_final" / "master_layers" / "north_slope_master_2d_layers.parquet"
+    if not master_path.exists():
+        return SLIDE02_GEOSCIENCE_ORIENTATION
+
+    context = pd.read_parquet(
+        master_path,
+        columns=[
+            "layer_name",
+            "feature_id",
+            "vertex_order",
+            "lon",
+            "lat",
+            "au_name",
+            "name",
+        ],
+    ).dropna(subset=["lon", "lat"])
+
+    extent = context[context["layer_name"] == "extent"].sort_values("vertex_order")
+    if extent.empty:
+        return SLIDE02_GEOSCIENCE_ORIENTATION
+
+    min_lon = float(extent["lon"].min()) - 0.9
+    max_lon = float(extent["lon"].max()) + 0.9
+    min_lat = float(extent["lat"].min()) - 0.45
+    max_lat = float(extent["lat"].max()) + 0.45
+    width, height = 1920, 1090
+    plot = (88, 122, 1832, 952)
+
+    def project(lon: float, lat: float) -> tuple[int, int]:
+        x = plot[0] + int((float(lon) - min_lon) / (max_lon - min_lon) * (plot[2] - plot[0]))
+        y = plot[3] - int((float(lat) - min_lat) / (max_lat - min_lat) * (plot[3] - plot[1]))
+        return x, y
+
+    def rows_to_points(rows: pd.DataFrame, max_points: int = 1600) -> list[tuple[int, int]]:
+        rows = rows.sort_values("vertex_order")
+        if len(rows) > max_points:
+            rows = rows.iloc[:: max(1, len(rows) // max_points)]
+        return [project(row.lon, row.lat) for row in rows.itertuples()]
+
+    img = Image.new("RGB", (width, height), (246, 250, 251))
+    draw = ImageDraw.Draw(img)
+    draw.rectangle(plot, fill=(240, 247, 249), outline=(166, 197, 206), width=3)
+    draw.rectangle((plot[0], plot[1], plot[2], plot[1] + 135), fill=(227, 243, 250))
+    text(draw, (88, 44), "North Slope Geoscience Orientation", 42, NAVY, True)
+    text(
+        draw,
+        (90, 94),
+        "Public geology framework + seismic coverage + public wells; context only, not occurrence or saturation evidence.",
+        22,
+        MUTED,
+        True,
+        width=1420,
+        gap=2,
+    )
+    pill(draw, (1518, 52, 1832, 91), "Slide 2 map source", WHITE, TEAL)
+
+    # Latitude/longitude grid.
+    for lon in range(math.floor(min_lon), math.ceil(max_lon) + 1, 2):
+        x, _ = project(lon, min_lat)
+        draw.line((x, plot[1], x, plot[3]), fill=(211, 226, 231), width=1)
+        text(draw, (x - 28, plot[3] + 10), f"{lon}°", 13, MUTED, width=56, align="center")
+    for lat in range(math.floor(min_lat), math.ceil(max_lat) + 1):
+        _, y = project(min_lon, lat)
+        draw.line((plot[0], y, plot[2], y), fill=(211, 226, 231), width=1)
+        text(draw, (plot[0] - 54, y - 8), f"{lat}°N", 13, MUTED, width=48, align="right")
+
+    overlay = Image.new("RGBA", (width, height), (255, 255, 255, 0))
+    overlay_draw = ImageDraw.Draw(overlay)
+    au_palette = {
+        "Brookian Foreset-Bottomset": ((20, 123, 133, 66), (20, 123, 133, 205)),
+        "Brookian Topset": ((52, 144, 220, 60), (52, 144, 220, 205)),
+        "Beaufortian Strata North": ((245, 158, 11, 58), (217, 119, 6, 205)),
+        "Beaufortian Strata South": ((245, 158, 11, 38), (180, 83, 9, 205)),
+        "Ellesmerian Strata North": ((111, 105, 190, 52), (111, 105, 190, 205)),
+        "Ellesmerian Strata South": ((111, 105, 190, 34), (81, 69, 160, 205)),
+    }
+
+    assessment_units = context[context["layer_name"] == "assessment_units"]
+    for au_name, au_rows in assessment_units.groupby("au_name", dropna=True):
+        fill, line = au_palette.get(str(au_name), ((148, 163, 184, 45), (100, 116, 139, 200)))
+        for _, rows in au_rows.groupby("feature_id"):
+            points = rows_to_points(rows, 1800)
+            if len(points) > 2:
+                overlay_draw.polygon(points, fill=fill, outline=line)
+
+    seismic_3d = context[context["layer_name"] == "seismic_3d_inventory"]
+    for _, rows in seismic_3d.groupby("feature_id"):
+        points = rows_to_points(rows, 800)
+        if len(points) > 2:
+            overlay_draw.polygon(points, fill=(249, 115, 22, 35), outline=(234, 88, 12, 190))
+
+    seismic_2d = context[context["layer_name"] == "seismic_2d"]
+    for _, rows in seismic_2d.groupby("feature_id"):
+        points = rows_to_points(rows, 900)
+        if len(points) > 1:
+            overlay_draw.line(points, fill=(14, 165, 233, 92), width=2)
+
+    extent_points = rows_to_points(extent, 32)
+    if len(extent_points) > 1:
+        overlay_draw.line(extent_points, fill=(15, 23, 42, 255), width=5, joint="curve")
+
+    img = Image.alpha_composite(img.convert("RGBA"), overlay).convert("RGB")
+    draw = ImageDraw.Draw(img)
+
+    wells = context[context["layer_name"] == "wells"].sort_values(["lon", "lat"])
+    if len(wells) > 2200:
+        wells = wells.iloc[:: max(1, len(wells) // 2200)]
+    for row in wells.itertuples():
+        x, y = project(row.lon, row.lat)
+        draw.ellipse((x - 2, y - 2, x + 2, y + 2), fill=(15, 23, 42), outline=None)
+
+    labels = [
+        ("Beaufort Sea", -151.0, 71.35, BLUE),
+        ("NPRA", -156.0, 70.25, MUTED),
+        ("Prudhoe Bay / Eileen trend", -148.6, 70.28, TEAL),
+        ("ANWR", -143.5, 69.55, MUTED),
+        ("Brooks Range", -151.8, 68.24, (124, 45, 18)),
+    ]
+    for label, lon, lat, color in labels:
+        x, y = project(lon, lat)
+        label_w = int(max(116, draw.textlength(label, font=font(17, True)) + 24))
+        card(draw, (x - label_w // 2, y - 19, x + label_w // 2, y + 19), fill=WHITE, outline=LINE, radius=8, width=1)
+        text(draw, (x - label_w // 2 + 12, y - 10), label, 17, color, True, width=label_w - 24, align="center")
+
+    legend_items = [
+        ("Geology / assessment units", TEAL, (223, 244, 248)),
+        ("2D seismic lines", ICE, (231, 246, 253)),
+        ("3D seismic footprints", AMBER, AMBER_LIGHT),
+        ("Public wells", NAVY, WHITE),
+        ("Study boundary", NAVY, LIGHT),
+    ]
+    x = 112
+    y = 980
+    for label, color, fill in legend_items:
+        item_w = int(draw.textlength(label, font=font(15, True)) + 58)
+        card(draw, (x, y, x + item_w, y + 40), fill=fill, outline=color, radius=8, width=2)
+        draw.rectangle((x + 14, y + 13, x + 36, y + 27), fill=color)
+        text(draw, (x + 44, y + 12), label, 15, NAVY, True)
+        x += item_w + 14
+
+    text(
+        draw,
+        (112, 1034),
+        "Public GIS orientation for website and Slide 2. Use as regional context only; it is not a hydrate occurrence map or saturation product.",
+        16,
+        MUTED,
+        True,
+        width=1530,
+        gap=0,
+    )
+
+    SLIDE02_GEOSCIENCE_ORIENTATION.parent.mkdir(parents=True, exist_ok=True)
+    img.save(SLIDE02_GEOSCIENCE_ORIENTATION)
+    return SLIDE02_GEOSCIENCE_ORIENTATION
+
+
+def v55_generate_slide02_clean_structure_types() -> Path:
+    """Remove the earlier off-target teal oval baked into the structure source crop."""
+    if not SLIDE02_STRUCTURE_TYPES.exists():
+        return SLIDE02_STRUCTURE_TYPES
+    src = Image.open(SLIDE02_STRUCTURE_TYPES).convert("RGB")
+    width, height = src.size
+    pixels = src.load()
+    mask: set[tuple[int, int]] = set()
+    x_start = int(width * 0.58)
+    y_stop = min(height, int(height * 0.38))
+
+    for y in range(y_stop):
+        for x in range(x_start, width):
+            r, g, b = pixels[x, y]
+            is_teal_outline = (
+                r < 95 and 75 <= g <= 180 and 90 <= b <= 190 and g - r > 30 and b - r > 30
+            )
+            is_off_target_tail = (
+                x > int(width * 0.81)
+                or (x > int(width * 0.72) and y < int(height * 0.055))
+                or (x > int(width * 0.77) and y < int(height * 0.12))
+            )
+            if is_teal_outline and is_off_target_tail:
+                mask.add((x, y))
+
+    expanded = set(mask)
+    for x, y in mask:
+        for dy in (-1, 0, 1):
+            for dx in (-1, 0, 1):
+                nx, ny = x + dx, y + dy
+                if x_start <= nx < width and 0 <= ny < y_stop:
+                    expanded.add((nx, ny))
+
+    remaining = set(expanded)
+    for _ in range(32):
+        updates: list[tuple[int, int, tuple[int, int, int]]] = []
+        for x, y in list(remaining):
+            neighbors: list[tuple[int, int, int]] = []
+            for dy in (-1, 0, 1):
+                for dx in (-1, 0, 1):
+                    if dx == 0 and dy == 0:
+                        continue
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < width and 0 <= ny < height and (nx, ny) not in remaining:
+                        neighbors.append(pixels[nx, ny])
+            if neighbors:
+                count = len(neighbors)
+                color = tuple(sum(channel) // count for channel in zip(*neighbors))
+                updates.append((x, y, color))
+        if not updates:
+            break
+        for x, y, color in updates:
+            pixels[x, y] = color
+            remaining.remove((x, y))
+
+    for x, y in remaining:
+        pixels[x, y] = WHITE
+
+    SLIDE02_STRUCTURE_TYPES_CLEAN.parent.mkdir(parents=True, exist_ok=True)
+    src.save(SLIDE02_STRUCTURE_TYPES_CLEAN)
+    return SLIDE02_STRUCTURE_TYPES_CLEAN
+
+
+def v55_generate_slide02_osl_gis_stability_crop() -> Path:
+    """Crop the OSL/website GIS stability map to the evidence-bearing map area."""
+    if not SLIDE02_OSL_GIS_STABILITY_MAP.exists():
+        return SLIDE02_STABILITY_WELL_MAP
+    src = Image.open(SLIDE02_OSL_GIS_STABILITY_MAP).convert("RGB")
+    width, height = src.size
+    crop = (
+        int(width * 0.13),
+        int(height * 0.105),
+        int(width * 0.885),
+        int(height * 0.895),
+    )
+    cropped = src.crop(crop)
+    SLIDE02_OSL_GIS_STABILITY_CROP.parent.mkdir(parents=True, exist_ok=True)
+    cropped.save(SLIDE02_OSL_GIS_STABILITY_CROP)
+    return SLIDE02_OSL_GIS_STABILITY_CROP
+
+
+def v55_slide02_stability_map_path() -> Path:
+    if SLIDE02_OSL_GIS_STABILITY_MAP.exists():
+        return v55_generate_slide02_osl_gis_stability_crop()
+    return v55_generate_slide02_stability_well_map()
+
+
+def v55_generate_slide02_stability_well_map() -> Path:
+    """Create the website-aligned 2D stability screen status map for Slide 2."""
+    screen_path = PUBLIC_PRODUCTS / "stability_screen_2026-06-14_methane_5ppt_v1.csv"
+    if not screen_path.exists():
+        return SLIDE02_STABILITY_WELL_MAP
+
+    columns = [
+        "well_name",
+        "lat",
+        "lon",
+        "stability_result_status",
+        "stability_confidence",
+    ]
+    screen = pd.read_csv(screen_path, usecols=columns)
+    screen["lat"] = pd.to_numeric(screen["lat"], errors="coerce")
+    screen["lon"] = pd.to_numeric(screen["lon"], errors="coerce")
+    screen = screen.dropna(subset=["lat", "lon"])
+    if screen.empty:
+        return SLIDE02_STABILITY_WELL_MAP
+
+    status_styles = {
+        "calculated": ("Calculated interval", (37, 99, 235), 8, 245),
+        "calculated_no_stable_interval": ("No stable interval", (17, 24, 39), 7, 225),
+        "blocked_phase_curve_range_insufficient": ("Phase range blocked", (217, 119, 6), 5, 205),
+        "blocked_missing_temperature_profile": ("Missing temp profile", (148, 163, 184), 3, 92),
+        "blocked_missing_depth": ("Missing depth", (100, 116, 139), 4, 135),
+        "outside_au_context": ("Outside AU context", (124, 58, 237), 4, 160),
+    }
+
+    width, height = 1920, 830
+    plot = (86, 132, 1834, 688)
+    min_lon = float(screen["lon"].quantile(0.001)) - 0.25
+    max_lon = float(screen["lon"].quantile(0.999)) + 0.25
+    min_lat = float(screen["lat"].quantile(0.001)) - 0.08
+    max_lat = float(screen["lat"].quantile(0.999)) + 0.08
+
+    # Keep the full public North Slope footprint visible even when a few far-west
+    # wells would otherwise pull the view too wide for the slide slot.
+    min_lon = min(min_lon, -155.5)
+    max_lon = max(max_lon, -143.1)
+    min_lat = min(min_lat, 69.0)
+    max_lat = max(max_lat, 71.35)
+
+    def project(lon: float, lat: float) -> tuple[int, int]:
+        x = plot[0] + int((float(lon) - min_lon) / (max_lon - min_lon) * (plot[2] - plot[0]))
+        y = plot[3] - int((float(lat) - min_lat) / (max_lat - min_lat) * (plot[3] - plot[1]))
+        return x, y
+
+    img = Image.new("RGB", (width, height), (247, 251, 252))
+    draw = ImageDraw.Draw(img)
+    draw.rectangle((0, 0, width, height), fill=(247, 251, 252))
+    draw.rectangle((0, 0, width, 112), fill=(235, 247, 250))
+    draw.rectangle(plot, fill=(239, 247, 249), outline=(166, 197, 206), width=3)
+    draw.rectangle((plot[0], plot[1], plot[2], plot[1] + 96), fill=(220, 237, 243))
+
+    text(draw, (88, 42), "2D Stability-Screen Well Map", 42, NAVY, True)
+    text(
+        draw,
+        (90, 90),
+        "Public wells colored by calculation status only; blue is a computed interval, not hydrate evidence.",
+        21,
+        MUTED,
+        True,
+        width=1420,
+        gap=1,
+    )
+    summary = screen["stability_result_status"].value_counts().to_dict()
+    calculated = int(summary.get("calculated", 0))
+    no_interval = int(summary.get("calculated_no_stable_interval", 0))
+    pill(
+        draw,
+        (1456, 42, 1834, 87),
+        f"{len(screen):,} wells | {calculated} calculated",
+        WHITE,
+        TEAL,
+    )
+
+    for lon in range(math.floor(min_lon), math.ceil(max_lon) + 1, 2):
+        x, _ = project(lon, min_lat)
+        draw.line((x, plot[1], x, plot[3]), fill=(213, 227, 232), width=1)
+        text(draw, (x - 34, plot[3] + 11), f"{lon} deg", 15, MUTED, width=68, align="center")
+    for lat in range(math.floor(min_lat), math.ceil(max_lat) + 1):
+        _, y = project(min_lon, lat)
+        draw.line((plot[0], y, plot[2], y), fill=(213, 227, 232), width=1)
+        text(draw, (plot[0] - 70, y - 9), f"{lat} deg N", 15, MUTED, width=62, align="right")
+
+    master_path = ROOT / "03_data_final" / "master_layers" / "north_slope_master_2d_layers.parquet"
+    if master_path.exists():
+        context = pd.read_parquet(
+            master_path,
+            columns=["layer_name", "feature_id", "vertex_order", "lon", "lat"],
+        ).dropna(subset=["lon", "lat"])
+        extent = context[context["layer_name"] == "extent"].sort_values("vertex_order")
+        if not extent.empty:
+            points = [project(row.lon, row.lat) for row in extent.itertuples()]
+            if len(points) > 1:
+                overlay = Image.new("RGBA", (width, height), (255, 255, 255, 0))
+                overlay_draw = ImageDraw.Draw(overlay)
+                overlay_draw.line(points, fill=(15, 23, 42, 210), width=6, joint="curve")
+                img = Image.alpha_composite(img.convert("RGBA"), overlay).convert("RGB")
+                draw = ImageDraw.Draw(img)
+
+    labels = [
+        ("NPRA", -153.6, 70.28, MUTED),
+        ("Prudhoe Bay / Eileen", -148.55, 70.31, TEAL),
+        ("Umiat", -152.05, 69.37, AMBER),
+        ("Arctic Coastal Plain", -149.2, 70.95, BLUE),
+    ]
+    for label, lon, lat, color in labels:
+        x, y = project(lon, lat)
+        label_w = int(max(96, draw.textlength(label, font=font(18, True)) + 24))
+        card(draw, (x - label_w // 2, y - 19, x + label_w // 2, y + 19), fill=WHITE, outline=LINE, radius=8, width=1)
+        text(draw, (x - label_w // 2 + 12, y - 10), label, 18, color, True, width=label_w - 24, align="center")
+
+    overlay = Image.new("RGBA", (width, height), (255, 255, 255, 0))
+    overlay_draw = ImageDraw.Draw(overlay)
+    draw_order = [
+        "blocked_missing_temperature_profile",
+        "blocked_missing_depth",
+        "outside_au_context",
+        "blocked_phase_curve_range_insufficient",
+        "calculated_no_stable_interval",
+        "calculated",
+    ]
+    for status in draw_order:
+        _, rgb, size, alpha = status_styles[status]
+        subset = screen[screen["stability_result_status"].eq(status)]
+        for row in subset.itertuples():
+            x, y = project(row.lon, row.lat)
+            overlay_draw.ellipse(
+                (x - size, y - size, x + size, y + size),
+                fill=(*rgb, alpha),
+                outline=(255, 255, 255, min(230, alpha + 20)) if size >= 5 else None,
+            )
+    img = Image.alpha_composite(img.convert("RGBA"), overlay).convert("RGB")
+    draw = ImageDraw.Draw(img)
+
+    legend_y = 720
+    legend_x = 86
+    legend_items = [
+        "calculated",
+        "calculated_no_stable_interval",
+        "blocked_phase_curve_range_insufficient",
+        "blocked_missing_temperature_profile",
+        "blocked_missing_depth",
+        "outside_au_context",
+    ]
+    for status in legend_items:
+        label, rgb, size, _ = status_styles[status]
+        count = int(summary.get(status, 0))
+        item_w = int(draw.textlength(f"{label} {count:,}", font=font(16, True)) + 58)
+        card(draw, (legend_x, legend_y, legend_x + item_w, legend_y + 42), fill=WHITE, outline=rgb, radius=8, width=2)
+        cx, cy = legend_x + 24, legend_y + 21
+        draw.ellipse((cx - size, cy - size, cx + size, cy + size), fill=rgb)
+        text(draw, (legend_x + 44, legend_y + 13), f"{label} {count:,}", 16, NAVY, True)
+        legend_x += item_w + 12
+        if legend_x > 1460:
+            legend_x = 86
+            legend_y += 48
+
+    text(
+        draw,
+        (1180, 775),
+        "Stability context only: not occurrence, not saturation, not a model result.",
+        17,
+        RED,
+        True,
+        width=620,
+        align="right",
+        gap=0,
+    )
+
+    SLIDE02_STABILITY_WELL_MAP.parent.mkdir(parents=True, exist_ok=True)
+    img.save(SLIDE02_STABILITY_WELL_MAP)
+    return SLIDE02_STABILITY_WELL_MAP
+
+
+def v55_slide_context() -> Path:
+    v55_generate_slide02_geoscience_orientation_map()
+    structure_path = v55_generate_slide02_clean_structure_types()
+    stability_map_path = v55_slide02_stability_map_path()
+    img = canvas(False)
+    draw = ImageDraw.Draw(img)
+    v53_panel_title(
+        draw,
+        "Gas Hydrates And Why The North Slope Matters",
+        "Source-backed context only: hydrate structure, North Slope setting, and the pressure-temperature gate used before any ML claim.",
+    )
+
+    def section_header(
+        box: tuple[int, int, int, int],
+        number: str,
+        heading: str,
+        color: tuple[int, int, int],
+    ) -> None:
+        x1, y1, _, _ = box
+        draw.ellipse((x1 + 20, y1 + 20, x1 + 54, y1 + 54), fill=color)
+        text(draw, (x1 + 31, y1 + 26), number, 16, WHITE, True)
+        text(draw, (x1 + 66, y1 + 24), heading, 21, NAVY, True, width=430)
+
+    # A. Hydrate definition and structure types from source-backed evidence.
+    hydrate_panel = (60, 138, 610, 790)
+    card(draw, hydrate_panel, fill=WHITE, outline=LINE, radius=9, width=2)
+    section_header(hydrate_panel, "1", "What gas hydrate is", TEAL)
+    text(
+        draw,
+        (84, 198),
+        "Water cages can trap gas under cold, high-pressure conditions.",
+        14,
+        MUTED,
+        True,
+        width=480,
+        gap=2,
+    )
+    pill(draw, (84, 228, 370, 260), "methane Structure I = current baseline", (235, 250, 251), TEAL)
+    structure_box = (84, 274, 586, 604)
+    if not v53_paste(
+        img,
+        v55_slide02_path(structure_path, v55_slide02_path(SLIDE02_STRUCTURE_TYPES, SLIDE02_USGS_PAGE)),
+        structure_box,
+        mode="contain",
+    ):
+        v53_placeholder_image(draw, structure_box, "Source hydrate-structure figure unavailable")
+    draw.ellipse((372, 283, 505, 417), outline=TEAL, width=5)
+    v54_source_label(draw, structure_box, "World Atlas Fig. 1.1 after Warrier et al. 2016; sI highlighted")
+    structure_notes = [
+        ((84, 626, 242, 704), "Structure I", "methane baseline", TEAL, (235, 250, 251)),
+        ((256, 626, 414, 704), "Structure II", "larger gases", AMBER, (255, 246, 222)),
+        ((428, 626, 586, 704), "Structure H", "scenario chemistry", PURPLE, (245, 238, 255)),
+    ]
+    for box, label, body, color, fill in structure_notes:
+        card(draw, box, fill=fill, outline=color, radius=8, width=2)
+        text(draw, (box[0] + 12, box[1] + 10), label, 14, color, True, width=box[2] - box[0] - 24)
+        text(draw, (box[0] + 12, box[1] + 36), body, 11, NAVY, True, width=box[2] - box[0] - 24)
+    text(draw, (84, 732), "Structure II/H are kept as gas-composition sensitivity, not the current baseline.", 11, MUTED, True, width=482, gap=1)
+
+    # B. North Slope structure, wells, and public map context.
+    map_panel = (620, 138, 1245, 790)
+    card(draw, map_panel, fill=WHITE, outline=LINE, radius=9, width=2)
+    section_header(map_panel, "2", "Why the North Slope", BLUE)
+    text(
+        draw,
+        (644, 198),
+        "The updated 2D stability-screen map uses OSL-staged DNR units, roads, TAPS, communities, and field labels.",
+        13,
+        MUTED,
+        True,
+        width=565,
+        gap=2,
+    )
+    map_box = (632, 238, 1233, 640)
+    map_path = v55_slide02_path(
+        stability_map_path,
+        v55_slide02_path(SLIDE02_STABILITY_WELL_MAP, SLIDE02_DGGS_GEOLOGY_LAYER),
+    )
+    if not v53_paste(img, map_path, map_box, mode="contain"):
+        v53_placeholder_image(draw, map_box, "North Slope stability well map unavailable")
+    v54_source_label(draw, map_box, "OSL/website 2D stability-screen map; DNR units + AKDOT roads + TAPS overlays")
+    layer_keys = [
+        ((632, 662, 813, 704), "DNR units", "#"),
+        ((828, 662, 1029, 704), "Dalton + TAPS", "|"),
+        ((1044, 662, 1233, 704), "field labels", "o"),
+    ]
+    for box, label, glyph in layer_keys:
+        card(draw, box, fill=(248, 252, 253), outline=LINE, radius=8, width=1)
+        text(draw, (box[0] + 12, box[1] + 9), glyph, 18, TEAL, True, width=22, align="center")
+        text(draw, (box[0] + 42, box[1] + 13), label, 13, NAVY, True, width=box[2] - box[0] - 52)
+    text(draw, (632, 728), "Map layers locate the public scaffold; they do not claim occurrence or saturation.", 11, RED, True, width=585, gap=1)
+
+    # C. Source-backed phase/stability visual and why this matters.
+    stability_panel = (1255, 138, 1540, 790)
+    card(draw, stability_panel, fill=WHITE, outline=LINE, radius=9, width=2)
+    section_header(stability_panel, "3", "P-T gate", GREEN)
+    text(draw, (1273, 198), "Stability screens whether hydrate is physically admissible under the selected assumptions.", 12, MUTED, True, width=230, gap=2)
+    graph_box = (1273, 244, 1518, 496)
+    card(draw, (graph_box[0] - 4, graph_box[1] - 4, graph_box[2] + 4, graph_box[3] + 4), fill=WHITE, outline=LINE, radius=6, width=1)
+    if not v53_paste(img, v55_slide02_path(SLIDE02_USGS_CURVE, SLIDE02_USGS_PAGE), graph_box, mode="contain"):
+        v53_placeholder_image(draw, graph_box, "Selected USGS/DOE stability graph unavailable")
+    v54_source_label(draw, graph_box, "Selected USGS/DOE North Slope hydrate stability figure")
+    gate_rows = [
+        ((1273, 520, 1518, 580), "Current assumption", "methane / Structure I / 5 ppt", TEAL, ICE_LIGHT),
+        ((1273, 592, 1518, 652), "Meaning", "admissible under assumptions", GREEN, GREEN_LIGHT),
+        ((1273, 664, 1518, 724), "Guardrail", "not proof; not saturation", RED, RED_LIGHT),
+    ]
+    for box, label, body, color, fill in gate_rows:
+        card(draw, box, fill=fill, outline=color, radius=8, width=2)
+        text(draw, (box[0] + 14, box[1] + 9), label, 12, color, True, width=252)
+        text(draw, (box[0] + 14, box[1] + 30), body, 13, NAVY, True, width=252)
+
+    why_band = (60, 804, 1540, 836)
+    card(draw, why_band, fill=(248, 252, 253), outline=LINE, radius=8, width=1)
+    text(
+        draw,
+        (80, 812),
+        "Why this project: North Slope methane hydrate needs integrated geology + stability + well-log/core evidence before occurrence or saturation ML can make reviewed claims.",
+        12,
+        NAVY,
+        True,
+        width=1430,
+        gap=0,
+    )
+
+    v53_footer(
+        draw,
+        "Slide 2 sources: World Atlas Fig. 1.1 hydrate structure crop; OSL/website 2D stability-screen map with public GIS overlays; selected USGS/DOE stability figure. Stability is not hydrate proof.",
+    )
+    return save(img, "slide_02_source_context_v5_5.png")
+
+
+def v55_slide_parameter_ranges() -> Path:
+    return v55_copy_v54_panel("slide_03_parameter_ranges_v5_4.png", "slide_03_parameter_ranges_v5_5.png")
+
+
+def v55_slide_full_workflow() -> Path:
+    return v54_copy_authority_panel(
+        V52_ASSET_DIR / "slide_04_expanded_architecture_map.png",
+        "slide_04_full_complex_project_workflow_v5_5.png",
+        "Full Complex Project Workflow V5.5",
+        "The complete architecture stays in the main sequence: public sources, approved runtime later, stability context, feature engineering, target rail, split controls, validation, and exports.",
+    )
+
+
+def v55_slide_equations_unit_gate() -> Path:
+    return v55_copy_v54_panel("slide_06_equations_feature_unit_gate_v5_4.png", "slide_06_equations_feature_unit_gate_v5_5.png")
+
+
+def v55_slide_ml_runtime() -> Path:
+    return v54_copy_authority_panel(
+        V52_ASSET_DIR / "slide_07_ml_runtime_detail.png",
+        "slide_07_complex_ml_runtime_architecture_v5_5.png",
+        "Complex ML Runtime Architecture V5.5",
+        "Feature groups, X_allowed, target-only rail, whole-well split, train-only preprocessing, baselines, ANN/Keras candidate, dual heads, validation, and reviewed outputs remain intact.",
+    )
+
+
+def v55_small_header(draw: ImageDraw.ImageDraw, xy: tuple[int, int], label: str, color: tuple[int, int, int]) -> None:
+    x, y = xy
+    card(draw, (x, y, x + 180, y + 32), fill=WHITE, outline=color, radius=10, width=2)
+    text(draw, (x + 12, y + 8), label, 12, color, True, width=156, align="center")
+
+
+def v55_feature_chip(
+    draw: ImageDraw.ImageDraw,
+    box: tuple[int, int, int, int],
+    label: str,
+    body: str,
+    color: tuple[int, int, int],
+) -> None:
+    card(draw, box, fill=WHITE, outline=color, radius=8, width=2)
+    x1, y1, x2, _ = box
+    text(draw, (x1 + 14, y1 + 10), label, 14, color, True, width=x2 - x1 - 28)
+    text(draw, (x1 + 14, y1 + 34), body, 11, NAVY, True, width=x2 - x1 - 28, gap=2)
+
+
+def v55_slide_doe_three_dataset_prototype() -> Path:
+    img = canvas(False)
+    draw = ImageDraw.Draw(img)
+    v53_panel_title(
+        draw,
+        "DOE Three-Dataset Prototype",
+        "What ran: a local approved-runtime plumbing test. What it proves: target leakage control and feature audit, not final science.",
+    )
+
+    data_cards = [
+        ((70, 150, 380, 305), "curated_dataset1.xlsx", "training workbook", "fits prototype saturation regressors when a target is selected", GREEN),
+        ((70, 375, 380, 530), "curated_dataset2.xlsx", "external review workbook", "scored or evaluated separately from dataset 1", BLUE),
+        ((70, 600, 380, 755), "curated_dataset3.xlsx", "external review or alternate train", "can train only if this is where approved labels exist", PURPLE),
+    ]
+    for box, heading, tag, body, color in data_cards:
+        card(draw, box, fill=(248, 252, 253), outline=color, radius=10, width=2)
+        text(draw, (box[0] + 20, box[1] + 18), heading, 20, color, True, width=box[2] - box[0] - 40)
+        pill(draw, (box[0] + 20, box[1] + 58, box[2] - 20, box[1] + 90), tag, WHITE, color)
+        text(draw, (box[0] + 20, box[1] + 105), body, 14, NAVY, True, width=box[2] - box[0] - 40, gap=4)
+
+    arrow(draw, (390, 227), (510, 285), GREEN, width=4, label="train")
+    arrow(draw, (390, 452), (510, 410), BLUE, width=4, label="score")
+    arrow(draw, (390, 677), (510, 535), PURPLE, width=4, label="review")
+
+    clean_box = (520, 150, 1015, 755)
+    card(draw, clean_box, fill=(247, 252, 250), outline=TEAL, radius=10, width=2)
+    text(draw, (548, 178), "Cleaned feature matrix", 24, TEAL, True, width=420)
+    text(draw, (548, 218), "Allowed X comes from cleaned numeric predictors after target-only, depth/helper, unnamed, and duplicate raw-alias exclusions.", 16, NAVY, True, width=420, gap=5)
+    chips = [
+        ("Measured logs", "GR, RHOB, RES, VP, VS only after canonical cleaning", GREEN),
+        ("Derived physics", "log resistivity, Vp/Vs, impedance, elastic attributes", BLUE),
+        ("QC/context", "missingness, source confidence, optional stability context", AMBER),
+        ("Train-only fit", "impute, scale, and model on the training workbook only", PURPLE),
+    ]
+    chip_positions = [(550, 300, 770, 405), (790, 300, 985, 405), (550, 435, 770, 540), (790, 435, 985, 540)]
+    for chip_box, chip_data in zip(chip_positions, chips):
+        v55_feature_chip(draw, chip_box, *chip_data)
+
+    exclude_box = (548, 590, 988, 720)
+    card(draw, exclude_box, fill=RED_LIGHT, outline=RED, radius=10, width=2)
+    text(draw, (574, 612), "Excluded from X_allowed", 20, RED, True, width=380)
+    text(
+        draw,
+        (574, 652),
+        "S_h, S_wr, Sh, Swr, occurrence/phase labels, Depth_ft, DEPT, depths_unit*, Unnamed:*, spreadsheet helper fields, and duplicate raw aliases.",
+        14,
+        NAVY,
+        True,
+        width=380,
+        gap=4,
+    )
+
+    run_box = (1060, 150, 1530, 755)
+    card(draw, run_box, fill=WHITE, outline=AMBER, radius=10, width=2)
+    text(draw, (1090, 178), "Visual model-run card", 24, AMBER, True, width=410)
+    run_rows = [
+        ("Targets", "S_h, S_wr, Sh, Swr stay Y-only", RED),
+        ("Features", "cleaned canonical logs + derived physics + QC/context", TEAL),
+        ("Runtime output", "ignored outputs_runtime/ and models_runtime/ folders", BLUE),
+        ("Metric status", "training-fit/runtime proof only; no final validation claim", RED),
+        ("Review surface", "Analyze Hydrates > Model Run Tracker reads local summaries", PURPLE),
+    ]
+    y = 235
+    for heading, body, color in run_rows:
+        card(draw, (1092, y, 1498, y + 78), fill=(248, 252, 253), outline=color, radius=8, width=2)
+        text(draw, (1112, y + 12), heading, 16, color, True, width=120)
+        text(draw, (1238, y + 12), body, 13, NAVY, True, width=238, gap=3)
+        y += 96
+
+    card(draw, (1060, 672, 1530, 755), fill=(255, 248, 248), outline=RED, radius=10, width=2)
+    text(draw, (1090, 696), "Training-fit disclaimer", 18, RED, True, width=180)
+    text(draw, (1285, 692), "Do not present R2 or row predictions as validated project results.", 14, NAVY, True, width=205, gap=4)
+
+    footer(
+        draw,
+        "Sources: DOE_THREE_DATASET_ML_PIPELINE_RUNBOOK, DOE_RUNTIME_PRESENTATION_AND_MODEL_TRACKING_PLAN, code_transfer_block multi-saturation workflow, and Model Run Tracker templates.",
+    )
+    return save(img, "slide_05_doe_three_dataset_prototype_v5_5.png")
+
+
+def v55_slide_stability_ml_overlay(values: dict[str, str]) -> Path:
+    img = canvas(False)
+    draw = ImageDraw.Draw(img)
+    v53_panel_title(
+        draw,
+        "Stability-To-ML Overlay",
+        "Stability can help review the model as context, mask, confidence, and caveat. It is not occurrence proof or a saturation label.",
+    )
+
+    source_box = (70, 155, 430, 720)
+    card(draw, source_box, fill=(248, 252, 253), outline=BLUE, radius=10, width=2)
+    text(draw, (98, 180), "Public stability screen", 23, BLUE, True, width=300)
+    stats = [
+        (values["screen_rows"], "public screen rows"),
+        (values["screen_calculated"], "calculated admissibility intervals"),
+        (values["screen_no_interval"], "no-stable rows"),
+        (values["screen_blocked"], "blocked rows"),
+    ]
+    y = 240
+    for number, label in stats:
+        card(draw, (100, y, 400, y + 70), fill=WHITE, outline=LINE, radius=8, width=2)
+        text(draw, (120, y + 12), number, 21, BLUE if label != "blocked rows" else RED, True, width=90)
+        text(draw, (220, y + 15), label, 13, NAVY, True, width=155, gap=3)
+        y += 90
+    text(draw, (98, 625), "Methane 5 ppt phase curve + hydrostatic pressure + G10015 temperature model under locked public assumptions.", 13, MUTED, True, width=300, gap=4)
+
+    overlay_box = (500, 155, 1110, 720)
+    card(draw, overlay_box, fill=WHITE, outline=TEAL, radius=10, width=2)
+    text(draw, (530, 180), "Allowed overlay roles", 24, TEAL, True, width=520)
+    role_boxes = [
+        ((535, 245, 795, 355), "Context", "Add stability status beside logs and predictions.", TEAL),
+        ((825, 245, 1080, 355), "Mask", "Filter or flag rows outside the current admissible screen.", BLUE),
+        ((535, 395, 795, 505), "Confidence", "Carry source-control labels: high, medium, low, blocked.", GREEN),
+        ((825, 395, 1080, 505), "Caveat", "Explain phase, temperature, pressure, and blocked reasons.", AMBER),
+    ]
+    for box, heading, body, color in role_boxes:
+        card(draw, box, fill=(248, 252, 253), outline=color, radius=9, width=2)
+        text(draw, (box[0] + 18, box[1] + 14), heading, 20, color, True, width=box[2] - box[0] - 36)
+        text(draw, (box[0] + 18, box[1] + 48), body, 14, NAVY, True, width=box[2] - box[0] - 36, gap=4)
+    for start, end, color in [
+        ((430, 438), (535, 300), BLUE),
+        ((430, 438), (535, 450), GREEN),
+        ((430, 438), (825, 300), TEAL),
+        ((430, 438), (825, 450), AMBER),
+    ]:
+        arrow(draw, start, end, color, width=4)
+
+    block_box = (535, 565, 1080, 680)
+    card(draw, block_box, fill=RED_LIGHT, outline=RED, radius=10, width=2)
+    text(draw, (565, 590), "Blocked uses", 20, RED, True, width=160)
+    text(draw, (745, 585), "Do not use stability as occurrence, saturation, hydrate-present target, negative label for blocked rows, or proof.", 16, NAVY, True, width=300, gap=5)
+
+    ml_box = (1180, 155, 1530, 720)
+    card(draw, ml_box, fill=(248, 252, 253), outline=PURPLE, radius=10, width=2)
+    text(draw, (1208, 180), "Model review layer", 23, PURPLE, True, width=290)
+    cards = [
+        ("Approved logs/targets", "drive model fit", GREEN),
+        ("Occurrence classifier", "future P(hydrate)", TEAL),
+        ("Saturation regressor", "future Sh_pred", BLUE),
+        ("Stability overlay", "context only", AMBER),
+        ("Public summary", "reviewed later", RED),
+    ]
+    y = 245
+    for heading, body, color in cards:
+        card(draw, (1210, y, 1500, y + 66), fill=WHITE, outline=color, radius=8, width=2)
+        text(draw, (1230, y + 10), heading, 15, color, True, width=120)
+        text(draw, (1360, y + 11), body, 13, NAVY, True, width=110, gap=3)
+        if heading != "Public summary":
+            arrow(draw, (1355, y + 70), (1355, y + 84), color, width=3)
+        y += 86
+
+    footer(
+        draw,
+        "Sources: STABILITY_CALCULATION_PLAN, public stability screen, DOE runtime tracking plan, and first model experiment plan. Stability remains admissibility context only.",
+    )
+    return save(img, "slide_08_stability_to_ml_overlay_v5_5.png")
+
+
+def v55_slide_done_not_claimed_next(values: dict[str, str]) -> Path:
+    img = canvas(False)
+    draw = ImageDraw.Draw(img)
+    v53_panel_title(
+        draw,
+        "What We Have Done, What Is Not Claimed, What Is Next",
+        "V5.5 makes the current contribution explicit while keeping every result claim inside the approved-runtime guardrails.",
+    )
+
+    columns = [
+        (
+            (70, 150, 505, 700),
+            "What we have done",
+            TEAL,
+            [
+                "V5.4 deck updated into a V5.5 mentor sequence.",
+                "Personal opener and source-backed hydrate/North Slope visuals preserved.",
+                "Full complex workflow and ML runtime diagrams kept in the main sequence.",
+                "DOE three-dataset prototype, cleaned feature audit, and Model Run Tracker explained.",
+                "Stability overlay framed as context, mask, confidence, and caveat only.",
+            ],
+        ),
+        (
+            (585, 150, 1020, 700),
+            "What is not claimed",
+            RED,
+            [
+                "No hydrate proof.",
+                "No final stability top/base/thickness claim.",
+                "No public row-level approved data.",
+                "No occurrence prediction or saturation prediction.",
+                "No final trained ML metrics, sweet spots, producibility ranking, or target authority.",
+            ],
+        ),
+        (
+            (1095, 150, 1530, 700),
+            "What is next",
+            AMBER,
+            [
+                "Run DOE workflow in the approved runtime and keep outputs ignored until review.",
+                "Confirm target priority for S_h, S_wr, Sh, Swr and fraction-vs-percent policy.",
+                "Review feature exclusions and stability overlay settings with mentor.",
+                "Assign whole-well or compartment validation before final metrics.",
+                "Bring back only public-safe summaries after data-owner review.",
+            ],
+        ),
+    ]
+    for box, heading, color, items in columns:
+        card(draw, box, fill=(248, 252, 253), outline=color, radius=10, width=2)
+        text(draw, (box[0] + 26, box[1] + 24), heading, 24, color, True, width=box[2] - box[0] - 52)
+        y = box[1] + 85
+        for idx, item in enumerate(items, start=1):
+            draw.ellipse((box[0] + 28, y + 2, box[0] + 54, y + 28), fill=color)
+            text(draw, (box[0] + 37, y + 6), str(idx), 11, WHITE, True)
+            y = text(draw, (box[0] + 70, y), item, 14, NAVY, True, width=box[2] - box[0] - 100, gap=4) + 14
+
+    card(draw, (70, 735, 1530, 812), fill=WHITE, outline=LINE, radius=10, width=2)
+    text(draw, (98, 758), "Source/provenance trail", 18, TEAL, True, width=210)
+    text(
+        draw,
+        (330, 755),
+        "V5.5 panels are generated by build_full_workflow_diagram_deliverables.py from V5.4 panels, V5.2 authority plates, public stability products, DOE runbook/tracker docs, and source_visual_inventory.",
+        16,
+        NAVY,
+        True,
+        width=1110,
+        gap=5,
+    )
+    footer(draw, f"Public scaffold: {values['screen_rows']} stability rows; {values['screen_calculated']} calculated admissibility intervals; about 3/71 approved datasets visible for schema/runtime prototyping.")
+    return save(img, "slide_09_done_not_claimed_next_v5_5.png")
+
+
+def v55_build_panels() -> list[Path]:
+    values = summaries()
+    return [
+        v55_slide_personal_opener(),
+        v55_slide_context(),
+        v55_slide_parameter_ranges(),
+        v55_slide_full_workflow(),
+        v55_slide_doe_three_dataset_prototype(),
+        v55_slide_equations_unit_gate(),
+        v55_slide_ml_runtime(),
+        v55_slide_stability_ml_overlay(values),
+        v55_slide_done_not_claimed_next(values),
+    ]
+
+
+def v55_build_word_companion(panel_paths: list[Path], contact_sheet: Path) -> Path:
+    values = summaries()
+    document = Document()
+    apply_doc_style(document)
+    section = document.sections[0]
+    section.top_margin = Inches(0.6)
+    section.bottom_margin = Inches(0.6)
+    section.left_margin = Inches(0.65)
+    section.right_margin = Inches(0.65)
+
+    props = document.core_properties
+    props.title = "V5.5 Slide 2 Source Update North Slope Gas Hydrate ML Workflow Companion"
+    props.subject = "Mentor-facing V5.5 slide companion with rebuilt source-backed Slide 2"
+    props.author = "North Slope Gas Hydrates project"
+
+    document.add_heading("V5.5 Slide 2 Source Update North Slope Gas Hydrate ML Workflow Companion", level=0)
+    document.add_paragraph(
+        "This companion explains the V5.5 revision built from the V5.4 corrected source-baseline deck, with Slide 2 "
+        "rebuilt from the selected USGS/DOE source screenshot, its cropped stability graph, the project website map, "
+        "and the digitized methane 5 ppt project CSV inset. It keeps the "
+        "personal/about-me opener, source-backed hydrate and North Slope context, the full complex workflow "
+        "diagram, and the complex ML runtime architecture in the main nine-slide sequence. The update adds a "
+        "clean DOE three-dataset prototype explanation, a visual model-run card, a stability-to-ML overlay, "
+        "and a clearer done/not-claimed/next status section."
+    )
+
+    document.add_heading("Current Public And Runtime Position", level=1)
+    document.add_paragraph(
+        f"The public scaffold tracks {values['wells']} Arctic Slope public wells, {values['profiles']} G10015 "
+        f"temperature profiles, {values['temp_matches']} temperature-profile matches, 374 rows ready for "
+        f"phase-curve inputs, and "
+        f"{values['screen_calculated']} methane 5 ppt calculated stability-admissibility intervals. The public "
+        "side still supports schema/runtime prototyping, source-backed visuals, and guardrail documentation, not "
+        "public approved-data rows or final model results."
+    )
+    document.add_paragraph(
+        "The DOE side now has a public-safe runtime path for the three curated workbooks. Dataset 1 can train "
+        "prototype saturation regressors, datasets 2 and 3 are treated as external review or alternate training "
+        "sets depending on target availability, and row-level outputs, predictions, fitted models, and manifests "
+        "remain in ignored runtime folders."
+    )
+
+    document.add_heading("What V5.5 Adds", level=1)
+    for item in [
+        "Slide 2 now uses the selected USGS/DOE page-3 hydrate stability source screenshot/crop as the primary stability visual, the project website regional map as North Slope context, and the digitized methane 5 ppt CSV only as a project input inset.",
+        "Slide 5 explains the cleaned DOE three-dataset prototype and model-run card: targets S_h, S_wr, Sh, and Swr are Y-only; cleaned canonical features enter X_allowed; depth/helper/raw-alias columns are excluded; training-fit metrics are runtime proof only.",
+        "Slide 8 makes the stability overlay explicit: context, mask, confidence, and caveat are allowed uses; occurrence proof, saturation, hydrate-present labels, and negative labels for blocked rows are not allowed.",
+        "Slide 9 closes with what has been done, what is not claimed, and what must happen next before final ML or stability claims.",
+    ]:
+        document.add_paragraph(item, style="List Bullet")
+    document.add_paragraph(
+        "Slide 2 structure language is intentionally narrow: Structure I methane-dominant hydrate is the project "
+        "baseline. Structure II and Structure H can occur with larger hydrocarbons such as ethane, propane, butane, "
+        "or heavier components, but they are not the current North Slope baseline claim. Variable gas composition "
+        "stays a mentor-approved sensitivity path."
+    )
+
+    document.add_heading("Guardrail Language", level=1)
+    for item in [
+        "Use 'training-fit/runtime proof only' for current DOE prototype metrics, not final model performance.",
+        "Use 'stability-admissibility context' for the public screen, not hydrate proof, occurrence, or saturation.",
+        "Keep S_h, S_wr, Sh, Swr, Sgh, NMR_SAT, hydrate saturation, occurrence labels, and phase labels out of X_allowed.",
+        "Bring back only public-safe summaries after mentor, data-owner, and release review.",
+    ]:
+        document.add_paragraph(item, style="List Bullet")
+
+    slide_notes = [
+        ("Slide 1 - Personal/about-me opener", "Preserved from V5.4 to keep the agreed mentor-facing opener style."),
+        ("Slide 2 - Source-backed hydrate and North Slope context", "Rebuilt around the original context spine: what gas hydrates are and why the Alaska North Slope matters. This accepted Slide 2 direction uses a fuller World Atlas hydrate-structure figure crop with Structure I highlighted as the methane-dominant baseline assumption, a public DGGS RI 2018-6 Umiat-Gubik North Slope geology-layer preview showing map units, contacts/faults, and fold axes, a USGS Arctic Alaska generalized cross section, and the selected USGS/DOE pressure-temperature stability figure. Stability remains a pressure-temperature admissibility screen only; occurrence and saturation evidence must come from approved logs, core, NMR, and mentor-reviewed labels. The hydrate-structure figure remains marked for rights/caption review before public release."),
+        ("Slide 3 - Parameters and expected hydrate ranges", "Preserved the registry-backed range board: working envelopes, mimics, roles, and Y-only labels."),
+        ("Slide 4 - Full complex project workflow", "Kept the whole complex architecture as a main-sequence plate, not an appendix-only reference."),
+        ("Slide 5 - DOE three-dataset prototype", "Adds the cleaned prototype story, feature exclusions, target-only saturation variants, and training-fit disclaimer."),
+        ("Slide 6 - Equations, feature engineering, and unit gate", "Preserves the unit/QC/leakage gate for equation features."),
+        ("Slide 7 - Complex ML runtime architecture", "Keeps the complete ML runtime plate in the main sequence."),
+        ("Slide 8 - Stability-to-ML overlay", "Shows stability as context, mask, confidence, and caveat only."),
+        ("Slide 9 - Done / not claimed / next", "Closes with current accomplishments, explicit non-claims, and next approved-runtime steps."),
+    ]
+    document.add_heading("Slide-By-Slide Companion", level=1)
+    for idx, (heading, body) in enumerate(slide_notes):
+        document.add_heading(heading, level=2)
+        document.add_paragraph(body)
+        if idx < len(panel_paths) and panel_paths[idx].exists():
+            document.add_picture(str(panel_paths[idx]), width=Inches(6.7))
+
+    document.add_heading("Contact Sheet", level=1)
+    if contact_sheet.exists():
+        document.add_picture(str(contact_sheet), width=Inches(6.7))
+
+    document.add_heading("Source And Visual Provenance", level=1)
+    anchors = [
+        "docs/evidence/slide02_source_bundle_2026_06_17/ for the rebuilt Slide 2 source bundle.",
+        "Original selected USGS/PDF page screenshot: https://drive.google.com/file/d/17T48zhoJKvxB21dJUovXhN-6V8DEgzf7/view?usp=drivesdk",
+        "Cropped hydrate stability curve: https://drive.google.com/file/d/1_edIg2LrifTnCL2GP23fcWfnpvIGulYn/view?usp=drivesdk",
+        "Digitized methane 5 ppt CSV inset: https://drive.google.com/file/d/1O7hFSgt3eEjaYt3FocJUlFhAZuswwlm3/view?usp=drivesdk",
+        "DGGS RI 2018-6 geology-layer preview: docs/evidence/slide02_source_bundle_2026_06_17/slide02_selected_11_dggs_umiat_gubik_geology_layer_slide_map.png",
+        "Prior Structure Explorer 2D wells/seismic export retained as provenance: docs/evidence/slide02_source_bundle_2026_06_17/slide02_selected_05_structure_explorer_2d_wells_seismic.png",
+        "USGS Arctic Alaska generalized cross section crop: docs/evidence/slide02_source_bundle_2026_06_17/slide02_selected_06_usgs_arctic_alaska_cross_section_fig2_crop.png",
+        "World Atlas Fig. 1.1 hydrate structure crop with Structure I highlighted: docs/evidence/slide02_source_bundle_2026_06_17/slide02_selected_09_world_atlas_fig1_1_full_structure_types_si_highlighted.png. Use only after rights/caption review in public deliverables.",
+        "docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/ for the V5.4 reference panels.",
+        "docs/project_blueprints/presentation_assets/full_workflow_diagram_2026_06_15/ for the V5.2 complex workflow and ML runtime authority plates.",
+        "data/public_ml_products/source_visual_inventory_2026-06-16.csv for slide and website visual provenance.",
+        "docs/DOE_THREE_DATASET_ML_PIPELINE_RUNBOOK_2026-06-16.md and docs/DOE_RUNTIME_PRESENTATION_AND_MODEL_TRACKING_PLAN_2026-06-16.md for the DOE prototype language.",
+        "docs/STABILITY_CALCULATION_PLAN.md and public stability products for the stability overlay.",
+    ]
+    for item in anchors:
+        document.add_paragraph(item, style="List Bullet")
+
+    OUT_DOCX.parent.mkdir(parents=True, exist_ok=True)
+    document.save(OUT_DOCX)
+    return OUT_DOCX
+
+
 def main() -> None:
-    panels = v54_build_panels()
+    panels = v55_build_panels()
     if len(panels) != 9:
-        raise ValueError(f"V5.4 must have exactly 9 slides, found {len(panels)}")
+        raise ValueError(f"V5.5 must have exactly 9 slides, found {len(panels)}")
     deck = rebuild_deck(panels)
     verify_deck(deck)
     contact_sheet = build_contact_sheet(panels)
-    docx = v54_build_word_companion(panels, contact_sheet)
-    print(f"Wrote {len(panels)} V5.4 panels")
+    docx = v55_build_word_companion(panels, contact_sheet)
+    print(f"Wrote {len(panels)} V5.5 panels")
     print(f"Wrote {contact_sheet}")
     print(f"Wrote {deck}")
     print(f"Wrote {docx}")

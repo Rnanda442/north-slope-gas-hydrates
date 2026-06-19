@@ -1,6 +1,9 @@
 .ipynb_checkpoints/
+**/.ipynb_checkpoints/
 __pycache__/
 *.zip
+.env
+.env.*
 .venv-dashboard/
 .codex_runtime/
 data_runtime/
@@ -8,7 +11,36 @@ outputs_runtime/
 models_runtime/
 logs_runtime/
 configs_local/
+approved_runtime/
+approved_data/
+approved_datasets/
+doe_runtime/
+runtime_exports/
+row_level_predictions/
+predictions_runtime/
+DOE_exports/
+DOE_export*/
 data/source_library/
+Northslopedatasets06052026/
+curated_dataset*.xlsx
+wellnametodataset.txt
+*.xls
+*.xlsx
+*.xlsm
+*.las
+*.LAS
+*.dlis
+*.DLIS
+*.joblib
+*.pkl
+*.pickle
+*.sav
+*.model
+*.onnx
+*.h5
+*.keras
+*.pt
+*.pth
 # Local spreadsheet screenshots are intake references, not public website assets.
 references/well-log-spreadsheet/*.png
 references/well-log-spreadsheet/*.jpg
@@ -19,3 +51,8 @@ docs/project_blueprints/presentation_assets/processing_revisions_2026_06_11/slid
 docs/project_blueprints/presentation_assets/processing_revisions_2026_06_11/processing_panel_contact_sheet.jpg
 references/presentation-revision-2026-06-11/gmail-2026-06-11/
 references/presentation-revision-2026-06-11/drive-thumbnails-2026-06-12/
+# Local-only GIS/PDF source review artifacts; commit only manifests and derived public-safe previews.
+docs/evidence/**/gis_sources_local_only/
+docs/evidence/**/gis_candidate_previews/
+docs/evidence/**/world_atlas_page23_fig1_1_full_page_render.png
+osl_upload_packages/

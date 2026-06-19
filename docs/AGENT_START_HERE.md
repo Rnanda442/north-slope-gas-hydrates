@@ -1,6 +1,6 @@
 # Agent Start Here
 
-Last updated: 2026-06-16
+Last updated: 2026-06-18
 
 Use this file as the first read for future Codex, PC, and OpenScienceLab
 sessions. It should be updated only when the project orientation,
@@ -11,10 +11,12 @@ authoritative artifacts, guardrails, tests, or next actions materially change.
 1. `docs/AGENT_START_HERE.md`
 2. `docs/CURRENT_ARTIFACT_INDEX.md`
 3. `docs/PROJECT_PROMPT_LIBRARY.md` when starting a repeated workflow
-4. `PROJECT_CONTEXT.md`
-5. `docs/NORTH_SLOPE_PROJECT_BASE.md`
-6. `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md`
-7. The technical docs named below for the specific task
+4. `docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md` for current
+   project/deck revision and delegated-chat work
+5. `PROJECT_CONTEXT.md`
+6. `docs/NORTH_SLOPE_PROJECT_BASE.md`
+7. `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md`
+8. The technical docs named below for the specific task
 
 Always run `git status --short` before edits and preserve unrelated local
 changes.
@@ -71,6 +73,9 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
 - `docs/CURRENT_ARTIFACT_INDEX.md` - artifact authority, status, and edit
   safety.
 - `docs/PROJECT_PROMPT_LIBRARY.md` - reusable prompts for repeated workflows.
+- `docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md` - latest self-email
+  project/deck direction, editable-slide rule, four-well ML scope, and copyable
+  prompts for PC/OSL/delegated Codex chats.
 - `PROJECT_CONTEXT.md` - concise living project memory.
 - `docs/NORTH_SLOPE_PROJECT_BASE.md` - broader project base and deliverable
   inventory.
@@ -79,12 +84,12 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
 - `docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md` -
   required before uploading, deleting, archiving, or renaming Word/PPT/Drive
   deliverables.
-- `docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md` - current V5.4 corrected
+- `docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md` - current V5.5 mentor update
   workflow package source language, generated file paths, and slide-use rules.
 - `docs/FINAL_NINE_SLIDE_GAP_AND_DIAGRAM_REUSE_PLAN_2026-06-15.md`,
   `docs/FINAL_NEW_SLIDE_DECK_CREATION_PROMPT_2026-06-15.md`, and
   `docs/GMAIL_STYLE_V5_2_SLIDE_REMAKE_PROMPT_2026-06-15.md` - provenance for
-  the corrected V5.4 visual/topic decisions and the older Gmail/V5.2 spine.
+  the corrected V5.4/V5.5 visual/topic decisions and the older Gmail/V5.2 spine.
 - `docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`,
   `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`, and
   `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md` - current ML/schema
@@ -100,18 +105,29 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
   provenance and QA layer.
 - `docs/ANACONDA_DEPENDENCY_REQUEST_2026-06-16.md` - DOE/Anaconda environment
   package request for website, GIS, slides/docs, and future approved runtime.
+- `docs/DOE_THREE_DATASET_ML_PIPELINE_RUNBOOK_2026-06-16.md` - approved-runtime
+  command guide for using `curated_dataset1.xlsx` as training and
+  `curated_dataset2.xlsx` / `curated_dataset3.xlsx` as external tests.
+- `docs/DOE_RUNTIME_PRESENTATION_AND_MODEL_TRACKING_PLAN_2026-06-16.md` -
+  current plan for showing DOE local model runs, feature exclusions, stability
+  context, and package-unlocked next steps in a mentor-readable website view.
 
 ## Current Authoritative Slide and Doc Assets
 
-- Current V5.4 corrected mentor-facing deck:
-  `docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx`
-- Native V5.4 Google Slides review copy:
-  <https://docs.google.com/presentation/d/1olavI9-nUSSvYtEm-TjYVOte-Cg-1UgaO9GMl6skDt0>
-- Current V5.4 corrected mentor-facing companion:
-  `docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx`
-- Native V5.4 Google Docs review copy:
-  <https://docs.google.com/document/d/1sgl7cyGHOyJyWGoVC9e7LHb0JFnriPIDAmRizyf5wIg>
-- Current V5.4 slide panels and contact sheet:
+- Current V5.5 Slide 2 source update mentor-facing deck:
+  `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`
+- Current V5.5 Slide 2 source update mentor-facing companion:
+  `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`
+- Current V5.5 Slide 2 source update slide panels and contact sheet:
+  `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/`
+- Verified native Google Slides/Docs review copies:
+  <https://docs.google.com/presentation/d/1-35vfTIXAnWCiyKTLooJy80HBYliMBliE_z4CbggJC0>
+  and
+  <https://docs.google.com/document/d/1CyZkRgfAUSOOaRxXni0mcmFN2OQcc5pNOw8TOv44f0Q>
+- Slide 2 source bundle:
+  `docs/evidence/slide02_source_bundle_2026_06_17/`
+- V5.4 corrected slide panels and contact sheet are now the source baseline
+  for V5.5:
   `docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/`
 - V5.3 mentor-facing workflow package is a flawed intermediate/reference,
   not the active mentor deck. Use it only for current counts, website captures,
@@ -130,6 +146,27 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
 - Current mentor status package:
   `docs/project_blueprints/North_Slope_Gas_Hydrate_Mentor_Status_Package_V5_Workflow_2026-06-15.docx`
 
+Latest user project/deck-direction update:
+
+- The 2026-06-18 self-email titled `slide updates for the newest deck`
+  identifies the attached
+  `V5.5 Slide 3 Signal Response QC-Cleaned North Slope Gas Hydrate ML Workflow Slides 2026-06-17 (1).pptx`
+  as the best review deck so far. The attachment is not committed and should
+  be treated as a needs-review Gmail/Drive artifact until a future session
+  explicitly downloads, verifies, and stages it.
+- The next project/deck pass should follow
+  `docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md`: convert whole-slide
+  screenshot/raster panels into editable slide builds where practical, use
+  larger source-backed or data-derived visuals, reduce on-slide source comments,
+  keep high-level text editable, use a unified North Slope map, rebuild Slide 3
+  around log-signal movement plus lithology/coring context, replace the
+  three-dataset prototype with an equation-only slide, and make Slides 7-9 a
+  guarded results/discussion plan without unsupported model or hydrate claims.
+- The current ML scope is the four wells represented by the three available
+  datasheets/workbooks. Future work must verify the well names/aliases,
+  locations, and core/NMR/pressure-core/lithology evidence for those wells
+  before finalizing the lithology, saturation, website, or model story.
+
 Do not directly edit generated PPTX/DOCX binaries unless the user explicitly
 asks. Prefer the documented builders and regenerate deliverables reproducibly.
 
@@ -144,10 +181,12 @@ Primary Streamlit sections in `dashboard/app.py`:
   - `Data & Sources`
 - `Analyze Hydrates`
   - `Public ML Readiness`
+  - `Mentor Review`
   - `Schema Coverage & Architecture`
   - `Target Registry & Leakage`
   - `Interval Review`
   - `Runtime Readiness`
+  - `Model Run Tracker`
   - `Presentation Exports`
   - `Methods & Evidence`
 - `Project Plan`
@@ -173,6 +212,9 @@ Public ML products in `data/public_ml_products/`:
 - `approved_data_y_target_registry_template_2026-06-15.csv`
 - `first_model_output_schema_template_2026-06-15.csv`
 - `variable_fingerprint_template_2026-06-15.csv`
+- `model_run_tracker_summary_template_2026-06-16.csv`
+- `model_run_feature_audit_template_2026-06-16.csv`
+- `model_run_stability_join_template_2026-06-16.csv`
 - `intake_readiness_reports/demo_header_audit_2026-06-15.csv`
 - `intake_readiness_reports/demo_header_audit_2026-06-15.json`
 
@@ -205,8 +247,9 @@ Run the full suite before committing meaningful changes:
 python -m pytest
 ```
 
-Expected current result: `117 passed` as of the 2026-06-18 unified website map
-update. Update this count only after verifying it locally.
+Expected current result: `122 passed, 2 skipped` as of the 2026-06-18
+project-revision-base merge with the unified website map update. Update this
+count only after verifying it locally.
 
 Current test files:
 
@@ -219,8 +262,11 @@ Current test files:
 - `tests/test_stability_screen_diagnostics.py`
 - `tests/test_approved_data_intake.py`
 - `tests/test_approved_data_intake_cli.py`
+- `tests/test_code_transfer_blocks.py`
 - `tests/test_parameter_evidence_registry.py`
 - `tests/test_source_visual_inventory.py`
+- `tests/test_three_dataset_ml_pipeline.py`
+- `tests/test_model_run_tracker.py`
 
 ## Current Guardrails
 
@@ -269,7 +315,9 @@ Preferred language: `public-safe scaffold`, `schema readiness`,
 4. For slides/docs, read
    `docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md`,
    `docs/FINAL_NINE_SLIDE_GAP_AND_DIAGRAM_REUSE_PLAN_2026-06-15.md`, and the
-   relevant prompt in `docs/PROJECT_PROMPT_LIBRARY.md`.
+   relevant prompt in `docs/PROJECT_PROMPT_LIBRARY.md`. For current delegated
+   slide work, also read
+   `docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md`.
 5. For ML/schema work, read the approved-data intake spec, first model plan,
    field-role table, parameter evidence registry, and leakage guardrails.
 6. For stability work, read `docs/STABILITY_CALCULATION_PLAN.md`, the public
@@ -296,6 +344,8 @@ Preferred language: `public-safe scaffold`, `schema readiness`,
   `data/public_stability_snapshot/`.
 - Raw heavy source bundles and approved runtime inputs:
   ignored OSL/runtime folders described in `docs/opensciencelab_runtime_layout.md`.
+- Short copy/paste handoff snippets for DOE/Jupyter:
+  `code_transfer_block/`.
 - Reusable prompts:
   `docs/PROJECT_PROMPT_LIBRARY.md` for short reusable prompts, or a dated
   `docs/*_PROMPT_YYYY-MM-DD.md` file for long one-off build prompts.

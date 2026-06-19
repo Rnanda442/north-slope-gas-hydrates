@@ -29,6 +29,10 @@ from dashboard.source_visual_inventory import (
     validate_source_visual_inventory,
 )
 from dashboard.runtime.feature_engineering import add_standard_features
+from dashboard.runtime.model_run_tracker import (
+    load_local_model_run_tracker,
+    stability_runtime_integration_plan_frame,
+)
 from dashboard.runtime.schemas import (
     CHONG_ML_FEATURE_COLUMNS,
     PROJECT_COHORT_ASSUMPTIONS,
@@ -141,12 +145,12 @@ FULL_WORKFLOW_ASSET_DIR = (
     / "docs"
     / "project_blueprints"
     / "presentation_assets"
-    / "v5_4_corrected_2026_06_16"
+    / "v5_5_slide2_source_update_2026_06_17"
 )
-FULL_WORKFLOW_FLOWCHART = FULL_WORKFLOW_ASSET_DIR / "slide_04_full_complex_project_workflow_v5_4.png"
-FULL_WORKFLOW_EXPANDED_FLOWCHART = FULL_WORKFLOW_ASSET_DIR / "slide_04_full_complex_project_workflow_v5_4.png"
-FULL_WORKFLOW_ML_NETWORK = FULL_WORKFLOW_ASSET_DIR / "slide_07_complex_ml_runtime_architecture_v5_4.png"
-FULL_WORKFLOW_CONTACT_SHEET = FULL_WORKFLOW_ASSET_DIR / "v5_4_corrected_contact_sheet.png"
+FULL_WORKFLOW_FLOWCHART = FULL_WORKFLOW_ASSET_DIR / "slide_04_full_complex_project_workflow_v5_5.png"
+FULL_WORKFLOW_EXPANDED_FLOWCHART = FULL_WORKFLOW_ASSET_DIR / "slide_04_full_complex_project_workflow_v5_5.png"
+FULL_WORKFLOW_ML_NETWORK = FULL_WORKFLOW_ASSET_DIR / "slide_07_complex_ml_runtime_architecture_v5_5.png"
+FULL_WORKFLOW_CONTACT_SHEET = FULL_WORKFLOW_ASSET_DIR / "v5_5_slide2_source_update_contact_sheet.png"
 V5_3_WEBSITE_CAPTURE_DIR = (
     PROJECT_ROOT
     / "docs"
@@ -169,16 +173,16 @@ FULL_WORKFLOW_DECK = (
     PROJECT_ROOT
     / "docs"
     / "project_blueprints"
-    / "V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx"
+    / "V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx"
 )
 FULL_WORKFLOW_WORD = (
     PROJECT_ROOT
     / "docs"
     / "project_blueprints"
-    / "V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx"
+    / "V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx"
 )
-FULL_WORKFLOW_DRIVE_SLIDES_URL = "https://docs.google.com/presentation/d/1olavI9-nUSSvYtEm-TjYVOte-Cg-1UgaO9GMl6skDt0"
-FULL_WORKFLOW_DRIVE_DOC_URL = "https://docs.google.com/document/d/1sgl7cyGHOyJyWGoVC9e7LHb0JFnriPIDAmRizyf5wIg"
+FULL_WORKFLOW_DRIVE_SLIDES_URL = "https://docs.google.com/presentation/d/1-35vfTIXAnWCiyKTLooJy80HBYliMBliE_z4CbggJC0"
+FULL_WORKFLOW_DRIVE_DOC_URL = "https://docs.google.com/document/d/1CyZkRgfAUSOOaRxXni0mcmFN2OQcc5pNOw8TOv44f0Q"
 SOURCE_VISUAL_INVENTORY = default_source_visual_inventory_path(PROJECT_ROOT)
 APPROVED_DATA_FIELD_ROLE_TABLE = (
     PROJECT_ROOT
@@ -248,6 +252,10 @@ APPROVED_DATA_INTAKE_READINESS_REPORT = (
     PROJECT_ROOT / "docs" / "APPROVED_DATA_INTAKE_READINESS_REPORT_2026-06-15.md"
 )
 OSL_HEADER_AUDIT_RUNBOOK = PROJECT_ROOT / "docs" / "OSL_APPROVED_DATA_HEADER_AUDIT_RUNBOOK_2026-06-15.md"
+DOE_THREE_DATASET_RUNBOOK = PROJECT_ROOT / "docs" / "DOE_THREE_DATASET_ML_PIPELINE_RUNBOOK_2026-06-16.md"
+DOE_RUNTIME_TRACKING_PLAN = (
+    PROJECT_ROOT / "docs" / "DOE_RUNTIME_PRESENTATION_AND_MODEL_TRACKING_PLAN_2026-06-16.md"
+)
 IGNORED_DIRS = {
     ".git",
     ".ipynb_checkpoints",
@@ -1157,6 +1165,166 @@ def build_geographic_structural_figure(
     return figure
 
 
+def build_north_slope_geoscience_orientation_figure() -> go.Figure:
+    """Build a public GIS orientation map for geoscience review and Slide 2."""
+    context = load_regional_context()
+    figure = go.Figure()
+
+    au_colors = {
+        "Brookian Foreset-Bottomset": "rgba(20, 123, 133, 0.24)",
+        "Brookian Topset": "rgba(52, 144, 220, 0.22)",
+        "Beaufortian Strata North": "rgba(245, 158, 11, 0.22)",
+        "Beaufortian Strata South": "rgba(245, 158, 11, 0.14)",
+        "Ellesmerian Strata North": "rgba(111, 105, 190, 0.20)",
+        "Ellesmerian Strata South": "rgba(111, 105, 190, 0.13)",
+    }
+    au_line_colors = {
+        "Brookian Foreset-Bottomset": "#147b85",
+        "Brookian Topset": "#3490dc",
+        "Beaufortian Strata North": "#d97706",
+        "Beaufortian Strata South": "#b45309",
+        "Ellesmerian Strata North": "#6f69be",
+        "Ellesmerian Strata South": "#5145a0",
+    }
+
+    assessment_units = context[context["layer_name"] == "assessment_units"]
+    for au_name, au_rows in assessment_units.groupby("au_name", dropna=True):
+        showlegend = True
+        for _, rows in au_rows.groupby("feature_id"):
+            rows = sample_rows(rows.sort_values("vertex_order"), 1200)
+            figure.add_trace(
+                go.Scatter(
+                    x=rows["lon"],
+                    y=rows["lat"],
+                    mode="lines",
+                    fill="toself",
+                    name=str(au_name),
+                    showlegend=showlegend,
+                    fillcolor=au_colors.get(str(au_name), "rgba(148, 163, 184, 0.16)"),
+                    line={"color": au_line_colors.get(str(au_name), "#64748b"), "width": 1.2},
+                    hovertemplate=(
+                        "<b>%{fullData.name}</b><br>"
+                        "Public geology / assessment-unit layer<extra></extra>"
+                    ),
+                )
+            )
+            showlegend = False
+
+    seismic_2d = context[context["layer_name"] == "seismic_2d"]
+    for index, (_, rows) in enumerate(seismic_2d.groupby("feature_id")):
+        rows = sample_rows(rows.sort_values("vertex_order"), 650)
+        figure.add_trace(
+            go.Scatter(
+                x=rows["lon"],
+                y=rows["lat"],
+                mode="lines",
+                name="2D seismic line",
+                showlegend=index == 0,
+                line={"color": "rgba(14, 165, 233, 0.34)", "width": 0.7},
+                hovertemplate="<b>2D seismic line</b><extra></extra>",
+            )
+        )
+
+    seismic_3d = context[context["layer_name"] == "seismic_3d_inventory"]
+    for index, (_, rows) in enumerate(seismic_3d.groupby("feature_id")):
+        rows = sample_rows(rows.sort_values("vertex_order"), 500)
+        figure.add_trace(
+            go.Scatter(
+                x=rows["lon"],
+                y=rows["lat"],
+                mode="lines",
+                fill="toself",
+                name="3D seismic footprint",
+                showlegend=index == 0,
+                fillcolor="rgba(249, 115, 22, 0.13)",
+                line={"color": "rgba(234, 88, 12, 0.60)", "width": 1.0},
+                hovertemplate="<b>3D seismic footprint</b><extra></extra>",
+            )
+        )
+
+    wells = sample_rows(load_north_slope_wells().sort_values(["lon", "lat"]), 1800)
+    figure.add_trace(
+        go.Scatter(
+            x=wells["lon"],
+            y=wells["lat"],
+            mode="markers",
+            name="Public wells",
+            marker={"size": 3.0, "color": "rgba(15, 23, 42, 0.62)"},
+            hovertemplate=(
+                "<b>Public well context</b><br>"
+                "Longitude: %{x:.2f}<br>Latitude: %{y:.2f}<extra></extra>"
+            ),
+        )
+    )
+
+    extent = context[context["layer_name"] == "extent"].sort_values("vertex_order")
+    figure.add_trace(
+        go.Scatter(
+            x=extent["lon"],
+            y=extent["lat"],
+            mode="lines",
+            name="North Slope study boundary",
+            line={"color": "#0f172a", "width": 2.8},
+            hovertemplate="<b>North Slope study boundary</b><extra></extra>",
+        )
+    )
+
+    for label, lon, lat, color in [
+        ("Beaufort Sea", -151.0, 71.35, "#2563eb"),
+        ("NPRA", -156.0, 70.25, "#334155"),
+        ("Prudhoe Bay / Eileen trend", -148.6, 70.25, "#0f766e"),
+        ("Brooks Range", -151.8, 68.25, "#7c2d12"),
+        ("ANWR", -143.5, 69.55, "#334155"),
+    ]:
+        figure.add_annotation(
+            x=lon,
+            y=lat,
+            text=label,
+            showarrow=False,
+            font={"size": 12, "color": color},
+            bgcolor="rgba(255,255,255,0.72)",
+            bordercolor="rgba(148,163,184,0.55)",
+            borderpad=3,
+        )
+
+    lon_values = pd.to_numeric(extent["lon"], errors="coerce")
+    lat_values = pd.to_numeric(extent["lat"], errors="coerce")
+    figure.update_layout(
+        title={
+            "text": "North Slope Geoscience Orientation: geology framework, seismic coverage, and public wells",
+            "x": 0.01,
+            "font": {"size": 17},
+        },
+        height=620,
+        margin={"l": 12, "r": 12, "t": 55, "b": 25},
+        paper_bgcolor="white",
+        plot_bgcolor="#f8fbfc",
+        legend={
+            "orientation": "h",
+            "y": -0.08,
+            "x": 0,
+            "font": {"size": 10},
+        },
+        xaxis={
+            "title": "Longitude",
+            "range": [float(lon_values.min()) - 0.7, float(lon_values.max()) + 0.7],
+            "showgrid": True,
+            "gridcolor": "rgba(148,163,184,0.22)",
+            "zeroline": False,
+        },
+        yaxis={
+            "title": "Latitude",
+            "range": [float(lat_values.min()) - 0.4, float(lat_values.max()) + 0.4],
+            "showgrid": True,
+            "gridcolor": "rgba(148,163,184,0.22)",
+            "zeroline": False,
+            "scaleanchor": "x",
+            "scaleratio": 0.55,
+        },
+    )
+    return figure
+
+
 @st.cache_data
 def cached_stability_source_status(bundle_root: str) -> pd.DataFrame:
     return stability_source_status_frame(Path(bundle_root))
@@ -1259,6 +1427,11 @@ def cached_stability_temperature_model(project_root: str) -> pd.DataFrame:
 @st.cache_data
 def cached_methane_phase_curve(project_root: str) -> pd.DataFrame:
     return load_methane_phase_curve(Path(project_root))
+
+
+@st.cache_data
+def cached_local_model_run_tracker(project_root: str) -> dict[str, pd.DataFrame]:
+    return load_local_model_run_tracker(Path(project_root))
 
 
 def project_relative_or_absolute(path: Path) -> str:
@@ -1934,6 +2107,33 @@ def render_regional_atlas() -> None:
             "geology-source note. It is not the main website map style."
         )
         render_scene(REGIONAL_SCENE, height=870)
+        geology_preview = (
+            PROJECT_ROOT
+            / "docs"
+            / "evidence"
+            / "slide02_source_bundle_2026_06_17"
+            / "slide02_selected_10_dggs_umiat_gubik_geology_layer_preview.png"
+        )
+        st.markdown("### OSL-Staged Geology Layer")
+        st.caption(
+            "The Slide 2 update uses the DGGS RI 2018-6 Umiat-Gubik geologic "
+            "map as a public North Slope geology context candidate. The raw "
+            "public shapefile package is staged through OpenScienceLab; "
+            "GitHub/Streamlit carries derived previews, source citation, and "
+            "handoff documentation only."
+        )
+        if geology_preview.exists():
+            st.image(str(geology_preview), use_container_width=True)
+        else:
+            st.warning(
+                "DGGS geology-layer preview image is not present in this checkout. "
+                "See docs/OSL_GIS_LAYER_CANDIDATES_FOR_SLIDE2_2026-06-18.md."
+            )
+        st.code("OSL source folder: data/source_library/slide2_north_slope_geology_2026_06_18/")
+        st.caption(
+            "Source: Herriott et al. 2018, Alaska DGGS RI 2018-6, DOI 10.14509/30099. "
+            "Geology context only; not hydrate occurrence, saturation, validation, or ML output."
+        )
 
 
 def render_stability_source_bundle() -> None:
@@ -4454,6 +4654,599 @@ def render_runtime_readiness(logs: pd.DataFrame) -> None:
         st.dataframe(issues, use_container_width=True, hide_index=True)
 
 
+def render_model_run_tracker() -> None:
+    st.subheader("Local Model Run Tracker")
+    st.caption(
+        "This panel reads ignored local files under outputs_runtime. It is meant "
+        "for DOE/approved-runtime review and does not require raw workbook rows in GitHub."
+    )
+    tracker = cached_local_model_run_tracker(str(PROJECT_ROOT))
+    runs = tracker.get("runs", pd.DataFrame())
+    summary = tracker.get("summary", pd.DataFrame())
+    features = tracker.get("features", pd.DataFrame())
+    exclusions = tracker.get("exclusions", pd.DataFrame())
+    datasets = tracker.get("datasets", pd.DataFrame())
+    test_metrics = tracker.get("test_metrics", pd.DataFrame())
+    target_cards = tracker.get("target_cards", pd.DataFrame())
+    run_comparison = tracker.get("run_comparison", pd.DataFrame())
+    public_safe_summary = tracker.get("public_safe_summary", pd.DataFrame())
+
+    st.markdown("#### Stability-To-ML Contract")
+    st.dataframe(stability_runtime_integration_plan_frame(), use_container_width=True, hide_index=True)
+    st.warning(
+        "Stability can become context, mask, confidence, and caveat. It cannot become "
+        "hydrate proof, occurrence, saturation, or final sweet-spot rank."
+    )
+
+    if runs.empty:
+        st.info(
+            "No local runtime folders were found yet. In DOE, rerun the three-dataset "
+            "workflow or the multi-saturation workflow, then refresh this page."
+        )
+        st.code(
+            "python code_transfer_block\\multi_saturation_target_workflow.py "
+            "--data-dir \"%USERPROFILE%\\Downloads\\Northslopedatasets06052026\"",
+            language="bash",
+        )
+        return
+
+    run_count = len(runs)
+    trained_targets = int(summary["status"].astype(str).str.eq("trained").sum()) if not summary.empty else 0
+    feature_count = int(features["feature_column"].nunique()) if "feature_column" in features else 0
+    excluded_count = int((exclusions["decision"].astype(str) == "excluded").sum()) if "decision" in exclusions else 0
+    external_validation_count = (
+        int(target_cards["has_external_or_whole_workbook_validation"].astype(bool).sum())
+        if "has_external_or_whole_workbook_validation" in target_cards
+        else 0
+    )
+    metrics = st.columns(5)
+    metrics[0].metric("Local run folders", f"{run_count:,}")
+    metrics[1].metric("Trained target runs", f"{trained_targets:,}")
+    metrics[2].metric("Unique feature columns", f"{feature_count:,}")
+    metrics[3].metric("Excluded columns audited", f"{excluded_count:,}")
+    metrics[4].metric("Validated target runs", f"{external_validation_count:,}")
+
+    if not run_comparison.empty:
+        st.markdown("#### Run Comparison")
+        st.dataframe(run_comparison, use_container_width=True, hide_index=True)
+        validation_counts = (
+            run_comparison["validation_statuses"]
+            .fillna("unknown")
+            .value_counts()
+            .rename_axis("validation_status")
+            .reset_index(name="runs")
+        )
+        figure = go.Figure(
+            go.Bar(
+                x=validation_counts["runs"],
+                y=validation_counts["validation_status"],
+                orientation="h",
+                marker={"color": "#475569"},
+                hovertemplate="%{y}<br>Runs: %{x:,}<extra></extra>",
+            )
+        )
+        figure.update_layout(
+            height=260,
+            xaxis_title="Run count",
+            yaxis_title="",
+            margin={"l": 20, "r": 20, "t": 12, "b": 20},
+        )
+        st.plotly_chart(figure, use_container_width=True)
+
+    if not target_cards.empty:
+        st.markdown("#### Target-By-Target Review Cards")
+        st.caption(
+            "Each target card is a row-free summary: what trained, which feature families entered, "
+            "what was excluded, whether external validation exists, and what blocks a final claim."
+        )
+        card_columns = [
+            column
+            for column in [
+                "run_name",
+                "target_column",
+                "target_sheet",
+                "status",
+                "model_kind",
+                "training_rows",
+                "feature_count",
+                "unique_feature_families",
+                "feature_family_counts",
+                "excluded_column_count",
+                "train_r2",
+                "metric_scope",
+                "validation_status",
+                "has_external_or_whole_workbook_validation",
+                "stability_join_status",
+                "final_claim_ready",
+                "final_claim_needed",
+            ]
+            if column in target_cards.columns
+        ]
+        st.dataframe(target_cards[card_columns], use_container_width=True, hide_index=True)
+        st.error(
+            "Any `train_r2` shown here is a training-fit/runtime check unless the validation status "
+            "explicitly says external or whole-workbook metrics are present."
+        )
+
+    if not summary.empty:
+        st.markdown("#### Run Summary")
+        display_columns = [
+            column
+            for column in [
+                "run_name",
+                "run_type",
+                "target_column",
+                "status",
+                "model_kind",
+                "training_rows",
+                "feature_count",
+                "train_mae",
+                "train_rmse",
+                "train_r2",
+                "test_status",
+                "metric_scope",
+                "validation_status",
+                "has_external_or_whole_workbook_validation",
+                "stability_join_status",
+                "prediction_file_count",
+                "guardrail",
+            ]
+            if column in summary.columns
+        ]
+        st.dataframe(summary[display_columns], use_container_width=True, hide_index=True)
+        st.caption(
+            "Training metrics show that the runtime executes. They are not final "
+            "model performance unless a whole-well validation or locked test row says so."
+        )
+
+    if not test_metrics.empty:
+        st.markdown("#### External/Whole-Workbook Test Metrics")
+        st.dataframe(test_metrics, use_container_width=True, hide_index=True)
+
+    if not features.empty:
+        st.markdown("#### Feature Families Used")
+        family_counts = (
+            features["feature_family"]
+            .fillna("unknown")
+            .value_counts()
+            .rename_axis("feature_family")
+            .reset_index(name="columns")
+        )
+        figure = go.Figure(
+            go.Bar(
+                x=family_counts["columns"],
+                y=family_counts["feature_family"],
+                orientation="h",
+                marker={"color": "#0891b2"},
+                hovertemplate="%{y}<br>Columns: %{x:,}<extra></extra>",
+            )
+        )
+        figure.update_layout(
+            height=320,
+            xaxis_title="Feature-column count",
+            yaxis_title="",
+            margin={"l": 20, "r": 20, "t": 20, "b": 20},
+        )
+        st.plotly_chart(figure, use_container_width=True)
+        st.dataframe(
+            features[["run_name", "target_id", "feature_column", "feature_family"]].drop_duplicates()
+            if "target_id" in features.columns
+            else features.drop_duplicates(),
+            use_container_width=True,
+            hide_index=True,
+        )
+
+        if "target_id" in features.columns:
+            st.markdown("#### Feature Families By Target")
+            by_target = (
+                features.groupby(["run_name", "target_id", "feature_family"], dropna=False)
+                .size()
+                .reset_index(name="columns")
+                .sort_values(["run_name", "target_id", "columns"], ascending=[True, True, False])
+            )
+            st.dataframe(by_target, use_container_width=True, hide_index=True)
+
+    if not exclusions.empty:
+        st.markdown("#### Feature Exclusion Audit")
+        if "reason" in exclusions.columns:
+            st.dataframe(
+                exclusions["reason"]
+                .fillna("unknown")
+                .value_counts()
+                .rename_axis("exclusion_reason")
+                .reset_index(name="columns"),
+                use_container_width=True,
+                hide_index=True,
+            )
+        st.dataframe(exclusions.head(200), use_container_width=True, hide_index=True)
+
+    if not datasets.empty:
+        st.markdown("#### Dataset/Sheet Inventory")
+        st.dataframe(datasets, use_container_width=True, hide_index=True)
+
+    if not target_cards.empty:
+        st.markdown("#### Final-Claim Checklist")
+        checklist = target_cards[
+            [
+                column
+                for column in [
+                    "run_name",
+                    "target_column",
+                    "validation_status",
+                    "stability_join_status",
+                    "final_claim_ready",
+                    "final_claim_needed",
+                ]
+                if column in target_cards.columns
+            ]
+        ].drop_duplicates()
+        st.dataframe(checklist, use_container_width=True, hide_index=True)
+
+    cols = st.columns(4)
+    if not summary.empty:
+        cols[0].download_button(
+            "Download run summary CSV",
+            csv_bytes(summary),
+            "local_model_run_summary.csv",
+            "text/csv",
+            key="download_local_model_run_summary",
+        )
+    if not features.empty:
+        cols[1].download_button(
+            "Download feature audit CSV",
+            csv_bytes(features),
+            "local_model_run_features.csv",
+            "text/csv",
+            key="download_local_model_run_features",
+        )
+    if not exclusions.empty:
+        cols[2].download_button(
+            "Download exclusions CSV",
+            csv_bytes(exclusions),
+            "local_model_run_exclusions.csv",
+            "text/csv",
+            key="download_local_model_run_exclusions",
+        )
+    if not public_safe_summary.empty:
+        cols[3].download_button(
+            "Download public-safe tracker summary CSV",
+            csv_bytes(public_safe_summary),
+            "local_model_run_public_safe_summary.csv",
+            "text/csv",
+            key="download_local_model_run_public_safe_summary",
+        )
+
+
+def render_mentor_review_dashboard() -> None:
+    st.subheader("Project Status / Mentor Review Dashboard")
+    st.caption(
+        "Mentor-facing, public-safe summary of what the website and runtime scaffolds can show now."
+    )
+    st.info(
+        "North star: build a defensible North Slope workflow that combines public geology and "
+        "stability context with approved-runtime well-log ML for future occurrence classification "
+        "and saturation regression."
+    )
+
+    boundary = pd.DataFrame(
+        [
+            {
+                "Surface": "Public GitHub / Streamlit",
+                "Can show": "public maps, stability-admissibility summaries, schemas, templates, diagrams, source inventory, synthetic examples",
+                "Must not show": "approved rows, private workbook values, row-level predictions, trained models, final ML metrics",
+            },
+            {
+                "Surface": "DOE / approved runtime",
+                "Can show": "approved logs/core/NMR rows, three-workbook prototype runs, fitted scalers/models, local tracker summaries",
+                "Must not show": "unreviewed private rows or sensitive row-level outputs outside the approved environment",
+            },
+        ]
+    )
+    st.markdown("##### Public vs DOE Runtime Boundary")
+    st.dataframe(boundary, use_container_width=True, hide_index=True)
+
+    done = pd.DataFrame(
+        [
+            {
+                "Track": "Public delivery",
+                "Current status": "GitHub/Streamlit public surface, source inventory, and V5.5 mentor package are in place.",
+            },
+            {
+                "Track": "Stability context",
+                "Current status": "Methane 5 ppt public stability-admissibility screen exists with guardrails.",
+            },
+            {
+                "Track": "ML/schema readiness",
+                "Current status": "Header roles, leakage barrier, templates, and approved-data intake checks are encoded.",
+            },
+            {
+                "Track": "DOE runtime skeleton",
+                "Current status": "Three-dataset runner and Model Run Tracker can read ignored local outputs in DOE.",
+            },
+        ]
+    )
+    not_claimed = pd.DataFrame(
+        [
+            {"Not claimed": "hydrate proof or final stability"},
+            {"Not claimed": "validated occurrence predictions"},
+            {"Not claimed": "validated saturation predictions or final performance metrics"},
+            {"Not claimed": "public release of approved/private rows, fitted models, or row-level outputs"},
+        ]
+    )
+    next_unlocked = pd.DataFrame(
+        [
+            {"Next item": "Rerun the three-dataset workflow inside DOE with approved workbooks."},
+            {"Next item": "Review target authority across Sgh, S_h, Sh, NMR_SAT, and related labels."},
+            {"Next item": "Lock whole-well or geography-aware validation wells before metric claims."},
+            {"Next item": "Bring back only reviewed public-safe run summaries and caveat counts."},
+        ]
+    )
+    status_cols = st.columns(3)
+    with status_cols[0]:
+        st.markdown("##### Done")
+        st.dataframe(done, use_container_width=True, hide_index=True)
+    with status_cols[1]:
+        st.markdown("##### Not Claimed")
+        st.dataframe(not_claimed, use_container_width=True, hide_index=True)
+    with status_cols[2]:
+        st.markdown("##### Next Unlocked")
+        st.dataframe(next_unlocked, use_container_width=True, hide_index=True)
+
+    screen = cached_stability_screen(str(PROJECT_ROOT))
+    summary = stability_screen_summary_frame(screen) if not screen.empty else pd.DataFrame()
+    summary_lookup = dict(zip(summary["metric"], summary["value"], strict=False)) if not summary.empty else {}
+    calculated = int(summary_lookup.get("Calculated stability intervals", 0))
+    no_interval = int(summary_lookup.get("No stable interval found", 0))
+    blocked = int(summary_lookup.get("Blocked rows", 0))
+    screen_rows = int(summary_lookup.get("Screen rows", len(screen)))
+    temperature_matches = int(screen["temperature_profile_code"].notna().sum()) if "temperature_profile_code" in screen else 0
+
+    st.markdown("##### Current Public Stability Counts")
+    metric_cols = st.columns(5)
+    metric_cols[0].metric("Public screen rows", f"{screen_rows:,}")
+    metric_cols[1].metric("Admissibility intervals", f"{calculated:,}")
+    metric_cols[2].metric("No stable interval", f"{no_interval:,}")
+    metric_cols[3].metric("Blocked rows", f"{blocked:,}")
+    metric_cols[4].metric("Temp-profile matches", f"{temperature_matches:,}")
+    st.warning(
+        "Stability is context only: physically admissible under assumptions, not occurrence, "
+        "not saturation, not hydrate proof, and not a final sweet-spot rank."
+    )
+
+    source_counts = pd.DataFrame(
+        [
+            {
+                "Public product": "Arctic Slope public well scaffold",
+                "Current count": "8,084",
+                "Use": "map and stability-screen row universe",
+            },
+            {
+                "Public product": "GGD223 permafrost controls",
+                "Current count": "43",
+                "Use": "permafrost context/control points",
+            },
+            {
+                "Public product": "G10015 temperature profiles",
+                "Current count": "184",
+                "Use": "temperature-gradient/profile source inventory",
+            },
+            {
+                "Public product": "Temperature-profile matches",
+                "Current count": f"{temperature_matches:,}",
+                "Use": "public wells matched to a temperature profile for context",
+            },
+        ]
+    )
+    st.dataframe(source_counts, use_container_width=True, hide_index=True)
+
+    st.markdown("##### Approved-Runtime Three-Dataset Prototype")
+    prototype = pd.DataFrame(
+        [
+            {
+                "Runtime element": "Available subset",
+                "Current status": "About 3 of the expected 71 datasets are available for approved-runtime prototyping.",
+                "Guardrail": "Enough for schema/architecture checks, not final training or public metrics.",
+            },
+            {
+                "Runtime element": "Prototype shape",
+                "Current status": "Use curated_dataset1 as training source and curated_dataset2/curated_dataset3 as external tests where compatible targets exist.",
+                "Guardrail": "Split policy must be whole-well or geography-aware before any result claim.",
+            },
+            {
+                "Runtime element": "Targets",
+                "Current status": "Occurrence classification and saturation regression are separate outputs; saturation values are handled as 0-1 fractions while original units stay recorded.",
+                "Guardrail": "Target-only fields supervise training but never enter the feature matrix.",
+            },
+            {
+                "Runtime element": "Runtime outputs",
+                "Current status": "Run summaries, feature audits, exclusions, and caveat counts can be reviewed in the tracker.",
+                "Guardrail": "Approved rows, fitted models, and row-level predictions stay in ignored DOE folders.",
+            },
+        ]
+    )
+    st.dataframe(prototype, use_container_width=True, hide_index=True)
+
+    tracker = cached_local_model_run_tracker(str(PROJECT_ROOT))
+    runs = tracker.get("runs", pd.DataFrame())
+    summary_runs = tracker.get("summary", pd.DataFrame())
+    features = tracker.get("features", pd.DataFrame())
+    exclusions = tracker.get("exclusions", pd.DataFrame())
+    tracker_cols = st.columns(4)
+    tracker_cols[0].metric("Local run folders", f"{len(runs):,}")
+    tracker_cols[1].metric(
+        "Trained target runs",
+        f"{int(summary_runs['status'].astype(str).str.eq('trained').sum()) if not summary_runs.empty and 'status' in summary_runs else 0:,}",
+    )
+    tracker_cols[2].metric(
+        "Feature columns audited",
+        f"{int(features['feature_column'].nunique()) if not features.empty and 'feature_column' in features else 0:,}",
+    )
+    tracker_cols[3].metric(
+        "Excluded columns audited",
+        f"{int((exclusions['decision'].astype(str) == 'excluded').sum()) if not exclusions.empty and 'decision' in exclusions else 0:,}",
+    )
+    if runs.empty:
+        st.info(
+            "No ignored DOE runtime folders are present in this public checkout. "
+            "Inside DOE, rerun the approved workflow and this tracker will summarize local run folders without exposing rows."
+        )
+    else:
+        st.dataframe(summary_runs, use_container_width=True, hide_index=True)
+        st.caption(
+            "Any training-fit values here are runtime checks only unless tied to an approved whole-well or locked-test validation row."
+        )
+
+    st.markdown("##### Mentor Decisions Needed")
+    decisions = pd.DataFrame(
+        [
+            {
+                "Decision": "Authoritative target",
+                "Why it matters": "Choose how to prioritize Sgh, S_h, Sh, NMR_SAT, hydrate saturation, Swr/S_wr, and interpreted labels when multiple exist.",
+            },
+            {
+                "Decision": "Occurrence-label policy",
+                "Why it matters": "Decide whether occurrence comes from mentor-reviewed intervals, phase labels, saturation thresholds, or source-documented observations.",
+            },
+            {
+                "Decision": "Blind validation wells",
+                "Why it matters": "Lock which wells or geographic groups are held out before scaling and model selection.",
+            },
+            {
+                "Decision": "Stability use in ML",
+                "Why it matters": "Confirm whether stability enters as context, mask, confidence, caveat, or reason flag only.",
+            },
+            {
+                "Decision": "Missing-log adapters",
+                "Why it matters": "Approve or block literature-style Vp/RHOB adapters before filling missing curves in North Slope data.",
+            },
+            {
+                "Decision": "Public release level",
+                "Why it matters": "Define which aggregate summaries, maps, and caveat counts can leave DOE after review.",
+            },
+        ]
+    )
+    st.dataframe(decisions, use_container_width=True, hide_index=True)
+
+    st.markdown("##### V5.5 Deliverables And Runbooks")
+    artifact_specs = [
+        (
+            "V5.5 Google Slides",
+            None,
+            "Drive review link pending",
+            FULL_WORKFLOW_DRIVE_SLIDES_URL,
+            "No verified V5.5 Drive import yet",
+            "",
+            "v55_drive_slides",
+        ),
+        (
+            "V5.5 Google Doc",
+            None,
+            "Drive review link pending",
+            FULL_WORKFLOW_DRIVE_DOC_URL,
+            "No verified V5.5 Drive import yet",
+            "",
+            "v55_drive_doc",
+        ),
+        (
+            "V5.5 PPTX",
+            FULL_WORKFLOW_DECK,
+            "Local download",
+            "",
+            "Mentor-facing slide deck",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "v55_pptx",
+        ),
+        (
+            "V5.5 Word companion",
+            FULL_WORKFLOW_WORD,
+            "Local download",
+            "",
+            "Mentor-facing companion document",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "v55_docx",
+        ),
+        (
+            "DOE three-dataset runbook",
+            DOE_THREE_DATASET_RUNBOOK,
+            "Local download",
+            "",
+            "Approved-runtime command guide",
+            "text/markdown",
+            "three_dataset_runbook",
+        ),
+        (
+            "DOE tracker plan",
+            DOE_RUNTIME_TRACKING_PLAN,
+            "Local download",
+            "",
+            "Model Run Tracker and presentation tracking plan",
+            "text/markdown",
+            "tracker_plan",
+        ),
+        (
+            "Header-audit runbook",
+            OSL_HEADER_AUDIT_RUNBOOK,
+            "Local download",
+            "",
+            "Public-safe approved-data header audit guide",
+            "text/markdown",
+            "header_audit_runbook",
+        ),
+        (
+            "Source visual inventory",
+            SOURCE_VISUAL_INVENTORY,
+            "Local download",
+            "",
+            "Slide/website visual provenance table",
+            "text/csv",
+            "source_visual_inventory",
+        ),
+    ]
+    artifact_table = pd.DataFrame(
+        [
+            {
+                "Artifact": label,
+                "Type": artifact_type,
+                "Status": (
+                    "link"
+                    if url
+                    else ("pending Drive import" if path is None else ("available" if path.exists() else "missing"))
+                ),
+                "Path or URL": url or (project_relative_or_absolute(path) if path else ""),
+                "Use": use,
+            }
+            for label, path, artifact_type, url, use, _mime, _key in artifact_specs
+        ]
+    )
+    st.dataframe(artifact_table, use_container_width=True, hide_index=True)
+
+    if FULL_WORKFLOW_DRIVE_SLIDES_URL or FULL_WORKFLOW_DRIVE_DOC_URL:
+        link_cols = st.columns(2)
+        if FULL_WORKFLOW_DRIVE_SLIDES_URL:
+            link_cols[0].link_button("Open V5.5 Google Slides", FULL_WORKFLOW_DRIVE_SLIDES_URL)
+        if FULL_WORKFLOW_DRIVE_DOC_URL:
+            link_cols[1].link_button("Open V5.5 Google Doc", FULL_WORKFLOW_DRIVE_DOC_URL)
+    else:
+        st.caption("V5.5 Drive review links are pending import and connector readback verification.")
+
+    download_specs = [spec for spec in artifact_specs if spec[1] is not None]
+    for offset in range(0, len(download_specs), 3):
+        for column, (label, path, _artifact_type, _url, _use, mime, key) in zip(
+            st.columns(3),
+            download_specs[offset : offset + 3],
+        ):
+            if path and path.exists():
+                column.download_button(
+                    f"Download {label}",
+                    path.read_bytes(),
+                    path.name,
+                    mime,
+                    key=f"mentor_review_download_{key}",
+                )
+            else:
+                column.button(f"Download {label}", disabled=True, key=f"mentor_review_download_{key}_missing")
+
+
 def render_ml_visual_architecture() -> None:
     st.subheader("Topic 5: ML Evidence and Well-Log Scaffold")
     st.caption(
@@ -4901,8 +5694,7 @@ def render_explore_north_slope(files: list[dict[str, object]]) -> None:
             "Assessment units, seismic coverage, public wells, and missing geometry stay visible before the full map.",
             height=360,
         )
-        with st.expander("Unified well + stability context map", expanded=True):
-            render_regional_atlas()
+        render_regional_atlas()
     with tabs[1]:
         render_processing_sketch(
             "structure_stack",
@@ -5479,9 +6271,9 @@ def render_full_workflow_map_panel() -> None:
     cols[3].metric("Model outputs", "Future")
 
     st.info(
-        "Use the V5.4 corrected deck and companion as the mentor-facing roadmap: stability is a context/admissibility branch, "
-        "target fields bypass the feature matrix, and occurrence plus saturation outputs wait for "
-        "approved labels and whole-well validation."
+        "Use the V5.5 mentor update deck and companion as the current roadmap: stability is a context/admissibility branch, "
+        "DOE three-dataset prototype metrics are training-fit/runtime proof only, target fields bypass the feature matrix, "
+        "and occurrence plus saturation outputs wait for approved labels and whole-well validation."
     )
 
     download_specs = [
@@ -5563,8 +6355,8 @@ def render_presentation_export_image_card(
 def render_presentation_exports() -> None:
     st.subheader("Presentation Exports")
     st.caption(
-        "Slide-ready, public-safe panels for the current V5.4 corrected deck and Word companion. "
-        "These previews reuse current website captures, generated V5.4 panels, and source-backed visuals; "
+        "Slide-ready, public-safe panels for the current V5.5 mentor update deck and Word companion. "
+        "These previews reuse current website captures, generated V5.5 panels, V5.2 authority plates, and source-backed visuals; "
         "they do not include approved rows, trained-model outputs, occurrence predictions, or saturation predictions."
     )
 
@@ -5593,31 +6385,31 @@ def render_presentation_exports() -> None:
         ),
         (
             "Hydrate Context",
-            FULL_WORKFLOW_ASSET_DIR / "slide_02_source_context_v5_4.png",
+            FULL_WORKFLOW_ASSET_DIR / "slide_02_source_context_v5_5.png",
             "Source-backed hydrate context panel with USGS image, methane 5 ppt curve, and public map capture",
             "hydrate_context",
         ),
         (
             "Parameter Ranges",
-            FULL_WORKFLOW_ASSET_DIR / "slide_03_parameter_ranges_v5_4.png",
+            FULL_WORKFLOW_ASSET_DIR / "slide_03_parameter_ranges_v5_5.png",
             "Slide-scale bars for parameter direction and working ranges",
             "parameter_ranges",
         ),
         (
-            "Parameter Behavior",
-            FULL_WORKFLOW_ASSET_DIR / "slide_05_parameter_behavior_v5_4.png",
-            "Why each parameter range matters, where it fails, and which mimics/masks can fool it",
-            "parameter_behavior",
+            "DOE Prototype Run Card",
+            FULL_WORKFLOW_ASSET_DIR / "slide_05_doe_three_dataset_prototype_v5_5.png",
+            "Cleaned DOE three-dataset prototype explanation with targets, excluded leakage/helper columns, and training-fit disclaimer",
+            "doe_prototype_run_card",
         ),
         (
             "Equations And Unit Gate",
-            FULL_WORKFLOW_ASSET_DIR / "slide_06_equations_feature_unit_gate_v5_4.png",
+            FULL_WORKFLOW_ASSET_DIR / "slide_06_equations_feature_unit_gate_v5_5.png",
             "Equation features, unit checks, QC gates, stability context, and leakage stop",
             "equations_unit_gate",
         ),
         (
             "Full Complex Workflow",
-            FULL_WORKFLOW_ASSET_DIR / "slide_04_full_complex_project_workflow_v5_4.png",
+            FULL_WORKFLOW_ASSET_DIR / "slide_04_full_complex_project_workflow_v5_5.png",
             "Full public/OSL/stability/feature/leakage/model/validation architecture plate",
             "full_complex_workflow",
         ),
@@ -5628,16 +6420,16 @@ def render_presentation_exports() -> None:
             "ml_runtime_detail",
         ),
         (
-            "Validation Outputs",
-            FULL_WORKFLOW_ASSET_DIR / "slide_08_validation_uncertainty_outputs_v5_4.png",
-            "Planned validation and uncertainty outputs with no fake results",
-            "validation_outputs",
+            "Stability-To-ML Overlay",
+            FULL_WORKFLOW_ASSET_DIR / "slide_08_stability_to_ml_overlay_v5_5.png",
+            "Allowed stability overlay roles: context, mask, confidence, and caveat only",
+            "stability_to_ml_overlay",
         ),
         (
-            "Status And Mentor Decisions",
-            FULL_WORKFLOW_ASSET_DIR / "slide_09_status_mentor_decisions_v5_4.png",
-            "Current public scaffold status, mentor decisions, and OSL next action",
-            "status_mentor_decisions",
+            "Done Not Claimed Next",
+            FULL_WORKFLOW_ASSET_DIR / "slide_09_done_not_claimed_next_v5_5.png",
+            "Mentor-facing summary of what is complete, what is not claimed, and what comes next",
+            "done_not_claimed_next",
         ),
     ]
 
@@ -5725,17 +6517,17 @@ def render_schema_coverage_architecture() -> None:
 
     render_parameter_evidence_board()
 
-    st.markdown("##### Latest V5.3 deck and companion roles")
+    st.markdown("##### Latest V5.5 deck and companion roles")
     latest_roles = [
         {
-            "Artifact": "V5.3 slide deck",
-            "Role": "Mentor-readable presentation with source-backed hydrate/North Slope context, parameter-range visuals, simplified workflow, stability context, beginner ML architecture, validation outputs, and intact appendix architecture plates.",
+            "Artifact": "V5.5 slide deck",
+            "Role": "Mentor-readable update with personal opener, source-backed hydrate/North Slope context, parameter ranges, intact complex workflow and ML runtime plates, DOE three-dataset prototype card, stability overlay, and done/not-claimed/next close.",
             "Local file": project_relative_or_absolute(FULL_WORKFLOW_DECK),
             "Drive link": FULL_WORKFLOW_DRIVE_SLIDES_URL or "pending Drive import",
         },
         {
-            "Artifact": "V5.3 Word companion",
-            "Role": "Research/source-backed explanation of the same workflow, including project purpose, public/OSL boundary, parameter evidence, stability method, ML workflow, website outputs, and mentor decisions.",
+            "Artifact": "V5.5 Word companion",
+            "Role": "Source-backed explanation of the same update, including public/approved-runtime boundary, DOE prototype guardrails, stability-as-context overlay, and visual provenance.",
             "Local file": project_relative_or_absolute(FULL_WORKFLOW_WORD),
             "Drive link": FULL_WORKFLOW_DRIVE_DOC_URL or "pending Drive import",
         },
@@ -5744,9 +6536,9 @@ def render_schema_coverage_architecture() -> None:
     if FULL_WORKFLOW_DRIVE_SLIDES_URL or FULL_WORKFLOW_DRIVE_DOC_URL:
         link_parts = []
         if FULL_WORKFLOW_DRIVE_SLIDES_URL:
-            link_parts.append(f"[Open V5.4 Google Slides]({FULL_WORKFLOW_DRIVE_SLIDES_URL})")
+            link_parts.append(f"[Open V5.5 Google Slides]({FULL_WORKFLOW_DRIVE_SLIDES_URL})")
         if FULL_WORKFLOW_DRIVE_DOC_URL:
-            link_parts.append(f"[Open V5.4 Google Doc]({FULL_WORKFLOW_DRIVE_DOC_URL})")
+            link_parts.append(f"[Open V5.5 Google Doc]({FULL_WORKFLOW_DRIVE_DOC_URL})")
         st.markdown(" | ".join(link_parts))
 
     st.markdown("##### Current public counts")
@@ -6405,10 +7197,12 @@ def render_analyze_hydrates() -> None:
     tabs = st.tabs(
         [
             "Public ML Readiness",
+            "Mentor Review",
             "Schema Coverage & Architecture",
             "Target Registry & Leakage",
             "Interval Review",
             "Runtime Readiness",
+            "Model Run Tracker",
             "Presentation Exports",
             "Methods & Evidence",
         ]
@@ -6416,12 +7210,14 @@ def render_analyze_hydrates() -> None:
     with tabs[0]:
         render_public_ml_readiness()
     with tabs[1]:
-        render_schema_coverage_architecture()
+        render_mentor_review_dashboard()
     with tabs[2]:
-        render_public_ml_target_registry()
+        render_schema_coverage_architecture()
     with tabs[3]:
-        render_interval_review(logs, intervals)
+        render_public_ml_target_registry()
     with tabs[4]:
+        render_interval_review(logs, intervals)
+    with tabs[5]:
         col1, col2 = st.columns(2)
         with col1:
             render_processing_sketch(
@@ -6440,9 +7236,11 @@ def render_analyze_hydrates() -> None:
                 height=280,
             )
         render_runtime_readiness(logs)
-    with tabs[5]:
-        render_presentation_exports()
     with tabs[6]:
+        render_model_run_tracker()
+    with tabs[7]:
+        render_presentation_exports()
+    with tabs[8]:
         render_ml_visual_architecture()
         render_source_anchors()
         with st.expander("Header and track blueprint", expanded=True):

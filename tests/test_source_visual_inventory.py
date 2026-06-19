@@ -13,7 +13,7 @@ from dashboard.source_visual_inventory import (
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_source_visual_inventory_loads_current_v5_3_visuals():
+def test_source_visual_inventory_loads_current_v5_5_visuals():
     inventory = load_source_visual_inventory(PROJECT_ROOT)
 
     assert not inventory.empty
@@ -25,6 +25,10 @@ def test_source_visual_inventory_loads_current_v5_3_visuals():
         "v53_expanded_workflow_png",
         "v53_ml_runtime_png",
         "website_regional_map",
+        "v55_slide_05_doe_prototype",
+        "v55_slide_08_stability_overlay",
+        "v55_slide_09_done_next",
+        "v55_contact_sheet",
     }.issubset(set(inventory["visual_id"]))
 
 

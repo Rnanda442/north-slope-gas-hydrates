@@ -4,11 +4,12 @@ Created: 2026-06-15
 
 ## Purpose
 
-This file records the source language for the V5.4 corrected workflow package
-used for the Word companion and mentor deck. The package has the agreed nine
-main audience slides and restores the complex project workflow and complex ML
-runtime diagrams inside the main sequence rather than demoting them to
-appendix-only support.
+This file records the source language for the V5.5 mentor update workflow
+package used for the Word companion and mentor deck. The package keeps the
+agreed nine main audience slides, preserves the complex project workflow and
+complex ML runtime diagrams inside the main sequence, and adds clearer
+mentor-facing sections for the DOE three-dataset prototype, the stability-to-ML
+overlay, and what is done / not claimed / next.
 
 The figure connects:
 
@@ -29,33 +30,36 @@ sweet-spot ranking.
 
 ## Current Generated Files
 
-Current V5.4 corrected slide panels and contact sheet:
+Current V5.5 mentor update slide panels and contact sheet:
 
 ```text
-docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/
-docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/v5_4_corrected_contact_sheet.png
+docs/project_blueprints/presentation_assets/v5_5_mentor_update_2026_06_17/
+docs/project_blueprints/presentation_assets/v5_5_mentor_update_2026_06_17/v5_5_mentor_update_contact_sheet.png
 ```
 
-Key V5.4 authority panels:
+Key V5.5 authority panels:
 
 ```text
-docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/slide_04_full_complex_project_workflow_v5_4.png
-docs/project_blueprints/presentation_assets/v5_4_corrected_2026_06_16/slide_07_complex_ml_runtime_architecture_v5_4.png
+docs/project_blueprints/presentation_assets/v5_5_mentor_update_2026_06_17/slide_04_full_complex_project_workflow_v5_5.png
+docs/project_blueprints/presentation_assets/v5_5_mentor_update_2026_06_17/slide_07_complex_ml_runtime_architecture_v5_5.png
+docs/project_blueprints/presentation_assets/v5_5_mentor_update_2026_06_17/slide_05_doe_three_dataset_prototype_v5_5.png
+docs/project_blueprints/presentation_assets/v5_5_mentor_update_2026_06_17/slide_08_stability_to_ml_overlay_v5_5.png
+docs/project_blueprints/presentation_assets/v5_5_mentor_update_2026_06_17/slide_09_done_not_claimed_next_v5_5.png
 ```
 
-V5.4 PowerPoint package:
+V5.5 PowerPoint package:
 
 ```text
-docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-16.pptx
+docs/project_blueprints/V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx
 ```
 
 Word companion:
 
 ```text
-docs/project_blueprints/V5_4_CORRECTED_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-16.docx
+docs/project_blueprints/V5_5_MENTOR_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx
 ```
 
-V5.4 Drive review copies:
+Previous V5.4 Drive review copies:
 
 ```text
 V5.4 CORRECTED North Slope Gas Hydrate ML Workflow Slides 2026-06-16
@@ -65,8 +69,9 @@ V5.4 CORRECTED North Slope Gas Hydrate ML Workflow Companion 2026-06-16
 https://docs.google.com/document/d/1sgl7cyGHOyJyWGoVC9e7LHb0JFnriPIDAmRizyf5wIg
 ```
 
-V5.3 is retained as a flawed intermediate/reference package only. It should not
-override the V5.4 corrected spine.
+V5.4 is retained as the source baseline for V5.5. V5.3 is retained as a flawed
+intermediate/reference package only. Neither should override the V5.5 local
+deck unless explicitly revived.
 
 Prior V5/V5.2 Drive copies:
 
@@ -176,7 +181,7 @@ flowchart LR
 
 ### A. Ready to encode now
 
-- Keep slide 4 as the full complex V5.4 project workflow architecture plate.
+- Keep slide 4 as the full complex V5.5 project workflow architecture plate.
   Do not reduce it to a beginner flowchart. Slide 7 likewise stays the
   complex ML runtime architecture plate.
 - Train two linked outputs in the approved runtime: occurrence classification
@@ -238,28 +243,35 @@ acoustic impedance, lambda-rho, mu-rho, NMR-density separation, and any
 Archie-style saturation baseline are feature or check producers. They do not
 create proof by themselves.
 
-The current V5.4 slide export is a mentor-facing explanation package. It uses
+The current V5.5 slide export is a mentor-facing explanation package. It uses
 the original personal/about-me opener, source-backed hydrate and North Slope
 context, a parameter-range board, the full complex project workflow,
-visual parameter behavior, equation and unit-gate logic, the full complex ML
-runtime architecture, validation/output controls, and a status/mentor-decision
-panel. The data boundary distinguishes public GitHub/Streamlit communication
-from OSL or approved-runtime execution, and the red target-only rail shows that
-Sgh, Sh, NMR SAT, hydrate saturation, and phase labels are Y-side labels rather
-than predictors.
+equation and unit-gate logic, the full complex ML runtime architecture, a
+cleaned DOE three-dataset prototype card, a stability-to-ML overlay, and a
+plain done / not claimed / next status close. The data boundary distinguishes
+public GitHub/Streamlit communication from OSL or approved-runtime execution,
+and the red target-only rail shows that Sgh, S_h, Sh, Swr, S_wr, NMR SAT,
+hydrate saturation, and phase labels are Y-side labels rather than predictors.
 
-The V5.4 full workflow plate carries the public counts, approved-OSL boundary,
+The V5.5 full workflow plate carries the public counts, approved-OSL boundary,
 stability equations and caveats, measured/derived/QC and context feature
 families, target-only occurrence and saturation labels, split and train-only
 preprocessing controls, baseline-before-ML logic, validation expectations,
 runtime/public output rules, and mentor decisions. Use it when the reader
 needs the full architecture.
 
-The V5.4 ML runtime visual expands the modeling lane into feature/QC groups,
+The V5.5 ML runtime visual expands the modeling lane into feature/QC groups,
 the X allowed matrix, whole-well split and train-only preprocessing controls,
 baselines, ANN/Keras candidate model, occurrence and saturation output heads,
 validation, reviewed outputs, and the red target-only rail. It is still an
 architecture guide only, not a trained model or result claim.
+
+The V5.5 DOE prototype slide explains the currently available approved-runtime
+plumbing without overclaiming it: `curated_dataset1.xlsx` is the default
+training workbook, `curated_dataset2.xlsx` and `curated_dataset3.xlsx` are
+external-review workbooks or alternate training sources when labels exist, the
+visible saturation variants `S_h`, `S_wr`, `Sh`, and `Swr` stay Y-only, and
+training-fit metrics are runtime proof only.
 
 The stability branch feeds the ML workflow as context, a mask, a confidence
 label, or a reason flag. It is not a hydrate occurrence label and not a
@@ -298,12 +310,12 @@ does not mean no hydrate.
 
 ## Slide Use
 
-Use the generated deck as the active V5.4 corrected workflow package for
+Use the generated deck as the active V5.5 mentor update package for local
 mentor review. Slides 1-9 are the audience-facing sequence: personal/about-me
 opener, gas hydrate and North Slope context, parameter ranges, full complex
-project workflow, why parameter ranges matter, equations/feature engineering
-and unit gate, complex ML runtime architecture, validation/uncertainty/outputs,
-and current status plus mentor decisions.
+project workflow, DOE three-dataset prototype and visual model-run card,
+equations/feature engineering and unit gate, complex ML runtime architecture,
+stability-to-ML overlay, and current status as done / not claimed / next.
 
 ## Word Use
 
@@ -319,17 +331,19 @@ are needed before final ML claims can be made.
 
 ## Mentor Decisions
 
-The V5.4 corrected package should keep these questions visible:
+The V5.5 mentor update should keep these questions visible:
 
 1. Phase-curve policy: keep methane 5 ppt as the only official baseline, or add
    a labeled scenario table?
 2. Target authority: which saturation and occurrence labels are official for
-   training and validation?
+   training and validation, including the current `S_h`, `S_wr`, `Sh`, and
+   `Swr` prototype variants?
 3. Validation split: use whole-well, compartment, geographic holdout, or a
    staged combination?
 4. Temperature handling: when G10015 is missing, keep rows blocked, use proxy
    tiers, or run scenario-only gradients?
 5. ML use of stability: allow the stability screen as context, confidence,
-   reason flag, or mask only, never as an occurrence label?
+   reason flag, or mask only, never as an occurrence label, saturation target,
+   or negative label for blocked rows?
 6. Public website outputs: which diagrams, counts, schema, caveat views, and
    readiness views are acceptable before approved model validation?
