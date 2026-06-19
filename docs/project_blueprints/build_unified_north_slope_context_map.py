@@ -19,6 +19,7 @@ ASSET_DIR = (
 PNG_PATH = ASSET_DIR / "unified_north_slope_well_stability_context_map_2026_06_18.png"
 SLIDE_PNG_PATH = ASSET_DIR / "unified_north_slope_slide_export_callout_space_2026_06_18.png"
 PUBLIC_STABILITY = ROOT / "data" / "public_stability_products"
+PUBLIC_GIS_PRODUCTS = ROOT / "data" / "public_gis_products"
 PUBLIC_SNAPSHOT = (
     ROOT
     / "data"
@@ -30,6 +31,7 @@ LANDMARK_DIR = ROOT / "data" / "source_library" / "basemap_landmarks_2026_06_18"
 SCREEN_CSV = PUBLIC_STABILITY / "stability_screen_2026-06-14_methane_5ppt_v1.csv"
 GGD223_CSV = PUBLIC_SNAPSHOT / "ggd223_permafrost_controls.csv"
 AU_GEOJSON = PUBLIC_SNAPSHOT / "GasHydrateAUs.geojson"
+BOROUGH_BOUNDARY_GEOJSON = PUBLIC_GIS_PRODUCTS / "north_slope_borough_boundary_tiger2025.geojson"
 MASTER_2D = ROOT / "03_data_final" / "master_layers" / "north_slope_master_2d_layers.parquet"
 DGGS_PREVIEW = (
     ROOT
@@ -392,12 +394,13 @@ def draw_side_panel(base: Image.Image) -> None:
     draw_text(draw, (x1 + 34, y1 + 34), "Integrated source layers", 38, NAVY, True, width=x2 - x1 - 68)
     y = y1 + 92
     layers = [
+        ("Regional Boundary", "Census/TIGER North Slope Borough edge"),
         ("Geoscience Orientation", "study boundary, public wells, 2D/3D seismic"),
         ("DGGS RI 2018-6", "Umiat-Gubik units, contacts/faults, folds"),
         ("Stability controls", "GGD223 pf_depth_m + USGS hydrate AUs"),
         ("OSL landmarks", "DNR units, AKDOT roads, TAPS, communities"),
     ]
-    colors = [ASSESSMENT_CONTEXT, SEISMIC_3D, TEAL, PIPE]
+    colors = [BLACK, ASSESSMENT_CONTEXT, SEISMIC_3D, TEAL, PIPE]
     for (header, body), color in zip(layers, colors):
         draw.rounded_rectangle((x1 + 34, y, x1 + 64, y + 30), radius=6, fill=color + (255,))
         draw_text(draw, (x1 + 82, y - 2), header, 26, NAVY, True, width=x2 - x1 - 120)
@@ -444,6 +447,7 @@ def field_label_frame(screen: pd.DataFrame) -> pd.DataFrame:
 def draw_legend(draw: ImageDraw.ImageDraw, ggd_min: int, ggd_max: int) -> None:
     x, y = 160, 210
     line_items = [
+        ("North Slope Borough boundary", BLACK, 6),
         ("Public assessment context", ASSESSMENT_CONTEXT, 4),
         ("2D seismic coverage", SEISMIC, 3),
         ("3D seismic footprints", SEISMIC_3D, 3),
@@ -515,6 +519,7 @@ def draw_map() -> Path:
     local_roads = [feature for feature in roads_all if feature not in key_roads]
     taps = load_geojson(LANDMARK_DIR / "alaska_dnr_trans_alaska_pipeline.geojson")
     aus = load_geojson(AU_GEOJSON)
+    borough_boundary = load_geojson(BOROUGH_BOUNDARY_GEOJSON)
     gnis = load_geojson(LANDMARK_DIR / "usgs_gnis_places_north_slope_clip.geojson")
     master_context = load_master_2d_context()
 
@@ -538,6 +543,7 @@ def draw_map() -> Path:
     draw_frame_lines(draw, master_context, "seismic_2d", SEISMIC, 1, 260, 130)
     draw_frame_lines(draw, master_context, "seismic_3d_inventory", SEISMIC_3D, 2, 120, 180)
     draw_frame_lines(draw, master_context, "extent", BLACK, 4, 8, 20)
+    draw_geojson_lines(draw, borough_boundary, BLACK, 7, max_points=2600)
     draw_public_well_reference_points(draw, master_context)
 
     draw_geojson_lines(draw, dnr_units, GRAY, 3, max_points=800)
@@ -598,7 +604,7 @@ def draw_map() -> Path:
     draw_text(
         draw,
         (132, 122),
-        "Geoscience orientation, DGGS Umiat-Gubik preview, GGD223 controls, USGS hydrate AUs, screen status, DNR units, roads, TAPS, and field labels.",
+        "Census/TIGER North Slope Borough boundary, geoscience orientation, DGGS Umiat-Gubik preview, GGD223 controls, USGS hydrate AUs, screen status, DNR units, roads, TAPS, and field labels.",
         29,
         MUTED,
     )
@@ -616,7 +622,7 @@ def draw_map() -> Path:
     draw_text(
         draw,
         (130, 1975),
-        "GitHub-safe layers: public master geoscience context, committed stability screen, USGS AU snapshot, GGD223 public snapshot, DGGS preview PNG, and this derived PNG. OSL/Drive-only raw layers: full DNR/AKDOT/TAPS/Census/GNIS/DGGS packages and any approved well-log/core/runtime data.",
+        "GitHub-safe layers: Census/TIGER North Slope Borough boundary, public master geoscience context, committed stability screen, USGS AU snapshot, GGD223 public snapshot, DGGS preview PNG, and this derived PNG. OSL/Drive-only raw layers: full DNR/AKDOT/TAPS/Census/GNIS/DGGS packages and any approved well-log/core/runtime data.",
         24,
         MUTED,
         width=3450,
@@ -650,7 +656,7 @@ def draw_slide_callout_export(full_map: Image.Image) -> Path:
     draw_text(draw, (2388, 270), "Editable callout lane", 38, NAVY, True, width=650)
     y = 344
     callouts = [
-        ("1", "North Slope setting", "fields, roads, TAPS, communities"),
+        ("1", "North Slope edge", "Census/TIGER borough boundary"),
         ("2", "Geology context", "DGGS Umiat-Gubik units + structures"),
         ("3", "P-T controls", "GGD223 + hydrate AU source controls"),
         ("4", "Screen status", "admissibility only; not hydrate proof"),
@@ -683,7 +689,7 @@ def draw_slide_callout_export(full_map: Image.Image) -> Path:
     draw_text(
         draw,
         (92, 1630),
-        "Sources/layers: public master geoscience context, DGGS RI 2018-6 preview, GGD223 controls, USGS hydrate assessment units, public stability screen, and OSL-staged DNR/AKDOT/TAPS/community/field landmarks.",
+        "Sources/layers: Census/TIGER North Slope Borough boundary, public master geoscience context, DGGS RI 2018-6 preview, GGD223 controls, USGS hydrate assessment units, public stability screen, and OSL-staged DNR/AKDOT/TAPS/community/field landmarks.",
         24,
         MUTED,
         width=3000,

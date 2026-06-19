@@ -327,6 +327,7 @@ def test_unified_context_map_combines_status_source_and_landmark_layers(
     )
 
     trace_names = {trace.name for trace in figure.data}
+    assert "North Slope Borough boundary" in trace_names
     assert "Public assessment-unit context" in trace_names
     assert "2D seismic coverage" in trace_names
     assert "3D seismic footprints" in trace_names
@@ -350,6 +351,7 @@ def test_unified_context_map_combines_status_source_and_landmark_layers(
     assert pf_trace.marker.colorbar.title.text == "pf_depth_m"
 
     inventory = unified_context_map_layer_inventory_frame(Path("missing_dggs_preview.png"))
+    assert "Regional Boundary" in set(inventory["layer_group"])
     assert "DGGS RI 2018-6" in set(inventory["layer_group"])
     assert "Geoscience Orientation" in set(inventory["layer_group"])
     assert "missing preview" in set(inventory["shown_as"])

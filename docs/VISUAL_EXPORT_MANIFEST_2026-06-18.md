@@ -8,10 +8,11 @@ Boundary: exported visuals are row-free summaries, diagrams, or public-safe tabl
 
 - `docs/project_blueprints/presentation_assets/website_well_maps_2026_06_18/unified_north_slope_well_stability_context_map_2026_06_18.png`
   is the full website/static export for the unified 2D North Slope map section.
-  It combines public Geoscience Orientation layers, DGGS RI 2018-6
-  Umiat-Gubik geology preview, GGD223 controls, USGS hydrate assessment units,
-  public stability-screen status points, and OSL-staged DNR/AKDOT/TAPS,
-  community, and field-label context.
+  It combines the public Census/TIGER North Slope Borough boundary, public
+  Geoscience Orientation layers, DGGS RI 2018-6 Umiat-Gubik geology preview,
+  GGD223 controls, USGS hydrate assessment units, public stability-screen
+  status points, and OSL-staged DNR/AKDOT/TAPS, community, and field-label
+  context.
 - `docs/project_blueprints/presentation_assets/website_well_maps_2026_06_18/unified_north_slope_slide_export_callout_space_2026_06_18.png`
   is the matching 16:9 slide-export map layer with a right-side callout lane
   for editable Slide 2 and Slide 7 annotations.

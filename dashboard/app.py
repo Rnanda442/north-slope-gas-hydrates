@@ -173,6 +173,10 @@ UNIFIED_CONTEXT_MAP_SLIDE_EXPORT = (
     WEBSITE_WELL_MAP_ASSET_DIR
     / "unified_north_slope_slide_export_callout_space_2026_06_18.png"
 )
+PUBLIC_GIS_PRODUCTS_DIR = PROJECT_ROOT / "data" / "public_gis_products"
+NORTH_SLOPE_BOROUGH_BOUNDARY = (
+    PUBLIC_GIS_PRODUCTS_DIR / "north_slope_borough_boundary_tiger2025.geojson"
+)
 SLIDE02_SOURCE_BUNDLE_DIR = PROJECT_ROOT / "docs" / "evidence" / "slide02_source_bundle_2026_06_17"
 DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW = (
     SLIDE02_SOURCE_BUNDLE_DIR / "slide02_selected_11_dggs_umiat_gubik_geology_layer_slide_map.png"
@@ -2080,9 +2084,10 @@ def render_regional_atlas() -> None:
     st.title("Unified 2D North Slope Map For Slides 2 And 7")
     st.write(
         "One public-safe map section combines the Geoscience Orientation layers, "
-        "DGGS Umiat-Gubik geology preview, GGD223 permafrost controls, USGS gas "
-        "hydrate assessment units, stability-screen status points, and OSL "
-        "desktop GIS landmarks for North Slope orientation."
+        "the Census/TIGER North Slope Borough boundary, DGGS Umiat-Gubik geology "
+        "preview, GGD223 permafrost controls, USGS gas hydrate assessment units, "
+        "stability-screen status points, and OSL desktop GIS landmarks for North "
+        "Slope orientation."
     )
     cols = st.columns(3)
     screen = cached_stability_screen(str(PROJECT_ROOT))
@@ -2704,6 +2709,7 @@ def load_basemap_landmark_layers(source_dir: Path) -> dict[str, object]:
     local_roads = [feature for feature in roads if feature not in key_roads]
     return {
         "source_dir": str(source_dir),
+        "borough_boundary": load_geojson_features(NORTH_SLOPE_BOROUGH_BOUNDARY),
         "units": load_geojson_features(source_dir / BASEMAP_LANDMARK_FILES["units"]),
         "local_roads": local_roads,
         "key_roads": key_roads,
@@ -2758,6 +2764,16 @@ def add_north_slope_basemap_line_layers(
     landmarks: dict[str, object],
     showlegend: bool = False,
 ) -> None:
+    add_geojson_line_trace(
+        figure,
+        landmarks.get("borough_boundary", []),
+        "North Slope Borough boundary",
+        "#0f172a",
+        3.2,
+        0.88,
+        max_points_per_path=2200,
+        showlegend=showlegend,
+    )
     add_geojson_line_trace(
         figure,
         landmarks.get("units", []),
@@ -3025,6 +3041,14 @@ def unified_context_map_layer_inventory_frame(
     dggs_status = "available as public-safe preview" if dggs_path.exists() else "missing preview"
     rows = [
         {
+            "layer_group": "Regional Boundary",
+            "layer": "North Slope Borough boundary",
+            "source": project_relative_or_absolute(NORTH_SLOPE_BOROUGH_BOUNDARY),
+            "shown_as": "bold map outline",
+            "slide_use": "Slide 2 and Slide 7 geographic edge/context",
+            "guardrail": "administrative/geographic context only; not hydrate evidence",
+        },
+        {
             "layer_group": "Geoscience Orientation",
             "layer": "study boundary, public wells, 2D seismic, 3D seismic, public assessment-unit context",
             "source": "03_data_final/master_layers/north_slope_master_2d_layers.parquet",
@@ -3071,11 +3095,12 @@ def unified_context_map_layer_inventory_frame(
 def unified_context_map_source_caveat_caption(landmark_source_dir: Path) -> str:
     return (
         "Unified public-safe map section: Geoscience Orientation master layers, "
-        "DGGS RI 2018-6 Umiat-Gubik public geology preview, GGD223 controls, "
-        "USGS gas hydrate assessment units, stability-screen status points, "
-        "and OSL-staged DNR/AKDOT/TAPS/community/field landmarks. Context and "
-        "stability-admissibility only; these layers do not prove hydrate "
-        "occurrence, saturation, producibility, or trained-model results. "
+        "Census/TIGER North Slope Borough boundary, DGGS RI 2018-6 Umiat-Gubik "
+        "public geology preview, GGD223 controls, USGS gas hydrate assessment "
+        "units, stability-screen status points, and OSL-staged "
+        "DNR/AKDOT/TAPS/community/field landmarks. Context and stability-"
+        "admissibility only; these layers do not prove hydrate occurrence, "
+        "saturation, producibility, or trained-model results. "
         f"OSL landmark source: `{project_relative_or_absolute(landmark_source_dir)}`."
     )
 
@@ -6658,7 +6683,7 @@ def render_presentation_exports() -> None:
         (
             "Unified North Slope Map",
             UNIFIED_CONTEXT_MAP_EXPORT,
-            "Large unified public geoscience, DGGS-preview, stability-status, GGD223, USGS AU, DNR unit, road, TAPS, and field-label context map",
+            "Large unified public Census/TIGER borough boundary, geoscience, DGGS-preview, stability-status, GGD223, USGS AU, DNR unit, road, TAPS, and field-label context map",
             "unified_north_slope_map",
         ),
         (

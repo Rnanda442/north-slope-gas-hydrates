@@ -12,8 +12,8 @@ Slide 2 and Slide 7 orientation/context.
 
 | Image | Current use | Visual QA |
 | --- | --- | --- |
-| `unified_north_slope_well_stability_context_map_2026_06_18.png` | Main readable export for the unified website map | Supersedes the prior status-only slide map by combining Geoscience Orientation layers, DGGS RI 2018-6 Umiat-Gubik geology preview, GGD223 `pf_depth_m` controls with colorbar, USGS hydrate AU outlines, stability-screen status points, DNR oil/gas unit outlines, AKDOT roads, Dalton/Deadhorse roads, TAPS, communities, and public field labels. |
-| `unified_north_slope_slide_export_callout_space_2026_06_18.png` | Slide 2 / Slide 7 map layer with editable-callout room | Same public-safe context stack as the full unified map, cropped into a 16:9 slide plate with a right-side callout lane so labels, circles, and arrows can remain editable in PowerPoint or Google Slides. |
+| `unified_north_slope_well_stability_context_map_2026_06_18.png` | Main readable export for the unified website map | Supersedes the prior status-only slide map by combining the Census/TIGER North Slope Borough boundary, Geoscience Orientation layers, DGGS RI 2018-6 Umiat-Gubik geology preview, GGD223 `pf_depth_m` controls with colorbar, USGS hydrate AU outlines, stability-screen status points, DNR oil/gas unit outlines, AKDOT roads, Dalton/Deadhorse roads, TAPS, communities, and public field labels. |
+| `unified_north_slope_slide_export_callout_space_2026_06_18.png` | Slide 2 / Slide 7 map layer with editable-callout room | Same public-safe context stack as the full unified map, including the Census/TIGER borough edge, cropped into a 16:9 slide plate with a right-side callout lane so labels, circles, and arrows can remain editable in PowerPoint or Google Slides. |
 | `slide3_correct_2d_well_stability_map_2026_06_18.png` | Correct slide-3/website-map export for the updated 2D well/stability context | Uses the updated map layers: Alaska DNR oil/gas unit outlines, AKDOT roads with Dalton/Deadhorse roads highlighted, Trans-Alaska Pipeline geometry, Census/GNIS community label context, public well field labels, and a caveat that these overlays are context rather than hydrate evidence. |
 | `website_2d_well_map_stability_status_2026_06_18.png` | Guarded methane 5 ppt stability-screen status map | Shows well distribution and screen categories, but the base layer does not make Prudhoe Bay, Kuparuk River, Milne Point, Deadhorse, or the Dalton/TAPS corridor obvious enough for a mentor audience. Use as a placeholder only until landmark overlays are added. |
 | `website_2d_well_map_temperature_coverage_2026_06_18.png` | Temperature-profile/proxy coverage diagnostic map | Good for explaining source coverage and blank-row reasons. It should not be used as the main hydrate science map because it is a data-readiness view, not an occurrence/saturation view. |
@@ -126,6 +126,9 @@ GitHub-safe committed or derived layers used in the unified map:
   for USGS hydrate assessment-unit outlines.
 - `data/public_stability_snapshot/north_slope_stability_snapshot_2026-06-13/ggd223_permafrost_controls.csv`
   for GGD223 `pf_depth_m` controls.
+- `data/public_gis_products/north_slope_borough_boundary_tiger2025.geojson`
+  for the public Census/TIGER North Slope Borough boundary used as the map's
+  real geographic edge.
 - `03_data_final/master_layers/north_slope_master_2d_layers.parquet` for the
   public-safe Geoscience Orientation master context used by the website and
   static export builder.
