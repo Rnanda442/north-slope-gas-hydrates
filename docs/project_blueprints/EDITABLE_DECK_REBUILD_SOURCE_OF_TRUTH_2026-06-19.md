@@ -131,7 +131,36 @@ native callout placeholders, and blank figure slots where the right map/plot or
 DOE export is still missing. Once the skeleton is movable, fix content and
 visual quality slide by slide.
 
-## Final Rebuild Status
+## Visual-Match Amendment
+
+Updated: 2026-06-19
+
+The first editable rebuild met the object-editability requirement, but user
+review found that it drifted too far from the prior V5.5 visual deck. The
+corrected direction is now: make the deck look like the previous V5.5 Drive
+review deck while keeping slide objects editable.
+
+This amendment supersedes the earlier Slide 1 cleanup rule for the current
+visual-match track. The corrected deck preserves the previous Slide 1 visual
+content because the newest instruction is visual fidelity to the prior deck.
+
+The corrected active rebuild is:
+
+- Local PPTX:
+  `docs/project_blueprints/EDITABLE_VISUAL_MATCH_North_Slope_Gas_Hydrate_ML_Workflow_2026-06-19.pptx`
+- Builder:
+  `docs/project_blueprints/build_editable_visual_match_deck_2026_06_19.ps1`
+- Source/recovery helper:
+  `docs/project_blueprints/render_editable_visual_match_assets_2026_06_19.py`
+- QA/source assets:
+  `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/`
+- Native Google Slides import:
+  <https://docs.google.com/presentation/d/1cmGnsgcgkAcdP2-2ozCE2uyKb4YE0JuQoQYItxGWkHA>
+
+The original V5.5 Drive review deck remains untouched:
+<https://docs.google.com/presentation/d/1ge6xYeiUTx1q1gFQcYGfMR1qv3uvOjKVG0YtipzwEsI>.
+
+## Initial Simplified Rebuild Status
 
 Updated: 2026-06-19
 
@@ -193,3 +222,66 @@ inserted image objects where appropriate.
 - Slide 2 P-T diagram uses the recovered CSV path requested for the rebuild.
 - No slide claims hydrate proof, final stability, trained metrics,
   occurrence/saturation predictions, or sweet-spot ranking.
+
+## Corrected Visual-Match Rebuild Status
+
+Updated: 2026-06-19
+
+Local visual-match editable rebuild output:
+
+- `docs/project_blueprints/EDITABLE_VISUAL_MATCH_North_Slope_Gas_Hydrate_ML_Workflow_2026-06-19.pptx`
+- Builder:
+  `docs/project_blueprints/build_editable_visual_match_deck_2026_06_19.ps1`
+- Source/recovery helper:
+  `docs/project_blueprints/render_editable_visual_match_assets_2026_06_19.py`
+- Reference panels recovered from the Drive review deck:
+  `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/reference_drive_panels/`
+- Cropped source pieces used in the visual-match deck:
+  `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/cropped_reference_assets/`
+- Rendered slides, contact sheets, and shape audit:
+  `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/`
+
+Native Google Slides import:
+
+- Title:
+  `EDITABLE VISUAL MATCH - North Slope Gas Hydrate ML Workflow - 2026-06-19`
+- Link:
+  <https://docs.google.com/presentation/d/1cmGnsgcgkAcdP2-2ozCE2uyKb4YE0JuQoQYItxGWkHA>
+- Google Slides ID:
+  `1cmGnsgcgkAcdP2-2ozCE2uyKb4YE0JuQoQYItxGWkHA`
+- Connector readback verified the imported deck ID, title, native Slides
+  structure, and editable text/shape objects.
+- Drive-import thumbnails:
+  `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/drive_import_thumbnails/`
+- Drive-import contact sheet:
+  `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/drive_import_contact_sheet_2026_06_19.png`
+
+Visual-match build method:
+
+- Slides 1 and 2 preserve the prior deck's visual image areas by using cropped
+  figure/photo assets from the recovered Drive reference panels, with editable
+  text and labels around them.
+- Slide 3 is rebuilt natively as editable signal bars and labels to match the
+  prior range-board look.
+- Slides 4 and 7 retain the complex workflow/runtime bodies as separate image
+  plates because that is the prior V5.5 look; titles, footers, and framing are
+  editable, and neither slide is a full-slide image object.
+- Slide 5's equation-card panel is rebuilt as native PowerPoint text/shapes,
+  not as the recovered full-slide image.
+- Slides 6, 8, and 9 are rebuilt with native editable text, cards, arrows, and
+  status panels.
+
+Corrected visual-match QA:
+
+- Rendered all nine PowerPoint slides locally and generated:
+  `editable_visual_match_contact_sheet_2026_06_19.png`.
+- Fetched exact prior Drive-reference slide panels and generated:
+  `reference_drive_contact_sheet_2026_06_19.png`.
+- Imported the corrected PPTX as a new native Google Slides deck without
+  overwriting the previous review deck.
+- Fetched fresh 1600x900 Drive thumbnails for slides 1-9 and generated:
+  `drive_import_contact_sheet_2026_06_19.png`.
+- Shape audit shows all slides contain editable text/shape objects and
+  `only_full_slide_image = False` for every slide.
+- The prior simplified rebuild remains a valid editable prototype but is
+  superseded for visual review by this visual-match deck.

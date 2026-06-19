@@ -1,6 +1,6 @@
 # North Slope Gas Hydrates Project Context
 
-Last updated: 2026-06-18
+Last updated: 2026-06-19
 
 ## Purpose
 
@@ -168,6 +168,16 @@ North Slope maps into one clear 2D map, rebuild Slide 3 around log-signal
 movement plus lithology/coring context, replace the three-dataset prototype
 with an equation-only slide, and make Slides 7-9 a guarded results/discussion
 plan without unsupported model or hydrate claims.
+The first native editable rebuild on 2026-06-19 proved the object model but
+drifted too far visually from the prior V5.5 review deck. The corrected active
+editable rebuild is now the visual-match deck
+`docs/project_blueprints/EDITABLE_VISUAL_MATCH_North_Slope_Gas_Hydrate_ML_Workflow_2026-06-19.pptx`,
+with QA assets in
+`docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/`
+and native Google Slides import at
+<https://docs.google.com/presentation/d/1cmGnsgcgkAcdP2-2ozCE2uyKb4YE0JuQoQYItxGWkHA>.
+Use that deck for the current editable-slide review; the simplified editable
+rebuild is superseded/reference.
 
 The active mentor-facing workflow package is now the V5.5 Slide 2 source update
 under
@@ -268,12 +278,9 @@ V5.4 as the source baseline and V5.3 as flawed reference only.
   scaffold views.
 - Tests exist in `tests/test_well_log_engine.py` and
   `tests/test_runtime_skeleton.py`.
-- The full project test suite passed after the DOE model-run tracker
-  review-board update and V5.5 deck update: 117 tests passed and 2 were
-  skipped after adding the tracker review-board tests and regenerating the
-  V5.5 deck, companion, slide panels, contact sheet, source visual inventory,
-  and Presentation Exports wiring. Update this count only after a fresh local
-  pytest run.
+- The full project test suite passed after the editable visual-match deck
+  rebuild: 119 tests passed and 2 were skipped on 2026-06-19. Update this
+  count only after a fresh local pytest run.
 - Public GIS layers, notebooks, structural surfaces, and Plotly exports are
   present.
 - Two working Word drafts and a rebuilt 2026-06-13 local research-overview

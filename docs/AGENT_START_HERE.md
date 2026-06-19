@@ -1,6 +1,6 @@
 # Agent Start Here
 
-Last updated: 2026-06-18
+Last updated: 2026-06-19
 
 Use this file as the first read for future Codex, PC, and OpenScienceLab
 sessions. It should be updated only when the project orientation,
@@ -126,6 +126,12 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
   `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/`
 - Current editable-deck rebuild source of truth:
   `docs/project_blueprints/EDITABLE_DECK_REBUILD_SOURCE_OF_TRUTH_2026-06-19.md`
+- Current corrected editable visual-match deck:
+  `docs/project_blueprints/EDITABLE_VISUAL_MATCH_North_Slope_Gas_Hydrate_ML_Workflow_2026-06-19.pptx`
+- Current corrected editable visual-match Drive import:
+  <https://docs.google.com/presentation/d/1cmGnsgcgkAcdP2-2ozCE2uyKb4YE0JuQoQYItxGWkHA>
+- Current corrected editable visual-match QA assets:
+  `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/`
 - Verified native Google Slides/Docs review copies:
   <https://docs.google.com/presentation/d/1-35vfTIXAnWCiyKTLooJy80HBYliMBliE_z4CbggJC0>
   and
@@ -253,8 +259,8 @@ Run the full suite before committing meaningful changes:
 python -m pytest
 ```
 
-Expected current result: `117 passed, 2 skipped` as of the 2026-06-17 V5.5
-deck update on top of the DOE model-run tracker review board. Update this count
+Expected current result: `119 passed, 2 skipped` as of the 2026-06-19
+editable visual-match deck rebuild. Update this count
 only after verifying it locally.
 
 Current test files:
