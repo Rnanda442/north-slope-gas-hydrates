@@ -76,6 +76,10 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
 - `docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md` - latest self-email
   project/deck direction, editable-slide rule, four-well ML scope, and copyable
   prompts for PC/OSL/delegated Codex chats.
+- `docs/project_blueprints/EDITABLE_DECK_REBUILD_SOURCE_OF_TRUTH_2026-06-19.md`
+  - current Drive/Gmail deck audit and the rule that the next deck pass must
+  rebuild slide faces as native movable/editable objects, not full-slide
+  screenshots.
 - `PROJECT_CONTEXT.md` - concise living project memory.
 - `docs/NORTH_SLOPE_PROJECT_BASE.md` - broader project base and deliverable
   inventory.
@@ -120,6 +124,8 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
   `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx`
 - Current V5.5 Slide 2 source update slide panels and contact sheet:
   `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/`
+- Current editable-deck rebuild source of truth:
+  `docs/project_blueprints/EDITABLE_DECK_REBUILD_SOURCE_OF_TRUTH_2026-06-19.md`
 - Verified native Google Slides/Docs review copies:
   <https://docs.google.com/presentation/d/1-35vfTIXAnWCiyKTLooJy80HBYliMBliE_z4CbggJC0>
   and
