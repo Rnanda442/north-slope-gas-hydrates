@@ -3,12 +3,19 @@
 Last updated: 2026-06-18
 
 This runbook is for the approved DOE/Anaconda runtime only. It is designed for
-the currently available three workbook package:
+the currently available three workbook package, which the 2026-06-18 project
+update treats as the active four-well ML scope:
 
 - `curated_dataset1.xlsx`
 - `curated_dataset2.xlsx`
 - `curated_dataset3.xlsx`
 - optional context file: `wellnametodataset.txt`
+
+Before using this package for final slide/Word claims, verify the real well
+names, aliases, locations, and available core/NMR/pressure-core/lithology data
+for the four wells represented by these files. Do not expand the current
+presentation or model story back to a broad 71-dataset scope unless the user or
+mentor explicitly restores that scope.
 
 The default experiment treats `curated_dataset1.xlsx` as the training workbook
 and `curated_dataset2.xlsx` plus `curated_dataset3.xlsx` as external test
