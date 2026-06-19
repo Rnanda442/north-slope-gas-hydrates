@@ -129,7 +129,7 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
 - Current corrected editable visual-match deck:
   `docs/project_blueprints/EDITABLE_VISUAL_MATCH_North_Slope_Gas_Hydrate_ML_Workflow_2026-06-19.pptx`
 - Current corrected editable visual-match Drive import:
-  <https://docs.google.com/presentation/d/1cmGnsgcgkAcdP2-2ozCE2uyKb4YE0JuQoQYItxGWkHA>
+  <https://docs.google.com/presentation/d/14l8zzQ8mbxf-adWIMphd1jorepqY3hqKdbGnn-vgb3I>
 - Current corrected editable visual-match QA assets:
   `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/`
 - Verified native Google Slides/Docs review copies:

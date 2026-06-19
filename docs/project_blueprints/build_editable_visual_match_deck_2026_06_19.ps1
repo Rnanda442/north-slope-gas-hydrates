@@ -10,6 +10,7 @@ $CropDir = Join-Path $AssetDir "cropped_reference_assets"
 $ExportDir = Join-Path $AssetDir "rendered_slides"
 $OutputFullPath = Join-Path $Root $OutputPath
 $QaCsv = Join-Path $AssetDir "editable_visual_match_shape_audit_2026_06_19.csv"
+$MapOnly = Join-Path $Root "docs/project_blueprints/presentation_assets/website_well_maps_2026_06_18/unified_north_slope_well_stability_context_map_2026_06_18.png"
 
 New-Item -ItemType Directory -Force -Path $AssetDir, $CropDir, $ExportDir | Out-Null
 & python (Join-Path $Root "docs/project_blueprints/render_editable_visual_match_assets_2026_06_19.py") --crop | Out-Host
@@ -170,9 +171,25 @@ function Add-SourceLabel($Slide, [double]$X1, [double]$Y1, [double]$X2, [double]
 }
 
 function Add-UnderLabel($Slide, [double]$X, [double]$Y, [double]$W, [string]$Top, [string]$Bottom, [int]$Color) {
-    Add-TextboxPx $Slide $X $Y $W 18 $Top 14 $NAVY $true 2 | Out-Null
-    Add-LinePx $Slide ($X + 8) ($Y + 22) ($X + $W - 8) ($Y + 22) $Color 2.1 | Out-Null
-    Add-TextboxPx $Slide $X ($Y + 26) $W 24 $Bottom 10 $MUTED $false 2 | Out-Null
+    Add-TextboxPx $Slide $X $Y $W 22 $Top 18 $NAVY $true 2 | Out-Null
+    Add-LinePx $Slide ($X + 8) ($Y + 27) ($X + $W - 8) ($Y + 27) $Color 2.3 | Out-Null
+    Add-TextboxPx $Slide $X ($Y + 32) $W 34 $Bottom 13 $MUTED $false 2 | Out-Null
+}
+
+function Add-CageIconPx($Slide, [double]$X, [double]$Y, [int]$Color) {
+    $water = Color 119 201 210
+    $pts = @(
+        @(0,-30), @(27,-15), @(27,15), @(0,30), @(-27,15), @(-27,-15)
+    )
+    for ($i = 0; $i -lt $pts.Count; $i++) {
+        $a = $pts[$i]
+        $b = $pts[($i + 1) % $pts.Count]
+        Add-LinePx $Slide ($X + $a[0]) ($Y + $a[1]) ($X + $b[0]) ($Y + $b[1]) (Color 107 142 149) 1.2 | Out-Null
+    }
+    foreach ($p in $pts) {
+        Add-OvalPx $Slide ($X + $p[0] - 7) ($Y + $p[1] - 7) ($X + $p[0] + 7) ($Y + $p[1] + 7) $water (Color 91 148 155) | Out-Null
+    }
+    Add-OvalPx $Slide ($X - 15) ($Y - 15) ($X + 15) ($Y + 15) $Color $Color | Out-Null
 }
 
 function Add-FeatureCard($Slide, [double]$X1, [double]$Y1, [double]$X2, [double]$Y2, [string]$Head, [string]$Body, [string]$Small, [int]$Color) {
@@ -233,16 +250,25 @@ function Build-Slide1($Presentation) {
 function Build-Slide2($Presentation) {
     $s = $Presentation.Slides.Add(2, $ppLayoutBlank)
     Set-Background $s
-    Add-PanelTitle $s "Gas Hydrates And Why The North Slope Matters" "Source-backed context only: hydrate structure, North Slope setting, and the pressure-temperature gate used before any ML claim."
+    Add-PanelTitle $s "Gas Hydrates And Why The North Slope Matters" "Source-backed context only: hydrate structure, North Slope setting, and the pressure-temperature diagram used before any ML claim."
     Add-CardPx $s 60 138 610 790 $WHITE $LINE | Out-Null
     Add-SectionHeader $s 60 138 "1" "What gas hydrate is" $TEAL
     Add-TextboxPx $s 84 198 480 28 "Water cages can trap gas under cold, high-pressure conditions." 14 $MUTED $true | Out-Null
     Add-PillPx $s 84 228 370 260 "methane Structure I = current baseline" $TEAL_LIGHT $TEAL | Out-Null
-    Add-ImagePx $s (Join-Path $CropDir "slide02_hydrate_structure_panel.png") 84 274 586 604 | Out-Null
-    $circle = Add-OvalPx $s 372 283 505 417 (Color 255 255 255) $TEAL
-    $circle.Fill.Transparency = 1
-    $circle.Line.Weight = 2.5
-    Add-SourceLabel $s 84 274 586 604 "World Atlas Fig. 1.1 after Warrier et al. 2016; sI highlighted"
+    Add-CardPx $s 84 274 586 604 $WHITE $LINE 1.0 | Out-Null
+    Add-TextboxPx $s 106 292 430 24 "Editable hydrate structure schematic" 16 $NAVY $true | Out-Null
+    Add-LinePx $s 106 327 560 327 $LINE 1.0 | Out-Null
+    Add-CageIconPx $s 132 365 $TEAL
+    Add-TextboxPx $s 190 337 130 28 "Structure I" 18 $TEAL $true | Out-Null
+    Add-TextboxPx $s 190 367 330 34 "methane-dominant baseline for this project" 14 $NAVY $true | Out-Null
+    Add-LinePx $s 106 421 560 421 $LINE 1.0 | Out-Null
+    Add-CageIconPx $s 132 459 $AMBER
+    Add-TextboxPx $s 190 431 130 28 "Structure II" 18 $AMBER $true | Out-Null
+    Add-TextboxPx $s 190 461 330 34 "larger hydrocarbons or mixed gas context" 14 $NAVY $true | Out-Null
+    Add-LinePx $s 106 515 560 515 $LINE 1.0 | Out-Null
+    Add-CageIconPx $s 132 553 $PURPLE
+    Add-TextboxPx $s 190 525 130 28 "Structure H" 18 $PURPLE $true | Out-Null
+    Add-TextboxPx $s 190 555 330 34 "larger molecule and scenario-chemistry context" 14 $NAVY $true | Out-Null
     Add-CardPx $s 84 626 242 704 $TEAL_LIGHT $TEAL | Out-Null
     Add-TextboxPx $s 96 636 132 24 "Structure I" 14 $TEAL $true | Out-Null
     Add-TextboxPx $s 96 662 132 24 "methane baseline" 11 $NAVY $true | Out-Null
@@ -252,13 +278,13 @@ function Build-Slide2($Presentation) {
     Add-CardPx $s 428 626 586 704 $PURPLE_LIGHT $PURPLE | Out-Null
     Add-TextboxPx $s 440 636 132 24 "Structure H" 14 $PURPLE $true | Out-Null
     Add-TextboxPx $s 440 662 132 24 "scenario chemistry" 11 $NAVY $true | Out-Null
-    Add-TextboxPx $s 84 732 482 30 "Structure II/H are kept as gas-composition sensitivity, not the current baseline." 11 $MUTED $true | Out-Null
+    Add-TextboxPx $s 84 732 482 30 "Structure II and H can host larger hydrocarbons or mixed gas; methane Structure I is the project baseline." 11 $MUTED $true | Out-Null
 
     Add-CardPx $s 620 138 1245 790 $WHITE $LINE | Out-Null
     Add-SectionHeader $s 620 138 "2" "Why the North Slope" $BLUE
     Add-TextboxPx $s 644 198 565 40 "The updated 2D stability-screen map uses OSL-staged DNR units, roads, TAPS, communities, and field labels." 13 $MUTED $true | Out-Null
     Add-ImagePx $s (Join-Path $CropDir "slide02_north_slope_map_panel.png") 632 238 1233 640 | Out-Null
-    Add-SourceLabel $s 632 238 1233 640 "OSL/website 2D stability-screen map; DNR units + AKDOT roads + TAPS overlays"
+    Add-SourceLabel $s 632 238 1233 640 "Public 2D context map: DNR units + AKDOT roads + TAPS overlays"
     $layers = @(
         @(632,662,813,704,"#","DNR units"),
         @(828,662,1029,704,"|","Dalton + TAPS"),
@@ -272,8 +298,8 @@ function Build-Slide2($Presentation) {
     Add-TextboxPx $s 632 728 585 30 "Map layers locate the public scaffold; they do not claim occurrence or saturation." 11 $RED $true | Out-Null
 
     Add-CardPx $s 1255 138 1540 790 $WHITE $LINE | Out-Null
-    Add-SectionHeader $s 1255 138 "3" "P-T gate" $GREEN
-    Add-TextboxPx $s 1273 198 230 38 "Stability screens whether hydrate is physically admissible under the selected assumptions." 12 $MUTED $true | Out-Null
+    Add-SectionHeader $s 1255 138 "3" "P-T diagram" $GREEN
+    Add-TextboxPx $s 1273 198 230 38 "The diagram screens whether hydrate is physically admissible under selected assumptions." 12 $MUTED $true | Out-Null
     Add-ImagePx $s (Join-Path $CropDir "slide02_stability_curve_panel.png") 1273 244 1518 496 | Out-Null
     Add-SourceLabel $s 1273 244 1518 496 "Selected USGS/DOE North Slope hydrate stability figure"
     Add-CardPx $s 1273 520 1518 580 (Color 217 247 249) $TEAL | Out-Null
@@ -287,8 +313,8 @@ function Build-Slide2($Presentation) {
     Add-TextboxPx $s 1287 704 210 18 "not proof; not saturation" 13 $NAVY $true | Out-Null
     Add-CardPx $s 60 805 1540 835 $LIGHT $LINE | Out-Null
     Add-TextboxPx $s 80 813 1420 16 "Why this project: North Slope methane hydrate needs integrated geology + stability + well-log/core evidence before occurrence or saturation ML can make reviewed claims." 12 $NAVY $true | Out-Null
-    Add-FooterPx $s "Slide 2 sources: World Atlas Fig. 1.1 hydrate structure crop; OSL/website 2D stability-screen map with public GIS overlays; selected USGS/DOE stability figure. Stability is not hydrate proof."
-    Add-Notes $s "Use this slide to set context. The P-T panel is a gate/admissibility screen only."
+    Add-FooterPx $s "Context only: hydrate structure, public North Slope map layers, and a P-T stability diagram. Stability is not hydrate proof."
+    Add-Notes $s "Use this slide to set context. The hydrate structure image has no drawn circle. The P-T panel is an admissibility diagram only."
 }
 
 function Build-Slide3($Presentation) {
@@ -321,85 +347,151 @@ function Build-Slide3($Presentation) {
 function Build-Slide4($Presentation) {
     $s = $Presentation.Slides.Add(4, $ppLayoutBlank)
     Set-Background $s
-    Add-PanelTitle $s "Full Complex Project Workflow V5.5" "The complete architecture stays in the main sequence: public sources, approved runtime later, stability context, feature engineering, target rail, split controls, validation, and exports."
-    Add-ImagePx $s (Join-Path $CropDir "slide04_architecture_body.png") 0 92 1600 842 | Out-Null
-    Add-FooterPx $s "Expanded architecture reference inside the deck: slides 5, 6, 8, and 9 provide readable zoom explanations."
-    Add-Notes $s "Keep this as the complete project architecture plate. It is a complex figure; downstream slides explain it in smaller editable pieces."
+    Add-PanelTitle $s "Four-Well Workflow: Audience Version" "The full architecture is reduced to editable steps: source intake, QC, leakage guardrails, model path, validation, and reviewed outputs."
+
+    Add-CardPx $s 60 145 1540 420 $LIGHT $LINE | Out-Null
+    Add-TextboxPx $s 86 166 450 28 "Editable main flow" 19 $TEAL $true | Out-Null
+    $steps = @(
+        @("1","Inputs","approved logs + core/NMR + lithology + public GIS context",$TEAL),
+        @("2","Prepare","preserve headers, units, depth axis, and missingness flags",$BLUE),
+        @("3","Leakage barrier","remove saturation and occurrence labels from predictors",$RED),
+        @("4","Model path","occurrence and saturation stay linked but separate",$PURPLE),
+        @("5","Validate","whole-well or geography-aware split before metrics",$GREEN),
+        @("6","Review outputs","figures, uncertainty, maps, and manuscript exports",$AMBER)
+    )
+    $x = 84
+    foreach ($step in $steps) {
+        Add-CardPx $s $x 210 ($x + 218) 370 $WHITE $step[3] 1.4 | Out-Null
+        $dot = Add-OvalPx $s ($x + 15) 226 ($x + 49) 260 $step[3] $step[3]
+        Set-TextStyle $dot $step[0] (F 16) $WHITE $true 2
+        Add-TextboxPx $s ($x + 60) 223 130 30 $step[1] 18 $step[3] $true | Out-Null
+        Add-TextboxPx $s ($x + 18) 276 180 70 $step[2] 14 $NAVY $true 2 | Out-Null
+        if ($x -lt 1300) { Add-LinePx $s ($x + 222) 290 ($x + 242) 290 $MUTED 2.0 $true | Out-Null }
+        $x += 244
+    }
+
+    Add-CardPx $s 60 470 520 775 $WHITE $TEAL | Out-Null
+    Add-TextboxPx $s 90 498 380 32 "What is collapsed from the full diagram" 22 $TEAL $true | Out-Null
+    $collapsed = @(
+        "source library and workbook intake detail",
+        "schema mapping and unit normalization",
+        "feature families and runtime branches",
+        "export packaging for Word, slides, and website"
+    )
+    $y = 550
+    foreach ($item in $collapsed) {
+        Add-OvalPx $s 92 ($y + 5) 106 ($y + 19) $TEAL $TEAL | Out-Null
+        Add-TextboxPx $s 122 $y 330 34 $item 15 $NAVY $true | Out-Null
+        $y += 46
+    }
+
+    Add-CardPx $s 570 470 1040 775 $WHITE $RED | Out-Null
+    Add-TextboxPx $s 600 498 380 32 "What stays out of predictor inputs" 22 $RED $true | Out-Null
+    $blocked = @(
+        "hydrate saturation labels",
+        "core hydrate observations",
+        "pressure-core saturation",
+        "occurrence labels and final interpretations"
+    )
+    $y = 550
+    foreach ($item in $blocked) {
+        Add-OvalPx $s 602 ($y + 5) 616 ($y + 19) $RED $RED | Out-Null
+        Add-TextboxPx $s 632 $y 340 34 $item 15 $NAVY $true | Out-Null
+        $y += 46
+    }
+    Add-CardPx $s 612 715 998 754 $RED_LIGHT $RED | Out-Null
+    Add-TextboxPx $s 632 724 345 18 "Y-only evidence supports labels, calibration, validation, and review." 12 $RED $true 2 | Out-Null
+
+    Add-CardPx $s 1090 470 1540 775 $WHITE $PURPLE | Out-Null
+    Add-TextboxPx $s 1120 498 350 32 "Two-minute talk-track structure" 22 $PURPLE $true | Out-Null
+    $talk = @(
+        "Start with what data are allowed.",
+        "Explain how source names and units survive QC.",
+        "Show why targets are separated from features.",
+        "End with reviewed outputs, not unsupported results."
+    )
+    $y = 550
+    foreach ($item in $talk) {
+        Add-OvalPx $s 1122 ($y + 5) 1136 ($y + 19) $PURPLE $PURPLE | Out-Null
+        Add-TextboxPx $s 1152 $y 330 34 $item 15 $NAVY $true | Out-Null
+        $y += 46
+    }
+
+    Add-CardPx $s 60 805 1540 835 $LIGHT $LINE | Out-Null
+    Add-TextboxPx $s 80 813 1410 16 "This slide explains process, not final ML performance. Approved runtime outputs are reviewed later against lithology, core/NMR calibration, uncertainty, and false positives." 12 $NAVY $true | Out-Null
+    Add-FooterPx $s "Sources: project revision base, science-to-ML logic ladder, baseline source ledger, and editable rebuild source-of-truth notes."
+    Add-Notes $s "Two-minute script: first, the workflow begins with approved logs and core/NMR/lithology evidence while public GIS remains context only. Second, every header, unit, and depth axis is preserved so features are traceable. Third, saturation and occurrence labels are locked into the Y-only rail and cannot leak into X_allowed. Fourth, occurrence and saturation can be modeled as linked but separate outputs after validation. Close by saying the current deck explains the review system, not final hydrate results."
 }
 
 function Build-Slide5($Presentation) {
     $s = $Presentation.Slides.Add(5, $ppLayoutBlank)
     Set-Background $s
-    Add-PanelTitle $s "Equation Checks For The Four-Well Workflow" "Measured curves, core calibration, and stability context are converted into review features. These equations are not final hydrate results."
-    Add-PillPx $s 1000 51 1125 84 "log input" $WHITE $GREEN | Out-Null
-    Add-PillPx $s 1145 51 1266 84 "core or lab" $WHITE $AMBER | Out-Null
-    Add-PillPx $s 1285 51 1408 84 "stability context" $WHITE $BLUE | Out-Null
-    Add-PillPx $s 1427 51 1550 84 "derived check" $WHITE $PURPLE | Out-Null
+    Add-PanelTitle $s "Equation Checks For The Four-Well Workflow" "Large editable checks only: source-backed quantities, real fraction bars, readable words under each symbol, and no result claim."
+    Add-PillPx $s 1010 51 1135 84 "log input" $WHITE $GREEN | Out-Null
+    Add-PillPx $s 1155 51 1280 84 "core/lab" $WHITE $AMBER | Out-Null
+    Add-PillPx $s 1300 51 1430 84 "stability" $WHITE $BLUE | Out-Null
+    Add-PillPx $s 1450 51 1550 84 "check" $WHITE $PURPLE | Out-Null
 
-    Add-CardPx $s 60 145 541 406 $LIGHT $BLUE | Out-Null
-    Add-RectPx $s 60 145 541 187 $BLUE $BLUE | Out-Null
-    Add-TextboxPx $s 78 157 435 26 "Hydrostatic pressure-depth relation" 16 $WHITE $true | Out-Null
-    Add-TextboxPx $s 91 216 415 56 "P_abs(z) = P0 +  rho_w * g * z" 34 $NAVY $true 2 | Out-Null
-    Add-LinePx $s 330 247 507 247 $NAVY 1.8 | Out-Null
-    Add-TextboxPx $s 357 260 110 28 "1,000,000" 28 $NAVY $true 2 | Out-Null
-    Add-UnderLabel $s 92 308 72 "P_abs" "absolute`npressure" $BLUE
-    Add-UnderLabel $s 164 308 55 "P0" "surface`npressure" $BLUE
-    Add-UnderLabel $s 237 308 62 "rho_w" "pore-fluid`ndensity" $BLUE
-    Add-UnderLabel $s 309 308 60 "g" "gravity" $BLUE
-    Add-UnderLabel $s 380 308 58 "z" "depth" $BLUE
-    Add-UnderLabel $s 452 308 58 "10^6" "Pa to MPa" $PURPLE
-    Add-TextboxPx $s 116 360 350 30 "Converts depth to pressure for phase-boundary comparison; not measured reservoir pressure." 13 $NAVY $true 2 | Out-Null
+    Add-CardPx $s 60 145 541 415 $LIGHT $BLUE | Out-Null
+    Add-RectPx $s 60 145 541 190 $BLUE $BLUE | Out-Null
+    Add-TextboxPx $s 78 158 430 26 "Hydrostatic pressure-depth relation" 18 $WHITE $true | Out-Null
+    Add-TextboxPx $s 86 224 250 42 "Pabs(z) = P0 +" 30 $NAVY $true 2 | Out-Null
+    Add-TextboxPx $s 335 214 180 32 "rho w g z" 25 $NAVY $true 2 | Out-Null
+    Add-LinePx $s 348 252 502 252 $NAVY 2.2 | Out-Null
+    Add-TextboxPx $s 365 262 120 28 "1e6" 25 $NAVY $true 2 | Out-Null
+    Add-UnderLabel $s 88 320 82 "Pabs" "absolute`npressure" $BLUE
+    Add-UnderLabel $s 171 320 64 "P0" "surface`npressure" $BLUE
+    Add-UnderLabel $s 250 320 82 "rho w" "fluid`ndensity" $BLUE
+    Add-UnderLabel $s 340 320 52 "g" "gravity" $BLUE
+    Add-UnderLabel $s 402 320 48 "z" "depth" $BLUE
+    Add-UnderLabel $s 456 320 78 "1e6" "Pa to MPa" $PURPLE
 
-    Add-CardPx $s 570 145 1016 406 $LIGHT $GREEN | Out-Null
-    Add-RectPx $s 570 145 1016 187 $GREEN $GREEN | Out-Null
-    Add-TextboxPx $s 588 157 260 26 "Velocity ratio" 16 $WHITE $true | Out-Null
-    Add-TextboxPx $s 657 238 110 45 "R_v =" 36 $NAVY $true 2 | Out-Null
-    Add-TextboxPx $s 775 214 110 36 "V_p" 34 $NAVY $true 2 | Out-Null
-    Add-LinePx $s 790 254 881 254 $NAVY 1.8 | Out-Null
-    Add-TextboxPx $s 775 260 110 40 "V_s" 34 $NAVY $true 2 | Out-Null
-    Add-UnderLabel $s 626 313 70 "R_v" "velocity ratio" $PURPLE
-    Add-UnderLabel $s 758 313 75 "V_p" "P-wave velocity" $GREEN
-    Add-UnderLabel $s 890 313 75 "V_s" "S-wave velocity" $GREEN
-    Add-TextboxPx $s 600 358 360 34 "Compares compressional and shear response; useful only with unit and lithology checks." 13 $NAVY $true 2 | Out-Null
+    Add-CardPx $s 570 145 1016 415 $LIGHT $GREEN | Out-Null
+    Add-RectPx $s 570 145 1016 190 $GREEN $GREEN | Out-Null
+    Add-TextboxPx $s 588 158 250 26 "Velocity ratio" 18 $WHITE $true | Out-Null
+    Add-TextboxPx $s 635 230 130 48 "VpVs =" 36 $NAVY $true 2 | Out-Null
+    Add-TextboxPx $s 790 207 96 38 "Vp" 36 $NAVY $true 2 | Out-Null
+    Add-LinePx $s 790 252 886 252 $NAVY 2.2 | Out-Null
+    Add-TextboxPx $s 790 260 96 38 "Vs" 36 $NAVY $true 2 | Out-Null
+    Add-UnderLabel $s 625 320 90 "VpVs" "velocity`nratio" $PURPLE
+    Add-UnderLabel $s 755 320 95 "Vp" "P wave`nvelocity" $GREEN
+    Add-UnderLabel $s 885 320 95 "Vs" "S wave`nvelocity" $GREEN
 
-    Add-CardPx $s 1045 145 1541 406 $LIGHT $TEAL | Out-Null
-    Add-RectPx $s 1045 145 1541 187 $TEAL $TEAL | Out-Null
-    Add-TextboxPx $s 1063 157 260 26 "Acoustic impedance" 16 $WHITE $true | Out-Null
-    Add-TextboxPx $s 1165 244 275 48 "AI = rho_b * V_p" 34 $NAVY $true 2 | Out-Null
-    Add-UnderLabel $s 1108 313 80 "AI" "acoustic impedance" $PURPLE
-    Add-UnderLabel $s 1258 313 85 "rho_b" "bulk density" $GREEN
-    Add-UnderLabel $s 1420 313 80 "V_p" "P-wave velocity" $GREEN
-    Add-TextboxPx $s 1105 358 380 26 "Combines density and velocity into an impedance contrast check." 13 $NAVY $true 2 | Out-Null
+    Add-CardPx $s 1045 145 1541 415 $LIGHT $TEAL | Out-Null
+    Add-RectPx $s 1045 145 1541 190 $TEAL $TEAL | Out-Null
+    Add-TextboxPx $s 1063 158 260 26 "Acoustic impedance" 18 $WHITE $true | Out-Null
+    Add-TextboxPx $s 1125 238 335 48 "AI = RHOB * Vp" 36 $NAVY $true 2 | Out-Null
+    Add-UnderLabel $s 1100 320 92 "AI" "acoustic`nimpedance" $PURPLE
+    Add-UnderLabel $s 1250 320 108 "RHOB" "bulk`ndensity" $GREEN
+    Add-UnderLabel $s 1415 320 90 "Vp" "P wave`nvelocity" $GREEN
 
-    Add-CardPx $s 60 440 542 742 $LIGHT $PURPLE | Out-Null
-    Add-RectPx $s 60 440 542 483 $PURPLE $PURPLE | Out-Null
-    Add-TextboxPx $s 78 452 260 26 "Shear rigidity" 16 $WHITE $true | Out-Null
-    Add-TextboxPx $s 169 535 265 48 "G = rho_b * V_s^2" 34 $NAVY $true 2 | Out-Null
-    Add-UnderLabel $s 120 609 75 "G" "shear modulus" $PURPLE
-    Add-UnderLabel $s 265 609 75 "rho_b" "bulk density" $GREEN
-    Add-UnderLabel $s 409 609 75 "V_s" "S-wave velocity" $GREEN
-    Add-PillPx $s 96 668 505 702 "Highlights frame stiffness; mimics still require review." $PURPLE_LIGHT $NAVY | Out-Null
+    Add-CardPx $s 60 455 542 742 $LIGHT $PURPLE | Out-Null
+    Add-RectPx $s 60 455 542 500 $PURPLE $PURPLE | Out-Null
+    Add-TextboxPx $s 78 468 260 26 "Shear rigidity" 18 $WHITE $true | Out-Null
+    Add-TextboxPx $s 145 555 310 48 "G = RHOB * Vs^2" 36 $NAVY $true 2 | Out-Null
+    Add-UnderLabel $s 100 638 92 "G" "shear`nmodulus" $PURPLE
+    Add-UnderLabel $s 255 638 108 "RHOB" "bulk`ndensity" $GREEN
+    Add-UnderLabel $s 415 638 90 "Vs" "S wave`nvelocity" $GREEN
 
-    Add-CardPx $s 570 440 1541 742 $LIGHT $AMBER | Out-Null
-    Add-RectPx $s 570 440 1541 483 $AMBER $AMBER | Out-Null
-    Add-TextboxPx $s 588 452 700 26 "Electrical saturation baseline - locked until parameters are approved" 16 $WHITE $true | Out-Null
-    Add-TextboxPx $s 618 520 145 46 "S_w^n =" 34 $NAVY $true 2 | Out-Null
-    Add-TextboxPx $s 785 506 145 34 "a * R_w" 34 $NAVY $true 2 | Out-Null
-    Add-LinePx $s 780 548 930 548 $NAVY 1.8 | Out-Null
-    Add-TextboxPx $s 778 555 160 34 "R_t * phi^m" 34 $NAVY $true 2 | Out-Null
-    Add-TextboxPx $s 960 525 245 44 "S_h ~= 1 - S_w" 34 $NAVY $true 2 | Out-Null
+    Add-CardPx $s 570 455 1541 742 $LIGHT $AMBER | Out-Null
+    Add-RectPx $s 570 455 1541 500 $AMBER $AMBER | Out-Null
+    Add-TextboxPx $s 588 468 690 26 "Electrical saturation baseline - optional review check only" 18 $WHITE $true | Out-Null
+    Add-TextboxPx $s 632 535 135 44 "Sw^n =" 34 $NAVY $true 2 | Out-Null
+    Add-TextboxPx $s 792 516 160 36 "a * Rw" 34 $NAVY $true 2 | Out-Null
+    Add-LinePx $s 786 558 960 558 $NAVY 2.2 | Out-Null
+    Add-TextboxPx $s 778 566 190 36 "Rt * phi^m" 34 $NAVY $true 2 | Out-Null
+    Add-TextboxPx $s 1038 548 270 44 "Sh ~= 1 - Sw" 34 $NAVY $true 2 | Out-Null
     $labels = @(
-        @(616,"S_w","water saturation",$PURPLE), @(731,"n","sat. exponent",$AMBER), @(846,"a","Archie constant",$AMBER),
-        @(961,"R_w","water resistivity",$AMBER), @(1076,"R_t","deep resistivity",$GREEN), @(1191,"phi","porosity",$GREEN),
-        @(1306,"m","cementation exp.",$AMBER), @(1421,"S_h","review estimate",$PURPLE)
+        @(610,"Sw","water`nsaturation",$PURPLE), @(720,"n","saturation`nexponent",$AMBER), @(830,"a","Archie`nconstant",$AMBER),
+        @(940,"Rw","water`nresistivity",$AMBER), @(1050,"Rt","deep`nresistivity",$GREEN), @(1160,"phi","porosity",$GREEN),
+        @(1270,"m","cementation`nexponent",$AMBER), @(1380,"Sh","review`nestimate",$PURPLE)
     )
-    foreach ($lab in $labels) { Add-UnderLabel $s $lab[0] 617 80 $lab[1] $lab[2] $lab[3] }
-    Add-TextboxPx $s 690 692 720 25 "Use as a comparison baseline only after water resistivity, porosity convention, shale correction, and target role are documented." 13 $NAVY $true 2 | Out-Null
+    foreach ($lab in $labels) { Add-UnderLabel $s $lab[0] 638 96 $lab[1] $lab[2] $lab[3] }
 
-    Add-CardPx $s 60 765 1541 830 $RED_LIGHT $RED | Out-Null
-    Add-TextboxPx $s 128 789 1300 30 "Guardrail: equations convert or compare source-backed quantities. They do not prove hydrate occurrence, final stability, saturation, producibility, or ranking." 19 $RED $true 2 | Out-Null
-    Add-FooterPx $s "Sources: stability calculation plan; email screenshot equation set; science logic ladder; baseline source ledger; well-log requirements map."
-    Add-Notes $s "Use this slide as equation checks only. Do not present equations as hydrate proof or final results."
+    Add-CardPx $s 60 770 1541 832 $RED_LIGHT $RED | Out-Null
+    Add-TextboxPx $s 118 790 1300 27 "Guardrail: equations convert or compare quantities. They do not prove hydrate occurrence, final stability, saturation, producibility, or ranking." 18 $RED $true 2 | Out-Null
+    Add-FooterPx $s "Sources: stability calculation plan; email equation set; science logic ladder; baseline source ledger; well-log requirements map."
+    Add-Notes $s "Use this slide as equation checks only. Words under symbols are intentionally large and editable. Do not present equations as hydrate proof or final results."
 }
 
 function Build-Slide6($Presentation) {
@@ -441,10 +533,40 @@ function Build-Slide6($Presentation) {
 function Build-Slide7($Presentation) {
     $s = $Presentation.Slides.Add(7, $ppLayoutBlank)
     Set-Background $s
-    Add-PanelTitle $s "Complex ML Runtime Architecture V5.5" "Feature groups, X_allowed, target-only rail, whole-well split, train-only preprocessing, baselines, ANN/Keras candidate, dual heads, validation, and reviewed outputs remain intact."
-    Add-ImagePx $s (Join-Path $CropDir "slide07_runtime_body.png") 0 92 1600 842 | Out-Null
-    Add-FooterPx $s "ML runtime detail inside the deck: X_allowed, Y-only rail, split controls, output heads, validation, and reviewed outputs."
-    Add-Notes $s "This is the complete runtime architecture plate. Do not call it final trained results."
+    Add-PanelTitle $s "Unified North Slope Well + Stability Context Map" "Regional context only: public GIS layers and stability-screen status for discussion, not an ML overlay or hydrate proof."
+    Add-CardPx $s 52 145 1105 720 $WHITE $LINE | Out-Null
+    Add-ImagePx $s (Join-Path $CropDir "slide07_unified_map_only_panel.png") 70 168 1088 665 | Out-Null
+
+    Add-CardPx $s 78 675 1080 707 $LIGHT $LINE | Out-Null
+    $status = @(
+        @(105,"Calculated screen interval",$BLUE),
+        @(365,"Calculated, no stable interval",$NAVY),
+        @(655,"Blocked: phase curve range",(Color 217 119 6)),
+        @(930,"Outside public AU context",$PURPLE)
+    )
+    foreach ($item in $status) {
+        Add-OvalPx $s $item[0] 684 ($item[0] + 14) 698 $item[2] $item[2] | Out-Null
+        Add-TextboxPx $s ($item[0] + 22) 680 220 20 $item[1] 11 $NAVY $true | Out-Null
+    }
+
+    Add-CardPx $s 1140 145 1540 302 $WHITE $TEAL | Out-Null
+    Add-TextboxPx $s 1166 168 300 26 "Readable orientation layers" 21 $TEAL $true | Out-Null
+    Add-TextboxPx $s 1168 207 320 64 "USGS hydrate AU outlines, DNR oil/gas unit outlines, AKDOT roads, Dalton/Deadhorse roads, TAPS corridor, field labels, and public wells." 14 $NAVY $true | Out-Null
+
+    Add-CardPx $s 1140 325 1540 482 $WHITE $BLUE | Out-Null
+    Add-TextboxPx $s 1166 348 300 26 "Status points stay separate" 21 $BLUE $true | Out-Null
+    Add-TextboxPx $s 1168 388 320 64 "Point colors are stability-screen status categories. They are not occurrence labels, saturation labels, or trained-model outputs." 14 $NAVY $true | Out-Null
+
+    Add-CardPx $s 1140 505 1540 662 $WHITE $AMBER | Out-Null
+    Add-TextboxPx $s 1166 528 300 26 "How to discuss it" 21 $AMBER $true | Out-Null
+    Add-TextboxPx $s 1168 568 320 64 "Use the map to locate the wells and public geologic context before showing planned result-review logic." 14 $NAVY $true | Out-Null
+
+    Add-CardPx $s 1140 690 1540 820 $RED_LIGHT $RED | Out-Null
+    Add-TextboxPx $s 1166 712 305 30 "Required caveat" 21 $RED $true | Out-Null
+    Add-TextboxPx $s 1168 752 325 42 "Context/orientation only. Stability-screen status does not prove hydrate occurrence, saturation, or trained-model evidence." 14 $RED $true | Out-Null
+
+    Add-FooterPx $s "Map source: public/OSL-staged unified North Slope GIS export. Raw DNR/AKDOT/TAPS/GNIS/DGGS packages remain Drive/OSL-only when not GitHub-safe."
+    Add-Notes $s "Use this map as context only. Mention public field labels, DNR units, roads, TAPS, USGS hydrate AU outlines, GGD223 controls, and stability-screen status. Do not call it an ML overlay or a hydrate occurrence map."
 }
 
 function Build-Slide8($Presentation) {

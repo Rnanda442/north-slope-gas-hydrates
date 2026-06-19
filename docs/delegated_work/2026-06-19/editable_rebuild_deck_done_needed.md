@@ -53,20 +53,29 @@
   `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/cropped_reference_assets/`
 - Rebuilt Slide 5's prior equation-card panel as native editable PowerPoint
   cards/text/shapes instead of keeping it as one image.
-- Kept the complex Slide 4 and Slide 7 bodies as separate image plates to
-  match the prior V5.5 deck, while keeping titles, framing, and captions
-  editable; shape audit confirms neither slide is a full-slide image.
+- Cleanup pass after user review rebuilt Slide 4 as a native editable
+  audience workflow instead of a locked image plate.
+- Cleanup pass rebuilt Slide 7 as the unified North Slope well + stability
+  context map, with the map as one image object and the title, callouts, status
+  legend, caveat, and source note editable.
+- Slide 2's first hydrate-structure image area is now a native editable
+  schematic, removing the messy circle-line source image issue.
+- Slide 5 was cleaned up with larger symbol-word labels and no visible
+  underscored symbol labels; the pressure, velocity-ratio, and Archie-style
+  divisions use visible fraction bars.
 - Rendered the visual-match deck, generated local and reference contact sheets,
   and created:
   `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/editable_visual_match_shape_audit_2026_06_19.csv`
-- Imported the visual-match PPTX as a new native Google Slides deck:
-  <https://docs.google.com/presentation/d/1cmGnsgcgkAcdP2-2ozCE2uyKb4YE0JuQoQYItxGWkHA>
-- Verified that visual-match Drive import by connector readback and fresh
-  1600x900 thumbnails for slides 1-9.
+- Imported the cleanup v2 visual-match PPTX as a new native Google Slides deck:
+  <https://docs.google.com/presentation/d/14l8zzQ8mbxf-adWIMphd1jorepqY3hqKdbGnn-vgb3I>
+- Verified that cleanup v2 Drive import by connector readback and fresh
+  1600x900 thumbnails for Slides 2, 4, 5, and 7.
 - Saved Drive-import visual-match thumbnails and contact sheet under:
   `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/drive_import_thumbnails/`
   and
   `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/drive_import_contact_sheet_2026_06_19.png`.
+- Saved cleanup v2 Drive-import thumbnails under:
+  `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/drive_import_thumbnails_cleanup_v2/`.
 
 ## Still Needed
 
@@ -96,7 +105,7 @@
 - `docs/project_blueprints/build_editable_visual_match_deck_2026_06_19.ps1`
 - `docs/project_blueprints/render_editable_visual_match_assets_2026_06_19.py`
 - `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/`
-- <https://docs.google.com/presentation/d/1cmGnsgcgkAcdP2-2ozCE2uyKb4YE0JuQoQYItxGWkHA>
+- <https://docs.google.com/presentation/d/14l8zzQ8mbxf-adWIMphd1jorepqY3hqKdbGnn-vgb3I>
 - `data/public_stability_products/phase_curve_methane_5ppt_screenshot_recovered_2026-06-18.csv`
 - `data/public_ml_products/four_well_case_location_index_2026-06-19.csv`
 - `docs/source_library_index/FOUR_WELL_CASE_LOCATION_INDEX_2026-06-19.md`
@@ -106,7 +115,7 @@
 ## Branch / Commit
 
 - Branch: `codex/editable-rebuild-deck-output-20260619`
-- Commit: visual-match correction commit pending at time of this handoff edit;
+- Commit: cleanup v2 correction commit pending at time of this handoff edit;
   use `git log -1 --oneline` or the final handoff response for the exact hash.
 
 ## Slides Affected

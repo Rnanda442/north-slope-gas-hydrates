@@ -155,7 +155,7 @@ The corrected active rebuild is:
 - QA/source assets:
   `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/`
 - Native Google Slides import:
-  <https://docs.google.com/presentation/d/1cmGnsgcgkAcdP2-2ozCE2uyKb4YE0JuQoQYItxGWkHA>
+  <https://docs.google.com/presentation/d/14l8zzQ8mbxf-adWIMphd1jorepqY3hqKdbGnn-vgb3I>
 
 The original V5.5 Drive review deck remains untouched:
 <https://docs.google.com/presentation/d/1ge6xYeiUTx1q1gFQcYGfMR1qv3uvOjKVG0YtipzwEsI>.
@@ -244,30 +244,36 @@ Local visual-match editable rebuild output:
 Native Google Slides import:
 
 - Title:
-  `EDITABLE VISUAL MATCH - North Slope Gas Hydrate ML Workflow - 2026-06-19`
+  `EDITABLE VISUAL MATCH CLEANUP v2 - North Slope Gas Hydrate ML Workflow - 2026-06-19`
 - Link:
-  <https://docs.google.com/presentation/d/1cmGnsgcgkAcdP2-2ozCE2uyKb4YE0JuQoQYItxGWkHA>
+  <https://docs.google.com/presentation/d/14l8zzQ8mbxf-adWIMphd1jorepqY3hqKdbGnn-vgb3I>
 - Google Slides ID:
-  `1cmGnsgcgkAcdP2-2ozCE2uyKb4YE0JuQoQYItxGWkHA`
+  `14l8zzQ8mbxf-adWIMphd1jorepqY3hqKdbGnn-vgb3I`
 - Connector readback verified the imported deck ID, title, native Slides
   structure, and editable text/shape objects.
 - Drive-import thumbnails:
   `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/drive_import_thumbnails/`
+- Drive-import cleanup v2 thumbnails:
+  `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/drive_import_thumbnails_cleanup_v2/`
 - Drive-import contact sheet:
   `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/drive_import_contact_sheet_2026_06_19.png`
 
 Visual-match build method:
 
-- Slides 1 and 2 preserve the prior deck's visual image areas by using cropped
-  figure/photo assets from the recovered Drive reference panels, with editable
-  text and labels around them.
+- Slides 1 and 2 preserve the prior deck's general visual organization. Slide
+  2 now replaces the marked-up hydrate-structure raster with a clean native
+  editable schematic, removing the distracting circle-line issue from the
+  previous image.
 - Slide 3 is rebuilt natively as editable signal bars and labels to match the
   prior range-board look.
-- Slides 4 and 7 retain the complex workflow/runtime bodies as separate image
-  plates because that is the prior V5.5 look; titles, footers, and framing are
-  editable, and neither slide is a full-slide image object.
+- Slide 4 is rebuilt as a native editable audience workflow instead of a locked
+  complex workflow image plate.
+- Slide 7 is rebuilt as the unified North Slope well + stability context map:
+  the map is a single image object, while the title, status legend, callouts,
+  caveat, and source note are editable.
 - Slide 5's equation-card panel is rebuilt as native PowerPoint text/shapes,
-  not as the recovered full-slide image.
+  not as the recovered full-slide image. The cleanup v2 pass uses larger words
+  under symbols and removes visible underscored symbol labels.
 - Slides 6, 8, and 9 are rebuilt with native editable text, cards, arrows, and
   status panels.
 
@@ -281,7 +287,12 @@ Corrected visual-match QA:
   overwriting the previous review deck.
 - Fetched fresh 1600x900 Drive thumbnails for slides 1-9 and generated:
   `drive_import_contact_sheet_2026_06_19.png`.
+- After user cleanup feedback, imported cleanup v2 as a new native Google
+  Slides copy and fetched fresh 1600x900 thumbnails for Slides 2, 4, 5, and 7
+  under `drive_import_thumbnails_cleanup_v2/`.
 - Shape audit shows all slides contain editable text/shape objects and
   `only_full_slide_image = False` for every slide.
+- Connector readback confirms Slide 4 has native shapes and no image elements;
+  Slide 7 has one map image plus editable callout/status/caveat objects.
 - The prior simplified rebuild remains a valid editable prototype but is
   superseded for visual review by this visual-match deck.

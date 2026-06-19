@@ -21,11 +21,44 @@ DRIVE_THUMBNAIL_DIR = ASSET_DIR / "drive_import_thumbnails"
 CONTACT_SHEET = ASSET_DIR / "editable_visual_match_contact_sheet_2026_06_19.png"
 REFERENCE_CONTACT_SHEET = ASSET_DIR / "reference_drive_contact_sheet_2026_06_19.png"
 DRIVE_CONTACT_SHEET = ASSET_DIR / "drive_import_contact_sheet_2026_06_19.png"
+WEBSITE_MAP_DIR = (
+    ROOT
+    / "docs"
+    / "project_blueprints"
+    / "presentation_assets"
+    / "website_well_maps_2026_06_18"
+)
 
 
 LIGHT = (248, 250, 252)
 GRID = (203, 213, 225)
 NAVY = (15, 23, 42)
+
+
+def build_slide07_unified_map_only_panel() -> Path:
+    source = WEBSITE_MAP_DIR / "unified_north_slope_well_stability_context_map_2026_06_18.png"
+    if not source.exists():
+        raise FileNotFoundError(source)
+
+    image = Image.open(source).convert("RGB")
+    # Crop out the baked title/sidebar so Slide 7 can use editable PowerPoint
+    # labels and callouts around the GIS map image.
+    left = int(image.width * 0.035)
+    top = int(image.height * 0.145)
+    right = int(image.width * 0.735)
+    bottom = int(image.height * 0.785)
+    crop = image.crop((left, top, right, bottom))
+
+    panel_w, panel_h = 1500, 820
+    canvas = Image.new("RGB", (panel_w, panel_h), (255, 255, 255))
+    ratio = min(panel_w / crop.width, panel_h / crop.height)
+    resized = crop.resize((int(crop.width * ratio), int(crop.height * ratio)), Image.LANCZOS)
+    x = (panel_w - resized.width) // 2
+    y = (panel_h - resized.height) // 2
+    canvas.paste(resized, (x, y))
+    output = CROP_DIR / "slide07_unified_map_only_panel.png"
+    canvas.save(output)
+    return output
 
 
 def font(size: int, bold: bool = False) -> ImageFont.ImageFont:
@@ -63,6 +96,7 @@ def crop_reference_assets() -> list[Path]:
         output = CROP_DIR / output_name
         image.crop(box).save(output)
         outputs.append(output)
+    outputs.append(build_slide07_unified_map_only_panel())
     return outputs
 
 

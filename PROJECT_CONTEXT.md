@@ -175,7 +175,10 @@ editable rebuild is now the visual-match deck
 with QA assets in
 `docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/`
 and native Google Slides import at
-<https://docs.google.com/presentation/d/1cmGnsgcgkAcdP2-2ozCE2uyKb4YE0JuQoQYItxGWkHA>.
+<https://docs.google.com/presentation/d/14l8zzQ8mbxf-adWIMphd1jorepqY3hqKdbGnn-vgb3I>.
+The cleanup v2 pass makes Slides 4 and 7 editable, cleans Slide 5 equation
+labels and fraction layout, and replaces the marked-up Slide 2 hydrate
+structure image with an editable no-circle schematic.
 Use that deck for the current editable-slide review; the simplified editable
 rebuild is superseded/reference.
 
