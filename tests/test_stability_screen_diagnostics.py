@@ -161,6 +161,30 @@ def minimal_screen_frame() -> pd.DataFrame:
                 "stability_base_m": None,
                 "stability_thickness_m": None,
             },
+            {
+                "well_name": "GMT TEST 1",
+                "field": "GREATER MOOSES TOOTH",
+                "lat": 70.18,
+                "lon": -151.69,
+                "tvd_m": 1150,
+                "stability_result_status": "blocked_phase_curve_range_insufficient",
+                "stability_confidence": "blocked",
+                "stability_top_m": None,
+                "stability_base_m": None,
+                "stability_thickness_m": None,
+            },
+            {
+                "well_name": "BADAMI TEST 1",
+                "field": "BADAMI",
+                "lat": 70.15,
+                "lon": -147.09,
+                "tvd_m": 1250,
+                "stability_result_status": "blocked_missing_depth",
+                "stability_confidence": "blocked",
+                "stability_top_m": None,
+                "stability_base_m": None,
+                "stability_thickness_m": None,
+            },
         ]
     )
 
@@ -374,6 +398,8 @@ def test_unified_context_map_combines_status_source_and_landmark_layers(
     assert "GGD223 pf_depth_m controls" in trace_names
     assert "Calculated screen interval" in trace_names
     assert "Background: no temperature profile" in trace_names
+    assert "Regional orientation labels" in trace_names
+    assert "Public well field labels" in trace_names
     assert (
         figure.layout.title.text
         == "Unified 2D North Slope Map: geology, controls, landmarks, and stability status"
@@ -393,6 +419,11 @@ def test_unified_context_map_combines_status_source_and_landmark_layers(
     )
     assert background_trace.marker.size == 2.4
     assert background_trace.marker.opacity == 0.16
+    field_label_trace = next(
+        trace for trace in figure.data if trace.name == "Public well field labels"
+    )
+    assert "Greater Mooses Tooth" in set(field_label_trace.text)
+    assert "Badami" in set(field_label_trace.text)
 
     inventory = unified_context_map_layer_inventory_frame(Path("missing_dggs_preview.png"))
     assert "Regional Boundary" in set(inventory["layer_group"])

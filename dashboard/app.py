@@ -449,8 +449,16 @@ FIELD_LABEL_ORDER = [
     "NIKAITCHUQ",
     "NORTHSTAR",
     "PIKKA",
+    "GREATER MOOSES TOOTH",
+    "BADAMI",
     "PT THOMSON",
     "OOOGURUK",
+]
+REGIONAL_ORIENTATION_LABELS = [
+    {"label": "Western North Slope", "lat": 70.82, "lon": -156.25},
+    {"label": "Central North Slope fields", "lat": 70.62, "lon": -150.05},
+    {"label": "Eastern North Slope", "lat": 70.25, "lon": -146.45},
+    {"label": "Dalton / TAPS corridor", "lat": 69.78, "lon": -148.45},
 ]
 MASTER_2D = PROJECT_ROOT / "03_data_final" / "master_layers" / "north_slope_master_2d_layers.parquet"
 STRUCTURAL_HORIZONS = ["NStopo", "NSLCU", "NSshublik", "NSbasement"]
@@ -2080,6 +2088,28 @@ def render_sweet_spot_page() -> None:
         )
 
 
+def render_unified_map_side_panel() -> None:
+    st.markdown("#### Integrated source layers")
+    st.markdown(
+        """
+- **Regional Boundary**: Census/TIGER North Slope Borough edge
+- **Geoscience Orientation**: study boundary, public wells, 2D/3D seismic
+- **DGGS RI 2018-6**: Umiat-Gubik geology preview
+- **Stability controls**: GGD223 `pf_depth_m` + USGS hydrate AUs
+- **OSL landmarks**: DNR units, AKDOT roads, TAPS, communities
+"""
+    )
+    st.markdown("#### DGGS Umiat-Gubik preview")
+    if DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW.exists():
+        st.image(str(DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW), use_container_width=True)
+    else:
+        st.caption("DGGS preview missing in this checkout.")
+    st.caption(
+        "Context only. These layers do not prove hydrate occurrence, saturation, "
+        "producibility, or trained-model results."
+    )
+
+
 def render_regional_atlas() -> None:
     st.markdown('<div class="atlas-kicker">Regional context</div>', unsafe_allow_html=True)
     st.title("Unified 2D North Slope Map For Slides 2 And 7")
@@ -2117,38 +2147,42 @@ def render_regional_atlas() -> None:
     landmark_source_dir = default_basemap_landmark_source_dir(PROJECT_ROOT)
     interactive_landmarks_available = basemap_landmark_bundle_is_available(landmark_source_dir)
     st.caption(unified_context_map_source_caveat_caption(landmark_source_dir))
-    if interactive_landmarks_available:
-        st.plotly_chart(
-            build_unified_north_slope_context_map(
-                screen,
-                permafrost_points,
-                assessment_units,
-                landmark_source_dir,
-            ),
-            use_container_width=True,
-            config={"displayModeBar": True, "responsive": True},
-            key="regional_unified_context_map",
-        )
-    elif UNIFIED_CONTEXT_MAP_EXPORT.exists():
-        st.warning(
-            "Interactive OSL-derived landmark bundle is not available in this "
-            "checkout, so the website is showing the latest combined PNG export. "
-            "Run the OSL export step to restore the full interactive layer map."
-        )
-        st.image(
-            str(UNIFIED_CONTEXT_MAP_EXPORT),
-            use_container_width=True,
-            caption=(
-                "Fallback combined map export with DNR units, roads, TAPS, "
-                "field labels, GGD223 controls, USGS hydrate AUs, and "
-                "stability-screen status."
-            ),
-        )
-    else:
-        st.info(
-            "Neither the interactive OSL-derived landmark bundle nor the "
-            "combined static map export is available in this checkout."
-        )
+    map_cols = st.columns([3.2, 1.05])
+    with map_cols[0]:
+        if interactive_landmarks_available:
+            st.plotly_chart(
+                build_unified_north_slope_context_map(
+                    screen,
+                    permafrost_points,
+                    assessment_units,
+                    landmark_source_dir,
+                ),
+                use_container_width=True,
+                config={"displayModeBar": True, "responsive": True},
+                key="regional_unified_context_map",
+            )
+        elif UNIFIED_CONTEXT_MAP_EXPORT.exists():
+            st.warning(
+                "Interactive OSL-derived landmark bundle is not available in this "
+                "checkout, so the website is showing the latest combined PNG export. "
+                "Run the OSL export step to restore the full interactive layer map."
+            )
+            st.image(
+                str(UNIFIED_CONTEXT_MAP_EXPORT),
+                use_container_width=True,
+                caption=(
+                    "Fallback combined map export with DNR units, roads, TAPS, "
+                    "field labels, GGD223 controls, USGS hydrate AUs, and "
+                    "stability-screen status."
+                ),
+            )
+        else:
+            st.info(
+                "Neither the interactive OSL-derived landmark bundle nor the "
+                "combined static map export is available in this checkout."
+            )
+    with map_cols[1]:
+        render_unified_map_side_panel()
 
     show_interactive_unified_map = st.checkbox(
         "Show interactive rebuild without complete landmark bundle",
@@ -2816,7 +2850,7 @@ def cached_basemap_landmark_layers(source_dir: str) -> dict[str, object]:
     return load_basemap_landmark_layers(Path(source_dir))
 
 
-def public_field_label_frame(map_frame: pd.DataFrame, max_labels: int = 10) -> pd.DataFrame:
+def public_field_label_frame(map_frame: pd.DataFrame, max_labels: int = 14) -> pd.DataFrame:
     required_columns = {"field", "lat", "lon"}
     if not required_columns.issubset(map_frame.columns):
         return pd.DataFrame(columns=["label", "well_count", "lat", "lon"])
@@ -2913,9 +2947,24 @@ def add_map_label_trace(
     color: str,
     size: int,
     textposition: str,
+    halo: bool = False,
 ) -> None:
     if frame.empty:
         return
+    if halo:
+        figure.add_trace(
+            go.Scattermapbox(
+                lon=frame["lon"],
+                lat=frame["lat"],
+                mode="text",
+                text=frame["label"],
+                name=f"{name} halo",
+                showlegend=False,
+                hoverinfo="skip",
+                textfont={"size": size + 5, "color": "rgba(255,255,255,0.95)"},
+                textposition=textposition,
+            )
+        )
     figure.add_trace(
         go.Scattermapbox(
             lon=frame["lon"],
@@ -2937,13 +2986,24 @@ def add_north_slope_basemap_label_layers(
     landmarks: dict[str, object],
 ) -> None:
     field_labels = public_field_label_frame(map_frame)
+    regional_labels = pd.DataFrame(REGIONAL_ORIENTATION_LABELS)
+    add_map_label_trace(
+        figure,
+        regional_labels,
+        "Regional orientation labels",
+        "#0f766e",
+        13,
+        "middle center",
+        halo=True,
+    )
     add_map_label_trace(
         figure,
         field_labels,
         "Public well field labels",
         "#111827",
-        14,
+        15,
         "top center",
+        halo=True,
     )
     field_label_names = {clean_map_label(label).lower() for label in field_labels["label"]}
     place_labels = pd.DataFrame(landmarks.get("place_labels", []))
@@ -2959,6 +3019,7 @@ def add_north_slope_basemap_label_layers(
             "#475569",
             12,
             "bottom center",
+            halo=True,
         )
 
 
