@@ -1,6 +1,6 @@
 # Project Architecture and Activity Map
 
-Last updated: 2026-06-18
+Last updated: 2026-06-19
 
 ## Purpose
 
@@ -367,6 +367,7 @@ and approved-data figures become available.
 
 | Date | Activity | Result |
 |---|---|---|
+| 2026-06-19 | Built a candidate editable Slide 2 methane-hydrate context rebuild | Added a source-backed Slide 2 package with the unified North Slope map crop, CSV-derived methane 5 ppt P-T diagram, editable Structure I/II/H callouts, biogenic/thermogenic gas wording, USGS resource-context wording, regional cross-section context, visual-inventory rows, and explicit guardrails that stability remains context only. A source-backed east-west anticline/stability-zone figure remains a recovery item. |
 | 2026-06-18 | Aligned website-map branch with the project revision base | Merged the project-revision base from `origin/codex/doe-equation-visual-generator` into the website-map branch after preserving unresolved local screenshot/Slide 2 work in a stash. The merge keeps the `Unified North Slope Well + Stability Context Map` as the main website regional map while adding the V5.5/four-well/delegation-base docs, DOE runtime runner, model-run tracker, and public-safe source assets. Verified `python -m pytest` with 122 passed and 2 skipped. |
 | 2026-06-16 | Organized the future-agent handoff base | Added `docs/AGENT_START_HERE.md`, `docs/CURRENT_ARTIFACT_INDEX.md`, and `docs/PROJECT_PROMPT_LIBRARY.md`; updated the context, project base, and architecture map so future sessions start from one short file set before deeper docs |
 | 2026-06-07 | Recovered the working project from a prior Codex session | Website, notebooks, GIS layers, Word drafts, and runtime scaffold restored |
