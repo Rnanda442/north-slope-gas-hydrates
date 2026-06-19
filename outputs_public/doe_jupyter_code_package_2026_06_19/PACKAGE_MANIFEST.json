@@ -1,0 +1,255 @@
+{
+  "copied_files": [
+    "01_pipeline/export_model_run_review_assets.py",
+    "01_pipeline/generate_doe_equation_derived_visuals.py",
+    "01_pipeline/generate_slide_paper_visuals_2026_06_18.py",
+    "01_pipeline/inspect_three_dataset_headers.py",
+    "01_pipeline/run_three_dataset_ml_pipeline.py",
+    "code_transfer_block/inspect_three_dataset_headers_standalone.py",
+    "code_transfer_block/multi_saturation_target_workflow.py",
+    "dashboard/__init__.py",
+    "dashboard/approved_data_intake.py",
+    "dashboard/parameter_evidence.py",
+    "dashboard/runtime/__init__.py",
+    "dashboard/runtime/core_calibration.py",
+    "dashboard/runtime/exports.py",
+    "dashboard/runtime/feature_engineering.py",
+    "dashboard/runtime/loaders.py",
+    "dashboard/runtime/model_run_tracker.py",
+    "dashboard/runtime/modeling.py",
+    "dashboard/runtime/plotting.py",
+    "dashboard/runtime/schemas.py",
+    "dashboard/runtime/three_dataset_pipeline.py",
+    "dashboard/runtime/validation.py",
+    "dashboard/source_visual_inventory.py",
+    "docs/ANACONDA_DEPENDENCY_REQUEST_2026-06-16.md",
+    "docs/DOE_RUNTIME_PRESENTATION_AND_MODEL_TRACKING_PLAN_2026-06-16.md",
+    "docs/DOE_THREE_DATASET_ML_PIPELINE_RUNBOOK_2026-06-16.md",
+    "docs/opensciencelab_runtime_layout.md"
+  ],
+  "excluded_suffixes": [
+    ".csv",
+    ".dlis",
+    ".env",
+    ".feather",
+    ".h5",
+    ".hdf5",
+    ".joblib",
+    ".keras",
+    ".las",
+    ".onnx",
+    ".parquet",
+    ".pickle",
+    ".pkl",
+    ".pt",
+    ".pth",
+    ".sav",
+    ".tsv",
+    ".xls",
+    ".xlsb",
+    ".xlsx"
+  ],
+  "expected_dataset_filenames": [
+    "curated_dataset1.xlsx",
+    "curated_dataset2.xlsx",
+    "curated_dataset3.xlsx",
+    "wellnametodataset.txt"
+  ],
+  "files": [
+    {
+      "bytes": 86,
+      "path": ".env.example",
+      "sha256": "900bab4e3f6bbc82a91b4427a9a5d01b9b6a91689f3ed05295de2010fd020b21"
+    },
+    {
+      "bytes": 260,
+      "path": ".gitignore",
+      "sha256": "73ff33b8070c8c6081f1c4693fbe4d20d34315d32feaaf8b45bef2ad4b3d2b83"
+    },
+    {
+      "bytes": 14726,
+      "path": "01_pipeline/export_model_run_review_assets.py",
+      "sha256": "4129c9bd5d352f9b6398d034a224c5867da98d1c440674158693a8c9b26dac77"
+    },
+    {
+      "bytes": 26501,
+      "path": "01_pipeline/generate_doe_equation_derived_visuals.py",
+      "sha256": "9f88d179621d9625dc087f42d82e0095105ac085ef05f86f19bafe4565646e11"
+    },
+    {
+      "bytes": 60850,
+      "path": "01_pipeline/generate_slide_paper_visuals_2026_06_18.py",
+      "sha256": "1e0d3bd8579ac5e1c97063c7ed83d54c6f5c86c8ed07eb31466bcdb1026033de"
+    },
+    {
+      "bytes": 1977,
+      "path": "01_pipeline/inspect_three_dataset_headers.py",
+      "sha256": "84ffc1398af775c050a9237c87232afccfcb0eed6359a8c2ff60222605f1933a"
+    },
+    {
+      "bytes": 3003,
+      "path": "01_pipeline/run_three_dataset_ml_pipeline.py",
+      "sha256": "7fc65fc9cff47823d4c4823e2b9796e9e9b068110d214607d65af55f10042056"
+    },
+    {
+      "bytes": 6364,
+      "path": "code_transfer_block/inspect_three_dataset_headers_standalone.py",
+      "sha256": "42995bfe4fb3adc761b72c1238873fafd51b7b935cfd42a44915dd74d1d33900"
+    },
+    {
+      "bytes": 23745,
+      "path": "code_transfer_block/multi_saturation_target_workflow.py",
+      "sha256": "924d41c7f077eb5d47799e5cd6eb79b41988a185973e3b6172f8d9a1d07b63a4"
+    },
+    {
+      "bytes": 38,
+      "path": "dashboard/__init__.py",
+      "sha256": "14e2a8822f1982634829f0b0646e3453c8c2ce146832c8ade6eb408fb6fcb5af"
+    },
+    {
+      "bytes": 40661,
+      "path": "dashboard/approved_data_intake.py",
+      "sha256": "d323b75cb75c7aacbcebf1bb6597c8180967d2fc7daad4b95ff5fc11b0d35468"
+    },
+    {
+      "bytes": 5710,
+      "path": "dashboard/parameter_evidence.py",
+      "sha256": "5033c3269b78abce15f1184cc8f0137ef478e0f298443b339aa6dc400f071f4c"
+    },
+    {
+      "bytes": 66,
+      "path": "dashboard/runtime/__init__.py",
+      "sha256": "7d8970511dda22d9b8fe339c467c5f66ada376f7b4438207cd18238c6d17f910"
+    },
+    {
+      "bytes": 1164,
+      "path": "dashboard/runtime/core_calibration.py",
+      "sha256": "4f04edb27bf9bdb4fb1515ee89b357d88125d40b3fb2f4ba32cc37f7abf98c5f"
+    },
+    {
+      "bytes": 420,
+      "path": "dashboard/runtime/exports.py",
+      "sha256": "fd6e60abca214aa63a990fd97e800093f0416fa2fd5be36f697fff0406f036c7"
+    },
+    {
+      "bytes": 3642,
+      "path": "dashboard/runtime/feature_engineering.py",
+      "sha256": "84e178f0cf0127bfc4c76e47938a925fe354a883d6191ae79f537f4f41738b0e"
+    },
+    {
+      "bytes": 3235,
+      "path": "dashboard/runtime/loaders.py",
+      "sha256": "6fec1e8c54bb7b3b393e35624fd200d0527ca2ad8c595f5e8573abaae99f8e7e"
+    },
+    {
+      "bytes": 22419,
+      "path": "dashboard/runtime/model_run_tracker.py",
+      "sha256": "f96796599d28c7b32c15457a8523e176231d369b60e64a2717fd6d4adeb858bb"
+    },
+    {
+      "bytes": 1648,
+      "path": "dashboard/runtime/modeling.py",
+      "sha256": "42bc14009f156eab7a27030636d4cd4d337733c2229805bb66ceed3bf125f95c"
+    },
+    {
+      "bytes": 1420,
+      "path": "dashboard/runtime/plotting.py",
+      "sha256": "74197b51762d4a9ece2a2da75196ca5484824b41c4cdb6a63df4b5ef479be3c5"
+    },
+    {
+      "bytes": 5385,
+      "path": "dashboard/runtime/schemas.py",
+      "sha256": "28b30c4f30aa551141a163051cf5d92bd60e4edd33e6ad70efc5523fc0def36f"
+    },
+    {
+      "bytes": 38584,
+      "path": "dashboard/runtime/three_dataset_pipeline.py",
+      "sha256": "66c9c45d8d7d5da9c2c423cb07fb6b7da30fbe0fdc680942c4b8fe1885ef2379"
+    },
+    {
+      "bytes": 12581,
+      "path": "dashboard/runtime/validation.py",
+      "sha256": "d679b748935dfe6466217af88bd2f28cb719e8154a51649ace7ee02ca178d8b7"
+    },
+    {
+      "bytes": 6212,
+      "path": "dashboard/source_visual_inventory.py",
+      "sha256": "d29e10fd06a928f9e46c1f263c869666b7e8d299a23a2c87d51a84cdb1af4d18"
+    },
+    {
+      "bytes": 5895,
+      "path": "docs/ANACONDA_DEPENDENCY_REQUEST_2026-06-16.md",
+      "sha256": "fdf791e58dc6a49ca2982784c5b714ccc2bc27977999f218973e3962525c97cb"
+    },
+    {
+      "bytes": 7741,
+      "path": "docs/DOE_RUNTIME_PRESENTATION_AND_MODEL_TRACKING_PLAN_2026-06-16.md",
+      "sha256": "580dcc0a41f8d5e90f96b9031c994880d27a4ea492ca8738b3f2e873fa4fde80"
+    },
+    {
+      "bytes": 9982,
+      "path": "docs/DOE_THREE_DATASET_ML_PIPELINE_RUNBOOK_2026-06-16.md",
+      "sha256": "9d1671ba70e15c5d507ad200667609441d618c408ea35243791efe7545471e4a"
+    },
+    {
+      "bytes": 2158,
+      "path": "docs/opensciencelab_runtime_layout.md",
+      "sha256": "ee892a174510bc703377f16993fd00d917c457b9212134bc7dcf974a1c13bb98"
+    },
+    {
+      "bytes": 644,
+      "path": "PACKAGE_EXCLUDE_RULES.md",
+      "sha256": "efbf0a841521067e9d4f322f071cbdf0823b93b24d79138d4a48afb46bffb85a"
+    },
+    {
+      "bytes": 2369,
+      "path": "PACKAGE_MANIFEST.json",
+      "sha256": "337fcfb9fead9f916a5f0fbc260399680a94c05c1e8c6a4f463a21d7458302bd"
+    },
+    {
+      "bytes": 2917,
+      "path": "README_DOE_JUPYTER_CODE_PACKAGE_2026_06_19.md",
+      "sha256": "19557f23edd4e6cf85261b1b49dbb5eda03075d98b0bef144b87a36da4603dc8"
+    },
+    {
+      "bytes": 551,
+      "path": "run_header_scan.py",
+      "sha256": "176dbbcc8f6e6fc968ecaade6be094b567ba0d780e693aca6b91e5a48e56d167"
+    },
+    {
+      "bytes": 553,
+      "path": "run_model_run_review_assets.py",
+      "sha256": "8a95b177ce9f97b130d66bd8990f729e0dc140848c3e37fe3ebe93219581314f"
+    },
+    {
+      "bytes": 570,
+      "path": "run_multi_saturation.py",
+      "sha256": "d0e61ef45a39fab26d97b9877452b6185c1b08673eb4c1594bab6138a0db3693"
+    },
+    {
+      "bytes": 559,
+      "path": "run_three_dataset_baseline.py",
+      "sha256": "5a2e34491cee15c26cae15ff4fe3dcb36eb1721d9de9cb2c17d47ab8300bc036"
+    },
+    {
+      "bytes": 3744,
+      "path": "verify_package.py",
+      "sha256": "47e0a4a583a6818d8e7a40b531338546e740e62f35c010ce0fa6f7b040b20904"
+    }
+  ],
+  "generated_files": [
+    ".env.example",
+    ".gitignore",
+    "PACKAGE_EXCLUDE_RULES.md",
+    "README_DOE_JUPYTER_CODE_PACKAGE_2026_06_19.md",
+    "run_header_scan.py",
+    "run_model_run_review_assets.py",
+    "run_multi_saturation.py",
+    "run_three_dataset_baseline.py",
+    "verify_package.py"
+  ],
+  "generated_utc": "2026-06-19T08:44:02+00:00",
+  "package_name": "doe_jupyter_code_package_2026_06_19",
+  "package_scope": "GitHub-safe code/docs/wrappers only; no data rows or runtime outputs.",
+  "source_repo": "Rnanda442/north-slope-gas-hydrates"
+}
