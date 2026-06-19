@@ -12,6 +12,8 @@ from dashboard.app import (
     build_temperature_proxy_map,
     build_selected_well_phase_audit_figure,
     g10015_temperature_control_crosswalk_frame,
+    unified_context_map_layer_inventory_frame,
+    unified_context_map_source_caveat_caption,
     public_field_label_frame,
     stability_screen_source_method_frame,
     stability_blank_reason_summary_frame,
@@ -163,6 +165,121 @@ def minimal_assessment_units() -> pd.DataFrame:
     )
 
 
+def minimal_geoscience_context() -> pd.DataFrame:
+    return pd.DataFrame(
+        [
+            {
+                "layer_name": "extent",
+                "feature_id": "extent",
+                "vertex_order": 1,
+                "lon": -150.5,
+                "lat": 69.9,
+                "depth_m": None,
+                "au_name": None,
+            },
+            {
+                "layer_name": "extent",
+                "feature_id": "extent",
+                "vertex_order": 2,
+                "lon": -148.0,
+                "lat": 69.9,
+                "depth_m": None,
+                "au_name": None,
+            },
+            {
+                "layer_name": "extent",
+                "feature_id": "extent",
+                "vertex_order": 3,
+                "lon": -148.0,
+                "lat": 70.7,
+                "depth_m": None,
+                "au_name": None,
+            },
+            {
+                "layer_name": "extent",
+                "feature_id": "extent",
+                "vertex_order": 4,
+                "lon": -150.5,
+                "lat": 70.7,
+                "depth_m": None,
+                "au_name": None,
+            },
+            {
+                "layer_name": "extent",
+                "feature_id": "extent",
+                "vertex_order": 5,
+                "lon": -150.5,
+                "lat": 69.9,
+                "depth_m": None,
+                "au_name": None,
+            },
+            {
+                "layer_name": "assessment_units",
+                "feature_id": "au1",
+                "vertex_order": 1,
+                "lon": -150.2,
+                "lat": 70.0,
+                "depth_m": None,
+                "au_name": "Synthetic public AU context",
+            },
+            {
+                "layer_name": "assessment_units",
+                "feature_id": "au1",
+                "vertex_order": 2,
+                "lon": -148.2,
+                "lat": 70.5,
+                "depth_m": None,
+                "au_name": "Synthetic public AU context",
+            },
+            {
+                "layer_name": "seismic_2d",
+                "feature_id": "line1",
+                "vertex_order": 1,
+                "lon": -150.1,
+                "lat": 70.1,
+                "depth_m": None,
+                "au_name": None,
+            },
+            {
+                "layer_name": "seismic_2d",
+                "feature_id": "line1",
+                "vertex_order": 2,
+                "lon": -148.4,
+                "lat": 70.45,
+                "depth_m": None,
+                "au_name": None,
+            },
+            {
+                "layer_name": "seismic_3d_inventory",
+                "feature_id": "survey1",
+                "vertex_order": 1,
+                "lon": -149.8,
+                "lat": 70.2,
+                "depth_m": None,
+                "au_name": None,
+            },
+            {
+                "layer_name": "seismic_3d_inventory",
+                "feature_id": "survey1",
+                "vertex_order": 2,
+                "lon": -148.8,
+                "lat": 70.35,
+                "depth_m": None,
+                "au_name": None,
+            },
+            {
+                "layer_name": "wells",
+                "feature_id": "well1",
+                "vertex_order": 1,
+                "lon": -149.0,
+                "lat": 70.3,
+                "depth_m": 1200,
+                "au_name": None,
+            },
+        ]
+    )
+
+
 def test_2d_well_maps_add_uploaded_landmark_context(tmp_path: Path) -> None:
     landmark_source = make_landmark_source_dir(tmp_path)
     screen = minimal_screen_frame()
@@ -206,9 +323,15 @@ def test_unified_context_map_combines_status_source_and_landmark_layers(
         minimal_permafrost_points(),
         minimal_assessment_units(),
         landmark_source,
+        minimal_geoscience_context(),
     )
 
     trace_names = {trace.name for trace in figure.data}
+    assert "Public assessment-unit context" in trace_names
+    assert "2D seismic coverage" in trace_names
+    assert "3D seismic footprints" in trace_names
+    assert "North Slope study boundary" in trace_names
+    assert "Public well reference points" in trace_names
     assert "DNR oil/gas unit outlines" in trace_names
     assert "Dalton/Deadhorse roads" in trace_names
     assert "Trans-Alaska Pipeline" in trace_names
@@ -216,12 +339,24 @@ def test_unified_context_map_combines_status_source_and_landmark_layers(
     assert "GGD223 pf_depth_m controls" in trace_names
     assert "Calculated screen interval" in trace_names
     assert "Blocked: missing temperature profile" in trace_names
-    assert figure.layout.title.text == "Unified North Slope Well + Stability Context Map"
+    assert (
+        figure.layout.title.text
+        == "Unified 2D North Slope Map: geology, controls, landmarks, and stability status"
+    )
 
     pf_trace = next(
         trace for trace in figure.data if trace.name == "GGD223 pf_depth_m controls"
     )
     assert pf_trace.marker.colorbar.title.text == "pf_depth_m"
+
+    inventory = unified_context_map_layer_inventory_frame(Path("missing_dggs_preview.png"))
+    assert "DGGS RI 2018-6" in set(inventory["layer_group"])
+    assert "Geoscience Orientation" in set(inventory["layer_group"])
+    assert "missing preview" in set(inventory["shown_as"])
+
+    caption = unified_context_map_source_caveat_caption(landmark_source)
+    assert "do not prove hydrate occurrence" in caption
+    assert "saturation" in caption
 
 
 def test_committed_stability_screen_diagnostics_explain_blanks_and_proxy_tiers() -> None:

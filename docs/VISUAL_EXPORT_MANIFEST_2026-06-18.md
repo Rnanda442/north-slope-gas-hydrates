@@ -6,6 +6,17 @@ Boundary: exported visuals are row-free summaries, diagrams, or public-safe tabl
 
 ## Related Focused Slide Rebuild
 
+- `docs/project_blueprints/presentation_assets/website_well_maps_2026_06_18/unified_north_slope_well_stability_context_map_2026_06_18.png`
+  is the full website/static export for the unified 2D North Slope map section.
+  It combines public Geoscience Orientation layers, DGGS RI 2018-6
+  Umiat-Gubik geology preview, GGD223 controls, USGS hydrate assessment units,
+  public stability-screen status points, and OSL-staged DNR/AKDOT/TAPS,
+  community, and field-label context.
+- `docs/project_blueprints/presentation_assets/website_well_maps_2026_06_18/unified_north_slope_slide_export_callout_space_2026_06_18.png`
+  is the matching 16:9 slide-export map layer with a right-side callout lane
+  for editable Slide 2 and Slide 7 annotations.
+  Both unified map exports are context/orientation only: no approved rows, no
+  row-level predictions, no fitted models, and no occurrence/saturation proof.
 - `docs/project_blueprints/presentation_assets/slide3_signal_response_geopackage_update_2026_06_18/slide_03_signal_response_geopackage_update_2026_06_18.png`
   was built by `docs/project_blueprints/build_slide3_signal_response_geopackage_update.py`
   as a focused Slide 3 update using the corrected website stability map at

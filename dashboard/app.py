@@ -169,6 +169,14 @@ UNIFIED_CONTEXT_MAP_EXPORT = (
     WEBSITE_WELL_MAP_ASSET_DIR
     / "unified_north_slope_well_stability_context_map_2026_06_18.png"
 )
+UNIFIED_CONTEXT_MAP_SLIDE_EXPORT = (
+    WEBSITE_WELL_MAP_ASSET_DIR
+    / "unified_north_slope_slide_export_callout_space_2026_06_18.png"
+)
+SLIDE02_SOURCE_BUNDLE_DIR = PROJECT_ROOT / "docs" / "evidence" / "slide02_source_bundle_2026_06_17"
+DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW = (
+    SLIDE02_SOURCE_BUNDLE_DIR / "slide02_selected_11_dggs_umiat_gubik_geology_layer_slide_map.png"
+)
 FULL_WORKFLOW_DECK = (
     PROJECT_ROOT
     / "docs"
@@ -1027,7 +1035,17 @@ def load_regional_context() -> pd.DataFrame:
         MASTER_2D,
         columns=["layer_name", "feature_id", "vertex_order", "lon", "lat", "depth_m", "au_name"],
     )
-    return layers[layers["layer_name"].isin(["extent", "assessment_units", "wells"])].copy()
+    return layers[
+        layers["layer_name"].isin(
+            [
+                "extent",
+                "assessment_units",
+                "wells",
+                "seismic_2d",
+                "seismic_3d_inventory",
+            ]
+        )
+    ].copy()
 
 
 @st.cache_data
@@ -2059,11 +2077,12 @@ def render_sweet_spot_page() -> None:
 
 def render_regional_atlas() -> None:
     st.markdown('<div class="atlas-kicker">Regional context</div>', unsafe_allow_html=True)
-    st.title("Unified North Slope Well + Stability Context Map")
+    st.title("Unified 2D North Slope Map For Slides 2 And 7")
     st.write(
-        "One public-safe map now combines the stability-screen well status, USGS "
-        "hydrate assessment units, GGD223 permafrost-depth controls, DNR unit "
-        "outlines, roads, TAPS, and field labels for North Slope orientation."
+        "One public-safe map section combines the Geoscience Orientation layers, "
+        "DGGS Umiat-Gubik geology preview, GGD223 permafrost controls, USGS gas "
+        "hydrate assessment units, stability-screen status points, and OSL "
+        "desktop GIS landmarks for North Slope orientation."
     )
     cols = st.columns(3)
     screen = cached_stability_screen(str(PROJECT_ROOT))
@@ -2089,7 +2108,8 @@ def render_regional_atlas() -> None:
         "current methane 5 ppt screen. Toggle legend groups to compare context "
         "layers with status categories."
     )
-    st.caption(map_landmark_source_caption(default_basemap_landmark_source_dir(PROJECT_ROOT)))
+    landmark_source_dir = default_basemap_landmark_source_dir(PROJECT_ROOT)
+    st.caption(unified_context_map_source_caveat_caption(landmark_source_dir))
     st.plotly_chart(
         build_unified_north_slope_context_map(
             screen,
@@ -2100,11 +2120,51 @@ def render_regional_atlas() -> None:
         config={"displayModeBar": True, "responsive": True},
         key="regional_unified_context_map",
     )
-    with st.expander("Reference: legacy geoscience orientation and DGGS source card"):
+
+    layer_inventory = unified_context_map_layer_inventory_frame(DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW)
+    st.markdown("### Layer stack and slide exports")
+    layer_cols = st.columns([1.35, 0.9])
+    with layer_cols[0]:
+        st.dataframe(layer_inventory, use_container_width=True, hide_index=True)
+        for export_label, export_path, help_text in [
+            (
+                "Download full unified map PNG",
+                UNIFIED_CONTEXT_MAP_EXPORT,
+                "Large static export with the unified map and source/caveat caption.",
+            ),
+            (
+                "Download slide-callout version PNG",
+                UNIFIED_CONTEXT_MAP_SLIDE_EXPORT,
+                "Slide export leaves a callout lane so labels can be added as editable deck objects.",
+            ),
+        ]:
+            if export_path.exists():
+                st.download_button(
+                    export_label,
+                    export_path.read_bytes(),
+                    file_name=export_path.name,
+                    mime="image/png",
+                    help=help_text,
+                )
+            else:
+                st.caption(f"{export_path.name} has not been generated in this checkout yet.")
+    with layer_cols[1]:
+        st.markdown("#### DGGS RI 2018-6 geology inset")
+        st.caption(
+            "Public Umiat-Gubik geology preview for map units, contacts/faults, "
+            "folds, stations, and structural labels. Raw/simplified DGGS geometry "
+            "stays in OSL/source-library handling until a clean public layer is committed."
+        )
+        if DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW.exists():
+            st.image(str(DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW), use_container_width=True)
+        else:
+            st.warning("DGGS geology preview is missing from this checkout.")
+
+    with st.expander("Reference-only legacy map views and source card"):
         st.caption(
             "The older notebook scene is retained as reference for public geology, "
             "seismic coverage, 3D seismic footprints, and the DGGS RI 2018-6 "
-            "geology-source note. It is not the main website map style."
+            "geology-source note. It is not the main map section."
         )
         render_scene(REGIONAL_SCENE, height=870)
         geology_preview = (
@@ -2804,6 +2864,222 @@ def map_landmark_source_caption(landmark_source_dir: Path) -> str:
     )
 
 
+def sampled_feature_path_arrays_from_frame(
+    frame: pd.DataFrame,
+    max_features: int = 180,
+    max_points_per_feature: int = 220,
+) -> tuple[list[float | None], list[float | None]]:
+    required = {"feature_id", "vertex_order", "lon", "lat"}
+    if frame.empty or not required.issubset(frame.columns):
+        return [], []
+
+    rows = frame[["feature_id", "vertex_order", "lon", "lat"]].copy()
+    rows["lon"] = pd.to_numeric(rows["lon"], errors="coerce")
+    rows["lat"] = pd.to_numeric(rows["lat"], errors="coerce")
+    rows = rows.dropna(subset=["feature_id", "vertex_order", "lon", "lat"])
+    if rows.empty:
+        return [], []
+
+    feature_ids = rows["feature_id"].drop_duplicates().tolist()
+    if len(feature_ids) > max_features:
+        step = max(1, len(feature_ids) // max_features)
+        feature_ids = feature_ids[::step][:max_features]
+    rows = rows[rows["feature_id"].isin(feature_ids)]
+
+    lon_values: list[float | None] = []
+    lat_values: list[float | None] = []
+    for _, feature_rows in rows.groupby("feature_id", sort=False):
+        feature_rows = feature_rows.sort_values("vertex_order")
+        if len(feature_rows) > max_points_per_feature:
+            step = max(1, len(feature_rows) // max_points_per_feature)
+            feature_rows = feature_rows.iloc[::step].copy()
+        lon_values.extend(feature_rows["lon"].astype(float).tolist() + [None])
+        lat_values.extend(feature_rows["lat"].astype(float).tolist() + [None])
+    return lon_values, lat_values
+
+
+def add_master_context_line_mapbox_layer(
+    figure: go.Figure,
+    context: pd.DataFrame,
+    layer_name: str,
+    name: str,
+    color: str,
+    width: float,
+    opacity: float,
+    max_features: int,
+    max_points_per_feature: int,
+    showlegend: bool = True,
+) -> None:
+    layer = context[context["layer_name"].eq(layer_name)].copy()
+    lon_values, lat_values = sampled_feature_path_arrays_from_frame(
+        layer,
+        max_features=max_features,
+        max_points_per_feature=max_points_per_feature,
+    )
+    if not lon_values:
+        return
+    figure.add_trace(
+        go.Scattermapbox(
+            lon=lon_values,
+            lat=lat_values,
+            mode="lines",
+            name=name,
+            legendgroup="Geoscience orientation",
+            showlegend=showlegend,
+            hoverinfo="skip",
+            opacity=opacity,
+            line={"color": color, "width": width},
+        )
+    )
+
+
+def add_public_well_reference_mapbox_layer(
+    figure: go.Figure,
+    context: pd.DataFrame,
+    max_points: int = 1800,
+) -> None:
+    wells = context[context["layer_name"].eq("wells")].copy()
+    if wells.empty:
+        return
+    wells["lon"] = pd.to_numeric(wells["lon"], errors="coerce")
+    wells["lat"] = pd.to_numeric(wells["lat"], errors="coerce")
+    wells = wells.dropna(subset=["lon", "lat"]).sort_values(["lon", "lat"])
+    if len(wells) > max_points:
+        step = max(1, len(wells) // max_points)
+        wells = wells.iloc[::step].head(max_points)
+    figure.add_trace(
+        go.Scattermapbox(
+            lon=wells["lon"],
+            lat=wells["lat"],
+            mode="markers",
+            name="Public well reference points",
+            legendgroup="Geoscience orientation",
+            marker={"size": 3, "color": "#64748b", "opacity": 0.32},
+            hovertemplate="Public well context<extra></extra>",
+        )
+    )
+
+
+def add_geoscience_orientation_mapbox_layers(
+    figure: go.Figure,
+    geoscience_context: pd.DataFrame | None = None,
+) -> None:
+    context = geoscience_context.copy() if geoscience_context is not None else load_regional_context()
+    if context.empty:
+        return
+    add_master_context_line_mapbox_layer(
+        figure,
+        context,
+        "assessment_units",
+        "Public assessment-unit context",
+        "rgba(20, 123, 133, 0.55)",
+        1.2,
+        0.38,
+        max_features=80,
+        max_points_per_feature=420,
+        showlegend=True,
+    )
+    add_master_context_line_mapbox_layer(
+        figure,
+        context,
+        "seismic_2d",
+        "2D seismic coverage",
+        "rgba(14, 165, 233, 0.38)",
+        0.8,
+        0.42,
+        max_features=260,
+        max_points_per_feature=130,
+        showlegend=True,
+    )
+    add_master_context_line_mapbox_layer(
+        figure,
+        context,
+        "seismic_3d_inventory",
+        "3D seismic footprints",
+        "rgba(249, 115, 22, 0.56)",
+        1.0,
+        0.46,
+        max_features=120,
+        max_points_per_feature=180,
+        showlegend=True,
+    )
+    add_master_context_line_mapbox_layer(
+        figure,
+        context,
+        "extent",
+        "North Slope study boundary",
+        "#0f172a",
+        2.5,
+        0.86,
+        max_features=8,
+        max_points_per_feature=20,
+        showlegend=True,
+    )
+    add_public_well_reference_mapbox_layer(figure, context)
+
+
+def unified_context_map_layer_inventory_frame(
+    dggs_preview_path: Path | None = None,
+) -> pd.DataFrame:
+    dggs_path = dggs_preview_path or DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW
+    dggs_status = "available as public-safe preview" if dggs_path.exists() else "missing preview"
+    rows = [
+        {
+            "layer_group": "Geoscience Orientation",
+            "layer": "study boundary, public wells, 2D seismic, 3D seismic, public assessment-unit context",
+            "source": "03_data_final/master_layers/north_slope_master_2d_layers.parquet",
+            "shown_as": "interactive map traces",
+            "slide_use": "Slide 2 setting and Slide 7 context",
+            "guardrail": "regional orientation only; not hydrate evidence",
+        },
+        {
+            "layer_group": "DGGS RI 2018-6",
+            "layer": "Umiat-Gubik geology preview: map units, contacts/faults, folds, stations, Umiat/Gubik labels",
+            "source": project_relative_or_absolute(dggs_path),
+            "shown_as": dggs_status,
+            "slide_use": "geology inset or editable callout anchor",
+            "guardrail": "public geology context only; raw shapefile package remains OSL/source-library controlled",
+        },
+        {
+            "layer_group": "Stability Source Controls",
+            "layer": "GGD223 permafrost-depth controls and USGS gas hydrate assessment-unit outlines",
+            "source": "public stability snapshot plus active stability source path",
+            "shown_as": "map points, colorbar, and AU outlines",
+            "slide_use": "P-T/stability context",
+            "guardrail": "source controls only; not occurrence or saturation",
+        },
+        {
+            "layer_group": "Screen Status",
+            "layer": "2D stability-screen status points",
+            "source": "data/public_stability_products/stability_screen_2026-06-14_methane_5ppt_v1.csv",
+            "shown_as": "status-colored public well points",
+            "slide_use": "Slide 7 guarded screen status",
+            "guardrail": "stability-admissibility only; not hydrate proof or model output",
+        },
+        {
+            "layer_group": "OSL Desktop GIS",
+            "layer": "DNR units, AKDOT roads, Dalton/Deadhorse roads, TAPS, communities, field labels",
+            "source": "data/source_library/basemap_landmarks_2026_06_18/ when present",
+            "shown_as": "map outlines, routes, pipeline, and labels",
+            "slide_use": "geoscience orientation and field-location callouts",
+            "guardrail": "orientation only; no private approved rows",
+        },
+    ]
+    return pd.DataFrame(rows)
+
+
+def unified_context_map_source_caveat_caption(landmark_source_dir: Path) -> str:
+    return (
+        "Unified public-safe map section: Geoscience Orientation master layers, "
+        "DGGS RI 2018-6 Umiat-Gubik public geology preview, GGD223 controls, "
+        "USGS gas hydrate assessment units, stability-screen status points, "
+        "and OSL-staged DNR/AKDOT/TAPS/community/field landmarks. Context and "
+        "stability-admissibility only; these layers do not prove hydrate "
+        "occurrence, saturation, producibility, or trained-model results. "
+        f"OSL landmark source: `{project_relative_or_absolute(landmark_source_dir)}`."
+    )
+
+
 def add_hydrate_assessment_unit_mapbox_layers(
     figure: go.Figure,
     assessment_units,
@@ -2956,6 +3232,7 @@ def build_unified_north_slope_context_map(
     permafrost_points: pd.DataFrame,
     assessment_units,
     landmark_source_dir: Path | None = None,
+    geoscience_context: pd.DataFrame | None = None,
 ) -> go.Figure:
     map_frame = prepared_stability_map_frame(screen)
     figure = go.Figure()
@@ -2982,6 +3259,7 @@ def build_unified_north_slope_context_map(
         else default_basemap_landmark_source_dir(PROJECT_ROOT)
     )
     landmarks = cached_basemap_landmark_layers(str(source_dir))
+    add_geoscience_orientation_mapbox_layers(figure, geoscience_context)
     add_north_slope_basemap_line_layers(figure, landmarks, showlegend=True)
     add_hydrate_assessment_unit_mapbox_layers(figure, assessment_units)
     add_ggd223_permafrost_mapbox_layer(figure, permafrost_points)
@@ -2990,7 +3268,7 @@ def build_unified_north_slope_context_map(
 
     figure.update_layout(
         title={
-            "text": "Unified North Slope Well + Stability Context Map",
+            "text": "Unified 2D North Slope Map: geology, controls, landmarks, and stability status",
             "x": 0,
             "xanchor": "left",
         },
@@ -6380,8 +6658,14 @@ def render_presentation_exports() -> None:
         (
             "Unified North Slope Map",
             UNIFIED_CONTEXT_MAP_EXPORT,
-            "Slide-ready unified public well, stability-status, GGD223, USGS AU, DNR unit, road, TAPS, and field-label context map",
+            "Large unified public geoscience, DGGS-preview, stability-status, GGD223, USGS AU, DNR unit, road, TAPS, and field-label context map",
             "unified_north_slope_map",
+        ),
+        (
+            "Unified Map With Callout Space",
+            UNIFIED_CONTEXT_MAP_SLIDE_EXPORT,
+            "Slide 2/7 export with a right-side lane for editable PowerPoint or Google Slides callouts",
+            "unified_north_slope_map_callout_space",
         ),
         (
             "Hydrate Context",
