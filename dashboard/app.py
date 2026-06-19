@@ -208,6 +208,12 @@ APPROVED_DATA_INTAKE_TEMPLATE = (
     / "public_ml_products"
     / "approved_data_intake_template_2026-06-15.csv"
 )
+FOUR_WELL_CASE_LOCATION_INDEX = (
+    PROJECT_ROOT
+    / "data"
+    / "public_ml_products"
+    / "four_well_case_location_index_2026-06-19.csv"
+)
 APPROVED_DATA_INTAKE_VALIDATION_SCHEMA = (
     PROJECT_ROOT
     / "data"
@@ -1409,6 +1415,22 @@ def cached_public_ml_leakage_guardrails(project_root: str) -> pd.DataFrame:
 
 
 @st.cache_data
+def cached_four_well_case_location_index(project_root: str) -> pd.DataFrame:
+    path = (
+        Path(project_root)
+        / "data"
+        / "public_ml_products"
+        / "four_well_case_location_index_2026-06-19.csv"
+    )
+    if not path.exists():
+        return pd.DataFrame()
+    return pd.read_csv(
+        path,
+        dtype={"permit_number": "string", "api_number": "string"},
+    )
+
+
+@st.cache_data
 def cached_approved_schema_coverage_matrix(project_root: str) -> pd.DataFrame:
     return load_approved_schema_coverage_matrix(Path(project_root))
 
@@ -2089,8 +2111,9 @@ def render_regional_atlas() -> None:
         "stability-screen status points, and OSL desktop GIS landmarks for North "
         "Slope orientation."
     )
-    cols = st.columns(3)
+    cols = st.columns(4)
     screen = cached_stability_screen(str(PROJECT_ROOT))
+    case_well_index = cached_four_well_case_location_index(str(PROJECT_ROOT))
     source_root = active_stability_source_path(PROJECT_ROOT)
     permafrost_points = cached_ggd223_points(str(source_root))
     assessment_units = cached_hydrate_assessment_units(str(source_root))
@@ -2104,6 +2127,7 @@ def render_regional_atlas() -> None:
     cols[0].metric("Screen wells", f"{len(screen):,}")
     cols[1].metric("GGD223 controls", f"{len(permafrost_points):,}")
     cols[2].metric("Calculated intervals", f"{calculated_count:,}")
+    cols[3].metric("ML/source anchors", f"{len(case_well_index):,}")
     st.warning(
         "Context/orientation only. Stability-screen status does not prove hydrate "
         "occurrence, saturation, or trained-model evidence."
@@ -2131,6 +2155,38 @@ def render_regional_atlas() -> None:
     layer_cols = st.columns([1.35, 0.9])
     with layer_cols[0]:
         st.dataframe(layer_inventory, use_container_width=True, hide_index=True)
+        if not case_well_index.empty:
+            st.markdown("#### ML and source-case well anchors")
+            st.caption(
+                "Public Alaska well metadata used for website labels and API-number "
+                "orientation. Header-only screenshots verify MTE and IGS workbook "
+                "well sheets; Hydrate-01 and HYDRATE 02 remain public source-case "
+                "anchors until workbook/header evidence confirms active ML membership."
+            )
+            visible_columns = [
+                "well_case",
+                "map_label",
+                "verified_public_well_name",
+                "api_number",
+                "field",
+                "current_status",
+                "evidence_status",
+                "github_use",
+            ]
+            st.dataframe(
+                case_well_index[
+                    [column for column in visible_columns if column in case_well_index.columns]
+                ],
+                use_container_width=True,
+                hide_index=True,
+            )
+            st.download_button(
+                "Download public case well/API index",
+                case_well_index.to_csv(index=False).encode("utf-8"),
+                file_name=FOUR_WELL_CASE_LOCATION_INDEX.name,
+                mime="text/csv",
+                help="Public-safe case well/API/location index for the website map.",
+            )
         for export_label, export_path, help_text in [
             (
                 "Download full unified map PNG",
@@ -3081,6 +3137,14 @@ def unified_context_map_layer_inventory_frame(
             "guardrail": "stability-admissibility only; not hydrate proof or model output",
         },
         {
+            "layer_group": "ML/Source Case Anchors",
+            "layer": "Mount Elbert, Ignik Sikumi, Hydrate-01, HYDRATE 02, and associated public well anchors with API numbers",
+            "source": "data/public_ml_products/four_well_case_location_index_2026-06-19.csv",
+            "shown_as": "separate labeled marker group",
+            "slide_use": "well-name/API/location orientation for ML-scope and source-case review",
+            "guardrail": "public Alaska well metadata only; workbook membership remains header/source verified separately",
+        },
+        {
             "layer_group": "OSL Desktop GIS",
             "layer": "DNR units, AKDOT roads, Dalton/Deadhorse roads, TAPS, communities, field labels",
             "source": "data/source_library/basemap_landmarks_2026_06_18/ when present",
@@ -3238,6 +3302,94 @@ def add_stability_status_mapbox_layers(
         )
 
 
+ML_CASE_ROLE_STYLES = {
+    "workbook_header_anchor": {
+        "label": "Header-verified ML well anchors",
+        "color": "#7c3aed",
+        "size": 14,
+    },
+    "public_source_case": {
+        "label": "Public source-case wells",
+        "color": "#0f766e",
+        "size": 13,
+    },
+    "associated_source_anchor": {
+        "label": "Associated public source anchors",
+        "color": "#475569",
+        "size": 11,
+    },
+    "associated_test_well": {
+        "label": "Associated HYDRATE 02 test wells",
+        "color": "#b45309",
+        "size": 10,
+    },
+}
+
+
+def add_ml_case_well_mapbox_layer(
+    figure: go.Figure,
+    case_wells: pd.DataFrame,
+) -> None:
+    required = {"map_label", "wellhead_latitude", "wellhead_longitude", "case_role"}
+    if case_wells.empty or not required.issubset(case_wells.columns):
+        return
+
+    wells = case_wells.copy()
+    wells["lat"] = pd.to_numeric(wells["wellhead_latitude"], errors="coerce")
+    wells["lon"] = pd.to_numeric(wells["wellhead_longitude"], errors="coerce")
+    wells = wells.dropna(subset=["lat", "lon"])
+    if wells.empty:
+        return
+
+    hover_columns = [
+        "well_case",
+        "verified_public_well_name",
+        "api_number",
+        "permit_number",
+        "field",
+        "current_status",
+        "evidence_status",
+        "website_use_note",
+    ]
+    for column in hover_columns:
+        if column not in wells.columns:
+            wells[column] = ""
+
+    for role, style in ML_CASE_ROLE_STYLES.items():
+        subset = wells[wells["case_role"].eq(role)].copy()
+        if subset.empty:
+            continue
+        figure.add_trace(
+            go.Scattermapbox(
+                lon=subset["lon"],
+                lat=subset["lat"],
+                mode="markers+text",
+                name=style["label"],
+                legendgroup="ML/source case well anchors",
+                marker={
+                    "size": style["size"],
+                    "color": style["color"],
+                    "opacity": 0.92,
+                },
+                text=subset["map_label"],
+                textposition="bottom right",
+                textfont={"size": 11, "color": "#111827"},
+                customdata=subset[hover_columns],
+                hovertemplate=(
+                    "<b>%{text}</b><br>"
+                    "Case: %{customdata[0]}<br>"
+                    "Public well: %{customdata[1]}<br>"
+                    "API: %{customdata[2]}<br>"
+                    "Permit: %{customdata[3]}<br>"
+                    "Field: %{customdata[4]}<br>"
+                    "Status: %{customdata[5]}<br>"
+                    "Evidence: %{customdata[6]}<br>"
+                    "%{customdata[7]}<extra></extra>"
+                ),
+            )
+        )
+
+
 def prepared_stability_map_frame(screen: pd.DataFrame) -> pd.DataFrame:
     map_frame = screen.copy()
     for column in [
@@ -3289,6 +3441,10 @@ def build_unified_north_slope_context_map(
     add_hydrate_assessment_unit_mapbox_layers(figure, assessment_units)
     add_ggd223_permafrost_mapbox_layer(figure, permafrost_points)
     add_stability_status_mapbox_layers(figure, map_frame)
+    add_ml_case_well_mapbox_layer(
+        figure,
+        cached_four_well_case_location_index(str(PROJECT_ROOT)),
+    )
     add_north_slope_basemap_label_layers(figure, map_frame, landmarks)
 
     figure.update_layout(

@@ -44,6 +44,16 @@ provenance, allowed use, QA status, replacement flags, and guardrails. It is
 displayed in Analyze Hydrates > Presentation Exports and is tested by
 `tests/test_source_visual_inventory.py`.
 
+`four_well_case_location_index_2026-06-19.csv`
+
+This is a public Alaska well metadata index for the current ML/source-case
+discussion. It lists public well names, API numbers, permit numbers, field
+labels, statuses, and coordinates for MTE/Mount Elbert, IGS/Ignik Sikumi,
+Hydrate-01, HYDRATE 02, and associated public source/test-site anchors. It is
+used by the unified website map as a separate labeled marker layer. It does
+not contain workbook rows, log/core rows, pressure-core values, model outputs,
+or proof that every public source-case anchor is an active ML workbook sheet.
+
 `model_run_tracker_summary_template_2026-06-16.csv`
 
 `model_run_feature_audit_template_2026-06-16.csv`
