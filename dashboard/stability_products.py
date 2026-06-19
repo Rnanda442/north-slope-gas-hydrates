@@ -2423,7 +2423,7 @@ def public_ml_target_registry_frame() -> pd.DataFrame:
             "leakage_policy": "exclude_from_feature_matrix_before_training",
             "current_public_status": "header_evidence_only_no_rows_committed",
             "unit_or_scale_status": "unresolved_fraction_or_percent",
-            "future_resolution_needed": "Confirm sheet-specific equivalence to Sgh/S_h and exact unit convention.",
+            "future_resolution_needed": "Confirm sheet-specific equivalence to Sgh/S_h and fraction 0-1 consistency.",
             "notes": "Header alias should be visible; do not silently rename it away.",
         },
         {

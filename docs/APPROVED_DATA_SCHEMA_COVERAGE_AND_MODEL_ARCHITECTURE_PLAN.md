@@ -258,8 +258,8 @@ validation without exposing approved data or overclaiming model performance.
 
 1. Which of `Sgh`, `S_h`, `Sh`, or `NMR_SAT` is the authoritative saturation
    target when multiple fields exist?
-2. Are saturation values fractions from 0 to 1 or percentages from 0 to 100 in
-   each sheet?
+2. Saturation values are currently treated as fractions from 0 to 1; confirm
+   each recovered sheet follows that convention before training.
 3. Should occurrence labels be derived from saturation thresholds, interpreted
    phase labels, or mentor-reviewed intervals?
 4. Are `MTE`, `IGS`, `MTE_refined`, and `IGS_refined` separate wells, separate

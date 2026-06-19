@@ -272,9 +272,9 @@ QC; and ANN/Keras belongs after baselines and tree/boosting.
 
 Use blue callouts only for runtime confirmations that still require full
 approved-workbook recovery: target priority when multiple saturation labels
-exist, fraction-vs-percent convention, occurrence-label provenance, train/
-validation/locked-test well assignment, caliper coverage sufficiency, and
-missing-log adapter permission.
+exist, sheet-level saturation fraction consistency, occurrence-label
+provenance, train/validation/locked-test well assignment, caliper coverage
+sufficiency, and missing-log adapter permission.
 
 Use `docs/GMAIL_STYLE_V5_2_SLIDE_REMAKE_PROMPT_2026-06-15.md` as the slide
 remake prompt: the original/main nine-slide topic sequence is the topic
