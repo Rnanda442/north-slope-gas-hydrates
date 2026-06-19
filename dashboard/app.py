@@ -438,6 +438,7 @@ BASEMAP_LANDMARK_FILES = {
     "pipeline": "alaska_dnr_trans_alaska_pipeline.geojson",
     "gnis_places": "usgs_gnis_places_north_slope_clip.geojson",
     "census_places": "census_tiger_2025_alaska_places.zip",
+    "census_places_geojson": "census_tiger_2025_alaska_places_north_slope_clip.geojson",
 }
 FIELD_LABEL_ORDER = [
     "PRUDHOE BAY",
@@ -2114,48 +2115,66 @@ def render_regional_atlas() -> None:
         "layers with status categories."
     )
     landmark_source_dir = default_basemap_landmark_source_dir(PROJECT_ROOT)
+    interactive_landmarks_available = basemap_landmark_bundle_is_available(landmark_source_dir)
     st.caption(unified_context_map_source_caveat_caption(landmark_source_dir))
-    if UNIFIED_CONTEXT_MAP_EXPORT.exists():
+    if interactive_landmarks_available:
+        st.plotly_chart(
+            build_unified_north_slope_context_map(
+                screen,
+                permafrost_points,
+                assessment_units,
+                landmark_source_dir,
+            ),
+            use_container_width=True,
+            config={"displayModeBar": True, "responsive": True},
+            key="regional_unified_context_map",
+        )
+    elif UNIFIED_CONTEXT_MAP_EXPORT.exists():
+        st.warning(
+            "Interactive OSL-derived landmark bundle is not available in this "
+            "checkout, so the website is showing the latest combined PNG export. "
+            "Run the OSL export step to restore the full interactive layer map."
+        )
         st.image(
             str(UNIFIED_CONTEXT_MAP_EXPORT),
             use_container_width=True,
             caption=(
-                "Current combined map export with DNR units, roads, TAPS, "
+                "Fallback combined map export with DNR units, roads, TAPS, "
                 "field labels, GGD223 controls, USGS hydrate AUs, and "
                 "stability-screen status."
             ),
         )
     else:
         st.info(
-            "The combined static map export is missing in this checkout. "
-            "Showing the interactive rebuild instead."
+            "Neither the interactive OSL-derived landmark bundle nor the "
+            "combined static map export is available in this checkout."
         )
 
     show_interactive_unified_map = st.checkbox(
-        "Show interactive layer-toggle rebuild",
-        value=not UNIFIED_CONTEXT_MAP_EXPORT.exists(),
+        "Show interactive rebuild without complete landmark bundle",
+        value=False,
         key="show_regional_interactive_unified_context_map",
         help=(
-            "The interactive rebuild can be slower and may omit local OSL-only "
-            "landmark layers when their source package is not present."
+            "This diagnostic view is useful only when checking partial layers; "
+            "it may omit DNR/road/TAPS/community landmarks if the OSL-derived "
+            "bundle has not been exported."
         ),
     )
-    if show_interactive_unified_map:
+    if show_interactive_unified_map and not interactive_landmarks_available:
         st.caption(
-            "Use this interactive version for legend toggles. If the local OSL "
-            "GIS package is absent, some landmark overlays may be missing even "
-            "though the committed static export above still shows the full "
-            "combined map."
+            "Diagnostic partial interactive rebuild. This is not the final "
+            "website map unless the public landmark bundle is available."
         )
         st.plotly_chart(
             build_unified_north_slope_context_map(
                 screen,
                 permafrost_points,
                 assessment_units,
+                landmark_source_dir,
             ),
             use_container_width=True,
             config={"displayModeBar": True, "responsive": True},
-            key="regional_unified_context_map",
+            key="regional_unified_context_map_partial",
         )
 
     layer_inventory = unified_context_map_layer_inventory_frame(DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW)
@@ -2516,11 +2535,27 @@ def render_stability_input_scaffold_product() -> None:
     )
 
 
+def public_basemap_landmark_bundle_dir(project_root: Path) -> Path:
+    return project_root / "data" / "public_gis_products" / BASEMAP_LANDMARK_DIR_NAME
+
+
+def raw_basemap_landmark_source_dir(project_root: Path) -> Path:
+    return project_root / "data" / "source_library" / BASEMAP_LANDMARK_DIR_NAME
+
+
+def basemap_landmark_bundle_is_available(path: Path) -> bool:
+    required_keys = ["units", "roads", "pipeline", "gnis_places"]
+    return all((path / BASEMAP_LANDMARK_FILES[key]).exists() for key in required_keys)
+
+
 def default_basemap_landmark_source_dir(project_root: Path) -> Path:
     override = os.environ.get("NORTH_SLOPE_BASEMAP_SOURCE_DIR")
     if override:
         return Path(override).expanduser()
-    return project_root / "data" / "source_library" / BASEMAP_LANDMARK_DIR_NAME
+    public_bundle = public_basemap_landmark_bundle_dir(project_root)
+    if basemap_landmark_bundle_is_available(public_bundle):
+        return public_bundle
+    return raw_basemap_landmark_source_dir(project_root)
 
 
 def clean_map_label(value: object) -> str:
@@ -2684,6 +2719,30 @@ def load_gnis_place_labels(source_dir: Path) -> list[dict[str, object]]:
 
 
 def load_census_place_labels(source_dir: Path) -> list[dict[str, object]]:
+    geojson_path = source_dir / BASEMAP_LANDMARK_FILES["census_places_geojson"]
+    if geojson_path.exists():
+        labels: list[dict[str, object]] = []
+        for feature in load_geojson_features(geojson_path):
+            properties = feature.get("properties", {}) or {}
+            label = clean_map_label(
+                properties.get("label")
+                or properties.get("NAME")
+                or properties.get("NAMELSAD")
+            )
+            if not label:
+                continue
+            if properties.get("lon") is not None and properties.get("lat") is not None:
+                try:
+                    lon = float(properties["lon"])
+                    lat = float(properties["lat"])
+                except (TypeError, ValueError):
+                    continue
+                labels.append({"label": label, "lat": lat, "lon": lon, "source": "US Census"})
+                continue
+            for lon, lat in point_coordinates_from_geometry(feature.get("geometry", {})):
+                labels.append({"label": label, "lat": lat, "lon": lon, "source": "US Census"})
+        return labels
+
     path = source_dir / BASEMAP_LANDMARK_FILES["census_places"]
     if not path.exists():
         return []
@@ -2904,8 +2963,13 @@ def add_north_slope_basemap_label_layers(
 
 
 def map_landmark_source_caption(landmark_source_dir: Path) -> str:
+    layer_source_type = (
+        "tracked public GIS bundle"
+        if "public_gis_products" in landmark_source_dir.parts
+        else "local OSL/source-library folder"
+    )
     return (
-        "Landmark overlays load from "
+        f"Landmark overlays load from the {layer_source_type} at "
         f"`{project_relative_or_absolute(landmark_source_dir)}` when present: "
         "Alaska DNR unit boundaries, AKDOT roads, Census/GNIS place labels, "
         "Trans-Alaska Pipeline geometry, and public well field centroids."
@@ -3113,9 +3177,12 @@ def unified_context_map_layer_inventory_frame(
             "guardrail": "stability-admissibility only; not hydrate proof or model output",
         },
         {
-            "layer_group": "OSL Desktop GIS",
+            "layer_group": "Public Basemap Landmarks",
             "layer": "DNR units, AKDOT roads, Dalton/Deadhorse roads, TAPS, communities, field labels",
-            "source": "data/source_library/basemap_landmarks_2026_06_18/ when present",
+            "source": (
+                "data/public_gis_products/basemap_landmarks_2026_06_18/ "
+                "derived from OSL-staged public GIS"
+            ),
             "shown_as": "map outlines, routes, pipeline, and labels",
             "slide_use": "geoscience orientation and field-location callouts",
             "guardrail": "orientation only; no private approved rows",
@@ -3125,15 +3192,21 @@ def unified_context_map_layer_inventory_frame(
 
 
 def unified_context_map_source_caveat_caption(landmark_source_dir: Path) -> str:
+    landmark_source_type = (
+        "tracked public GIS bundle"
+        if "public_gis_products" in landmark_source_dir.parts
+        else "OSL/local landmark source"
+    )
     return (
         "Unified public-safe map section: Geoscience Orientation master layers, "
         "Census/TIGER North Slope Borough boundary, DGGS RI 2018-6 Umiat-Gubik "
         "public geology preview, GGD223 controls, USGS gas hydrate assessment "
-        "units, stability-screen status points, and OSL-staged "
+        "units, stability-screen status points, and public/OSL-derived "
         "DNR/AKDOT/TAPS/community/field landmarks. Context and stability-"
         "admissibility only; these layers do not prove hydrate occurrence, "
         "saturation, producibility, or trained-model results. "
-        f"OSL landmark source: `{project_relative_or_absolute(landmark_source_dir)}`."
+        f"Landmark layer source ({landmark_source_type}): "
+        f"`{project_relative_or_absolute(landmark_source_dir)}`."
     )
 
 
@@ -4399,46 +4472,68 @@ It should not be treated as a G10015 temperature-profile screenshot.
             "Context/orientation only. Stability-screen status does not prove hydrate "
             "occurrence, saturation, or trained-model evidence."
         )
-        st.caption(map_landmark_source_caption(default_basemap_landmark_source_dir(PROJECT_ROOT)))
-        if UNIFIED_CONTEXT_MAP_EXPORT.exists():
+        stability_landmark_source_dir = default_basemap_landmark_source_dir(PROJECT_ROOT)
+        interactive_landmarks_available = basemap_landmark_bundle_is_available(
+            stability_landmark_source_dir
+        )
+        st.caption(map_landmark_source_caption(stability_landmark_source_dir))
+        if interactive_landmarks_available:
+            st.plotly_chart(
+                build_unified_north_slope_context_map(
+                    screen,
+                    ggd223_points,
+                    assessment_units,
+                    stability_landmark_source_dir,
+                ),
+                use_container_width=True,
+                config={"displayModeBar": True, "responsive": True},
+                key="stability_unified_context_map",
+            )
+        elif UNIFIED_CONTEXT_MAP_EXPORT.exists():
+            st.warning(
+                "Interactive OSL-derived landmark bundle is not available in "
+                "this checkout, so the website is showing the latest combined "
+                "PNG export. Run the OSL export step to restore the full "
+                "interactive layer map."
+            )
             st.image(
                 str(UNIFIED_CONTEXT_MAP_EXPORT),
                 use_container_width=True,
                 caption=(
-                    "Current combined map export. Use this view for slide/mentor "
-                    "review because it preserves the full landmark layer stack."
+                    "Fallback combined map export. Use this view for slide/mentor "
+                    "review until the OSL-derived interactive bundle is present."
                 ),
             )
         else:
             st.info(
-                "The combined static map export is missing in this checkout. "
-                "Showing the interactive rebuild instead."
+                "Neither the interactive OSL-derived landmark bundle nor the "
+                "combined static map export is available in this checkout."
             )
         show_interactive_stability_map = st.checkbox(
-            "Show interactive layer-toggle rebuild",
-            value=not UNIFIED_CONTEXT_MAP_EXPORT.exists(),
+            "Show interactive rebuild without complete landmark bundle",
+            value=False,
             key="show_stability_interactive_unified_context_map",
             help=(
-                "The interactive rebuild can be slower and may omit local OSL-only "
-                "landmark layers when their source package is not present."
+                "This diagnostic view is useful only when checking partial layers; "
+                "it may omit DNR/road/TAPS/community landmarks if the OSL-derived "
+                "bundle has not been exported."
             ),
         )
-        if show_interactive_stability_map:
+        if show_interactive_stability_map and not interactive_landmarks_available:
             st.caption(
-                "Use this interactive version for legend toggles. If the local "
-                "OSL GIS package is absent, some DNR/road/TAPS/community layers "
-                "may be missing even though the committed static export above "
-                "still shows the full combined map."
+                "Diagnostic partial interactive rebuild. This is not the final "
+                "website map unless the public landmark bundle is available."
             )
             st.plotly_chart(
                 build_unified_north_slope_context_map(
                     screen,
                     ggd223_points,
                     assessment_units,
+                    stability_landmark_source_dir,
                 ),
                 use_container_width=True,
                 config={"displayModeBar": True, "responsive": True},
-                key="stability_unified_context_map",
+                key="stability_unified_context_map_partial",
             )
         with st.expander("Reference: status-only 2D screen map"):
             st.caption(

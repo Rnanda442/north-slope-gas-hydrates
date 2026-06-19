@@ -11,6 +11,8 @@ from dashboard.app import (
     build_stability_screen_map,
     build_temperature_proxy_map,
     build_selected_well_phase_audit_figure,
+    basemap_landmark_bundle_is_available,
+    default_basemap_landmark_source_dir,
     g10015_temperature_control_crosswalk_frame,
     unified_context_map_layer_inventory_frame,
     unified_context_map_source_caveat_caption,
@@ -98,6 +100,38 @@ def make_landmark_source_dir(tmp_path: Path) -> Path:
         ],
     )
     return tmp_path
+
+
+def test_basemap_landmark_source_prefers_tracked_public_bundle(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.delenv("NORTH_SLOPE_BASEMAP_SOURCE_DIR", raising=False)
+    project_root = tmp_path
+    raw_dir = project_root / "data" / "source_library" / "basemap_landmarks_2026_06_18"
+    public_dir = (
+        project_root
+        / "data"
+        / "public_gis_products"
+        / "basemap_landmarks_2026_06_18"
+    )
+
+    assert default_basemap_landmark_source_dir(project_root) == raw_dir
+    public_dir.mkdir(parents=True)
+    for name in [
+        "alaska_dnr_unit_boundary_current_north_slope_clip.geojson",
+        "alaska_akdot_roads_north_slope_clip.geojson",
+        "alaska_dnr_trans_alaska_pipeline.geojson",
+        "usgs_gnis_places_north_slope_clip.geojson",
+    ]:
+        (public_dir / name).write_text('{"type":"FeatureCollection","features":[]}', encoding="utf-8")
+
+    assert basemap_landmark_bundle_is_available(public_dir)
+    assert default_basemap_landmark_source_dir(project_root) == public_dir
+
+    override_dir = tmp_path / "custom_osl_bundle"
+    monkeypatch.setenv("NORTH_SLOPE_BASEMAP_SOURCE_DIR", str(override_dir))
+    assert default_basemap_landmark_source_dir(project_root) == override_dir
 
 
 def minimal_screen_frame() -> pd.DataFrame:

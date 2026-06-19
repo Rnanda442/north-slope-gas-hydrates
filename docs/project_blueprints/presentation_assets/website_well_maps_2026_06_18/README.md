@@ -59,6 +59,13 @@ loads `data/public_stability_products/phase_curve_methane_5ppt_sir2008_csmhyd_di
 that public product matches the Slide 2 source-bundle digitized methane 5 ppt
 phase-curve CSV and is not a well-temperature-profile screenshot.
 
+2026-06-19 interactive-map update: the website should default to an interactive
+layer map when the OSL-derived public bundle exists at
+`data/public_gis_products/basemap_landmarks_2026_06_18/`. The combined PNGs stay
+as slide/export fallback images. See
+`OSL_INTERACTIVE_MAP_BUNDLE_INSTRUCTIONS_2026_06_19.md` for the PC/OSL export
+workflow.
+
 The older maps remain secondary:
 
 - The old geoscience orientation/DGGS views are retained under
