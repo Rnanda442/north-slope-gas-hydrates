@@ -126,7 +126,12 @@ and writes row-level predictions/models only to ignored runtime folders.
 The DOE/Jupyter multi-saturation transfer workflow now trains separate
 prototype regressors for visible saturation target variants while excluding
 depth, unit/helper columns, unnamed spreadsheet artifacts, and duplicate raw
-aliases from `X_allowed`. The website now has an
+aliases from `X_allowed`. The GitHub-downloadable DOE Jupyter handoff now lives
+in `doe_jupyter_runtime_pack/`; it contains a notebook, config template,
+wrapper script, and graph-output checklist for running header scans,
+multi-saturation workflows, model-run review exports, slide/Word graph exports,
+and optional equation-derived visuals against local DOE workbooks without
+committing rows or models. The website now has an
 `Analyze Hydrates > Model Run Tracker` tab backed by
 `dashboard/runtime/model_run_tracker.py`; it reads ignored local
 `outputs_runtime/` summaries and shows run comparisons, target-by-target review

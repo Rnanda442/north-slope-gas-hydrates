@@ -1,0 +1,23 @@
+{
+  "data_dir": "C:/PATH/TO/Northslopedatasets06052026",
+  "workbooks": [
+    "curated_dataset1.xlsx",
+    "curated_dataset2.xlsx",
+    "curated_dataset3.xlsx"
+  ],
+  "train_workbook": "curated_dataset1.xlsx",
+  "test_workbooks": [
+    "curated_dataset2.xlsx",
+    "curated_dataset3.xlsx"
+  ],
+  "target": "auto",
+  "target_task": "auto",
+  "model": "baseline",
+  "run_label": "doe_jupyter_pack",
+  "include_training_fit_metrics": false,
+  "run_single_target_pipeline": false,
+  "run_slide_paper_visuals": true,
+  "equation_input": "",
+  "equation_sheet": null
+}
+

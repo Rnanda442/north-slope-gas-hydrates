@@ -103,6 +103,26 @@ python 01_pipeline/run_three_dataset_ml_pipeline.py --data-dir "%USERPROFILE%\Do
 Use TensorFlow/Keras later only after the environment package request is
 approved and the baseline feature/target tables are confirmed.
 
+## Jupyter Transfer Pack
+
+The GitHub-downloadable DOE/Jupyter handoff is:
+
+```text
+doe_jupyter_runtime_pack/
+```
+
+Open `doe_jupyter_runtime_pack/DOE_JUPYTER_RUNTIME_ML_GRAPHS.ipynb` in
+JupyterLab after cloning or downloading the full repo. Copy
+`doe_jupyter_runtime_pack/runtime_config.template.json` to an ignored local
+file such as `configs_local/doe_jupyter_runtime_config.json`, then set
+`data_dir` to the local DOE folder containing the three curated workbooks.
+
+The notebook and wrapper script run the header scan, multi-saturation workflow,
+optional single-target pipeline, public-safe model-run review asset export,
+slide/paper visual export, and optional equation-derived figures. Outputs stay
+under ignored `outputs_runtime/` folders unless a public-safe release is
+reviewed and approved.
+
 ## Header-Only Public-Safe Audit
 
 If the goal is only to test a header list or workbook-exported header CSV
