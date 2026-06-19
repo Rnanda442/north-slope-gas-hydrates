@@ -119,9 +119,16 @@ file such as `configs_local/doe_jupyter_runtime_config.json`, then set
 
 The notebook and wrapper script run the header scan, multi-saturation workflow,
 optional single-target pipeline, public-safe model-run review asset export,
-slide/paper visual export, and optional equation-derived figures. Outputs stay
-under ignored `outputs_runtime/` folders unless a public-safe release is
-reviewed and approved.
+slide/paper visual export, case-well stability spatial join, and optional
+equation-derived figures. Outputs stay under ignored `outputs_runtime/`
+folders unless a public-safe release is reviewed and approved.
+
+For the stability map/spatial-join side, use
+`doe_jupyter_runtime_pack/DOE_SPATIAL_STABILITY_JOIN_CHECKLIST.md`. The default
+join compares the public four-well/case-well index against the committed public
+stability screen and writes `case_well_stability_context.csv`,
+`nearby_stability_screen_points.csv`, and a local map. Use this as P-T
+context/overlay only, not as hydrate occurrence or saturation truth.
 
 ## Header-Only Public-Safe Audit
 

@@ -130,8 +130,11 @@ aliases from `X_allowed`. The GitHub-downloadable DOE Jupyter handoff now lives
 in `doe_jupyter_runtime_pack/`; it contains a notebook, config template,
 wrapper script, and graph-output checklist for running header scans,
 multi-saturation workflows, model-run review exports, slide/Word graph exports,
-and optional equation-derived visuals against local DOE workbooks without
-committing rows or models. The website now has an
+case-well stability spatial joins, and optional equation-derived visuals
+against local DOE workbooks without committing rows or models. The default
+spatial join checks the four public case-well anchors against the committed
+public stability screen and writes local `outputs_runtime/` context tables/maps
+for post-model overlay only. The website now has an
 `Analyze Hydrates > Model Run Tracker` tab backed by
 `dashboard/runtime/model_run_tracker.py`; it reads ignored local
 `outputs_runtime/` summaries and shows run comparisons, target-by-target review

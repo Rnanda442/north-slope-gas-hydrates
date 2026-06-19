@@ -122,6 +122,7 @@ def main() -> None:
     parser.add_argument("--output-root", type=Path, help="Ignored runtime output root.")
     parser.add_argument("--run-single-target-pipeline", action="store_true")
     parser.add_argument("--skip-slide-paper-visuals", action="store_true")
+    parser.add_argument("--skip-spatial-stability-join", action="store_true")
     parser.add_argument("--equation-input", type=Path, help="Optional approved local CSV/XLSX/parquet table.")
     parser.add_argument("--equation-sheet", help="Optional Excel sheet for equation input.")
     args = parser.parse_args()
@@ -142,6 +143,15 @@ def main() -> None:
     include_training_fit = bool(config.get("include_training_fit_metrics", False))
     run_single_target = bool(config.get("run_single_target_pipeline", False)) or args.run_single_target_pipeline
     run_slide_paper_visuals = bool(config.get("run_slide_paper_visuals", True)) and not args.skip_slide_paper_visuals
+    run_spatial_join = bool(config.get("run_spatial_stability_join", True)) and not args.skip_spatial_stability_join
+    case_wells_csv = Path(config.get("case_wells_csv", "data/public_ml_products/four_well_case_location_index_2026-06-19.csv"))
+    if not case_wells_csv.is_absolute():
+        case_wells_csv = repo_root / case_wells_csv
+    case_roles = [str(role) for role in config.get("case_roles", ["workbook_header_anchor", "public_source_case"])]
+    nearby_count = int(config.get("nearby_stability_points_per_case", 5))
+    temperature_gradient_csv = None
+    if config.get("temperature_gradient_csv"):
+        temperature_gradient_csv = Path(config["temperature_gradient_csv"]).expanduser()
     equation_input = args.equation_input or (Path(config["equation_input"]) if config.get("equation_input") else None)
     equation_sheet = args.equation_sheet if args.equation_sheet is not None else config.get("equation_sheet")
 
@@ -240,6 +250,26 @@ def main() -> None:
         manifest["commands"].append(
             skipped_command("single_target_pipeline", "scikit-learn is not installed in this Python environment.")
         )
+
+    if run_spatial_join:
+        spatial_output = output_root / "spatial_stability_join"
+        spatial_command = [
+            sys.executable,
+            "doe_jupyter_runtime_pack/run_spatial_stability_join.py",
+            "--repo-root",
+            str(repo_root),
+            "--case-wells-csv",
+            str(case_wells_csv),
+            "--output-dir",
+            str(spatial_output),
+            "--case-roles",
+            *case_roles,
+            "--nearby-count",
+            str(nearby_count),
+        ]
+        if temperature_gradient_csv is not None:
+            spatial_command.extend(["--temperature-gradient-csv", str(temperature_gradient_csv)])
+        manifest["commands"].append(run_command(spatial_command, cwd=repo_root, required=False))
 
     review_output = output_root / "model_run_review_assets"
     review_command = [

@@ -17,7 +17,14 @@
   "include_training_fit_metrics": false,
   "run_single_target_pipeline": false,
   "run_slide_paper_visuals": true,
+  "run_spatial_stability_join": true,
+  "case_wells_csv": "data/public_ml_products/four_well_case_location_index_2026-06-19.csv",
+  "case_roles": [
+    "workbook_header_anchor",
+    "public_source_case"
+  ],
+  "nearby_stability_points_per_case": 5,
+  "temperature_gradient_csv": "",
   "equation_input": "",
   "equation_sheet": null
 }
-

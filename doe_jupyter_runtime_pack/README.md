@@ -33,6 +33,7 @@ The notebook and runner call the existing repo scripts:
 - `01_pipeline/inspect_three_dataset_headers.py`
 - `code_transfer_block/multi_saturation_target_workflow.py`
 - `01_pipeline/run_three_dataset_ml_pipeline.py` when a target is chosen
+- `doe_jupyter_runtime_pack/run_spatial_stability_join.py`
 - `01_pipeline/export_model_run_review_assets.py`
 - `01_pipeline/generate_slide_paper_visuals_2026_06_18.py`
 - `01_pipeline/generate_doe_equation_derived_visuals.py` when an approved
@@ -45,11 +46,15 @@ Runtime outputs are written under ignored local folders:
 - `outputs_runtime/doe_jupyter_pack_<timestamp>/header_scan/`
 - `outputs_runtime/doe_jupyter_pack_<timestamp>/multi_saturation/`
 - `outputs_runtime/doe_jupyter_pack_<timestamp>/single_target_pipeline/`
+- `outputs_runtime/doe_jupyter_pack_<timestamp>/spatial_stability_join/`
 - `outputs_runtime/doe_jupyter_pack_<timestamp>/model_run_review_assets/`
 - `outputs_runtime/doe_jupyter_pack_<timestamp>/equation_visuals/`
 
 The Word/slide graph families are listed in
 `ML_GRAPH_OUTPUT_CHECKLIST.md`.
+
+The map/spatial source checklist is listed in
+`DOE_SPATIAL_STABILITY_JOIN_CHECKLIST.md`.
 
 ## Guardrails
 
@@ -65,3 +70,19 @@ The Word/slide graph families are listed in
 - Do not push runtime outputs, raw workbooks, row-level predictions, fitted
   models, local configs, or approved identifiers back to GitHub.
 
+## Spatial Stability Join
+
+The pack can compare the four active/case wells against the committed public
+stability-screen rows:
+
+```bash
+python doe_jupyter_runtime_pack/run_spatial_stability_join.py
+```
+
+This writes a local context table and map under `outputs_runtime/`. It answers
+whether the case wells are on or near existing stability-screen points, and it
+records the closest screen status, confidence, top/base/thickness fields where
+available, temperature-profile context, and caveats.
+
+Use this as a post-model physics overlay first. Do not use stability status as
+the hydrate occurrence label.

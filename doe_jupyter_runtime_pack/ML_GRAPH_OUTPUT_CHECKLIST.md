@@ -35,6 +35,16 @@ locally, are not final model performance claims.
 - Optional stability-margin plot when local temperature and pressure inputs
   are available.
 
+## Spatial Stability Context
+
+- Four-well/case-well stability context table.
+- Nearby stability-screen point table.
+- Local case-well stability context map.
+- Optional richer GIS map when OSL/DOE source layers are present.
+
+This is a post-model context overlay first. Do not use stability status as the
+occurrence or saturation target.
+
 ## Optional DOE-Local Figures
 
 These can be generated locally for internal review, but should not be pushed
@@ -67,4 +77,3 @@ Keep DOE-only:
 - populated local configs;
 - private runtime manifests;
 - unreviewed metric tables.
-
