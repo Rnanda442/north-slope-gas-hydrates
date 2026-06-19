@@ -48,10 +48,11 @@ update base intact.
 
 ## Delegated Chats And Prompt Coverage
 
-No matching delegated chat branches were available to inspect. The coverage
-below is reconstructed from the authoritative delegation base and current
-committed assets so the main Codex session can proceed without pretending that
-branch reports exist.
+The integration branch now contains the imported delegated main-thread report,
+the current main-thread done/needed handoffs, the Word companion science-support
+handoff, and the current unified-map asset work. Some prompt numbers still have
+no dedicated report, so those remain explicitly marked as missing rather than
+treated as complete.
 
 | prompt | topic | branch/report found? | intake status |
 |---:|---|---|---|
@@ -61,12 +62,12 @@ branch reports exist.
 | 3 | Slide 2 hydrate and North Slope context rebuild | No | Not imported. Current Slide 2 source-update baseline remains active. |
 | 4 | Unified website and 2D well map integration | No delegated branch, but current base has completed map assets | Use current committed unified-map assets. |
 | 5 | Four-well data, core, lithology, and location recovery | Yes, `main_codex_thread` | Imported source-safe finding: MTE/IGS are supported aliases; `MTE_refined`/`IGS_refined` remain workbook-stage questions; four-well mapping still needs OSL/header confirmation. |
-| 6 | Slide 3 log signal and lithology visual rebuild | No | Not imported. Needs a planned or generated slide asset. |
+| 6 | Slide 3 log signal and lithology visual rebuild | Yes, `main_codex_slide5_integration` handoff | Planned realistic multi-curve log panel with lithology column and core/NMR/coring strip; final build still needs verified four-well evidence. |
 | 7 | Slide 4 simplified ML architecture and script | Yes, `main_codex_thread` | Imported layout guidance: inputs, preparation, leakage barrier, separate occurrence/saturation paths, validation, reviewed outputs. |
-| 8 | Equation slide rebuild | No matching delegated branch | Existing equation/workflow code should be inspected before rebuilding. |
+| 8 | Equation slide rebuild | Yes, `main_codex_slide5_integration` handoff | Slide 5 was rebuilt locally as equation-only review cards and validated, but the dirty slide-builder/assets still need a commit or native rebuild decision. |
 | 9 | Slide 6 high-level visual cleanup | Yes, `main_codex_thread` | Imported before/after recommendation: make Slide 6 a high-level evidence-review board after moving equations to Slide 5. |
 | 10 | Slides 7-9 results and discussion plan | No | Not imported. Use `SLIDE_FINISHING_NEEDS_2026-06-18.md` as the checklist seed. |
-| 11 | Word companion science support | No matching delegated branch | No imported report. Keep detailed science/citations in Word/end material. |
+| 11 | Word companion science support | Yes, `word_companion_science_support` handoff | Word companion source-note appendix was generated and tested; main Codex should preserve it after future companion rebuilds. |
 
 ## Report Files In This Integration Branch
 
@@ -75,15 +76,18 @@ branch reports exist.
 | `docs/delegated_work/2026-06-18/main_codex_thread_PROMPT_RESULTS.md` | Imported delegated report covering Prompts 5, 7, 9, and coordination handoff. | Yes |
 | `docs/delegated_work/2026-06-18/DELEGATED_WORK_INDEX_2026-06-18.md` | Consolidated intake status, slide findings, asset inventory, missing items, decisions, and next actions. | Yes |
 | `docs/delegated_work/2026-06-18/SLIDE_FINISHING_NEEDS_2026-06-18.md` | Concise slide-finishing checklist for the main Codex session. | Yes |
+| `docs/delegated_work/2026-06-19/main_codex_thread_done_needed.md` | Done/needed handoff for Prompts 5, 7, 9, and coordination. | Yes |
+| `docs/delegated_work/2026-06-19/word_companion_science_support_done_needed.md` | Done/needed handoff for Prompt 11 Word companion science support. | Yes |
+| `docs/delegated_work/2026-06-19/main_codex_slide5_integration_done_needed.md` | Done/needed handoff for Prompts 5, 6, 8, and delegated integration status. | Yes |
 
 ## Slide-By-Slide Findings For Slides 2-9
 
 | slide | current finding | use now | still needed |
 |---:|---|---|---|
 | 2 | Current V5.5 Slide 2 source update is the active baseline. It has a source-backed hydrate/context structure, but the 2026-06-18 direction asks for a stronger combined map, P-T diagram, gas hydrate structure labels, thermogenic/biogenic explanation, resource motivation, and cross-section context. | Use existing Slide 2 as baseline, not as final locked content. Use unified map assets where helpful. | Editable rebuild with concise source-backed labels; better P-T diagram/curve; corrected Structure I/II/H visual; thermogenic/biogenic and resource text in Word or notes. |
-| 3 | The requested Slide 3 direction is a realistic multi-curve log/lithology/coring explanation. `main_codex_thread` reinforces the need for signal movement plus lithology/core context, but no finished visual was imported. | Use public parameter registry and header evidence as planning sources only. | Generate or build a simplified editable log panel, lithology column, curve-callout logic, and core/NMR calibration strip without approved rows. |
+| 3 | The requested Slide 3 direction is a realistic multi-curve log/lithology/coring explanation. The main-thread and Slide 5 integration handoffs reinforce signal movement plus lithology/core context. | Use public parameter registry and header evidence as planning sources only. | Generate or build a simplified editable log panel, lithology column, curve-callout logic, and core/NMR calibration strip without approved rows after four-well evidence is verified. |
 | 4 | The detailed ML runtime plate is too complex for the audience. `main_codex_thread` supplies the simplified layout and talk-track direction. | Keep complex diagram for Word/reference; use it as source material. | Build an editable simplified flow: inputs, prep/QC, leakage barrier, separate occurrence/saturation paths, validation, reviewed outputs. |
-| 5 | The old three-dataset prototype slide should be replaced by an equation-only slide. No matching delegated equation branch was found under the requested pattern. | Use stability/equation source docs and existing builders as source, not result claims. | Large readable equation cards with stacked fractions, symbol labels, and source-role coloring; no map, ML diagram, or final equation-result claim. |
+| 5 | The old three-dataset prototype slide should be replaced by an equation-only slide. A local rebuild exists and is documented, but it is not yet promoted into this integration branch's slide assets. | Use the Prompt 8 handoff plus stability/equation source docs as source, not result claims. | Decide whether to commit/promote the local equation-card rebuild, revise it, or rebuild it natively with editable labels. |
 | 6 | Needs high-level visual cleanup, lower text, and source-backed visuals. `main_codex_thread` recommends a four-well evidence-review board after equations move to Slide 5. | Keep only the strongest current visual concept. | Move citations/details to Word/speaker notes; rebuild disconnected image boxes into one visual story. |
 | 7 | The new unified North Slope map belongs here as context only. Current map exports exist. | Use `unified_north_slope_slide_export_callout_space_2026_06_18.png` or `unified_north_slope_well_stability_context_map_2026_06_18.png`. | Add editable caption/callouts: context only, not ML overlay, not hydrate proof, not occurrence/saturation evidence. |
 | 8 | Should be a planned four-well result-review logic slide, not fake results. No delegated report found. | Use DOE runtime tracker plan and public templates for structure. | Show planned figures/tables: feature exclusion audit, log/lithology/core review, separate occurrence and saturation review, uncertainty and false-positive checks. |
@@ -104,24 +108,27 @@ branch reports exist.
 
 ## Assets Still Missing
 
-- Additional delegated branch reports beyond `main_codex_thread`.
+- Dedicated handoff reports for Prompts 0, 1, 2, 3, and 10.
 - Latest Gmail attachment verified as a source/reference deck.
 - Header-only workbook export from DOE/OSL mapping `curated_dataset1/2/3.xlsx`
   to visible sheets and target headers.
 - Verified four-well names, aliases, locations, and core/NMR/pressure-core or
   lithology evidence.
 - Slide 3 log/lithology/coring visual export or editable build.
-- Slide 4 simplified audience ML diagram and two-minute script.
-- Slide 5 equation-only slide assets.
-- Slide 6 high-level cleanup asset plan/build.
+- Native editable Slide 4 simplified audience ML diagram. The talk-track plan
+  exists, but the editable slide is not built.
+- Committed/natively editable Slide 5 equation-only asset. A local candidate is
+  documented but still dirty outside this integration branch.
+- Slide 6 high-level cleanup build. The plan exists, but the slide is not built.
 - DOE row-free model-run review exports for Slide 8.
 - Mentor-approved validation split, target authority, and public-safe summary
   approval.
 
 ## Decisions Needed From User Or Mentor
 
-1. Confirm whether the missing delegated branches should be pushed or whether
-   the main Codex should proceed from current repo assets only.
+1. Confirm whether missing reports for Prompts 0, 1, 2, 3, and 10 should still
+   be pushed or whether the main Codex should proceed from current repo assets
+   and the existing handoff files.
 2. Decide whether the latest Gmail deck attachment should be downloaded and
    treated as a reference artifact.
 3. Confirm the slide rebuild path: reproducible `python-pptx` builder, manual
