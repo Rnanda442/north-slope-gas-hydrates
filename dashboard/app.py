@@ -309,10 +309,10 @@ STABILITY_SCREEN_STATUS_STYLES = {
         "opacity": 0.72,
     },
     "blocked_missing_temperature_profile": {
-        "label": "Blocked: missing temperature profile",
-        "color": "#94a3b8",
-        "size": 5,
-        "opacity": 0.42,
+        "label": "Background: no temperature profile",
+        "color": "#cbd5e1",
+        "size": 2.4,
+        "opacity": 0.16,
     },
     "blocked_missing_depth": {
         "label": "Blocked: missing depth",
@@ -2970,7 +2970,7 @@ def add_public_well_reference_mapbox_layer(
             mode="markers",
             name="Public well reference points",
             legendgroup="Geoscience orientation",
-            marker={"size": 3, "color": "#64748b", "opacity": 0.32},
+            marker={"size": 1.8, "color": "#94a3b8", "opacity": 0.14},
             hovertemplate="Public well context<extra></extra>",
         )
     )
@@ -3809,7 +3809,12 @@ def stability_screen_source_method_frame(phase_curve: pd.DataFrame) -> pd.DataFr
             },
             {
                 "Step": "3. Methane phase curve",
-                "Source used": f"{citation}; {gas_assumption}; {salinity} ppt salinity; {extraction_method}.",
+                "Source used": (
+                    f"{citation}; {gas_assumption}; {salinity} ppt salinity; "
+                    f"{extraction_method}; `data/public_stability_products/"
+                    f"phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv`, "
+                    "matching the Slide 2 source-bundle CSV."
+                ),
                 "How the website uses it": "Replots the CSV points as the methane 5 ppt phase boundary and compares modeled well temperature against it.",
                 "Guardrail": "The CSV/PNG curve is a phase-boundary input; it is not a G10015 temperature profile and not occurrence evidence.",
             },
@@ -4319,7 +4324,9 @@ allowed; occurrence and saturation still require log, core, NMR, or other
 validated target evidence.
 
 The Drive CSV-curve screenshot belongs to the methane 5 ppt phase-boundary
-input. It should not be treated as a G10015 temperature-profile screenshot.
+input. The stability screen loads the matching public product CSV at
+`data/public_stability_products/phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv`.
+It should not be treated as a G10015 temperature-profile screenshot.
 """
         )
         st.dataframe(
@@ -4350,6 +4357,11 @@ input. It should not be treated as a G10015 temperature-profile screenshot.
             "This replaces the older 2D Screen Status Map with the same status "
             "categories plus USGS AU outlines, GGD223 pf_depth_m controls, DNR "
             "units, roads, TAPS, and field labels."
+        )
+        st.caption(
+            "Grey wells with no matched G10015 temperature profile are intentionally "
+            "drawn as faint background coverage so calculated, no-interval, "
+            "phase-curve-blocked, depth-blocked, and outside-AU rows remain readable."
         )
         st.warning(
             "Context/orientation only. Stability-screen status does not prove hydrate "

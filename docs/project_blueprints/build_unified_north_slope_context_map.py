@@ -71,10 +71,10 @@ ASSESSMENT_CONTEXT = (20, 123, 133)
 
 STATUS_STYLES = {
     "blocked_missing_temperature_profile": {
-        "label": "Blocked: missing temperature profile",
-        "color": (148, 163, 184),
-        "size": 4,
-        "alpha": 95,
+        "label": "Background: no temp profile",
+        "color": (203, 213, 225),
+        "size": 2,
+        "alpha": 42,
     },
     "blocked_missing_depth": {
         "label": "Blocked: missing depth",
@@ -359,7 +359,7 @@ def draw_public_well_reference_points(
     for row in wells.itertuples():
         lon, lat = float(row.lon), float(row.lat)
         if in_extent(lon, lat):
-            draw_circle(draw, project(lon, lat), 2, (100, 116, 139), 72, outline=None)
+            draw_circle(draw, project(lon, lat), 1, (148, 163, 184), 38, outline=None)
 
 
 def paste_image_fit(
@@ -604,7 +604,7 @@ def draw_map() -> Path:
     draw_text(
         draw,
         (132, 122),
-        "Census/TIGER North Slope Borough boundary, geoscience orientation, DGGS Umiat-Gubik preview, GGD223 controls, USGS hydrate AUs, screen status, DNR units, roads, TAPS, and field labels.",
+        "Census/TIGER North Slope Borough boundary, geoscience orientation, DGGS Umiat-Gubik preview, GGD223 controls, USGS hydrate AUs, methane 5 ppt CSV-screen status, DNR units, roads, TAPS, and field labels.",
         29,
         MUTED,
     )
@@ -622,7 +622,7 @@ def draw_map() -> Path:
     draw_text(
         draw,
         (130, 1975),
-        "GitHub-safe layers: Census/TIGER North Slope Borough boundary, public master geoscience context, committed stability screen, USGS AU snapshot, GGD223 public snapshot, DGGS preview PNG, and this derived PNG. OSL/Drive-only raw layers: full DNR/AKDOT/TAPS/Census/GNIS/DGGS packages and any approved well-log/core/runtime data.",
+        "GitHub-safe layers: Census/TIGER North Slope Borough boundary, public master geoscience context, committed stability screen using the methane 5 ppt digitized CSV phase curve, USGS AU snapshot, GGD223 public snapshot, DGGS preview PNG, and this derived PNG. OSL/Drive-only raw layers: full DNR/AKDOT/TAPS/Census/GNIS/DGGS packages and any approved well-log/core/runtime data.",
         24,
         MUTED,
         width=3450,
@@ -689,7 +689,7 @@ def draw_slide_callout_export(full_map: Image.Image) -> Path:
     draw_text(
         draw,
         (92, 1630),
-        "Sources/layers: Census/TIGER North Slope Borough boundary, public master geoscience context, DGGS RI 2018-6 preview, GGD223 controls, USGS hydrate assessment units, public stability screen, and OSL-staged DNR/AKDOT/TAPS/community/field landmarks.",
+        "Sources/layers: Census/TIGER North Slope Borough boundary, public master geoscience context, DGGS RI 2018-6 preview, GGD223 controls, USGS hydrate assessment units, public stability screen using the methane 5 ppt digitized CSV phase curve, and OSL-staged DNR/AKDOT/TAPS/community/field landmarks.",
         24,
         MUTED,
         width=3000,

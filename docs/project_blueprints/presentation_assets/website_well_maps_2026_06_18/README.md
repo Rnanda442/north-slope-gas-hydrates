@@ -52,6 +52,13 @@ The website now uses **Unified 2D North Slope Map For Slides 2 And 7** as the
 main `Explore North Slope > Regional Map` view. The same layer stack is the
 public map source for the slide-callout export.
 
+2026-06-19 focus update: wells without a matched G10015 temperature profile are
+intentionally drawn as tiny, faint background coverage so the calculated and
+source-constrained stability-screen layers remain readable. The stability screen
+loads `data/public_stability_products/phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv`;
+that public product matches the Slide 2 source-bundle digitized methane 5 ppt
+phase-curve CSV and is not a well-temperature-profile screenshot.
+
 The older maps remain secondary:
 
 - The old geoscience orientation/DGGS views are retained under

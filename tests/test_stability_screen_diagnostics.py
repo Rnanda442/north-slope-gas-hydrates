@@ -339,7 +339,7 @@ def test_unified_context_map_combines_status_source_and_landmark_layers(
     assert "USGS hydrate AU outlines" in trace_names
     assert "GGD223 pf_depth_m controls" in trace_names
     assert "Calculated screen interval" in trace_names
-    assert "Blocked: missing temperature profile" in trace_names
+    assert "Background: no temperature profile" in trace_names
     assert (
         figure.layout.title.text
         == "Unified 2D North Slope Map: geology, controls, landmarks, and stability status"
@@ -349,6 +349,16 @@ def test_unified_context_map_combines_status_source_and_landmark_layers(
         trace for trace in figure.data if trace.name == "GGD223 pf_depth_m controls"
     )
     assert pf_trace.marker.colorbar.title.text == "pf_depth_m"
+    public_reference_trace = next(
+        trace for trace in figure.data if trace.name == "Public well reference points"
+    )
+    assert public_reference_trace.marker.size == 1.8
+    assert public_reference_trace.marker.opacity == 0.14
+    background_trace = next(
+        trace for trace in figure.data if trace.name == "Background: no temperature profile"
+    )
+    assert background_trace.marker.size == 2.4
+    assert background_trace.marker.opacity == 0.16
 
     inventory = unified_context_map_layer_inventory_frame(Path("missing_dggs_preview.png"))
     assert "Regional Boundary" in set(inventory["layer_group"])
