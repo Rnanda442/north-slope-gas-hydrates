@@ -1,0 +1,69 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          -157.3254592,
+          70.4807859
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "label": "Atqasuk",
+        "lat": 70.4807859,
+        "lon": -157.3254592,
+        "source": "US Census TIGER/Line Alaska Places"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -151.0250762,
+          70.2125803
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "label": "Nuiqsut",
+        "lat": 70.2125803,
+        "lon": -151.0250762,
+        "source": "US Census TIGER/Line Alaska Places"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -156.7536782,
+          71.2643765
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "label": "Utqiag\u0307vik",
+        "lat": 71.2643765,
+        "lon": -156.7536782,
+        "source": "US Census TIGER/Line Alaska Places"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -148.7498043,
+          70.3658576
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "label": "Prudhoe Bay",
+        "lat": 70.3658576,
+        "lon": -148.7498043,
+        "source": "US Census TIGER/Line Alaska Places"
+      },
+      "type": "Feature"
+    }
+  ],
+  "type": "FeatureCollection"
+}

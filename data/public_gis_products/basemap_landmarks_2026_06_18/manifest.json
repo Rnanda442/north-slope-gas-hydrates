@@ -1,0 +1,57 @@
+{
+  "bbox": {
+    "max_lat": 71.7,
+    "max_lon": -144.5,
+    "min_lat": 68.5,
+    "min_lon": -157.5
+  },
+  "bundle_id": "basemap_landmarks_2026_06_18",
+  "generated_at_utc": "2026-06-19T22:37:12.806613+00:00",
+  "guardrails": [
+    "public geospatial context only",
+    "no approved rows",
+    "no private workbooks",
+    "no row-level predictions",
+    "no trained models or fitted scalers",
+    "not hydrate occurrence or saturation evidence"
+  ],
+  "layers": [
+    {
+      "features": 25,
+      "layer": "units",
+      "output": "/home/jovyan/north-slope-gas-hydrates/data/public_gis_products/basemap_landmarks_2026_06_18/alaska_dnr_unit_boundary_current_north_slope_clip.geojson",
+      "source": "/home/jovyan/north-slope-gas-hydrates/data/source_library/basemap_landmarks_2026_06_18/alaska_dnr_unit_boundary_current_north_slope_clip.geojson",
+      "status": "exported"
+    },
+    {
+      "features": 138,
+      "layer": "roads",
+      "output": "/home/jovyan/north-slope-gas-hydrates/data/public_gis_products/basemap_landmarks_2026_06_18/alaska_akdot_roads_north_slope_clip.geojson",
+      "source": "/home/jovyan/north-slope-gas-hydrates/data/source_library/basemap_landmarks_2026_06_18/alaska_akdot_roads_north_slope_clip.geojson",
+      "status": "exported"
+    },
+    {
+      "features": 1,
+      "layer": "pipeline",
+      "output": "/home/jovyan/north-slope-gas-hydrates/data/public_gis_products/basemap_landmarks_2026_06_18/alaska_dnr_trans_alaska_pipeline.geojson",
+      "source": "/home/jovyan/north-slope-gas-hydrates/data/source_library/basemap_landmarks_2026_06_18/alaska_dnr_trans_alaska_pipeline.geojson",
+      "status": "exported"
+    },
+    {
+      "features": 3,
+      "layer": "gnis_places",
+      "output": "/home/jovyan/north-slope-gas-hydrates/data/public_gis_products/basemap_landmarks_2026_06_18/usgs_gnis_places_north_slope_clip.geojson",
+      "source": "/home/jovyan/north-slope-gas-hydrates/data/source_library/basemap_landmarks_2026_06_18/usgs_gnis_places_north_slope_clip.geojson",
+      "status": "exported"
+    },
+    {
+      "features": 4,
+      "layer": "census_places",
+      "output": "/home/jovyan/north-slope-gas-hydrates/data/public_gis_products/basemap_landmarks_2026_06_18/census_tiger_2025_alaska_places_north_slope_clip.geojson",
+      "source": "/home/jovyan/north-slope-gas-hydrates/data/source_library/basemap_landmarks_2026_06_18/census_tiger_2025_alaska_places.zip",
+      "status": "exported"
+    }
+  ],
+  "output_dir": "/home/jovyan/north-slope-gas-hydrates/data/public_gis_products/basemap_landmarks_2026_06_18",
+  "source_dir": "/home/jovyan/north-slope-gas-hydrates/data/source_library/basemap_landmarks_2026_06_18"
+}
