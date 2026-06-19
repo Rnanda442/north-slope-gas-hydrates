@@ -128,6 +128,15 @@ results/discussion plan, and Word companion science support. Whole-slide
 screenshot/raster panels are not the desired final deck format when the user
 needs selectable/editable text, labels, and callouts.
 
+As of 2026-06-19, editable-deck conversion also has a source-image recovery
+gate. Before final slide visuals are rebuilt, the original or closest verified
+source-backed image, map, plot, equation, or figure must be recovered and
+logged with allowed use. Use the image/source recovery table in
+`docs/project_blueprints/EDITABLE_DECK_REBUILD_SOURCE_OF_TRUTH_2026-06-19.md`
+and the delegated handoff before using any scientific visual. Low-resolution
+screenshots, generic AI images, and whole-slide screenshots are not acceptable
+final source figures.
+
 The active near-term ML scope is the four wells represented by the three
 available datasheets/workbooks. Older "about 3 of 71 datasets" language remains
 schema-history context, but the current build should go deeper on those four
@@ -478,3 +487,6 @@ and approved-data figures become available.
 | 2026-06-18 | Corrected Slide 2 geology-layer and hydrate-structure source treatment | Verified DGGS RI 2018-6 Umiat-Gubik as the strongest public North Slope geology layer candidate for OSL, generated slide/handoff preview PNGs from its public shapefile package, built local ignored OSL upload package `osl_upload_packages/slide2_north_slope_geology_osl_upload_2026_06_18.zip`, recorded the user-reported OSL upload completion, switched the Slide 2 map from the generated orientation view to the DGGS geology-layer preview, recropped the World Atlas Fig. 1.1 hydrate-structure visual so sI/sII/sH are visible with sI highlighted, and documented the OSL/GitHub split without making hydrate occurrence, saturation, or model-output claims. |
 | 2026-06-18 | Hardened the GitHub-safe DOE ML workflow handoff | Expanded `.gitignore` for approved/runtime data, model binaries, local workbook packages, secrets, and DOE-only exports; added `01_pipeline/export_model_run_review_assets.py` for row-free Word/slide review tables and PNGs from ignored runtime summaries; updated the DOE runbooks with header-only, three-dataset, multi-saturation, and review-export commands; and added tests so summary exports avoid row-level predictions and training metrics by default. |
 | 2026-06-18 | Captured latest self-email project/deck direction and delegation prompts | Added `docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md` from the user's self-email `slide updates for the newest deck`, recorded the Gmail deck attachment as needs review, corrected the "whole-slide screenshot" issue into an editable-slide rule, narrowed the active ML scope to four wells from three datasheets/workbooks, and split the next work into copyable prompts for PC/OSL sync, Gmail deck intake, editable deck conversion, Slide 2 hydrate/context, unified website map, four-well source/core/lithology recovery, Slide 3 log/lithology, simplified ML architecture, equation-only slide, Slide 6 cleanup, Slides 7-9 results plan, and Word companion science support. |
+| 2026-06-19 | Added editable-deck source-image recovery gate | Updated the editable rebuild source of truth and delegated handoff so final slide visuals require original or closest verified source-backed images, maps, CSV-derived plots, equations, and figures before rebuild. Added the required search order, allowed-use labels for GitHub/Drive/OSL, and an image/source recovery table covering slides 1-9 with current local, Drive, Gmail, and placeholder status. |
+| 2026-06-19 | Recovered slide P-T CSV provenance copy | Added `data/public_stability_products/phase_curve_methane_5ppt_screenshot_recovered_2026-06-18.csv`, a 41-row methane 5 ppt depth-pressure-temperature lookup with source columns tying the slide P-T plot data to the June 18 Gmail `Screenshot sources for pc` source package. |
+| 2026-06-19 | Added focused well-location/API recovery and website panel | Added `data/public_stability_products/focused_well_location_recovery_2026-06-19.csv` with public Alaska DNR/AOGCC surface-hole and bottom-hole endpoints for Mount Elbert, Ignik Sikumi, Hydrate-01, and Hydrate-02; preserved `MLK` and probable `EIT`/`E1T`/`ETG` as unresolved screenshot-reported separate well candidates; updated the Streamlit Regional Map with a focused well-location/path panel; and created the V5.6 Word companion update with well names, API numbers, coordinates, and path caveats. |

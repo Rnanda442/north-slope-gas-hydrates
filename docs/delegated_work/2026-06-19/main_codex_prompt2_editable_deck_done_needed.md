@@ -40,10 +40,53 @@
   - rendered-slide/contact-sheet QA;
   - source/claim QA;
   - visual-style comparison against the current V5.5 contact sheet.
+- Captured the 2026-06-19 source-image recovery addition in:
+  - `docs/project_blueprints/EDITABLE_DECK_REBUILD_SOURCE_OF_TRUTH_2026-06-19.md`
+- Ran a local source/evidence/source-index pass plus bounded Drive/Gmail checks
+  for the current image-source gaps:
+  - Drive searches found HYDRATE 02 NMR/permeability PDFs, Aung et al. 2026
+    LWD PDFs, V5.5 Slide 3 Signal Response decks/companions, and comparative
+    ML source PDFs.
+  - Gmail June 17-19 attachment search found the latest `slide updates for the
+    newest deck` message, the V5.5 Slide 3 QC-cleaned PPTX attachment, DOE
+    import Slide 2/Slide 3 PPTX attachments, the equation-focused DOCX, and
+    the `source_screenshot_share_2026_06_18.zip` source bundle.
+
+## Image / Source Recovery Table
+
+Do not finalize a slide visual until the relevant row below is resolved as
+`found` or a deliberate placeholder is documented. Source figures may remain
+high-quality image objects, but surrounding labels, captions, arrows, and
+callouts should be native editable objects.
+
+| slide | needed image/figure | found? | source/location | resolution/quality | allowed use | rebuild role | still needed |
+|---|---|---|---|---|---|---|---|
+| 1 | Personal photo | placeholder by design | Remove current personal photo; use native empty photo frame. | N/A | GitHub | Editable placeholder frame | User can manually add final photo. |
+| 2 | Hydrate structure/source image | yes | `docs/evidence/slide02_source_bundle_2026_06_17/slide02_selected_14_world_atlas_fig1_1_structure_types_clean.png`; alternate `slide02_selected_09_world_atlas_fig1_1_full_structure_types_si_highlighted.png`. | 1312 x 1042; clean crop. | GitHub, citation/license recheck | Source-backed figure object with editable Structure I callout/ring. | Confirm final citation/rights wording; no AI hydrate cage art. |
+| 2 | North Slope geology/context map | yes | DGGS RI 2018-6 derived previews in `docs/evidence/slide02_source_bundle_2026_06_17/`; source documented in `docs/OSL_GIS_LAYER_CANDIDATES_FOR_SLIDE2_2026-06-18.md`. | 1280 x 555 preview; 1100 x 475 slide map. | GitHub for derived preview; OSL only for raw GIS | Source-backed map with editable labels/caption. | If used large, export higher-res static map from source package. |
+| 2 | North Slope cross-section figure | yes | `docs/evidence/slide02_source_bundle_2026_06_17/slide02_selected_06_usgs_arctic_alaska_cross_section_fig2_crop.png`. | 1093 x 605; usable small/medium. | GitHub | Source-backed cross-section image with editable labels. | Record exact USGS figure citation in source notes. |
+| 2 | P-T/stability curve or CSV-derived plot | yes | Canonical slide-rebuild CSV: `data/public_stability_products/phase_curve_methane_5ppt_screenshot_recovered_2026-06-18.csv`; source CSVs: `data/public_stability_products/phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv` and `docs/evidence/slide02_source_bundle_2026_06_17/slide02_selected_03_project_digitized_methane_5ppt_curve.csv`; low-res crop exists. | 41 rows; full methane 5 ppt depth-pressure-temperature lookup with June 18 email/source-bundle provenance. Crop is only 276 x 436. | GitHub | Recreate clean high-resolution P-T plot from recovered CSV. | Generate/export final plot; do not use low-res crop except as source reference. |
+| 2 | Combined 2D well/stability map | yes | `docs/project_blueprints/presentation_assets/website_well_maps_2026_06_18/slide3_correct_2d_well_stability_map_2026_06_18.png`. | 3600 x 2240; high-quality. | GitHub for derived map; OSL only for raw basemap packages | Figure object with editable labels/callouts outside map. | Caption as stability/context only, not hydrate proof. |
+| 3 | Realistic well-log/source-signal figure | partial | USGS public-domain log images in `references/presentation-revision-2026-06-11/images/`; project `synthetic_well_log_panel.png`; Chong et al. 2022 PDF supports method. | USGS images 605 x 456 to 1097 x 1806; synthetic panel reference only. | GitHub for USGS/project visuals; Drive only for paper figures | Project-generated/source-backed log panel image plus editable callouts. | Recover or generate clean depth-aligned log/lithology panel. |
+| 3 | Lithology/core/NMR/pressure-core visuals | partial | Drive search found Yoneda et al. 2026 NMR/permeability PDFs; manifest lists Aung et al. 2026 and missing Phillips/Haines 2026 pressure-core/lithology papers. | Source PDFs available; exact figures not extracted or GitHub-cleared. | Drive only; OSL only for approved/runtime/core exports | Use documented placeholders until exact figures are recovered. | Export allowed clean figures or state exactly which visual is missing. |
+| 4 | Full workflow/architecture visual | reference found | V5.2/V5.5 workflow plates in `docs/project_blueprints/presentation_assets/`. | Reference panels are slide-sized, but not final editable content. | GitHub | Rebuild as native boxes, arrows, dividers, and text. | Use old plate only as visual reference or appendix source. |
+| 5 | Equation screenshots/source equations | partial | `docs/project_blueprints/North_Slope_Gas_Hydrate_Equation_Focused_Research_Overview_Paper_Sources_Only_2026-06-17.docx`, source-index equation docs, June 18 Gmail equation-focused DOCX. | Text/equation sources exist; clean equation renderings not exported. | GitHub for project equation docs; Drive only for publisher figures | Prefer native editable equations/labels; image render only if needed. | Lock final equation list, units, and symbol-under-word labels. |
+| 6 | Evidence/unit-gate visuals | partial | V5.5 slide 6 reference panel and public USGS log images. | Existing panel is 1600 x 900 reference only. | GitHub for project/public images | Native high-level evidence board with source-backed small figures only if needed. | Decide exact visuals to keep; move detailed comments to notes/Word. |
+| 7 | Stability map / unified well map | yes | `docs/project_blueprints/presentation_assets/website_well_maps_2026_06_18/slide3_correct_2d_well_stability_map_2026_06_18.png`; status/temperature maps in same folder. | 3600 x 2240 primary map; 792 px screenshots fallback only. | GitHub for derived map; OSL only for raw source layers | Context-only figure object with editable caption/legend/callouts. | Do not make it an ML overlay or proof map. |
+| 8 | Planned four-well results/review thumbnails | placeholder needed | No approved DOE result figures are public; future exports belong in ignored runtime/OSL until reviewed. | N/A | GitHub for empty placeholders only; OSL only for real runtime outputs until review | Native editable review slots and blank thumbnails. | After DOE run, export row-free public-safe summaries only if approved. |
+| 9 | Done/not-claimed/next visuals | no figure needed | Native editable status boxes only. | N/A | GitHub | Native text, checkmarks, dividers, and next-action boxes. | None unless a cited icon/source visual is deliberately added. |
 
 ## Still Needed
 
 - Do not rebuild the deck yet until the user explicitly asks for implementation.
+- Treat source-image recovery as a required gate before final slide visuals:
+  search repo/evidence, `docs/source_library_index/`, Drive source folders,
+  Gmail June 17-19 attachments, website exports, identified PDFs/papers, then
+  official/public online pages only when needed.
+- Save clean high-resolution source copies/exports only when allowed; otherwise
+  use Drive-only or OSL-only references and document placeholders.
+- Do not use low-resolution screenshots, generic AI images, or whole-slide
+  screenshots for scientific figures.
 - Decide whether the editable rebuild should:
   - create a new artifact-tool builder from scratch, or
   - wrap/reuse existing figure-generation functions and replace only the deck
