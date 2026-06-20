@@ -189,6 +189,83 @@ def minimal_screen_frame() -> pd.DataFrame:
     )
 
 
+def minimal_case_well_index() -> pd.DataFrame:
+    return pd.DataFrame(
+        [
+            {
+                "well_case": "MTE",
+                "case_role": "workbook_header_anchor",
+                "map_label": "MTE / Mount Elbert",
+                "verified_public_well_name": "MT ELBERT 1",
+                "api_number": "50029233020000",
+                "permit_number": "2060330",
+                "field": "MILNE POINT",
+                "current_status": "Plugged & Abandoned",
+                "wellhead_latitude": 70.455636,
+                "wellhead_longitude": -149.410798,
+                "evidence_status": "Header-only screenshot verifies MTE.",
+                "website_use_note": "Show as project well anchor.",
+            },
+            {
+                "well_case": "IGS",
+                "case_role": "workbook_header_anchor",
+                "map_label": "IGS / Ignik Sikumi",
+                "verified_public_well_name": "PRUDHOE BAY UN IGNIK SIKUMI 1",
+                "api_number": "50029234430000",
+                "permit_number": "2110270",
+                "field": "PRUDHOE BAY",
+                "current_status": "Plugged & Abandoned",
+                "wellhead_latitude": 70.348712,
+                "wellhead_longitude": -149.317096,
+                "evidence_status": "Header-only screenshot verifies IGS.",
+                "website_use_note": "Show as project well anchor.",
+            },
+            {
+                "well_case": "Hydrate-01",
+                "case_role": "public_source_case",
+                "map_label": "Hydrate-01",
+                "verified_public_well_name": "HYDRATE 01",
+                "api_number": "50029236130000",
+                "permit_number": "2181250",
+                "field": "*EXPLORATORY",
+                "current_status": "Suspended well",
+                "wellhead_latitude": 70.316936,
+                "wellhead_longitude": -149.200104,
+                "evidence_status": "Public source-case anchor.",
+                "website_use_note": "Show as source-case anchor.",
+            },
+            {
+                "well_case": "HYDRATE 02",
+                "case_role": "public_source_case",
+                "map_label": "HYDRATE 02",
+                "verified_public_well_name": "HYDRATE 02",
+                "api_number": "50029237280000",
+                "permit_number": "2221140",
+                "field": "*EXPLORATORY",
+                "current_status": "Gas well, single completion",
+                "wellhead_latitude": 70.317174,
+                "wellhead_longitude": -149.200285,
+                "evidence_status": "Public source-case anchor.",
+                "website_use_note": "Show as source-case anchor.",
+            },
+            {
+                "well_case": "HYDRATE 02 associated well",
+                "case_role": "associated_test_well",
+                "map_label": "HYDRATE P1",
+                "verified_public_well_name": "HYDRATE P1",
+                "api_number": "50029237370000",
+                "permit_number": "2221410",
+                "field": "*EXPLORATORY",
+                "current_status": "Observation well",
+                "wellhead_latitude": 70.317056,
+                "wellhead_longitude": -149.200186,
+                "evidence_status": "Associated test-site well.",
+                "website_use_note": "Only show in full context.",
+            },
+        ]
+    )
+
+
 def minimal_permafrost_points() -> pd.DataFrame:
     return pd.DataFrame(
         [
@@ -382,6 +459,7 @@ def test_unified_context_map_combines_status_source_and_landmark_layers(
         minimal_assessment_units(),
         landmark_source,
         minimal_geoscience_context(),
+        case_well_index=minimal_case_well_index(),
     )
 
     trace_names = {trace.name for trace in figure.data}
@@ -390,35 +468,38 @@ def test_unified_context_map_combines_status_source_and_landmark_layers(
     assert "2D seismic coverage" in trace_names
     assert "3D seismic footprints" in trace_names
     assert "North Slope study boundary" in trace_names
-    assert "Public well reference points" in trace_names
+    assert "Public well reference points" not in trace_names
     assert "DNR oil/gas unit outlines" in trace_names
     assert "Dalton/Deadhorse roads" in trace_names
     assert "Trans-Alaska Pipeline" in trace_names
     assert "USGS hydrate AU outlines" in trace_names
     assert "GGD223 pf_depth_m controls" in trace_names
     assert "Calculated screen interval" in trace_names
-    assert "Background: no temperature profile" in trace_names
+    assert "Background: no temperature profile" not in trace_names
+    assert "Header-verified project wells" in trace_names
+    assert "Public source-case project wells" in trace_names
+    assert "Associated HYDRATE 02 test wells" not in trace_names
+    assert "Project well labels" in trace_names
     assert "Regional orientation labels" in trace_names
     assert "Public well field labels" in trace_names
     assert (
         figure.layout.title.text
-        == "Unified 2D North Slope Map: geology, controls, landmarks, and stability status"
+        == "Focused 2D North Slope Map: calculated stability ranges and project wells"
     )
 
     pf_trace = next(
         trace for trace in figure.data if trace.name == "GGD223 pf_depth_m controls"
     )
     assert pf_trace.marker.colorbar.title.text == "pf_depth_m"
-    public_reference_trace = next(
-        trace for trace in figure.data if trace.name == "Public well reference points"
+    calculated_trace = next(
+        trace for trace in figure.data if trace.name == "Calculated screen interval"
     )
-    assert public_reference_trace.marker.size == 1.8
-    assert public_reference_trace.marker.opacity == 0.14
-    background_trace = next(
-        trace for trace in figure.data if trace.name == "Background: no temperature profile"
+    assert len(calculated_trace.lat) == 1
+    project_label_trace = next(
+        trace for trace in figure.data if trace.name == "Project well labels"
     )
-    assert background_trace.marker.size == 2.4
-    assert background_trace.marker.opacity == 0.16
+    assert "MTE / Mount Elbert" in set(project_label_trace.text)
+    assert "HYDRATE 02" in set(project_label_trace.text)
     field_label_trace = next(
         trace for trace in figure.data if trace.name == "Public well field labels"
     )
@@ -434,6 +515,43 @@ def test_unified_context_map_combines_status_source_and_landmark_layers(
     caption = unified_context_map_source_caveat_caption(landmark_source)
     assert "do not prove hydrate occurrence" in caption
     assert "saturation" in caption
+
+
+def test_unified_context_map_full_context_restores_background_layers(
+    tmp_path: Path,
+) -> None:
+    landmark_source = make_landmark_source_dir(tmp_path)
+    figure = build_unified_north_slope_context_map(
+        minimal_screen_frame(),
+        minimal_permafrost_points(),
+        minimal_assessment_units(),
+        landmark_source,
+        minimal_geoscience_context(),
+        case_well_index=minimal_case_well_index(),
+        focused=False,
+        include_public_reference_points=True,
+        include_associated_case_wells=True,
+    )
+
+    trace_names = {trace.name for trace in figure.data}
+    assert "Public well reference points" in trace_names
+    assert "Background: no temperature profile" in trace_names
+    assert "Associated HYDRATE 02 test wells" in trace_names
+    assert (
+        figure.layout.title.text
+        == "Unified 2D North Slope Map: geology, controls, landmarks, and stability status"
+    )
+
+    public_reference_trace = next(
+        trace for trace in figure.data if trace.name == "Public well reference points"
+    )
+    assert public_reference_trace.marker.size == 1.8
+    assert public_reference_trace.marker.opacity == 0.14
+    background_trace = next(
+        trace for trace in figure.data if trace.name == "Background: no temperature profile"
+    )
+    assert background_trace.marker.size == 2.4
+    assert background_trace.marker.opacity == 0.16
 
 
 def test_committed_stability_screen_diagnostics_explain_blanks_and_proxy_tiers() -> None:
