@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 from typing import Iterable
+import urllib.error
+import urllib.request
 
 import pandas as pd
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageEnhance, ImageFont
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -20,6 +23,7 @@ PNG_PATH = ASSET_DIR / "unified_north_slope_well_stability_context_map_2026_06_1
 SLIDE_PNG_PATH = ASSET_DIR / "unified_north_slope_slide_export_callout_space_2026_06_18.png"
 PUBLIC_STABILITY = ROOT / "data" / "public_stability_products"
 PUBLIC_GIS_PRODUCTS = ROOT / "data" / "public_gis_products"
+PUBLIC_ML_PRODUCTS = ROOT / "data" / "public_ml_products"
 PUBLIC_SNAPSHOT = (
     ROOT
     / "data"
@@ -27,8 +31,10 @@ PUBLIC_SNAPSHOT = (
     / "north_slope_stability_snapshot_2026-06-13"
 )
 LANDMARK_DIR = ROOT / "data" / "source_library" / "basemap_landmarks_2026_06_18"
+PUBLIC_LANDMARK_DIR = PUBLIC_GIS_PRODUCTS / "basemap_landmarks_2026_06_18"
 
 SCREEN_CSV = PUBLIC_STABILITY / "stability_screen_2026-06-14_methane_5ppt_v1.csv"
+PROJECT_WELL_CSV = PUBLIC_ML_PRODUCTS / "four_well_case_location_index_2026-06-19.csv"
 GGD223_CSV = PUBLIC_SNAPSHOT / "ggd223_permafrost_controls.csv"
 AU_GEOJSON = PUBLIC_SNAPSHOT / "GasHydrateAUs.geojson"
 BOROUGH_BOUNDARY_GEOJSON = PUBLIC_GIS_PRODUCTS / "north_slope_borough_boundary_tiger2025.geojson"
@@ -44,8 +50,16 @@ DGGS_PREVIEW = (
 W, H = 3800, 2200
 MAP_BOX = (150, 330, 2785, 1680)
 SIDE_PANEL = (2850, 330, 3655, 1680)
-LON_MIN, LON_MAX = -157.7, -145.0
-LAT_MIN, LAT_MAX = 68.9, 71.35
+# Slide-focused extent: keeps the eastern/central public stable-range wells and
+# the four project/source wells legible instead of recreating the all-well audit map.
+LON_MIN, LON_MAX = -155.85, -145.75
+LAT_MIN, LAT_MAX = 69.10, 71.02
+TILE_ZOOM = 8
+TILE_SIZE = 256
+TILE_CACHE_DIR = ASSET_DIR / "_tile_cache" / "osm_z8"
+TILE_URL_TEMPLATE = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+TILE_USER_AGENT = "NorthSlopeGasHydrateAtlas/1.0 local map export"
+WEB_MERCATOR_LAT_LIMIT = 85.05112878
 
 NAVY = (12, 34, 49)
 INK = (25, 48, 60)
@@ -118,6 +132,20 @@ FIELD_LABEL_ORDER = [
     "NORTHSTAR",
 ]
 
+PROJECT_WELL_COLORS = {
+    "MTE": (190, 18, 60),
+    "IGS": (15, 118, 110),
+    "Hydrate-01": (124, 58, 237),
+    "HYDRATE 02": (234, 88, 12),
+}
+
+PROJECT_WELL_LABEL_OFFSETS = {
+    "MTE": (-116, -72),
+    "IGS": (120, 78),
+    "Hydrate-01": (-130, 104),
+    "HYDRATE 02": (142, -106),
+}
+
 VIRIDIS = [
     (68, 1, 84),
     (59, 82, 139),
@@ -177,9 +205,26 @@ def draw_text(
 
 def project(lon: float, lat: float) -> tuple[int, int]:
     left, top, right, bottom = MAP_BOX
-    x = left + (lon - LON_MIN) / (LON_MAX - LON_MIN) * (right - left)
-    y = bottom - (lat - LAT_MIN) / (LAT_MAX - LAT_MIN) * (bottom - top)
+    px, py = lonlat_to_world_pixel(lon, lat, TILE_ZOOM)
+    x = left + (px - WORLD_LEFT) / (WORLD_RIGHT - WORLD_LEFT) * (right - left)
+    y = top + (py - WORLD_TOP) / (WORLD_BOTTOM - WORLD_TOP) * (bottom - top)
     return int(round(x)), int(round(y))
+
+
+def lonlat_to_world_pixel(lon: float, lat: float, zoom: int) -> tuple[float, float]:
+    lat = max(-WEB_MERCATOR_LAT_LIMIT, min(WEB_MERCATOR_LAT_LIMIT, float(lat)))
+    scale = TILE_SIZE * (2**zoom)
+    x = (float(lon) + 180.0) / 360.0 * scale
+    lat_rad = math.radians(lat)
+    y = (
+        1.0
+        - math.log(math.tan(lat_rad) + (1.0 / math.cos(lat_rad))) / math.pi
+    ) / 2.0 * scale
+    return x, y
+
+
+WORLD_LEFT, WORLD_TOP = lonlat_to_world_pixel(LON_MIN, LAT_MAX, TILE_ZOOM)
+WORLD_RIGHT, WORLD_BOTTOM = lonlat_to_world_pixel(LON_MAX, LAT_MIN, TILE_ZOOM)
 
 
 def in_extent(lon: float, lat: float, pad: float = 0.1) -> bool:
@@ -291,6 +336,82 @@ def clean_label(value: object) -> str:
     return " ".join(str(value or "").replace("City of ", "").title().split())
 
 
+def landmark_path(filename: str) -> Path:
+    public_path = PUBLIC_LANDMARK_DIR / filename
+    if public_path.exists():
+        return public_path
+    return LANDMARK_DIR / filename
+
+
+def stable_range_screen_frame(screen: pd.DataFrame) -> pd.DataFrame:
+    frame = screen.copy()
+    for column in [
+        "lat",
+        "lon",
+        "stability_top_m",
+        "stability_base_m",
+        "stability_thickness_m",
+    ]:
+        frame[column] = pd.to_numeric(frame.get(column), errors="coerce")
+    frame = frame[
+        frame["stability_result_status"].eq("calculated")
+    ].dropna(
+        subset=[
+            "lat",
+            "lon",
+            "stability_top_m",
+            "stability_base_m",
+            "stability_thickness_m",
+        ]
+    )
+    return frame[frame["stability_thickness_m"].gt(0)].copy()
+
+
+def load_project_case_wells() -> pd.DataFrame:
+    if not PROJECT_WELL_CSV.exists():
+        return pd.DataFrame()
+    wells = pd.read_csv(PROJECT_WELL_CSV)
+    wells = wells[
+        wells["well_case"].isin(["MTE", "IGS", "Hydrate-01", "HYDRATE 02"])
+    ].copy()
+    for prefix in ["bottomhole", "wellhead"]:
+        wells[f"{prefix}_latitude"] = pd.to_numeric(
+            wells.get(f"{prefix}_latitude"), errors="coerce"
+        )
+        wells[f"{prefix}_longitude"] = pd.to_numeric(
+            wells.get(f"{prefix}_longitude"), errors="coerce"
+        )
+    wells["plot_lat"] = wells["bottomhole_latitude"].fillna(wells["wellhead_latitude"])
+    wells["plot_lon"] = wells["bottomhole_longitude"].fillna(wells["wellhead_longitude"])
+    wells = wells.dropna(subset=["plot_lat", "plot_lon"])
+    wells["map_label"] = wells["well_case"].map(
+        {
+            "MTE": "MTE",
+            "IGS": "IGS",
+            "Hydrate-01": "Hydrate-01",
+            "HYDRATE 02": "HYDRATE 02",
+        }
+    ).fillna(wells["well_case"])
+    return wells
+
+
+def draw_project_case_wells(draw: ImageDraw.ImageDraw, wells: pd.DataFrame) -> None:
+    if wells.empty:
+        return
+    for row in wells.itertuples():
+        well_case = str(row.well_case)
+        lon, lat = float(row.plot_lon), float(row.plot_lat)
+        if not in_extent(lon, lat, pad=0.04):
+            continue
+        color = PROJECT_WELL_COLORS.get(well_case, NAVY)
+        px, py = project(lon, lat)
+        dx, dy = PROJECT_WELL_LABEL_OFFSETS.get(well_case, (0, -62))
+        label_xy = (px + dx, py + dy)
+        draw.line((px, py, label_xy[0], label_xy[1]), fill=color + (210,), width=4)
+        draw_circle(draw, (px, py), 17, color, 250, outline=WHITE)
+        draw_label(draw, label_xy, str(row.map_label), 25, color)
+
+
 def load_master_2d_context() -> pd.DataFrame:
     if not MASTER_2D.exists():
         return pd.DataFrame(
@@ -362,6 +483,75 @@ def draw_public_well_reference_points(
             draw_circle(draw, project(lon, lat), 1, (148, 163, 184), 38, outline=None)
 
 
+def fetch_osm_tile(x: int, y: int, zoom: int) -> Image.Image | None:
+    TILE_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_path = TILE_CACHE_DIR / f"{zoom}_{x}_{y}.png"
+    if cache_path.exists():
+        return Image.open(cache_path).convert("RGB")
+    url = TILE_URL_TEMPLATE.format(z=zoom, x=x, y=y)
+    request = urllib.request.Request(url, headers={"User-Agent": TILE_USER_AGENT})
+    try:
+        with urllib.request.urlopen(request, timeout=12) as response:
+            payload = response.read()
+    except (OSError, urllib.error.URLError, TimeoutError):
+        return None
+    cache_path.write_bytes(payload)
+    return Image.open(cache_path).convert("RGB")
+
+
+def build_osm_basemap() -> Image.Image | None:
+    tile_left = math.floor(WORLD_LEFT / TILE_SIZE)
+    tile_right = math.floor((WORLD_RIGHT - 1) / TILE_SIZE)
+    tile_top = math.floor(WORLD_TOP / TILE_SIZE)
+    tile_bottom = math.floor((WORLD_BOTTOM - 1) / TILE_SIZE)
+    canvas_w = (tile_right - tile_left + 1) * TILE_SIZE
+    canvas_h = (tile_bottom - tile_top + 1) * TILE_SIZE
+    canvas = Image.new("RGB", (canvas_w, canvas_h), LAND)
+    fetched_any = False
+
+    for tile_x in range(tile_left, tile_right + 1):
+        for tile_y in range(tile_top, tile_bottom + 1):
+            tile = fetch_osm_tile(tile_x, tile_y, TILE_ZOOM)
+            if tile is None:
+                continue
+            fetched_any = True
+            canvas.paste(
+                tile,
+                ((tile_x - tile_left) * TILE_SIZE, (tile_y - tile_top) * TILE_SIZE),
+            )
+
+    if not fetched_any:
+        return None
+
+    crop = canvas.crop(
+        (
+            int(round(WORLD_LEFT - tile_left * TILE_SIZE)),
+            int(round(WORLD_TOP - tile_top * TILE_SIZE)),
+            int(round(WORLD_RIGHT - tile_left * TILE_SIZE)),
+            int(round(WORLD_BOTTOM - tile_top * TILE_SIZE)),
+        )
+    )
+    left, top, right, bottom = MAP_BOX
+    basemap = crop.resize((right - left, bottom - top), Image.Resampling.LANCZOS)
+    basemap = ImageEnhance.Color(basemap).enhance(0.55)
+    basemap = ImageEnhance.Contrast(basemap).enhance(0.86)
+    basemap = ImageEnhance.Brightness(basemap).enhance(1.08)
+    veil = Image.new("RGBA", basemap.size, (255, 255, 255, 76))
+    return Image.alpha_composite(basemap.convert("RGBA"), veil)
+
+
+def draw_map_background(base: Image.Image, draw: ImageDraw.ImageDraw) -> bool:
+    left, top, right, bottom = MAP_BOX
+    basemap = build_osm_basemap()
+    if basemap is None:
+        draw.rectangle(MAP_BOX, fill=LAND + (255,), outline=(91, 111, 124), width=3)
+        draw.rectangle((left, top, right, top + 315), fill=OCEAN + (255,))
+        return False
+    base.paste(basemap, (left, top), basemap)
+    draw.rectangle(MAP_BOX, outline=(91, 111, 124), width=3)
+    return True
+
+
 def paste_image_fit(
     base: Image.Image,
     path: Path,
@@ -397,10 +587,11 @@ def draw_side_panel(base: Image.Image) -> None:
         ("Regional Boundary", "Census/TIGER North Slope Borough edge"),
         ("Geoscience Orientation", "study boundary, public wells, 2D/3D seismic"),
         ("DGGS RI 2018-6", "Umiat-Gubik units, contacts/faults, folds"),
-        ("Stability controls", "GGD223 pf_depth_m + USGS hydrate AUs"),
+        ("Stability screen", "calculated intervals with top/base depth only"),
+        ("Project wells", "MTE, IGS, Hydrate-01, HYDRATE 02"),
         ("OSL landmarks", "DNR units, AKDOT roads, TAPS, communities"),
     ]
-    colors = [BLACK, ASSESSMENT_CONTEXT, SEISMIC_3D, TEAL, PIPE]
+    colors = [BLACK, ASSESSMENT_CONTEXT, SEISMIC_3D, BLUE, PROJECT_WELL_COLORS["MTE"], PIPE]
     for (header, body), color in zip(layers, colors):
         draw.rounded_rectangle((x1 + 34, y, x1 + 64, y + 30), radius=6, fill=color + (255,))
         draw_text(draw, (x1 + 82, y - 2), header, 26, NAVY, True, width=x2 - x1 - 120)
@@ -465,31 +656,17 @@ def draw_legend(draw: ImageDraw.ImageDraw, ggd_min: int, ggd_max: int) -> None:
         x += 440
 
     x, y = 160, 1718
-    for status in [
-        "calculated",
-        "calculated_no_stable_interval",
-        "blocked_phase_curve_range_insufficient",
-        "blocked_missing_temperature_profile",
-        "blocked_missing_depth",
-        "outside_au_context",
-    ]:
-        style = STATUS_STYLES[status]
-        draw_circle(draw, (x + 16, y + 16), style["size"] + 3, style["color"], style["alpha"])
-        draw.text((x + 42, y), style["label"], font=font(23), fill=INK)
-        x += 460 if status != "blocked_missing_temperature_profile" else 565
-
-    bar_x, bar_y, bar_w, bar_h = 3080, 210, 330, 26
-    for i in range(bar_w):
-        value = ggd_min + (ggd_max - ggd_min) * (i / max(1, bar_w - 1))
-        draw.line(
-            (bar_x + i, bar_y, bar_x + i, bar_y + bar_h),
-            fill=color_scale(value, ggd_min, ggd_max),
-            width=1,
-        )
-    draw.rectangle((bar_x, bar_y, bar_x + bar_w, bar_y + bar_h), outline=LINE, width=2)
-    draw.text((bar_x, bar_y - 35), "GGD223 pf_depth_m", font=font(24, True), fill=INK)
-    draw.text((bar_x, bar_y + 34), f"{ggd_min} m", font=font(22), fill=MUTED)
-    draw.text((bar_x + bar_w - 68, bar_y + 34), f"{ggd_max} m", font=font(22), fill=MUTED)
+    point_items = [
+        ("Stable-range wells with top/base depth", BLUE, 13),
+        ("MTE", PROJECT_WELL_COLORS["MTE"], 17),
+        ("IGS", PROJECT_WELL_COLORS["IGS"], 17),
+        ("Hydrate-01", PROJECT_WELL_COLORS["Hydrate-01"], 17),
+        ("HYDRATE 02", PROJECT_WELL_COLORS["HYDRATE 02"], 17),
+    ]
+    for label, color, size in point_items:
+        draw_circle(draw, (x + 16, y + 16), size, color, 245)
+        draw.text((x + 46, y), label, font=font(23), fill=INK)
+        x += 605 if label == "Stable-range wells with top/base depth" else 290
 
 
 def draw_map() -> Path:
@@ -503,31 +680,35 @@ def draw_map() -> Path:
             "lon",
             "stability_result_status",
             "stability_confidence",
+            "stability_top_m",
+            "stability_base_m",
+            "stability_thickness_m",
         ],
     )
     screen["lat"] = pd.to_numeric(screen["lat"], errors="coerce")
     screen["lon"] = pd.to_numeric(screen["lon"], errors="coerce")
     screen = screen.dropna(subset=["lat", "lon"])
+    stable_screen = stable_range_screen_frame(screen)
+    project_wells = load_project_case_wells()
     ggd = pd.read_csv(GGD223_CSV)
     ggd["permafrost_depth_m"] = pd.to_numeric(ggd["permafrost_depth_m"], errors="coerce")
     ggd_min = int(ggd["permafrost_depth_m"].min())
     ggd_max = int(ggd["permafrost_depth_m"].max())
 
-    dnr_units = load_geojson(LANDMARK_DIR / "alaska_dnr_unit_boundary_current_north_slope_clip.geojson")
-    roads_all = load_geojson(LANDMARK_DIR / "alaska_akdot_roads_north_slope_clip.geojson")
+    dnr_units = load_geojson(landmark_path("alaska_dnr_unit_boundary_current_north_slope_clip.geojson"))
+    roads_all = load_geojson(landmark_path("alaska_akdot_roads_north_slope_clip.geojson"))
     key_roads = [feature for feature in roads_all if any(term in road_name(feature) for term in ["dalton", "deadhorse"])]
     local_roads = [feature for feature in roads_all if feature not in key_roads]
-    taps = load_geojson(LANDMARK_DIR / "alaska_dnr_trans_alaska_pipeline.geojson")
+    taps = load_geojson(landmark_path("alaska_dnr_trans_alaska_pipeline.geojson"))
     aus = load_geojson(AU_GEOJSON)
     borough_boundary = load_geojson(BOROUGH_BOUNDARY_GEOJSON)
-    gnis = load_geojson(LANDMARK_DIR / "usgs_gnis_places_north_slope_clip.geojson")
+    gnis = load_geojson(landmark_path("usgs_gnis_places_north_slope_clip.geojson"))
     master_context = load_master_2d_context()
 
     img = Image.new("RGBA", (W, H), PALE + (255,))
     draw = ImageDraw.Draw(img, "RGBA")
-    draw.rectangle(MAP_BOX, fill=LAND + (255,), outline=(91, 111, 124), width=3)
     left, top, right, bottom = MAP_BOX
-    draw.rectangle((left, top, right, top + 315), fill=OCEAN + (255,))
+    using_osm_basemap = draw_map_background(img, draw)
 
     for lon in range(-157, -144, 2):
         x, _ = project(lon, LAT_MIN)
@@ -544,7 +725,6 @@ def draw_map() -> Path:
     draw_frame_lines(draw, master_context, "seismic_3d_inventory", SEISMIC_3D, 2, 120, 180)
     draw_frame_lines(draw, master_context, "extent", BLACK, 4, 8, 20)
     draw_geojson_lines(draw, borough_boundary, BLACK, 7, max_points=2600)
-    draw_public_well_reference_points(draw, master_context)
 
     draw_geojson_lines(draw, dnr_units, GRAY, 3, max_points=800)
     draw_geojson_lines(draw, aus, TEAL, 5, max_points=1400)
@@ -552,27 +732,20 @@ def draw_map() -> Path:
     draw_geojson_lines(draw, key_roads, BLACK, 6, max_points=1600)
     draw_geojson_lines(draw, taps, PIPE, 6, max_points=1600)
 
-    for row in ggd.itertuples():
-        lon, lat = float(row.longitude), float(row.latitude)
+    stable_style = STATUS_STYLES["calculated"]
+    for row in stable_screen.itertuples():
+        lon, lat = float(row.lon), float(row.lat)
         if not in_extent(lon, lat):
             continue
-        color = color_scale(float(row.permafrost_depth_m), ggd_min, ggd_max)
-        draw_circle(draw, project(lon, lat), 10, color, 235)
-
-    for status, style in STATUS_STYLES.items():
-        subset = screen[screen["stability_result_status"].eq(status)]
-        for row in subset.itertuples():
-            lon, lat = float(row.lon), float(row.lat)
-            if not in_extent(lon, lat):
-                continue
-            draw_circle(
-                draw,
-                project(lon, lat),
-                style["size"],
-                style["color"],
-                style["alpha"],
-                outline=None if style["size"] <= 4 else WHITE,
-            )
+        draw_circle(
+            draw,
+            project(lon, lat),
+            stable_style["size"] + 4,
+            stable_style["color"],
+            stable_style["alpha"],
+            outline=WHITE,
+        )
+    draw_project_case_wells(draw, project_wells)
 
     label_offsets = {
         "Prudhoe Bay": (65, 45),
@@ -600,11 +773,11 @@ def draw_map() -> Path:
                 if in_extent(lon, lat):
                     draw_label(draw, project(lon, lat), label, 23, MUTED)
 
-    draw_text(draw, (130, 55), "Unified North Slope Well + Stability Context Map", 54, NAVY, True)
+    draw_text(draw, (130, 55), "Focused North Slope Stability + Project Well Map", 54, NAVY, True)
     draw_text(
         draw,
         (132, 122),
-        "Census/TIGER North Slope Borough boundary, geoscience orientation, DGGS Umiat-Gubik preview, GGD223 controls, USGS hydrate AUs, methane 5 ppt CSV-screen status, DNR units, roads, TAPS, and field labels.",
+        "Stable-range wells from the methane 5 ppt CSV screen, four public-safe project/source wells, hydrate AU outlines, DNR units, roads, TAPS, communities, and field labels. Background/blocked well dots are omitted.",
         29,
         MUTED,
     )
@@ -622,7 +795,12 @@ def draw_map() -> Path:
     draw_text(
         draw,
         (130, 1975),
-        "GitHub-safe layers: Census/TIGER North Slope Borough boundary, public master geoscience context, committed stability screen using the methane 5 ppt digitized CSV phase curve, USGS AU snapshot, GGD223 public snapshot, DGGS preview PNG, and this derived PNG. OSL/Drive-only raw layers: full DNR/AKDOT/TAPS/Census/GNIS/DGGS packages and any approved well-log/core/runtime data.",
+        (
+            "Visual basemap: OpenStreetMap contributors, cached for this local export. "
+            if using_osm_basemap
+            else "Visual basemap: local simplified land/ocean fallback. "
+        )
+        + "GitHub-safe layers: Census/TIGER North Slope Borough boundary, public master geoscience context, committed stability screen using the methane 5 ppt digitized CSV phase curve, public project well/API index, USGS AU snapshot, DGGS preview PNG, and this derived PNG. OSL/Drive-only raw layers: full DNR/AKDOT/TAPS/Census/GNIS/DGGS packages and any approved well-log/core/runtime data.",
         24,
         MUTED,
         width=3450,
@@ -636,11 +814,11 @@ def draw_slide_callout_export(full_map: Image.Image) -> Path:
     slide_w, slide_h = 3200, 1800
     slide = Image.new("RGB", (slide_w, slide_h), PALE)
     draw = ImageDraw.Draw(slide, "RGBA")
-    draw_text(draw, (92, 54), "Unified 2D North Slope Map", 54, NAVY, True)
+    draw_text(draw, (92, 54), "Focused 2D North Slope Stability Map", 54, NAVY, True)
     draw_text(
         draw,
         (94, 122),
-        "Slide export leaves a right-side lane for editable callouts in PowerPoint or Google Slides.",
+        "Stable-range wells and four project/source wells are baked into the map export; slide-level explanation remains editable.",
         30,
         MUTED,
         width=2700,
@@ -656,12 +834,12 @@ def draw_slide_callout_export(full_map: Image.Image) -> Path:
     draw_text(draw, (2388, 270), "Editable callout lane", 38, NAVY, True, width=650)
     y = 344
     callouts = [
-        ("1", "North Slope edge", "Census/TIGER borough boundary"),
-        ("2", "Geology context", "DGGS Umiat-Gubik units + structures"),
-        ("3", "P-T controls", "GGD223 + hydrate AU source controls"),
-        ("4", "Screen status", "admissibility only; not hydrate proof"),
+        ("1", "Stable range wells", "CSV screen rows with top/base depth"),
+        ("2", "Project wells", "MTE, IGS, Hydrate-01, HYDRATE 02"),
+        ("3", "Regional labels", "field and place context for orientation"),
+        ("4", "Guardrail", "stability context, not hydrate proof"),
     ]
-    colors = [ASSESSMENT_CONTEXT, SEISMIC_3D, TEAL, AMBER]
+    colors = [BLUE, PROJECT_WELL_COLORS["MTE"], TEAL, AMBER]
     for (number, header, body), color in zip(callouts, colors):
         draw.ellipse((2388, y, 2440, y + 52), fill=color)
         draw_text(draw, (2404, y + 10), number, 26, WHITE, True)
@@ -689,7 +867,7 @@ def draw_slide_callout_export(full_map: Image.Image) -> Path:
     draw_text(
         draw,
         (92, 1630),
-        "Sources/layers: Census/TIGER North Slope Borough boundary, public master geoscience context, DGGS RI 2018-6 preview, GGD223 controls, USGS hydrate assessment units, public stability screen using the methane 5 ppt digitized CSV phase curve, and OSL-staged DNR/AKDOT/TAPS/community/field landmarks.",
+        "Visual basemap: OpenStreetMap contributors. Sources/layers: Census/TIGER North Slope Borough boundary, public master geoscience context, DGGS RI 2018-6 preview, USGS hydrate assessment units, public stability screen using the methane 5 ppt digitized CSV phase curve, public project well/API index, and OSL-staged DNR/AKDOT/TAPS/community/field landmarks.",
         24,
         MUTED,
         width=3000,

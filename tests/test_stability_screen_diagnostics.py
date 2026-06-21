@@ -473,7 +473,7 @@ def test_unified_context_map_combines_status_source_and_landmark_layers(
     assert "Dalton/Deadhorse roads" in trace_names
     assert "Trans-Alaska Pipeline" in trace_names
     assert "USGS hydrate AU outlines" in trace_names
-    assert "GGD223 pf_depth_m controls" in trace_names
+    assert "GGD223 pf_depth_m controls" not in trace_names
     assert "Calculated screen interval" in trace_names
     assert "Background: no temperature profile" not in trace_names
     assert "Header-verified project wells" in trace_names
@@ -487,10 +487,6 @@ def test_unified_context_map_combines_status_source_and_landmark_layers(
         == "Focused 2D North Slope Map: calculated stability ranges and project wells"
     )
 
-    pf_trace = next(
-        trace for trace in figure.data if trace.name == "GGD223 pf_depth_m controls"
-    )
-    assert pf_trace.marker.colorbar.title.text == "pf_depth_m"
     calculated_trace = next(
         trace for trace in figure.data if trace.name == "Calculated screen interval"
     )
@@ -505,6 +501,28 @@ def test_unified_context_map_combines_status_source_and_landmark_layers(
     )
     assert "Greater Mooses Tooth" in set(field_label_trace.text)
     assert "Badami" in set(field_label_trace.text)
+
+    full_context_figure = build_unified_north_slope_context_map(
+        minimal_screen_frame(),
+        minimal_permafrost_points(),
+        minimal_assessment_units(),
+        landmark_source,
+        minimal_geoscience_context(),
+        case_well_index=minimal_case_well_index(),
+        focused=False,
+        include_public_reference_points=True,
+        include_associated_case_wells=True,
+    )
+    full_trace_names = {trace.name for trace in full_context_figure.data}
+    assert "GGD223 pf_depth_m controls" in full_trace_names
+    assert "Background: no temperature profile" in full_trace_names
+    assert "Associated HYDRATE 02 test wells" in full_trace_names
+    pf_trace = next(
+        trace
+        for trace in full_context_figure.data
+        if trace.name == "GGD223 pf_depth_m controls"
+    )
+    assert pf_trace.marker.colorbar.title.text == "pf_depth_m"
 
     inventory = unified_context_map_layer_inventory_frame(Path("missing_dggs_preview.png"))
     assert "Regional Boundary" in set(inventory["layer_group"])

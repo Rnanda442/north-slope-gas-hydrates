@@ -2200,7 +2200,8 @@ def render_regional_atlas() -> None:
     st.caption(
         f"{blocked_count:,} rows are blocked by public-source gates under the "
         "current methane 5 ppt screen. The default map hides those background "
-        "points so calculated stability ranges and the four project wells stay readable."
+        "points, associated well anchors, and GGD control-point dots so calculated "
+        "stability ranges and the four project wells stay readable."
     )
     landmark_source_dir = default_basemap_landmark_source_dir(PROJECT_ROOT)
     interactive_landmarks_available = basemap_landmark_bundle_is_available(landmark_source_dir)
@@ -3697,7 +3698,8 @@ def build_unified_north_slope_context_map(
     )
     add_north_slope_basemap_line_layers(figure, landmarks, showlegend=True)
     add_hydrate_assessment_unit_mapbox_layers(figure, assessment_units)
-    add_ggd223_permafrost_mapbox_layer(figure, permafrost_points)
+    if not focused:
+        add_ggd223_permafrost_mapbox_layer(figure, permafrost_points)
     add_stability_status_mapbox_layers(
         figure,
         status_frame,
@@ -3734,9 +3736,13 @@ def build_unified_north_slope_context_map(
             "itemsizing": "constant",
         },
         mapbox={
-            "style": "carto-positron",
-            "center": {"lat": 70.35, "lon": -150.4},
-            "zoom": 4.35,
+            "style": "open-street-map",
+            "center": (
+                {"lat": 70.22, "lon": -149.95}
+                if focused
+                else {"lat": 70.35, "lon": -150.4}
+            ),
+            "zoom": 5.2 if focused else 4.35,
         },
     )
     return figure
