@@ -6,6 +6,8 @@ Scope: public well-name, API, permit, field, status, and coordinate anchors for 
 
 Public CSV: `data/public_ml_products/four_well_case_location_index_2026-06-19.csv`
 
+Related core/source audit: `docs/source_library_index/FOUR_WELL_CORE_DATA_AUDIT_2026-06-20.md`
+
 ## Verified Public Well Anchors
 
 | well/case | public well name | API number | field | website role | evidence status |

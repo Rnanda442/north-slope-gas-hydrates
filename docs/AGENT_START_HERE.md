@@ -76,6 +76,10 @@ and ignored-data rules are in `docs/opensciencelab_runtime_layout.md`.
 - `docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md` - latest self-email
   project/deck direction, editable-slide rule, four-well ML scope, and copyable
   prompts for PC/OSL/delegated Codex chats.
+- `docs/WORKSPACE_CONSOLIDATION_2026-06-21.md` - canonical local checkout,
+  merged branch list, local-only intake, and excluded raw/source material.
+- `docs/SLIDE_BY_SLIDE_WORKSPACE_GUIDE_2026-06-21.md` - current one-slide-at-a-
+  time Drive deck cleanup workflow and active working deck ID.
 - `docs/project_blueprints/EDITABLE_DECK_REBUILD_SOURCE_OF_TRUTH_2026-06-19.md`
   - current Drive/Gmail deck audit and the rule that the next deck pass must
   rebuild slide faces as native movable/editable objects, not full-slide
@@ -331,7 +335,8 @@ Preferred language: `public-safe scaffold`, `schema readiness`,
    `docs/FINAL_NINE_SLIDE_GAP_AND_DIAGRAM_REUSE_PLAN_2026-06-15.md`, and the
    relevant prompt in `docs/PROJECT_PROMPT_LIBRARY.md`. For current delegated
    slide work, also read
-   `docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md`.
+   `docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md` and
+   `docs/SLIDE_BY_SLIDE_WORKSPACE_GUIDE_2026-06-21.md`.
 5. For ML/schema work, read the approved-data intake spec, first model plan,
    field-role table, parameter evidence registry, and leakage guardrails.
 6. For stability work, read `docs/STABILITY_CALCULATION_PLAN.md`, the public
