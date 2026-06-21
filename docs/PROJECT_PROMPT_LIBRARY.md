@@ -1,10 +1,39 @@
 # Project Prompt Library
 
-Last updated: 2026-06-17
+Last updated: 2026-06-18
 
 Use these prompts as reusable starting points. Each prompt intentionally starts
 by reading `docs/AGENT_START_HERE.md`; keep that requirement when copying or
 editing.
+
+## Current Project Revision Delegation
+
+```text
+We are working in Rnanda442/north-slope-gas-hydrates.
+
+First read docs/AGENT_START_HERE.md, docs/CURRENT_ARTIFACT_INDEX.md, and
+docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md.
+
+Task: pick one topic prompt from
+docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md and complete only that scoped
+task. Keep the personal PC, OSL, Drive, and GitHub aligned by reporting what
+belongs in GitHub, what belongs in Drive/OSL only, what was generated, and what
+still needs user or mentor review.
+
+Use the latest rules from the project revision base: whole-slide raster
+screenshots should be converted to real editable slide builds wherever
+practical, and the active ML scope is the four wells represented by the three
+available datasheets/workbooks. Verify well names, locations, coring data, and
+lithology before finalizing the ML/lithology/saturation story.
+
+Guardrails: do not commit approved/private rows, raw heavy source bundles,
+private email attachments, runtime predictions, trained models, fitted scalers,
+or unsupported slide claims. Keep stability as context only and keep detailed
+source notes in the Word companion/end material rather than crowding slides.
+
+Output: files changed, figures/assets produced, tests/checks run, unresolved
+questions, and the next exact prompt/topic to delegate.
+```
 
 ## Slide Rebuild
 
@@ -12,6 +41,8 @@ editing.
 We are working in Rnanda442/north-slope-gas-hydrates.
 
 First read docs/AGENT_START_HERE.md, then docs/CURRENT_ARTIFACT_INDEX.md.
+Then read docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md for the latest
+self-email project/deck direction, editable-slide rule, and four-well ML scope.
 Then read docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md,
 docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md,
 docs/FINAL_NINE_SLIDE_GAP_AND_DIAGRAM_REUSE_PLAN_2026-06-15.md,
@@ -23,6 +54,11 @@ audience topic slides, preserve the complex workflow and ML runtime diagrams in
 the main sequence, use website/source-backed visuals, and keep the explanation
 clear for non-ML/non-hydrate audiences. Treat V5.4 as the source baseline and
 V5.3 as flawed reference only.
+
+Do not rebuild final slides as whole-slide screenshots. Use native editable
+text, labels, arrows, and callouts wherever practical. Maps/plots/source
+figures may remain high-resolution generated figure objects, but slide titles,
+phrases, and explanation labels should be manually editable when possible.
 
 Guardrails: do not expose approved/private rows; do not claim hydrate proof,
 final stability, final top/base/thickness, trained ML metrics, occurrence
