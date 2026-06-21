@@ -25,7 +25,6 @@ from dashboard.processing_visuals import render_processing_sketch
 from dashboard.source_visual_inventory import (
     default_source_visual_inventory_path,
     load_source_visual_inventory,
-    source_card_frame,
     source_visual_inventory_summary_frame,
     validate_source_visual_inventory,
 )
@@ -192,7 +191,7 @@ FULL_WORKFLOW_WORD = (
     PROJECT_ROOT
     / "docs"
     / "project_blueprints"
-    / "V5_6_WELL_LOCATION_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-19.docx"
+    / "V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx"
 )
 FULL_WORKFLOW_DRIVE_SLIDES_URL = "https://docs.google.com/presentation/d/1-35vfTIXAnWCiyKTLooJy80HBYliMBliE_z4CbggJC0"
 FULL_WORKFLOW_DRIVE_DOC_URL = "https://docs.google.com/document/d/1CyZkRgfAUSOOaRxXni0mcmFN2OQcc5pNOw8TOv44f0Q"
@@ -264,21 +263,6 @@ VARIABLE_FINGERPRINT_TEMPLATE = (
     / "variable_fingerprint_template_2026-06-15.csv"
 )
 PUBLIC_PARAMETER_EVIDENCE_REGISTRY = default_parameter_evidence_registry_path(PROJECT_ROOT)
-FOCUSED_WELL_LOCATION_RECOVERY = (
-    PROJECT_ROOT
-    / "data"
-    / "public_stability_products"
-    / "focused_well_location_recovery_2026-06-19.csv"
-)
-ALASKA_DNR_WELL_SURFACE_SERVICE = (
-    "https://services1.arcgis.com/7HDiw78fcUiM2BWn/arcgis/rest/services/"
-    "Well_Surface_Hole_Location/FeatureServer/0"
-)
-ALASKA_DNR_WELL_BOTTOM_SERVICE = (
-    "https://services1.arcgis.com/7HDiw78fcUiM2BWn/arcgis/rest/services/"
-    "Well_Bottom_Hole_Location/FeatureServer/0"
-)
-AOGCC_DATA_PAGE = "https://www.commerce.alaska.gov/web/aogcc/data.aspx"
 INTAKE_READINESS_REPORT_DIR = PROJECT_ROOT / "data" / "public_ml_products" / "intake_readiness_reports"
 DEMO_HEADER_AUDIT_CSV = INTAKE_READINESS_REPORT_DIR / "demo_header_audit_2026-06-15.csv"
 DEMO_HEADER_AUDIT_JSON = INTAKE_READINESS_REPORT_DIR / "demo_header_audit_2026-06-15.json"
@@ -331,10 +315,10 @@ STABILITY_SCREEN_STATUS_STYLES = {
         "opacity": 0.72,
     },
     "blocked_missing_temperature_profile": {
-        "label": "Blocked: missing temperature profile",
-        "color": "#94a3b8",
-        "size": 5,
-        "opacity": 0.42,
+        "label": "Background: no temperature profile",
+        "color": "#cbd5e1",
+        "size": 2.4,
+        "opacity": 0.16,
     },
     "blocked_missing_depth": {
         "label": "Blocked: missing depth",
@@ -354,6 +338,38 @@ STABILITY_SCREEN_CONFIDENCE_COLORS = {
     "high_source_control": "#2563eb",
     "medium_source_control": "#0891b2",
     "low_source_control": "#d97706",
+}
+
+PROJECT_CASE_ROLE_STYLES = {
+    "workbook_header_anchor": {
+        "label": "Header-verified project wells",
+        "color": "#be123c",
+        "size": 15,
+    },
+    "public_source_case": {
+        "label": "Public source-case project wells",
+        "color": "#0f766e",
+        "size": 14,
+    },
+    "associated_source_anchor": {
+        "label": "Associated public source anchors",
+        "color": "#475569",
+        "size": 10,
+    },
+    "associated_test_well": {
+        "label": "Associated HYDRATE 02 test wells",
+        "color": "#b45309",
+        "size": 10,
+    },
+}
+
+PRIMARY_PROJECT_CASE_ROLES = {"workbook_header_anchor", "public_source_case"}
+
+PROJECT_CASE_LABEL_OFFSETS = {
+    "MTE": {"lat": 0.025, "lon": -0.13},
+    "IGS": {"lat": -0.028, "lon": 0.13},
+    "Hydrate-01": {"lat": 0.040, "lon": -0.14},
+    "HYDRATE 02": {"lat": -0.040, "lon": 0.14},
 }
 
 BLANK_REASON_DETAILS = {
@@ -460,6 +476,7 @@ BASEMAP_LANDMARK_FILES = {
     "pipeline": "alaska_dnr_trans_alaska_pipeline.geojson",
     "gnis_places": "usgs_gnis_places_north_slope_clip.geojson",
     "census_places": "census_tiger_2025_alaska_places.zip",
+    "census_places_geojson": "census_tiger_2025_alaska_places_north_slope_clip.geojson",
 }
 FIELD_LABEL_ORDER = [
     "PRUDHOE BAY",
@@ -470,8 +487,16 @@ FIELD_LABEL_ORDER = [
     "NIKAITCHUQ",
     "NORTHSTAR",
     "PIKKA",
+    "GREATER MOOSES TOOTH",
+    "BADAMI",
     "PT THOMSON",
     "OOOGURUK",
+]
+REGIONAL_ORIENTATION_LABELS = [
+    {"label": "Western North Slope", "lat": 70.82, "lon": -156.25},
+    {"label": "Central North Slope fields", "lat": 70.62, "lon": -150.05},
+    {"label": "Eastern North Slope", "lat": 70.25, "lon": -146.45},
+    {"label": "Dalton / TAPS corridor", "lat": 69.78, "lon": -148.45},
 ]
 MASTER_2D = PROJECT_ROOT / "03_data_final" / "master_layers" / "north_slope_master_2d_layers.parquet"
 STRUCTURAL_HORIZONS = ["NStopo", "NSLCU", "NSshublik", "NSbasement"]
@@ -774,46 +799,6 @@ def apply_styles() -> None:
             color: #123447;
             margin: 0.1rem 0 0.4rem;
         }
-        .source-card {
-            background: #ffffff;
-            border: 1px solid #d9e7e8;
-            border-radius: 8px;
-            min-height: 340px;
-            padding: 1rem 1.05rem;
-            margin-bottom: 0.85rem;
-        }
-        .source-card h4 {
-            color: #123447;
-            font-size: 1.02rem;
-            line-height: 1.25;
-            margin: 0.22rem 0 0.55rem;
-        }
-        .source-card p {
-            color: #334155;
-            font-size: 0.9rem;
-            line-height: 1.36;
-            margin: 0.34rem 0;
-        }
-        .source-card-meta {
-            color: #167d8d;
-            font-size: 0.74rem;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
-        .source-card code {
-            background: #edf7f8;
-            border-radius: 4px;
-            color: #123447;
-            display: inline-block;
-            font-size: 0.78rem;
-            line-height: 1.28;
-            margin-top: 0.15rem;
-            max-width: 100%;
-            overflow-wrap: anywhere;
-            padding: 0.08rem 0.25rem;
-            white-space: normal;
-        }
         .atlas-step {
             background: #edf7f8;
             border-left: 4px solid #167d8d;
@@ -1058,10 +1043,6 @@ def format_bytes(size: int) -> str:
             return f"{value:,.1f} {unit}"
         value /= 1024
     return f"{size:,} B"
-
-
-def is_pytest_run() -> bool:
-    return bool(os.environ.get("PYTEST_CURRENT_TEST"))
 
 
 @st.cache_data
@@ -1637,188 +1618,11 @@ def build_stability_source_figure(
     return figure
 
 
-def load_focused_well_location_recovery() -> pd.DataFrame:
-    if not FOCUSED_WELL_LOCATION_RECOVERY.exists():
-        return pd.DataFrame()
-    return pd.read_csv(FOCUSED_WELL_LOCATION_RECOVERY, dtype=str).replace({np.nan: ""})
-
-
-def build_focused_well_path_figure(wells: pd.DataFrame) -> go.Figure:
-    mapped = wells[wells["alaska_well_map_status"].eq("official_surface_and_bottomhole_found")].copy()
-    for column in [
-        "wellhead_latitude",
-        "wellhead_longitude",
-        "bottomhole_latitude",
-        "bottomhole_longitude",
-        "surface_to_bottomhole_m",
-    ]:
-        mapped[column] = pd.to_numeric(mapped[column], errors="coerce")
-    mapped = mapped.dropna(
-        subset=[
-            "wellhead_latitude",
-            "wellhead_longitude",
-            "bottomhole_latitude",
-            "bottomhole_longitude",
-        ]
-    )
-
-    figure = go.Figure()
-    if mapped.empty:
-        figure.update_layout(
-            height=460,
-            margin={"l": 0, "r": 0, "t": 20, "b": 0},
-            mapbox={"style": "open-street-map", "center": {"lat": 70.34, "lon": -149.26}, "zoom": 8},
-        )
-        return figure
-
-    colors = ["#0f766e", "#2563eb", "#7c3aed", "#c2410c"]
-    for index, (_, row) in enumerate(mapped.iterrows()):
-        color = colors[index % len(colors)]
-        text = (
-            f"<b>{escape(str(row['alias_or_candidate']))}: "
-            f"{escape(str(row['public_well_name']))}</b><br>"
-            f"API: {escape(str(row['api_number']))}<br>"
-            f"Surface-to-bottomhole segment: {row['surface_to_bottomhole_m']:.1f} m<br>"
-            "Public line segment only; not a full deviation survey."
-        )
-        figure.add_trace(
-            go.Scattermapbox(
-                lat=[row["wellhead_latitude"], row["bottomhole_latitude"]],
-                lon=[row["wellhead_longitude"], row["bottomhole_longitude"]],
-                mode="lines",
-                name=str(row["alias_or_candidate"]),
-                line={"color": color, "width": 4},
-                text=[text, text],
-                hovertemplate="%{text}<extra></extra>",
-            )
-        )
-    figure.add_trace(
-        go.Scattermapbox(
-            lat=mapped["wellhead_latitude"],
-            lon=mapped["wellhead_longitude"],
-            mode="markers",
-            name="Wellhead",
-            marker={"size": 12, "color": "#111827", "opacity": 0.85},
-            text=(
-                "<b>"
-                + mapped["alias_or_candidate"].astype(str)
-                + " wellhead</b><br>"
-                + mapped["public_well_name"].astype(str)
-                + "<br>API: "
-                + mapped["api_number"].astype(str)
-            ),
-            hovertemplate="%{text}<extra></extra>",
-        )
-    )
-    figure.add_trace(
-        go.Scattermapbox(
-            lat=mapped["bottomhole_latitude"],
-            lon=mapped["bottomhole_longitude"],
-            mode="markers",
-            name="Bottomhole",
-            marker={"size": 11, "color": "#f59e0b", "opacity": 0.9},
-            text=(
-                "<b>"
-                + mapped["alias_or_candidate"].astype(str)
-                + " bottomhole</b><br>"
-                + mapped["public_well_name"].astype(str)
-                + "<br>API: "
-                + mapped["api_number"].astype(str)
-            ),
-            hovertemplate="%{text}<extra></extra>",
-        )
-    )
-
-    center_lat = float(
-        pd.concat([mapped["wellhead_latitude"], mapped["bottomhole_latitude"]]).mean()
-    )
-    center_lon = float(
-        pd.concat([mapped["wellhead_longitude"], mapped["bottomhole_longitude"]]).mean()
-    )
-    figure.update_layout(
-        height=520,
-        margin={"l": 0, "r": 0, "t": 28, "b": 0},
-        legend={
-            "orientation": "h",
-            "yanchor": "bottom",
-            "y": 1.01,
-            "xanchor": "left",
-            "x": 0,
-        },
-        mapbox={
-            "style": "open-street-map",
-            "center": {"lat": center_lat, "lon": center_lon},
-            "zoom": 8.7,
-        },
-    )
-    return figure
-
-
-def render_focused_well_location_recovery() -> None:
-    wells = load_focused_well_location_recovery()
-    st.markdown("### Focused Well Locations And Public Well-Path Segments")
-    if wells.empty:
-        st.info(
-            "Focused well-location recovery table is not present yet. "
-            f"Expected path: `{project_relative_or_absolute(FOCUSED_WELL_LOCATION_RECOVERY)}`."
-        )
-        return
-
-    mapped = wells[wells["alaska_well_map_status"].eq("official_surface_and_bottomhole_found")]
-    unresolved = wells[wells["alaska_well_map_status"].ne("official_surface_and_bottomhole_found")]
-    cols = st.columns(3)
-    cols[0].metric("Official API-mapped wells", f"{len(mapped):,}")
-    cols[1].metric("Unresolved screenshot aliases", f"{len(unresolved):,}")
-    cols[2].metric("Public path type", "surface to bottomhole")
-    st.caption(
-        "This focused extract is sourced from the public Alaska DNR / Division of Oil and Gas "
-        "surface-hole and bottom-hole services, plus the local public stability context table. "
-        "The path line is a straight endpoint segment, not a measured deviation survey."
-    )
-    st.plotly_chart(build_focused_well_path_figure(wells), use_container_width=True)
-    display_columns = [
-        "alias_or_candidate",
-        "public_well_name",
-        "api_number",
-        "field",
-        "current_status",
-        "wellhead_latitude",
-        "wellhead_longitude",
-        "bottomhole_latitude",
-        "bottomhole_longitude",
-        "surface_to_bottomhole_m",
-        "depth_basis_m",
-        "alaska_well_map_status",
-        "notes",
-    ]
-    st.dataframe(
-        wells[[column for column in display_columns if column in wells.columns]],
-        use_container_width=True,
-        hide_index=True,
-    )
-    st.download_button(
-        "Download focused well locations CSV",
-        wells.to_csv(index=False).encode("utf-8"),
-        file_name=FOCUSED_WELL_LOCATION_RECOVERY.name,
-        mime="text/csv",
-        use_container_width=True,
-    )
-    st.markdown(
-        "Official source services: "
-        f"[Well Surface Hole Location]({ALASKA_DNR_WELL_SURFACE_SERVICE}) and "
-        f"[Well Bottom Hole Location]({ALASKA_DNR_WELL_BOTTOM_SERVICE}); "
-        f"broader well-info reference: [AOGCC Data Miner/Data page]({AOGCC_DATA_PAGE})."
-    )
-
-
 def render_scene(path: Path, height: int = 830) -> None:
     if not path.exists():
         st.warning(f"Scene has not been generated yet: {path.relative_to(PROJECT_ROOT)}")
         return
     st.caption(f"{path.relative_to(PROJECT_ROOT).as_posix()} | {format_bytes(path.stat().st_size)}")
-    if is_pytest_run():
-        st.info("Large exported scene available in the website runtime; inline embed skipped during automated tests.")
-        return
     components.html(read_scene(path), height=height, scrolling=True)
 
 
@@ -2338,6 +2142,29 @@ def render_sweet_spot_page() -> None:
         )
 
 
+def render_unified_map_side_panel() -> None:
+    st.markdown("#### Integrated source layers")
+    st.markdown(
+        """
+- **Regional Boundary**: Census/TIGER North Slope Borough edge
+- **Geoscience Orientation**: study boundary, 2D/3D seismic, optional public well cloud
+- **Project Wells**: MTE, IGS, Hydrate-01, and HYDRATE 02 public anchors
+- **DGGS RI 2018-6**: Umiat-Gubik geology preview
+- **Stability controls**: GGD223 `pf_depth_m` + USGS hydrate AUs
+- **OSL landmarks**: DNR units, AKDOT roads, TAPS, communities
+"""
+    )
+    st.markdown("#### DGGS Umiat-Gubik preview")
+    if DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW.exists():
+        st.image(str(DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW), use_container_width=True)
+    else:
+        st.caption("DGGS preview missing in this checkout.")
+    st.caption(
+        "Context only. These layers do not prove hydrate occurrence, saturation, "
+        "producibility, or trained-model results."
+    )
+
+
 def render_regional_atlas() -> None:
     st.markdown('<div class="atlas-kicker">Regional context</div>', unsafe_allow_html=True)
     st.title("Unified 2D North Slope Map For Slides 2 And 7")
@@ -2355,6 +2182,7 @@ def render_regional_atlas() -> None:
     permafrost_points = cached_ggd223_points(str(source_root))
     assessment_units = cached_hydrate_assessment_units(str(source_root))
     calculated_count = int(screen["stability_result_status"].eq("calculated").sum())
+    project_case_count = len(project_case_well_frame(case_well_index))
     blocked_count = int(
         screen["stability_result_status"]
         .fillna("")
@@ -2364,33 +2192,101 @@ def render_regional_atlas() -> None:
     cols[0].metric("Screen wells", f"{len(screen):,}")
     cols[1].metric("GGD223 controls", f"{len(permafrost_points):,}")
     cols[2].metric("Calculated intervals", f"{calculated_count:,}")
-    cols[3].metric("ML/source anchors", f"{len(case_well_index):,}")
+    cols[3].metric("Project wells", f"{project_case_count:,}")
     st.warning(
         "Context/orientation only. Stability-screen status does not prove hydrate "
         "occurrence, saturation, or trained-model evidence."
     )
     st.caption(
         f"{blocked_count:,} rows are blocked by public-source gates under the "
-        "current methane 5 ppt screen. Toggle legend groups to compare context "
-        "layers with status categories."
+        "current methane 5 ppt screen. The default map hides those background "
+        "points, associated well anchors, and GGD control-point dots so calculated "
+        "stability ranges and the four project wells stay readable."
     )
     landmark_source_dir = default_basemap_landmark_source_dir(PROJECT_ROOT)
+    interactive_landmarks_available = basemap_landmark_bundle_is_available(landmark_source_dir)
     st.caption(unified_context_map_source_caveat_caption(landmark_source_dir))
-    st.plotly_chart(
-        build_unified_north_slope_context_map(
-            screen,
-            permafrost_points,
-            assessment_units,
+    show_full_status_context = st.checkbox(
+        "Show full background well/status context",
+        value=False,
+        key="show_regional_full_status_context",
+        help=(
+            "Default view shows only calculated stability-range wells plus project "
+            "well anchors. Turn this on for audit/background wells and associated "
+            "Hydrate site anchors."
         ),
-        use_container_width=True,
-        config={"displayModeBar": True, "responsive": True},
-        key="regional_unified_context_map",
     )
-    st.info(
-        "Use the Plotly controls inside the map to zoom and inspect layers. "
-        "The well-color selector switches the active well comparison."
+    map_cols = st.columns([3.2, 1.05])
+    with map_cols[0]:
+        if interactive_landmarks_available:
+            st.plotly_chart(
+                build_unified_north_slope_context_map(
+                    screen,
+                    permafrost_points,
+                    assessment_units,
+                    landmark_source_dir,
+                    case_well_index=case_well_index,
+                    focused=not show_full_status_context,
+                    include_public_reference_points=show_full_status_context,
+                    include_associated_case_wells=show_full_status_context,
+                ),
+                use_container_width=True,
+                config={"displayModeBar": True, "responsive": True},
+                key="regional_unified_context_map",
+            )
+        elif UNIFIED_CONTEXT_MAP_EXPORT.exists():
+            st.warning(
+                "Interactive OSL-derived landmark bundle is not available in this "
+                "checkout, so the website is showing the latest combined PNG export. "
+                "Run the OSL export step to restore the full interactive layer map."
+            )
+            st.image(
+                str(UNIFIED_CONTEXT_MAP_EXPORT),
+                use_container_width=True,
+                caption=(
+                    "Fallback combined map export with DNR units, roads, TAPS, "
+                    "field labels, GGD223 controls, USGS hydrate AUs, and "
+                    "stability-screen status."
+                ),
+            )
+        else:
+            st.info(
+                "Neither the interactive OSL-derived landmark bundle nor the "
+                "combined static map export is available in this checkout."
+            )
+    with map_cols[1]:
+        render_unified_map_side_panel()
+
+    show_interactive_unified_map = st.checkbox(
+        "Show interactive rebuild without complete landmark bundle",
+        value=False,
+        key="show_regional_interactive_unified_context_map",
+        help=(
+            "This diagnostic view is useful only when checking partial layers; "
+            "it may omit DNR/road/TAPS/community landmarks if the OSL-derived "
+            "bundle has not been exported."
+        ),
     )
-    render_focused_well_location_recovery()
+    if show_interactive_unified_map and not interactive_landmarks_available:
+        st.caption(
+            "Diagnostic partial interactive rebuild. This is not the final "
+            "website map unless the public landmark bundle is available."
+        )
+        st.plotly_chart(
+            build_unified_north_slope_context_map(
+                screen,
+                permafrost_points,
+                assessment_units,
+                landmark_source_dir,
+                case_well_index=case_well_index,
+                focused=not show_full_status_context,
+                include_public_reference_points=show_full_status_context,
+                include_associated_case_wells=show_full_status_context,
+            ),
+            use_container_width=True,
+            config={"displayModeBar": True, "responsive": True},
+            key="regional_unified_context_map_partial",
+        )
 
     layer_inventory = unified_context_map_layer_inventory_frame(DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW)
     st.markdown("### Layer stack and slide exports")
@@ -2398,22 +2294,22 @@ def render_regional_atlas() -> None:
     with layer_cols[0]:
         st.dataframe(layer_inventory, use_container_width=True, hide_index=True)
         if not case_well_index.empty:
-            st.markdown("#### ML and source-case well anchors")
+            st.markdown("#### Project well anchors")
             st.caption(
                 "Public Alaska well metadata used for website labels and API-number "
-                "orientation. Header-only screenshots verify MTE and IGS workbook "
-                "well sheets; Hydrate-01 and HYDRATE 02 remain public source-case "
-                "anchors until workbook/header evidence confirms active ML membership."
+                "orientation. MTE and IGS are header-verified workbook anchors; "
+                "Hydrate-01 and HYDRATE 02 remain public source-case anchors until "
+                "workbook/header evidence confirms active ML membership."
             )
             visible_columns = [
                 "well_case",
+                "case_role",
                 "map_label",
                 "verified_public_well_name",
                 "api_number",
                 "field",
                 "current_status",
                 "evidence_status",
-                "github_use",
             ]
             st.dataframe(
                 case_well_index[
@@ -2423,7 +2319,7 @@ def render_regional_atlas() -> None:
                 hide_index=True,
             )
             st.download_button(
-                "Download public case well/API index",
+                "Download public project well/API index",
                 case_well_index.to_csv(index=False).encode("utf-8"),
                 file_name=FOUR_WELL_CASE_LOCATION_INDEX.name,
                 mime="text/csv",
@@ -2470,6 +2366,28 @@ def render_regional_atlas() -> None:
             "geology-source note. It is not the main map section."
         )
         render_scene(REGIONAL_SCENE, height=870)
+        geology_preview = (
+            PROJECT_ROOT
+            / "docs"
+            / "evidence"
+            / "slide02_source_bundle_2026_06_17"
+            / "slide02_selected_10_dggs_umiat_gubik_geology_layer_preview.png"
+        )
+        st.markdown("### OSL-Staged Geology Layer")
+        st.caption(
+            "The Slide 2 update uses the DGGS RI 2018-6 Umiat-Gubik geologic "
+            "map as a public North Slope geology context candidate. The raw "
+            "public shapefile package is staged through OpenScienceLab; "
+            "GitHub/Streamlit carries derived previews, source citation, and "
+            "handoff documentation only."
+        )
+        if geology_preview.exists():
+            st.image(str(geology_preview), use_container_width=True)
+        else:
+            st.warning(
+                "DGGS geology-layer preview image is not present in this checkout. "
+                "See docs/OSL_GIS_LAYER_CANDIDATES_FOR_SLIDE2_2026-06-18.md."
+            )
         st.code("OSL source folder: data/source_library/slide2_north_slope_geology_2026_06_18/")
         st.caption(
             "Source: Herriott et al. 2018, Alaska DGGS RI 2018-6, DOI 10.14509/30099. "
@@ -2760,11 +2678,27 @@ def render_stability_input_scaffold_product() -> None:
     )
 
 
+def public_basemap_landmark_bundle_dir(project_root: Path) -> Path:
+    return project_root / "data" / "public_gis_products" / BASEMAP_LANDMARK_DIR_NAME
+
+
+def raw_basemap_landmark_source_dir(project_root: Path) -> Path:
+    return project_root / "data" / "source_library" / BASEMAP_LANDMARK_DIR_NAME
+
+
+def basemap_landmark_bundle_is_available(path: Path) -> bool:
+    required_keys = ["units", "roads", "pipeline", "gnis_places"]
+    return all((path / BASEMAP_LANDMARK_FILES[key]).exists() for key in required_keys)
+
+
 def default_basemap_landmark_source_dir(project_root: Path) -> Path:
     override = os.environ.get("NORTH_SLOPE_BASEMAP_SOURCE_DIR")
     if override:
         return Path(override).expanduser()
-    return project_root / "data" / "source_library" / BASEMAP_LANDMARK_DIR_NAME
+    public_bundle = public_basemap_landmark_bundle_dir(project_root)
+    if basemap_landmark_bundle_is_available(public_bundle):
+        return public_bundle
+    return raw_basemap_landmark_source_dir(project_root)
 
 
 def clean_map_label(value: object) -> str:
@@ -2928,6 +2862,30 @@ def load_gnis_place_labels(source_dir: Path) -> list[dict[str, object]]:
 
 
 def load_census_place_labels(source_dir: Path) -> list[dict[str, object]]:
+    geojson_path = source_dir / BASEMAP_LANDMARK_FILES["census_places_geojson"]
+    if geojson_path.exists():
+        labels: list[dict[str, object]] = []
+        for feature in load_geojson_features(geojson_path):
+            properties = feature.get("properties", {}) or {}
+            label = clean_map_label(
+                properties.get("label")
+                or properties.get("NAME")
+                or properties.get("NAMELSAD")
+            )
+            if not label:
+                continue
+            if properties.get("lon") is not None and properties.get("lat") is not None:
+                try:
+                    lon = float(properties["lon"])
+                    lat = float(properties["lat"])
+                except (TypeError, ValueError):
+                    continue
+                labels.append({"label": label, "lat": lat, "lon": lon, "source": "US Census"})
+                continue
+            for lon, lat in point_coordinates_from_geometry(feature.get("geometry", {})):
+                labels.append({"label": label, "lat": lat, "lon": lon, "source": "US Census"})
+        return labels
+
     path = source_dir / BASEMAP_LANDMARK_FILES["census_places"]
     if not path.exists():
         return []
@@ -3001,7 +2959,7 @@ def cached_basemap_landmark_layers(source_dir: str) -> dict[str, object]:
     return load_basemap_landmark_layers(Path(source_dir))
 
 
-def public_field_label_frame(map_frame: pd.DataFrame, max_labels: int = 10) -> pd.DataFrame:
+def public_field_label_frame(map_frame: pd.DataFrame, max_labels: int = 14) -> pd.DataFrame:
     required_columns = {"field", "lat", "lon"}
     if not required_columns.issubset(map_frame.columns):
         return pd.DataFrame(columns=["label", "well_count", "lat", "lon"])
@@ -3098,9 +3056,24 @@ def add_map_label_trace(
     color: str,
     size: int,
     textposition: str,
+    halo: bool = False,
 ) -> None:
     if frame.empty:
         return
+    if halo:
+        figure.add_trace(
+            go.Scattermapbox(
+                lon=frame["lon"],
+                lat=frame["lat"],
+                mode="text",
+                text=frame["label"],
+                name=f"{name} halo",
+                showlegend=False,
+                hoverinfo="skip",
+                textfont={"size": size + 5, "color": "rgba(255,255,255,0.95)"},
+                textposition=textposition,
+            )
+        )
     figure.add_trace(
         go.Scattermapbox(
             lon=frame["lon"],
@@ -3122,13 +3095,24 @@ def add_north_slope_basemap_label_layers(
     landmarks: dict[str, object],
 ) -> None:
     field_labels = public_field_label_frame(map_frame)
+    regional_labels = pd.DataFrame(REGIONAL_ORIENTATION_LABELS)
+    add_map_label_trace(
+        figure,
+        regional_labels,
+        "Regional orientation labels",
+        "#0f766e",
+        13,
+        "middle center",
+        halo=True,
+    )
     add_map_label_trace(
         figure,
         field_labels,
         "Public well field labels",
         "#111827",
-        14,
+        15,
         "top center",
+        halo=True,
     )
     field_label_names = {clean_map_label(label).lower() for label in field_labels["label"]}
     place_labels = pd.DataFrame(landmarks.get("place_labels", []))
@@ -3144,12 +3128,18 @@ def add_north_slope_basemap_label_layers(
             "#475569",
             12,
             "bottom center",
+            halo=True,
         )
 
 
 def map_landmark_source_caption(landmark_source_dir: Path) -> str:
+    layer_source_type = (
+        "tracked public GIS bundle"
+        if "public_gis_products" in landmark_source_dir.parts
+        else "local OSL/source-library folder"
+    )
     return (
-        "Landmark overlays load from "
+        f"Landmark overlays load from the {layer_source_type} at "
         f"`{project_relative_or_absolute(landmark_source_dir)}` when present: "
         "Alaska DNR unit boundaries, AKDOT roads, Census/GNIS place labels, "
         "Trans-Alaska Pipeline geometry, and public well field centroids."
@@ -3246,7 +3236,7 @@ def add_public_well_reference_mapbox_layer(
             mode="markers",
             name="Public well reference points",
             legendgroup="Geoscience orientation",
-            marker={"size": 3, "color": "#64748b", "opacity": 0.32},
+            marker={"size": 1.8, "color": "#94a3b8", "opacity": 0.14},
             hovertemplate="Public well context<extra></extra>",
         )
     )
@@ -3255,6 +3245,7 @@ def add_public_well_reference_mapbox_layer(
 def add_geoscience_orientation_mapbox_layers(
     figure: go.Figure,
     geoscience_context: pd.DataFrame | None = None,
+    include_public_reference_points: bool = False,
 ) -> None:
     context = geoscience_context.copy() if geoscience_context is not None else load_regional_context()
     if context.empty:
@@ -3307,7 +3298,8 @@ def add_geoscience_orientation_mapbox_layers(
         max_points_per_feature=20,
         showlegend=True,
     )
-    add_public_well_reference_mapbox_layer(figure, context)
+    if include_public_reference_points:
+        add_public_well_reference_mapbox_layer(figure, context)
 
 
 def unified_context_map_layer_inventory_frame(
@@ -3352,22 +3344,25 @@ def unified_context_map_layer_inventory_frame(
             "layer_group": "Screen Status",
             "layer": "2D stability-screen status points",
             "source": "data/public_stability_products/stability_screen_2026-06-14_methane_5ppt_v1.csv",
-            "shown_as": "status-colored public well points",
+            "shown_as": "default shows calculated stability-range wells; full context toggle restores blocked/background statuses",
             "slide_use": "Slide 7 guarded screen status",
             "guardrail": "stability-admissibility only; not hydrate proof or model output",
         },
         {
-            "layer_group": "ML/Source Case Anchors",
-            "layer": "Mount Elbert, Ignik Sikumi, Hydrate-01, HYDRATE 02, and associated public well anchors with API numbers",
+            "layer_group": "Project Well Anchors",
+            "layer": "MTE, IGS, Hydrate-01, and HYDRATE 02 public well/API/location anchors",
             "source": "data/public_ml_products/four_well_case_location_index_2026-06-19.csv",
-            "shown_as": "separate labeled marker group",
-            "slide_use": "well-name/API/location orientation for ML-scope and source-case review",
-            "guardrail": "public Alaska well metadata only; workbook membership remains header/source verified separately",
+            "shown_as": "separate labeled marker group; associated P1/P2/KUP anchors only in full context",
+            "slide_use": "Slides 2, 3, and 7 project well orientation",
+            "guardrail": "public well metadata only; does not imply hydrate proof or active ML membership for source-case anchors",
         },
         {
-            "layer_group": "OSL Desktop GIS",
+            "layer_group": "Public Basemap Landmarks",
             "layer": "DNR units, AKDOT roads, Dalton/Deadhorse roads, TAPS, communities, field labels",
-            "source": "data/source_library/basemap_landmarks_2026_06_18/ when present",
+            "source": (
+                "data/public_gis_products/basemap_landmarks_2026_06_18/ "
+                "derived from OSL-staged public GIS"
+            ),
             "shown_as": "map outlines, routes, pipeline, and labels",
             "slide_use": "geoscience orientation and field-location callouts",
             "guardrail": "orientation only; no private approved rows",
@@ -3377,15 +3372,21 @@ def unified_context_map_layer_inventory_frame(
 
 
 def unified_context_map_source_caveat_caption(landmark_source_dir: Path) -> str:
+    landmark_source_type = (
+        "tracked public GIS bundle"
+        if "public_gis_products" in landmark_source_dir.parts
+        else "OSL/local landmark source"
+    )
     return (
         "Unified public-safe map section: Geoscience Orientation master layers, "
         "Census/TIGER North Slope Borough boundary, DGGS RI 2018-6 Umiat-Gubik "
         "public geology preview, GGD223 controls, USGS gas hydrate assessment "
-        "units, stability-screen status points, and OSL-staged "
+        "units, stability-screen status points, and public/OSL-derived "
         "DNR/AKDOT/TAPS/community/field landmarks. Context and stability-"
         "admissibility only; these layers do not prove hydrate occurrence, "
         "saturation, producibility, or trained-model results. "
-        f"OSL landmark source: `{project_relative_or_absolute(landmark_source_dir)}`."
+        f"Landmark layer source ({landmark_source_type}): "
+        f"`{project_relative_or_absolute(landmark_source_dir)}`."
     )
 
 
@@ -3467,14 +3468,17 @@ def add_ggd223_permafrost_mapbox_layer(
 def add_stability_status_mapbox_layers(
     figure: go.Figure,
     map_frame: pd.DataFrame,
+    statuses: list[str] | None = None,
 ) -> None:
-    statuses = list(STABILITY_SCREEN_STATUS_STYLES)
+    ordered_statuses = statuses or list(STABILITY_SCREEN_STATUS_STYLES)
     extra_statuses = [
         status
         for status in sorted(map_frame["stability_result_status"].dropna().unique())
         if status not in STABILITY_SCREEN_STATUS_STYLES
     ]
-    for status in statuses + extra_statuses:
+    if statuses:
+        extra_statuses = []
+    for status in ordered_statuses + extra_statuses:
         style = STABILITY_SCREEN_STATUS_STYLES.get(
             status,
             {
@@ -3522,42 +3526,53 @@ def add_stability_status_mapbox_layers(
         )
 
 
-ML_CASE_ROLE_STYLES = {
-    "workbook_header_anchor": {
-        "label": "Header-verified ML well anchors",
-        "color": "#7c3aed",
-        "size": 14,
-    },
-    "public_source_case": {
-        "label": "Public source-case wells",
-        "color": "#0f766e",
-        "size": 13,
-    },
-    "associated_source_anchor": {
-        "label": "Associated public source anchors",
-        "color": "#475569",
-        "size": 11,
-    },
-    "associated_test_well": {
-        "label": "Associated HYDRATE 02 test wells",
-        "color": "#b45309",
-        "size": 10,
-    },
-}
+def focused_stability_range_map_frame(map_frame: pd.DataFrame) -> pd.DataFrame:
+    required = [
+        "stability_result_status",
+        "stability_top_m",
+        "stability_base_m",
+        "stability_thickness_m",
+    ]
+    if map_frame.empty or not set(required).issubset(map_frame.columns):
+        return map_frame.iloc[0:0].copy()
+    focused = map_frame[
+        map_frame["stability_result_status"].eq("calculated")
+    ].dropna(subset=["stability_top_m", "stability_base_m", "stability_thickness_m"])
+    return focused[focused["stability_thickness_m"].gt(0)].copy()
 
 
-def add_ml_case_well_mapbox_layer(
-    figure: go.Figure,
+def project_case_well_frame(
     case_wells: pd.DataFrame,
-) -> None:
+    include_associated: bool = False,
+) -> pd.DataFrame:
     required = {"map_label", "wellhead_latitude", "wellhead_longitude", "case_role"}
     if case_wells.empty or not required.issubset(case_wells.columns):
-        return
+        return pd.DataFrame()
 
     wells = case_wells.copy()
+    if not include_associated:
+        wells = wells[wells["case_role"].isin(PRIMARY_PROJECT_CASE_ROLES)].copy()
     wells["lat"] = pd.to_numeric(wells["wellhead_latitude"], errors="coerce")
     wells["lon"] = pd.to_numeric(wells["wellhead_longitude"], errors="coerce")
     wells = wells.dropna(subset=["lat", "lon"])
+    if wells.empty:
+        return wells
+
+    wells["label_lat"] = wells["lat"]
+    wells["label_lon"] = wells["lon"]
+    for well_case, offsets in PROJECT_CASE_LABEL_OFFSETS.items():
+        mask = wells["well_case"].eq(well_case)
+        wells.loc[mask, "label_lat"] = wells.loc[mask, "lat"] + offsets["lat"]
+        wells.loc[mask, "label_lon"] = wells.loc[mask, "lon"] + offsets["lon"]
+    return wells
+
+
+def add_project_case_well_mapbox_layer(
+    figure: go.Figure,
+    case_wells: pd.DataFrame,
+    include_associated: bool = False,
+) -> None:
+    wells = project_case_well_frame(case_wells, include_associated=include_associated)
     if wells.empty:
         return
 
@@ -3575,7 +3590,7 @@ def add_ml_case_well_mapbox_layer(
         if column not in wells.columns:
             wells[column] = ""
 
-    for role, style in ML_CASE_ROLE_STYLES.items():
+    for role, style in PROJECT_CASE_ROLE_STYLES.items():
         subset = wells[wells["case_role"].eq(role)].copy()
         if subset.empty:
             continue
@@ -3583,17 +3598,15 @@ def add_ml_case_well_mapbox_layer(
             go.Scattermapbox(
                 lon=subset["lon"],
                 lat=subset["lat"],
-                mode="markers+text",
+                mode="markers",
                 name=style["label"],
-                legendgroup="ML/source case well anchors",
+                legendgroup="Project well anchors",
                 marker={
                     "size": style["size"],
                     "color": style["color"],
-                    "opacity": 0.92,
+                    "opacity": 0.96,
                 },
                 text=subset["map_label"],
-                textposition="bottom right",
-                textfont={"size": 11, "color": "#111827"},
                 customdata=subset[hover_columns],
                 hovertemplate=(
                     "<b>%{text}</b><br>"
@@ -3608,6 +3621,23 @@ def add_ml_case_well_mapbox_layer(
                 ),
             )
         )
+
+    label_frame = pd.DataFrame(
+        {
+            "lon": wells["label_lon"],
+            "lat": wells["label_lat"],
+            "label": wells["map_label"],
+        }
+    )
+    add_map_label_trace(
+        figure,
+        label_frame,
+        "Project well labels",
+        "#7f1d1d",
+        12,
+        "middle center",
+        halo=True,
+    )
 
 
 def prepared_stability_map_frame(screen: pd.DataFrame) -> pd.DataFrame:
@@ -3630,6 +3660,10 @@ def build_unified_north_slope_context_map(
     assessment_units,
     landmark_source_dir: Path | None = None,
     geoscience_context: pd.DataFrame | None = None,
+    case_well_index: pd.DataFrame | None = None,
+    focused: bool = True,
+    include_public_reference_points: bool = False,
+    include_associated_case_wells: bool = False,
 ) -> go.Figure:
     map_frame = prepared_stability_map_frame(screen)
     figure = go.Figure()
@@ -3656,20 +3690,38 @@ def build_unified_north_slope_context_map(
         else default_basemap_landmark_source_dir(PROJECT_ROOT)
     )
     landmarks = cached_basemap_landmark_layers(str(source_dir))
-    add_geoscience_orientation_mapbox_layers(figure, geoscience_context)
+    status_frame = focused_stability_range_map_frame(map_frame) if focused else map_frame
+    add_geoscience_orientation_mapbox_layers(
+        figure,
+        geoscience_context,
+        include_public_reference_points=include_public_reference_points,
+    )
     add_north_slope_basemap_line_layers(figure, landmarks, showlegend=True)
     add_hydrate_assessment_unit_mapbox_layers(figure, assessment_units)
-    add_ggd223_permafrost_mapbox_layer(figure, permafrost_points)
-    add_stability_status_mapbox_layers(figure, map_frame)
-    add_ml_case_well_mapbox_layer(
+    if not focused:
+        add_ggd223_permafrost_mapbox_layer(figure, permafrost_points)
+    add_stability_status_mapbox_layers(
         figure,
-        cached_four_well_case_location_index(str(PROJECT_ROOT)),
+        status_frame,
+        statuses=["calculated"] if focused else None,
+    )
+    add_project_case_well_mapbox_layer(
+        figure,
+        case_well_index
+        if case_well_index is not None
+        else cached_four_well_case_location_index(str(PROJECT_ROOT)),
+        include_associated=include_associated_case_wells,
     )
     add_north_slope_basemap_label_layers(figure, map_frame, landmarks)
 
+    title_text = (
+        "Focused 2D North Slope Map: calculated stability ranges and project wells"
+        if focused
+        else "Unified 2D North Slope Map: geology, controls, landmarks, and stability status"
+    )
     figure.update_layout(
         title={
-            "text": "Unified 2D North Slope Map: geology, controls, landmarks, and stability status",
+            "text": title_text,
             "x": 0,
             "xanchor": "left",
         },
@@ -3684,9 +3736,13 @@ def build_unified_north_slope_context_map(
             "itemsizing": "constant",
         },
         mapbox={
-            "style": "carto-positron",
-            "center": {"lat": 70.35, "lon": -150.4},
-            "zoom": 4.35,
+            "style": "open-street-map",
+            "center": (
+                {"lat": 70.22, "lon": -149.95}
+                if focused
+                else {"lat": 70.35, "lon": -150.4}
+            ),
+            "zoom": 5.2 if focused else 4.35,
         },
     )
     return figure
@@ -4185,7 +4241,12 @@ def stability_screen_source_method_frame(phase_curve: pd.DataFrame) -> pd.DataFr
             },
             {
                 "Step": "3. Methane phase curve",
-                "Source used": f"{citation}; {gas_assumption}; {salinity} ppt salinity; {extraction_method}.",
+                "Source used": (
+                    f"{citation}; {gas_assumption}; {salinity} ppt salinity; "
+                    f"{extraction_method}; `data/public_stability_products/"
+                    f"phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv`, "
+                    "matching the Slide 2 source-bundle CSV."
+                ),
                 "How the website uses it": "Replots the CSV points as the methane 5 ppt phase boundary and compares modeled well temperature against it.",
                 "Guardrail": "The CSV/PNG curve is a phase-boundary input; it is not a G10015 temperature profile and not occurrence evidence.",
             },
@@ -4672,10 +4733,6 @@ def render_guarded_stability_screen_product() -> None:
         .head(30)
     )
 
-    if is_pytest_run():
-        st.info("Detailed stability temperature tabs are skipped during automated tests.")
-        return
-
     source_root = active_stability_source_path(PROJECT_ROOT)
     ggd223_points = cached_ggd223_points(str(source_root))
     assessment_units = cached_hydrate_assessment_units(str(source_root))
@@ -4699,7 +4756,9 @@ allowed; occurrence and saturation still require log, core, NMR, or other
 validated target evidence.
 
 The Drive CSV-curve screenshot belongs to the methane 5 ppt phase-boundary
-input. It should not be treated as a G10015 temperature-profile screenshot.
+input. The stability screen loads the matching public product CSV at
+`data/public_stability_products/phase_curve_methane_5ppt_sir2008_csmhyd_digitized_v1.csv`.
+It should not be treated as a G10015 temperature-profile screenshot.
 """
         )
         st.dataframe(
@@ -4731,21 +4790,96 @@ input. It should not be treated as a G10015 temperature-profile screenshot.
             "categories plus USGS AU outlines, GGD223 pf_depth_m controls, DNR "
             "units, roads, TAPS, and field labels."
         )
+        st.caption(
+            "Default view shows wells with calculated stability ranges plus the "
+            "four public project/source anchors. Turn on the full context view "
+            "only when auditing blocked/background status categories."
+        )
         st.warning(
             "Context/orientation only. Stability-screen status does not prove hydrate "
             "occurrence, saturation, or trained-model evidence."
         )
-        st.caption(map_landmark_source_caption(default_basemap_landmark_source_dir(PROJECT_ROOT)))
-        st.plotly_chart(
-            build_unified_north_slope_context_map(
-                screen,
-                ggd223_points,
-                assessment_units,
-            ),
-            use_container_width=True,
-            config={"displayModeBar": True, "responsive": True},
-            key="stability_unified_context_map",
+        case_well_index = cached_four_well_case_location_index(str(PROJECT_ROOT))
+        stability_landmark_source_dir = default_basemap_landmark_source_dir(PROJECT_ROOT)
+        interactive_landmarks_available = basemap_landmark_bundle_is_available(
+            stability_landmark_source_dir
         )
+        st.caption(map_landmark_source_caption(stability_landmark_source_dir))
+        show_full_stability_context = st.checkbox(
+            "Show full background well/status context",
+            value=False,
+            key="show_stability_full_status_context",
+            help=(
+                "Default view hides the thousands of blocked/background wells so "
+                "calculated stability ranges and project well anchors are readable."
+            ),
+        )
+        if interactive_landmarks_available:
+            st.plotly_chart(
+                build_unified_north_slope_context_map(
+                    screen,
+                    ggd223_points,
+                    assessment_units,
+                    stability_landmark_source_dir,
+                    case_well_index=case_well_index,
+                    focused=not show_full_stability_context,
+                    include_public_reference_points=show_full_stability_context,
+                    include_associated_case_wells=show_full_stability_context,
+                ),
+                use_container_width=True,
+                config={"displayModeBar": True, "responsive": True},
+                key="stability_unified_context_map",
+            )
+        elif UNIFIED_CONTEXT_MAP_EXPORT.exists():
+            st.warning(
+                "Interactive OSL-derived landmark bundle is not available in "
+                "this checkout, so the website is showing the latest combined "
+                "PNG export. Run the OSL export step to restore the full "
+                "interactive layer map."
+            )
+            st.image(
+                str(UNIFIED_CONTEXT_MAP_EXPORT),
+                use_container_width=True,
+                caption=(
+                    "Fallback combined map export. Use this view for slide/mentor "
+                    "review until the OSL-derived interactive bundle is present."
+                ),
+            )
+        else:
+            st.info(
+                "Neither the interactive OSL-derived landmark bundle nor the "
+                "combined static map export is available in this checkout."
+            )
+        show_interactive_stability_map = st.checkbox(
+            "Show interactive rebuild without complete landmark bundle",
+            value=False,
+            key="show_stability_interactive_unified_context_map",
+            help=(
+                "This diagnostic view is useful only when checking partial layers; "
+                "it may omit DNR/road/TAPS/community landmarks if the OSL-derived "
+                "bundle has not been exported."
+            ),
+        )
+        if show_interactive_stability_map and not interactive_landmarks_available:
+            st.caption(
+                "Diagnostic partial interactive rebuild. This is not the final "
+                "website map unless the public landmark bundle is available."
+            )
+            st.plotly_chart(
+                build_unified_north_slope_context_map(
+                    screen,
+                    ggd223_points,
+                    assessment_units,
+                    stability_landmark_source_dir,
+                    case_well_index=case_well_index,
+                    focused=not show_full_stability_context,
+                    include_public_reference_points=show_full_stability_context,
+                    include_associated_case_wells=show_full_stability_context,
+                ),
+                use_container_width=True,
+                config={"displayModeBar": True, "responsive": True},
+                key="stability_unified_context_map_partial",
+            )
         with st.expander("Reference: status-only 2D screen map"):
             st.caption(
                 "Status colors are identical to the unified map. This legacy view "
@@ -5112,97 +5246,6 @@ def render_data_library(files: list[dict[str, object]]) -> None:
         "point geometry and 356 currently lack usable geometry. The atlas should "
         "preserve that distinction rather than silently treating all records as mappable."
     )
-
-
-def source_card_html(row: pd.Series) -> str:
-    title = escape(str(row["source_title"]))
-    category = escape(str(row["source_category"]))
-    visual_status = escape(str(row["visual_status"]))
-    claim = escape(str(row["project_claim_supported"]))
-    allowed = escape(str(row["allowed_use"]))
-    not_allowed = escape(str(row["not_allowed_use"]))
-    related = escape(str(row["related_slide_website_section"]))
-    status = escape(str(row["source_status"]))
-    path = escape(str(row["public_safe_link_or_path"]))
-    return f"""
-    <div class="source-card">
-        <div class="source-card-meta">{category} &middot; {visual_status}</div>
-        <h4>{title}</h4>
-        <p><strong>Supports:</strong> {claim}</p>
-        <p><strong>Allowed use:</strong> {allowed}</p>
-        <p><strong>Not allowed:</strong> {not_allowed}</p>
-        <p><strong>Related section:</strong> {related}</p>
-        <p><strong>Source status:</strong> {status}</p>
-        <p><strong>Public-safe link/path:</strong><br><code>{path}</code></p>
-    </div>
-    """
-
-
-def render_source_card_library(
-    inventory: pd.DataFrame,
-    key_prefix: str,
-    card_limit: int = 8,
-) -> None:
-    cards = source_card_frame(inventory)
-    if cards.empty:
-        st.info("No source-card rows are available yet.")
-        return
-
-    controls = st.columns([1.2, 1.2, 1.6])
-    categories = sorted(cards["source_category"].dropna().unique())
-    statuses = sorted(cards["source_status"].dropna().unique())
-    selected_categories = controls[0].multiselect(
-        "Source category",
-        categories,
-        default=categories,
-        key=f"{key_prefix}_source_category",
-    )
-    selected_statuses = controls[1].multiselect(
-        "Source status",
-        statuses,
-        default=statuses,
-        key=f"{key_prefix}_source_status",
-    )
-    query = controls[2].text_input(
-        "Search title, claim, section, or path",
-        key=f"{key_prefix}_source_query",
-    ).strip().lower()
-
-    filtered = cards[
-        cards["source_category"].isin(selected_categories)
-        & cards["source_status"].isin(selected_statuses)
-    ].copy()
-    if query:
-        searchable = filtered[
-            [
-                "source_title",
-                "project_claim_supported",
-                "related_slide_website_section",
-                "public_safe_link_or_path",
-            ]
-        ].apply(lambda column: column.astype(str).str.lower())
-        filtered = filtered[searchable.apply(lambda row: query in " ".join(row), axis=1)]
-
-    st.caption(f"Showing {len(filtered):,} of {len(cards):,} public-safe source cards.")
-    preview = filtered.head(card_limit)
-    for index in range(0, len(preview), 2):
-        columns = st.columns(2)
-        for column, (_, row) in zip(columns, preview.iloc[index : index + 2].iterrows()):
-            with column:
-                st.markdown(source_card_html(row), unsafe_allow_html=True)
-
-    if len(filtered) > card_limit:
-        st.caption(f"{len(filtered) - card_limit:,} more rows are available in the full table.")
-
-    with st.expander("Full source-card table", expanded=False):
-        st.dataframe(filtered, use_container_width=True, hide_index=True)
-        st.download_button(
-            "Download source-card table CSV",
-            csv_bytes(filtered),
-            "source_card_library_2026-06-16.csv",
-            "text/csv",
-            key=f"{key_prefix}_download_source_cards",
-        )
 
 
 def render_framework() -> None:
@@ -6459,8 +6502,14 @@ def render_explore_north_slope(files: list[dict[str, object]]) -> None:
     st.markdown('<div class="atlas-kicker">Public regional context</div>', unsafe_allow_html=True)
     st.title("Explore North Slope")
     st.write("Public GIS and structural layers constrain interpretation; they do not classify hydrate by themselves.")
-    tabs = st.tabs(["Regional Map", "3D Structure", "Data & Sources"])
-    with tabs[0]:
+    selected_view = st.radio(
+        "Explore view",
+        ["Regional Map", "3D Structure", "Data & Sources"],
+        horizontal=True,
+        label_visibility="collapsed",
+        key="explore_north_slope_view",
+    )
+    if selected_view == "Regional Map":
         render_processing_sketch(
             "layer_map",
             {"layers": LAYER_SUMMARY},
@@ -6469,7 +6518,7 @@ def render_explore_north_slope(files: list[dict[str, object]]) -> None:
             height=360,
         )
         render_regional_atlas()
-    with tabs[1]:
+    elif selected_view == "3D Structure":
         render_processing_sketch(
             "structure_stack",
             {"layers": STRUCTURE_LAYERS},
@@ -6479,7 +6528,7 @@ def render_explore_north_slope(files: list[dict[str, object]]) -> None:
         )
         with st.expander("Full 3D structural explorer", expanded=True):
             render_structural_explorer()
-    with tabs[2]:
+    else:
         render_processing_sketch(
             "blocks",
             {
@@ -6496,16 +6545,6 @@ def render_explore_north_slope(files: list[dict[str, object]]) -> None:
             "Public / Runtime Boundary",
             "Source categories are separated before users reach file tables.",
             height=300,
-        )
-        st.markdown("#### Source Cards")
-        st.caption(
-            "Reusable public-safe source rows that explain what each visual or method supports, "
-            "where it belongs, and what it must not be used to claim."
-        )
-        render_source_card_library(
-            cached_source_visual_inventory(str(PROJECT_ROOT)),
-            "explore_source_cards",
-            card_limit=6,
         )
         with st.expander("Layer catalog and repository browser", expanded=True):
             render_data_library(files)
@@ -7255,8 +7294,6 @@ def render_presentation_exports() -> None:
         use_container_width=True,
         hide_index=True,
     )
-    st.markdown("##### Source reuse cards")
-    render_source_card_library(inventory, "presentation_source_cards", card_limit=8)
     display_columns = [
         "visual_id",
         "slide_or_site_use",

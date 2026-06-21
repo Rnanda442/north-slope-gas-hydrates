@@ -20,7 +20,7 @@ Public CSV: `data/public_ml_products/four_well_case_location_index_2026-06-19.cs
 
 ## Website Use
 
-The unified website map now loads the CSV as a separate `ML/source case well anchors` marker group. The marker colors are separate from the stability-screen status colors so the public well/API labels do not imply hydrate occurrence, saturation, producibility, or trained-model evidence.
+The unified website map now loads the CSV as a separate project well marker group. The default focused map shows MTE, IGS, Hydrate-01, and HYDRATE 02 with the calculated stability-range wells; associated KUPARUK/P1/P2 anchors are available only in the full-context audit view. The marker colors are separate from the stability-screen status colors so the public well/API labels do not imply hydrate occurrence, saturation, producibility, or trained-model evidence.
 
 The map hover shows the public well name, API number, permit number, field, current status, and evidence status. The Regional Map panel also exposes the table and a CSV download.
 
