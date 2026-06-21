@@ -1,6 +1,6 @@
 # North Slope Gas Hydrates Project Context
 
-Last updated: 2026-06-18
+Last updated: 2026-06-19
 
 ## Purpose
 
@@ -176,6 +176,19 @@ North Slope maps into one clear 2D map, rebuild Slide 3 around log-signal
 movement plus lithology/coring context, replace the three-dataset prototype
 with an equation-only slide, and make Slides 7-9 a guarded results/discussion
 plan without unsupported model or hydrate claims.
+The first native editable rebuild on 2026-06-19 proved the object model but
+drifted too far visually from the prior V5.5 review deck. The corrected active
+editable rebuild is now the visual-match deck
+`docs/project_blueprints/EDITABLE_VISUAL_MATCH_North_Slope_Gas_Hydrate_ML_Workflow_2026-06-19.pptx`,
+with QA assets in
+`docs/project_blueprints/presentation_assets/editable_visual_match_2026_06_19/`
+and native Google Slides import at
+<https://docs.google.com/presentation/d/14l8zzQ8mbxf-adWIMphd1jorepqY3hqKdbGnn-vgb3I>.
+The cleanup v2 pass makes Slides 4 and 7 editable, cleans Slide 5 equation
+labels and fraction layout, and replaces the marked-up Slide 2 hydrate
+structure image with an editable no-circle schematic.
+Use that deck for the current editable-slide review; the simplified editable
+rebuild is superseded/reference.
 
 The active mentor-facing workflow package is now the V5.5 Slide 2 source update
 under
@@ -276,11 +289,11 @@ V5.4 as the source baseline and V5.3 as flawed reference only.
   scaffold views.
 - Tests exist in `tests/test_well_log_engine.py` and
   `tests/test_runtime_skeleton.py`.
-- The full project test suite passed after the project-revision-base merge and
-  unified website map update: 122 tests passed and 2 were skipped after adding
-  the DOE tracker/review-board tests, V5.5 deck assets, source visual
-  inventory updates, and unified map tests. Update this count only after a
-  fresh local pytest run.
+- The full project test suite must be rerun after unified branch
+  consolidation before recording a new current count. Recent branch-specific
+  historical checks include 122 passed / 2 skipped after the project-revision
+  base plus unified map work, and 119 passed / 2 skipped after the editable
+  visual-match deck rebuild.
 - Public GIS layers, notebooks, structural surfaces, and Plotly exports are
   present.
 - Two working Word drafts and a rebuilt 2026-06-13 local research-overview
