@@ -32,7 +32,15 @@ def parse_args() -> argparse.Namespace:
         )
     )
     parser.add_argument("--data-dir", type=Path, default=default_data_dir())
-    parser.add_argument("--logs", default=DEFAULT_LOG_FILE, help="Combined four-well log CSV inside --data-dir.")
+    parser.add_argument(
+        "--logs",
+        nargs="+",
+        default=[DEFAULT_LOG_FILE],
+        help=(
+            "One or more log CSVs inside --data-dir. Supports a combined flat CSV, "
+            "MTE/IGS flat exports, and refined depth/Sgh pair exports."
+        ),
+    )
     parser.add_argument(
         "--core",
         default=DEFAULT_CORE_FILE,
@@ -71,7 +79,7 @@ def main() -> None:
     result = run_four_well_runtime_pipeline(
         project_root=PROJECT_ROOT,
         data_dir=args.data_dir,
-        logs_file=args.logs,
+        logs_file=tuple(args.logs),
         core_file=core_file,
         split_file=split_file,
         requested_target=args.target,

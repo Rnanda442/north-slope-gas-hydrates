@@ -1,5 +1,5 @@
 input_name,default_file,required,grain,public_safe_to_commit,local_doe_path_hint,notes
-combined_log_rows,four_well_logs.csv,true,well_depth_row,false,approved_runtime/four_well/four_well_logs.csv,Use the log table template headers; target columns may be present but are never predictors.
+log_rows,four_well_logs.csv or MTE.csv;IGS.csv;MTE_refined.csv;IGS_refined.csv,true,well_depth_row,false,approved_runtime/four_well/,Use the log table template for combined rows or pass separate screenshot-style CSV exports with --logs; target columns may be present but are never predictors.
 core_or_pressure_core_samples,four_well_core_samples.csv,false,core_sample_or_interval,false,approved_runtime/four_well/four_well_core_samples.csv,Use only approved/public rows; sparse core samples are validation overlays unless target policy is approved.
 split_registry,four_well_split_registry.csv,false,well,false,approved_runtime/four_well/four_well_split_registry.csv,Copy the public template and edit before running; split is applied before preprocessing.
 public_four_well_location_index,four_well_case_location_index_2026-06-19.csv,true,well,true,data/public_ml_products/four_well_case_location_index_2026-06-19.csv,Committed public-safe identity and alias registry.

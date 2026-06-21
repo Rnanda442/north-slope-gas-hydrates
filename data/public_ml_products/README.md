@@ -86,7 +86,9 @@ does not contain row-level core measurements.
 These are the DOE/local runtime templates used by
 `01_pipeline/run_four_well_ml_pipeline.py`. Copy them into an ignored local
 runtime folder such as `approved_runtime/four_well/`, populate them with
-approved rows on the DOE laptop, and keep the populated copies out of Git.
+approved rows on the DOE laptop, and keep the populated copies out of Git. The
+runner can also read separate screenshot-style CSV exports such as `MTE.csv`,
+`IGS.csv`, `MTE_refined.csv`, and `IGS_refined.csv`.
 
 `intake_readiness_reports/demo_header_audit_2026-06-15.csv`
 

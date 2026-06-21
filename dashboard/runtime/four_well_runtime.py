@@ -38,8 +38,38 @@ DEFAULT_LOG_FILE = "four_well_logs.csv"
 DEFAULT_CORE_FILE = "four_well_core_samples.csv"
 DEFAULT_SPLIT_FILE = "four_well_split_registry.csv"
 
+FLAT_LOG_HEADER_HINTS = {
+    "depthft",
+    "depthm",
+    "dept",
+    "rhob",
+    "densitygpcc",
+    "densitygcpcc",
+    "nphi",
+    "dphi",
+    "phiden",
+    "phinmr",
+    "nmrphi",
+    "gr",
+    "caliper",
+    "cal1",
+    "res",
+    "a090",
+    "af90",
+    "velp",
+    "vp",
+    "vs1",
+    "vs",
+    "sh",
+    "sgh",
+    "shyd",
+    "swr",
+    "swr",
+    "nmrsat",
+}
 DEPTH_FT_HEADER_HINTS = {
     "depthft",
+    "depth",
     "depthfeet",
     "depthinfeet",
     "depthfttvd",
@@ -136,6 +166,25 @@ def _read_csv_if_exists(path: Path) -> pd.DataFrame:
     if not path.exists():
         return pd.DataFrame()
     return pd.read_csv(path)
+
+
+def _safe_csv_text(value: object) -> str:
+    if pd.isna(value):
+        return ""
+    return str(value).strip()
+
+
+def infer_well_alias_from_file(path: Path) -> str:
+    normalized = normalize_alias(path.stem)
+    if "mte" in normalized or "mountelbert" in normalized or "mtelbert" in normalized:
+        return "MTE"
+    if "igs" in normalized or "ignik" in normalized or "sikumi" in normalized:
+        return "IGS"
+    if "hydrate01" in normalized or "hydrate1" in normalized:
+        return "Hydrate-01"
+    if "hydrate02" in normalized or "hydrate2" in normalized or "gdw" in normalized:
+        return "HYDRATE 02"
+    return path.stem
 
 
 def load_four_well_location_index(project_root: Path) -> pd.DataFrame:
@@ -261,6 +310,137 @@ def source_depth_unit(frame: pd.DataFrame) -> str:
     return first
 
 
+def read_raw_csv_grid(path: Path) -> pd.DataFrame:
+    return pd.read_csv(path, header=None, dtype=str, keep_default_na=False)
+
+
+def row_header_score(row: pd.Series) -> int:
+    score = 0
+    for value in row:
+        normalized = normalize_header_name(value)
+        if normalized in FLAT_LOG_HEADER_HINTS:
+            score += 2
+        elif any(part in normalized for part in ("depth", "hydrate", "saturation", "caliper", "porosity")):
+            score += 1
+    return score
+
+
+def detect_flat_header_row(raw: pd.DataFrame, max_scan_rows: int = 10) -> int:
+    best_row = 0
+    best_score = -1
+    for index in range(min(max_scan_rows, len(raw))):
+        score = row_header_score(raw.iloc[index])
+        if score > best_score:
+            best_row = index
+            best_score = score
+    return best_row
+
+
+def raw_grid_contains_refined_saturation_layout(raw: pd.DataFrame) -> bool:
+    text = " ".join(_safe_csv_text(value).lower() for value in raw.head(8).to_numpy().ravel())
+    return (
+        "depth correspondence at ml data" in text
+        or "hydrate saturation" in text
+        or "unit d" in text
+        or "unit c" in text
+    )
+
+
+def header_text_for_column(raw: pd.DataFrame, column_index: int, header_rows: int = 4) -> str:
+    values = []
+    for row_index in range(min(header_rows, len(raw))):
+        values.append(_safe_csv_text(raw.iat[row_index, column_index]))
+    return " ".join(value for value in values if value)
+
+
+def unit_label_for_refined_column(raw: pd.DataFrame, column_index: int) -> str:
+    for row_index in range(min(2, len(raw))):
+        for scan_column in range(max(0, column_index - 2), column_index + 1):
+            text = _safe_csv_text(raw.iat[row_index, scan_column]).lower()
+            if "unit d" in text:
+                return "Unit D"
+            if "unit c" in text:
+                return "Unit C"
+    return ""
+
+
+def parse_refined_saturation_csv(raw: pd.DataFrame, path: Path) -> pd.DataFrame:
+    pairs: list[tuple[int, int, str, str]] = []
+    for column_index in range(raw.shape[1]):
+        column_header = header_text_for_column(raw, column_index)
+        normalized = normalize_header_name(column_header)
+        is_depth = "depth" in normalized and "sgh" not in normalized and "saturation" not in normalized
+        if not is_depth:
+            continue
+        saturation_column: int | None = None
+        for candidate in range(column_index + 1, min(column_index + 4, raw.shape[1])):
+            candidate_header = header_text_for_column(raw, candidate)
+            candidate_normalized = normalize_header_name(candidate_header)
+            if "sgh" in candidate_normalized or "hydratesaturation" in candidate_normalized:
+                saturation_column = candidate
+                break
+        if saturation_column is None:
+            continue
+        depth_kind = "ml_depth_correspondence" if "correspondence" in normalized else "source_depth"
+        pairs.append((column_index, saturation_column, depth_kind, unit_label_for_refined_column(raw, column_index)))
+
+    rows: list[dict[str, Any]] = []
+    for depth_column, saturation_column, depth_kind, unit_label in pairs:
+        for row_index in range(2, len(raw)):
+            depth_value = pd.to_numeric(_safe_csv_text(raw.iat[row_index, depth_column]), errors="coerce")
+            saturation_value = pd.to_numeric(_safe_csv_text(raw.iat[row_index, saturation_column]), errors="coerce")
+            if pd.isna(depth_value) or pd.isna(saturation_value):
+                continue
+            rows.append(
+                {
+                    "well_alias": infer_well_alias_from_file(path),
+                    "source_dataset": path.stem,
+                    "source_sheet": path.stem,
+                    "dataset_file": path.name,
+                    "source_row_id": row_index + 1,
+                    "source_depth_value": float(depth_value),
+                    "source_depth_unit": "ft",
+                    "depth_m": float(depth_value) * 0.3048,
+                    "Sgh": float(saturation_value),
+                    "source_unit_label": unit_label,
+                    "source_depth_kind": depth_kind,
+                    "source_table_format": "refined_depth_saturation_pairs",
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def parse_flat_log_csv(raw: pd.DataFrame, path: Path) -> pd.DataFrame:
+    header_row = detect_flat_header_row(raw)
+    headers = [_safe_csv_text(value) or f"unnamed_{index}" for index, value in enumerate(raw.iloc[header_row])]
+    data = raw.iloc[header_row + 1 :].copy()
+    data.columns = headers
+    data = data.replace("", pd.NA).dropna(how="all")
+    if data.empty:
+        return data
+    standardized = standardize_four_well_log_frame(data)
+    standardized["source_dataset"] = path.stem
+    standardized["source_sheet"] = path.stem
+    standardized["dataset_file"] = path.name
+    standardized["source_table_format"] = (
+        "role_mnemonic_unit_header_block" if header_row > 0 else "flat_log_table"
+    )
+    if "well_alias" not in standardized.columns:
+        standardized["well_alias"] = infer_well_alias_from_file(path)
+    return standardized
+
+
+def parse_four_well_log_csv(path: Path) -> pd.DataFrame:
+    raw = read_raw_csv_grid(path)
+    if raw.empty:
+        return pd.DataFrame()
+    if raw_grid_contains_refined_saturation_layout(raw):
+        refined = parse_refined_saturation_csv(raw, path)
+        if not refined.empty:
+            return refined
+    return parse_flat_log_csv(raw, path)
+
+
 def standardize_four_well_log_frame(frame: pd.DataFrame) -> pd.DataFrame:
     raw = frame.copy()
     api_column = find_first_header(raw, API_HEADER_HINTS)
@@ -271,6 +451,12 @@ def standardize_four_well_log_frame(frame: pd.DataFrame) -> pd.DataFrame:
         raw["object_id"] = raw[object_column]
 
     standardized = standardize_curve_columns(raw)
+    if "rt_ohm_m" not in standardized.columns:
+        for resistivity_header in ("A090", "AO90", "AF90"):
+            if resistivity_header in raw.columns:
+                standardized["rt_ohm_m"] = pd.to_numeric(raw[resistivity_header], errors="coerce")
+                standardized["rt_source_mnemonic"] = resistivity_header
+                break
     if "api_number" in raw.columns:
         standardized["api_number"] = raw["api_number"].map(normalize_identifier)
     if "object_id" in raw.columns:
@@ -302,17 +488,42 @@ def standardize_four_well_log_frame(frame: pd.DataFrame) -> pd.DataFrame:
 
 
 def load_four_well_log_csv(data_dir: Path, logs_file: str = DEFAULT_LOG_FILE) -> pd.DataFrame:
-    path = Path(data_dir) / logs_file
+    path = Path(logs_file)
+    if not path.is_absolute():
+        path = Path(data_dir) / logs_file
     if not path.exists():
         raise FileNotFoundError(f"Four-well log CSV does not exist: {path}")
-    frame = pd.read_csv(path)
-    standardized = standardize_four_well_log_frame(frame)
-    standardized["source_dataset"] = Path(logs_file).stem
-    standardized["dataset_file"] = Path(logs_file).name
+    standardized = parse_four_well_log_csv(path)
+    if standardized.empty:
+        return standardized
     standardized["row_index"] = np.arange(len(standardized))
     if "well_alias" not in standardized.columns:
-        standardized["well_alias"] = standardized.get("well_case", "unknown_well").astype(str)
+        standardized["well_alias"] = standardized.get("well_case", infer_well_alias_from_file(path)).astype(str)
     return standardized
+
+
+def coerce_log_files(logs_file: str | tuple[str, ...] | list[str]) -> tuple[str, ...]:
+    if isinstance(logs_file, str):
+        return (logs_file,)
+    return tuple(str(file_name) for file_name in logs_file)
+
+
+def load_four_well_log_csvs(
+    data_dir: Path,
+    logs_file: str | tuple[str, ...] | list[str] = DEFAULT_LOG_FILE,
+) -> pd.DataFrame:
+    frames = []
+    for file_name in coerce_log_files(logs_file):
+        frame = load_four_well_log_csv(data_dir, file_name)
+        if not frame.empty:
+            frames.append(frame)
+    if not frames:
+        return pd.DataFrame()
+    all_columns = sorted({column for frame in frames for column in frame.columns})
+    aligned = [frame.reindex(columns=all_columns) for frame in frames]
+    combined = pd.concat(aligned, ignore_index=True)
+    combined["row_index"] = np.arange(len(combined))
+    return combined
 
 
 def load_four_well_core_csv(data_dir: Path, core_file: str | None = DEFAULT_CORE_FILE) -> pd.DataFrame:
@@ -662,7 +873,7 @@ def run_four_well_runtime_pipeline(
     *,
     project_root: Path,
     data_dir: Path,
-    logs_file: str = DEFAULT_LOG_FILE,
+    logs_file: str | tuple[str, ...] | list[str] = DEFAULT_LOG_FILE,
     core_file: str | None = DEFAULT_CORE_FILE,
     split_file: str | None = DEFAULT_SPLIT_FILE,
     requested_target: str = "auto",
@@ -690,7 +901,8 @@ def run_four_well_runtime_pipeline(
     stability = load_four_well_stability_context(project_root)
     evidence = load_four_well_core_evidence_registry(project_root)
     split_registry = load_split_registry(data_dir, split_file)
-    logs = load_four_well_log_csv(data_dir, logs_file)
+    log_files = coerce_log_files(logs_file)
+    logs = load_four_well_log_csvs(data_dir, log_files)
     logs = attach_four_well_identity(logs, registry)
     logs = attach_stability_context(logs, stability)
     logs = add_four_well_context_features(logs)
@@ -898,7 +1110,7 @@ def run_four_well_runtime_pipeline(
         "status": status,
         "blocked_reason": blocked_reason,
         "data_dir": str(data_dir),
-        "logs_file": logs_file,
+        "logs_file": list(log_files),
         "core_file": core_file,
         "split_file": split_file,
         "target": asdict(target),

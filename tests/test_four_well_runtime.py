@@ -12,6 +12,7 @@ from dashboard.runtime.four_well_runtime import (
     FOUR_WELL_LOG_TEMPLATE,
     FOUR_WELL_RUNTIME_MANIFEST_TEMPLATE,
     FOUR_WELL_SPLIT_TEMPLATE,
+    load_four_well_log_csvs,
     run_four_well_runtime_pipeline,
 )
 
@@ -178,6 +179,63 @@ def write_runtime_inputs(data_dir: Path) -> None:
     ).to_csv(data_dir / "four_well_split_registry.csv", index=False)
 
 
+def write_screenshot_style_runtime_inputs(data_dir: Path) -> None:
+    data_dir.mkdir(parents=True)
+    pd.DataFrame(
+        {
+            "Depth_ft": [2006.5, 2007.0, 2011.0, 2014.0],
+            "Density_gpcc": [2.1406, 2.146, 2.0038, 2.1194],
+            "phi_den": [0.3087, 0.3055, 0.3916, 0.3216],
+            "phi_nmr": [0.3025, 0.3014, 0.3839, 0.3204],
+            "S_h": [0.02017, 0.01327, 0.01975, 0.00365],
+            "S_wr": [0.8017, 0.8054, 0.8482, 0.7410],
+            "GR": [57.52, 67.98, 80.57, 70.81],
+            "phi_neut": [0.5818, 0.5841, 0.6102, 0.5273],
+            "CAL1": [8.5602, 8.6696, 8.8493, 9.1212],
+            "A090": [10.5649, 11.5460, 10.7956, 0.8448],
+            "VELP": [2080.4171, 2059.2915, 2008.9875, 2061.6797],
+            "VS1": [712.4422, 700.4006, 708.2964, 726.7069],
+            "depths_unitD": [2015, 2015.5, 2016, 2016.5],
+            "depths_unitC": [2130, 2130.5, 2131, 2131.5],
+        }
+    ).to_csv(data_dir / "MTE.csv", index=False)
+
+    pd.DataFrame(
+        {
+            "DEPT": [1775.5, 1776.5, 1777.5, 1779.0],
+            "RHOB": [2.0803, 2.0732, 2.0705, 2.0514],
+            "NPHI": [0.5122, 0.5283, 0.5347, 0.4914],
+            "DPHI": [0.3599, 0.3562, 0.3629, 0.3828],
+            "NMRPHI": [0.3545, 0.3575, 0.3564, 0.3764],
+            "GR": [56.8281, 56.1337, 59.2144, 62.4692],
+            "caliper": [-0.0757, -0.0757, -0.099, 0.0493],
+            "RES": [22.7361, 23.2096, 23.7485, 24.542],
+            "VP": [1948.108, 1948.858, 1956.58, 1932.996],
+            "VS": [604.9273, 598.4517, 590.9512, 576.5146],
+            "Sh": [0.015, 0, 0.01791, 0.01672],
+            "Swr": [0.1842, 0.1723, 0.166, 0.1475],
+        }
+    ).to_csv(data_dir / "IGS.csv", index=False)
+
+    refined_rows = [
+        ["", "Unit D", "", "", "Unit D", "", "", "", "Unit C", "", "", "Unit C", ""],
+        ["", "Depth, ft", "Sgh", "", "Depth correspondence at ML data", "Sgh", "", "", "Depth, ft", "Sgh", "", "Depth correspondence at ML data", "Sgh"],
+        ["", 2015.70698, 0.07601, "", 2015.5, 0.076013, "", "", 2131.7093, 0.08892, "", 2131.5, 0.08892],
+        ["", 2015.87365, 0.1069, "", 2016.0, 0.106899, "", "", 2131.87597, 0.10902, "", 2132.0, 0.10902],
+        ["", 2016.04032, 0.14472, "", 2016.0, 0.144722, "", "", 2132.04264, 0.15074, "", 2132.0, 0.15074],
+    ]
+    pd.DataFrame(refined_rows).to_csv(data_dir / "MTE_refined.csv", index=False, header=False)
+
+    igs_refined_rows = [
+        ["", "", "Depth (ft)", "Hydrate Saturation"],
+        ["", "", "", "Sgh"],
+        ["", "", 1890.167, 0],
+        ["", "", 1890.667, 0],
+        ["", "", 1891.167, 0],
+    ]
+    pd.DataFrame(igs_refined_rows).to_csv(data_dir / "IGS_refined.csv", index=False, header=False)
+
+
 def test_core_interval_match_prefers_log_rows_inside_core_interval() -> None:
     logs = pd.DataFrame(
         {
@@ -239,6 +297,31 @@ def test_four_well_runtime_trains_and_keeps_identity_columns_out_of_features(tmp
     assert enriched["four_well_identity_status"].eq("matched").all()
 
 
+def test_four_well_loader_accepts_screenshot_style_flat_and_refined_csvs(tmp_path: Path) -> None:
+    data_dir = tmp_path / "approved_runtime" / "four_well"
+    write_screenshot_style_runtime_inputs(data_dir)
+
+    logs = load_four_well_log_csvs(
+        data_dir,
+        ("MTE.csv", "IGS.csv", "MTE_refined.csv", "IGS_refined.csv"),
+    )
+
+    assert {"MTE", "IGS"}.issubset(set(logs["well_alias"]))
+    assert {"flat_log_table", "refined_depth_saturation_pairs"}.issubset(set(logs["source_table_format"]))
+    mte_flat = logs[logs["dataset_file"].eq("MTE.csv")].iloc[0]
+    igs_flat = logs[logs["dataset_file"].eq("IGS.csv")].iloc[0]
+    refined = logs[logs["dataset_file"].eq("MTE_refined.csv")]
+
+    assert round(float(mte_flat["depth_m"]), 3) == round(2006.5 * 0.3048, 3)
+    assert mte_flat["rt_source_mnemonic"] == "A090"
+    assert pd.notna(mte_flat["rt_ohm_m"])
+    assert pd.notna(igs_flat["rt_ohm_m"])
+    assert {"source_depth", "ml_depth_correspondence"}.issubset(set(refined["source_depth_kind"]))
+    assert {"Unit D", "Unit C"}.issubset(set(refined["source_unit_label"]))
+    assert "Sgh" in logs.columns
+    assert "S_h" in logs.columns
+
+
 def test_committed_four_well_templates_exist_with_expected_headers() -> None:
     project_root = Path(__file__).resolve().parents[1]
     product_dir = project_root / "data" / "public_ml_products"
@@ -252,6 +335,6 @@ def test_committed_four_well_templates_exist_with_expected_headers() -> None:
     assert {"well_alias", "api_number", "depth_m", "Sgh", "NMR_SAT"}.issubset(log_template.columns)
     assert {"sample_top_m", "sample_base_m", "hydrate_saturation_vv"}.issubset(core_template.columns)
     assert {"well_case", "split", "locked_for_validation"}.issubset(split_template.columns)
-    assert "combined_log_rows" in manifest_template["input_name"].tolist()
+    assert "log_rows" in manifest_template["input_name"].tolist()
     assert "IGS" in evidence["well_case"].tolist()
     assert evidence.loc[evidence["well_case"].eq("IGS"), "current_status"].str.contains("core|log", case=False).any()

@@ -37,7 +37,7 @@ data/public_ml_products/four_well_split_registry_template_2026-06-20.csv
 data/public_ml_products/four_well_runtime_manifest_template_2026-06-20.csv
 ```
 
-Expected local names:
+Expected local names for the simplest combined-table path:
 
 ```text
 approved_runtime/four_well/four_well_logs.csv
@@ -46,6 +46,29 @@ approved_runtime/four_well/four_well_split_registry.csv
 ```
 
 The core CSV is optional. The logs CSV is required.
+
+The runner also accepts separate screenshot-style CSV exports, so you do not
+have to hand-merge them first:
+
+```text
+approved_runtime/four_well/MTE.csv
+approved_runtime/four_well/IGS.csv
+approved_runtime/four_well/MTE_refined.csv
+approved_runtime/four_well/IGS_refined.csv
+```
+
+Supported log CSV shapes:
+
+- flat MTE-style table with headers such as `Depth_ft`, `Density_gpcc`,
+  `phi_den`, `phi_nmr`, `S_h`, `S_wr`, `GR`, `phi_neut`, `CAL1`, `A090`,
+  `VELP`, `VS1`, `depths_unitD`, and `depths_unitC`;
+- flat IGS-style table with headers such as `DEPT`, `RHOB`, `NPHI`, `DPHI`,
+  `NMRPHI`, `GR`, `caliper`, `RES`, `VP`, `VS`, `Sh`, and `Swr`;
+- refined MTE-style paired depth/Sgh blocks for Unit D and Unit C, including
+  `Depth correspondence at ML data`;
+- refined IGS-style `Depth (ft)` / `Hydrate Saturation` / `Sgh` pair tables;
+- a role/mnemonic/unit/description header block where the mnemonic row is the
+  usable column-header row.
 
 ## Command
 
@@ -73,6 +96,18 @@ python 01_pipeline\run_four_well_ml_pipeline.py `
   --run-label four_well_sgh_regression
 ```
 
+For separate CSV exports from the screenshot-style workbook:
+
+```powershell
+python 01_pipeline\run_four_well_ml_pipeline.py `
+  --data-dir approved_runtime\four_well `
+  --logs MTE.csv IGS.csv MTE_refined.csv IGS_refined.csv `
+  --core four_well_core_samples.csv `
+  --split four_well_split_registry.csv `
+  --target auto `
+  --run-label four_well_screenshot_exports
+```
+
 ## Join Logic
 
 The runner joins local rows to the committed four-well index by:
@@ -80,7 +115,8 @@ The runner joins local rows to the committed four-well index by:
 1. `object_id`
 2. `api_number`
 3. normalized aliases such as `MTE`, `Well-MTE`, `MT ELBERT 1`, `IGS`,
-   `Ignik Sikumi`, `Hydrate-01`, and `HYDRATE 02`
+   `MTE_refined`, `IGS_refined`, `Ignik Sikumi`, `Hydrate-01`, and
+   `HYDRATE 02`
 
 The public identity spine is:
 
@@ -164,6 +200,11 @@ are written with `predicted_unlabeled` status.
   phase labels are target-only.
 - API numbers, object IDs, coordinates, field names, and source IDs are not
   model features.
+- `A090`, `AO90`, and `AF90` are mapped to canonical `rt_ohm_m` for this
+  four-well runtime, with `rt_source_mnemonic` retained for review.
+- Refined depth/Sgh pair tables are target overlays. They should not be used
+  as continuous feature rows unless they are matched to feature-bearing logs
+  under an approved alignment policy.
 - Whole-well split is applied before fitting preprocessing or model weights.
 - IGS is log/NMR-supported but remains unresolved for actual core rows.
 - Hydrate-01 and HYDRATE 02 pressure-core rows should be validation or
