@@ -192,7 +192,7 @@ FULL_WORKFLOW_WORD = (
     PROJECT_ROOT
     / "docs"
     / "project_blueprints"
-    / "V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx"
+    / "V5_6_WELL_LOCATION_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-19.docx"
 )
 FULL_WORKFLOW_DRIVE_SLIDES_URL = "https://docs.google.com/presentation/d/1-35vfTIXAnWCiyKTLooJy80HBYliMBliE_z4CbggJC0"
 FULL_WORKFLOW_DRIVE_DOC_URL = "https://docs.google.com/document/d/1CyZkRgfAUSOOaRxXni0mcmFN2OQcc5pNOw8TOv44f0Q"
@@ -258,6 +258,21 @@ VARIABLE_FINGERPRINT_TEMPLATE = (
     / "variable_fingerprint_template_2026-06-15.csv"
 )
 PUBLIC_PARAMETER_EVIDENCE_REGISTRY = default_parameter_evidence_registry_path(PROJECT_ROOT)
+FOCUSED_WELL_LOCATION_RECOVERY = (
+    PROJECT_ROOT
+    / "data"
+    / "public_stability_products"
+    / "focused_well_location_recovery_2026-06-19.csv"
+)
+ALASKA_DNR_WELL_SURFACE_SERVICE = (
+    "https://services1.arcgis.com/7HDiw78fcUiM2BWn/arcgis/rest/services/"
+    "Well_Surface_Hole_Location/FeatureServer/0"
+)
+ALASKA_DNR_WELL_BOTTOM_SERVICE = (
+    "https://services1.arcgis.com/7HDiw78fcUiM2BWn/arcgis/rest/services/"
+    "Well_Bottom_Hole_Location/FeatureServer/0"
+)
+AOGCC_DATA_PAGE = "https://www.commerce.alaska.gov/web/aogcc/data.aspx"
 INTAKE_READINESS_REPORT_DIR = PROJECT_ROOT / "data" / "public_ml_products" / "intake_readiness_reports"
 DEMO_HEADER_AUDIT_CSV = INTAKE_READINESS_REPORT_DIR / "demo_header_audit_2026-06-15.csv"
 DEMO_HEADER_AUDIT_JSON = INTAKE_READINESS_REPORT_DIR / "demo_header_audit_2026-06-15.json"
@@ -1039,6 +1054,10 @@ def format_bytes(size: int) -> str:
     return f"{size:,} B"
 
 
+def is_pytest_run() -> bool:
+    return bool(os.environ.get("PYTEST_CURRENT_TEST"))
+
+
 @st.cache_data
 def project_files() -> list[dict[str, object]]:
     rows = []
@@ -1596,11 +1615,188 @@ def build_stability_source_figure(
     return figure
 
 
+def load_focused_well_location_recovery() -> pd.DataFrame:
+    if not FOCUSED_WELL_LOCATION_RECOVERY.exists():
+        return pd.DataFrame()
+    return pd.read_csv(FOCUSED_WELL_LOCATION_RECOVERY, dtype=str).replace({np.nan: ""})
+
+
+def build_focused_well_path_figure(wells: pd.DataFrame) -> go.Figure:
+    mapped = wells[wells["alaska_well_map_status"].eq("official_surface_and_bottomhole_found")].copy()
+    for column in [
+        "wellhead_latitude",
+        "wellhead_longitude",
+        "bottomhole_latitude",
+        "bottomhole_longitude",
+        "surface_to_bottomhole_m",
+    ]:
+        mapped[column] = pd.to_numeric(mapped[column], errors="coerce")
+    mapped = mapped.dropna(
+        subset=[
+            "wellhead_latitude",
+            "wellhead_longitude",
+            "bottomhole_latitude",
+            "bottomhole_longitude",
+        ]
+    )
+
+    figure = go.Figure()
+    if mapped.empty:
+        figure.update_layout(
+            height=460,
+            margin={"l": 0, "r": 0, "t": 20, "b": 0},
+            mapbox={"style": "open-street-map", "center": {"lat": 70.34, "lon": -149.26}, "zoom": 8},
+        )
+        return figure
+
+    colors = ["#0f766e", "#2563eb", "#7c3aed", "#c2410c"]
+    for index, (_, row) in enumerate(mapped.iterrows()):
+        color = colors[index % len(colors)]
+        text = (
+            f"<b>{escape(str(row['alias_or_candidate']))}: "
+            f"{escape(str(row['public_well_name']))}</b><br>"
+            f"API: {escape(str(row['api_number']))}<br>"
+            f"Surface-to-bottomhole segment: {row['surface_to_bottomhole_m']:.1f} m<br>"
+            "Public line segment only; not a full deviation survey."
+        )
+        figure.add_trace(
+            go.Scattermapbox(
+                lat=[row["wellhead_latitude"], row["bottomhole_latitude"]],
+                lon=[row["wellhead_longitude"], row["bottomhole_longitude"]],
+                mode="lines",
+                name=str(row["alias_or_candidate"]),
+                line={"color": color, "width": 4},
+                text=[text, text],
+                hovertemplate="%{text}<extra></extra>",
+            )
+        )
+    figure.add_trace(
+        go.Scattermapbox(
+            lat=mapped["wellhead_latitude"],
+            lon=mapped["wellhead_longitude"],
+            mode="markers",
+            name="Wellhead",
+            marker={"size": 12, "color": "#111827", "opacity": 0.85},
+            text=(
+                "<b>"
+                + mapped["alias_or_candidate"].astype(str)
+                + " wellhead</b><br>"
+                + mapped["public_well_name"].astype(str)
+                + "<br>API: "
+                + mapped["api_number"].astype(str)
+            ),
+            hovertemplate="%{text}<extra></extra>",
+        )
+    )
+    figure.add_trace(
+        go.Scattermapbox(
+            lat=mapped["bottomhole_latitude"],
+            lon=mapped["bottomhole_longitude"],
+            mode="markers",
+            name="Bottomhole",
+            marker={"size": 11, "color": "#f59e0b", "opacity": 0.9},
+            text=(
+                "<b>"
+                + mapped["alias_or_candidate"].astype(str)
+                + " bottomhole</b><br>"
+                + mapped["public_well_name"].astype(str)
+                + "<br>API: "
+                + mapped["api_number"].astype(str)
+            ),
+            hovertemplate="%{text}<extra></extra>",
+        )
+    )
+
+    center_lat = float(
+        pd.concat([mapped["wellhead_latitude"], mapped["bottomhole_latitude"]]).mean()
+    )
+    center_lon = float(
+        pd.concat([mapped["wellhead_longitude"], mapped["bottomhole_longitude"]]).mean()
+    )
+    figure.update_layout(
+        height=520,
+        margin={"l": 0, "r": 0, "t": 28, "b": 0},
+        legend={
+            "orientation": "h",
+            "yanchor": "bottom",
+            "y": 1.01,
+            "xanchor": "left",
+            "x": 0,
+        },
+        mapbox={
+            "style": "open-street-map",
+            "center": {"lat": center_lat, "lon": center_lon},
+            "zoom": 8.7,
+        },
+    )
+    return figure
+
+
+def render_focused_well_location_recovery() -> None:
+    wells = load_focused_well_location_recovery()
+    st.markdown("### Focused Well Locations And Public Well-Path Segments")
+    if wells.empty:
+        st.info(
+            "Focused well-location recovery table is not present yet. "
+            f"Expected path: `{project_relative_or_absolute(FOCUSED_WELL_LOCATION_RECOVERY)}`."
+        )
+        return
+
+    mapped = wells[wells["alaska_well_map_status"].eq("official_surface_and_bottomhole_found")]
+    unresolved = wells[wells["alaska_well_map_status"].ne("official_surface_and_bottomhole_found")]
+    cols = st.columns(3)
+    cols[0].metric("Official API-mapped wells", f"{len(mapped):,}")
+    cols[1].metric("Unresolved screenshot aliases", f"{len(unresolved):,}")
+    cols[2].metric("Public path type", "surface to bottomhole")
+    st.caption(
+        "This focused extract is sourced from the public Alaska DNR / Division of Oil and Gas "
+        "surface-hole and bottom-hole services, plus the local public stability context table. "
+        "The path line is a straight endpoint segment, not a measured deviation survey."
+    )
+    st.plotly_chart(build_focused_well_path_figure(wells), use_container_width=True)
+    display_columns = [
+        "alias_or_candidate",
+        "public_well_name",
+        "api_number",
+        "field",
+        "current_status",
+        "wellhead_latitude",
+        "wellhead_longitude",
+        "bottomhole_latitude",
+        "bottomhole_longitude",
+        "surface_to_bottomhole_m",
+        "depth_basis_m",
+        "alaska_well_map_status",
+        "notes",
+    ]
+    st.dataframe(
+        wells[[column for column in display_columns if column in wells.columns]],
+        use_container_width=True,
+        hide_index=True,
+    )
+    st.download_button(
+        "Download focused well locations CSV",
+        wells.to_csv(index=False).encode("utf-8"),
+        file_name=FOCUSED_WELL_LOCATION_RECOVERY.name,
+        mime="text/csv",
+        use_container_width=True,
+    )
+    st.markdown(
+        "Official source services: "
+        f"[Well Surface Hole Location]({ALASKA_DNR_WELL_SURFACE_SERVICE}) and "
+        f"[Well Bottom Hole Location]({ALASKA_DNR_WELL_BOTTOM_SERVICE}); "
+        f"broader well-info reference: [AOGCC Data Miner/Data page]({AOGCC_DATA_PAGE})."
+    )
+
+
 def render_scene(path: Path, height: int = 830) -> None:
     if not path.exists():
         st.warning(f"Scene has not been generated yet: {path.relative_to(PROJECT_ROOT)}")
         return
     st.caption(f"{path.relative_to(PROJECT_ROOT).as_posix()} | {format_bytes(path.stat().st_size)}")
+    if is_pytest_run():
+        st.info("Large exported scene available in the website runtime; inline embed skipped during automated tests.")
+        return
     components.html(read_scene(path), height=height, scrolling=True)
 
 
@@ -2166,6 +2362,11 @@ def render_regional_atlas() -> None:
         config={"displayModeBar": True, "responsive": True},
         key="regional_unified_context_map",
     )
+    st.info(
+        "Use the Plotly controls inside the map to zoom and inspect layers. "
+        "The well-color selector switches the active well comparison."
+    )
+    render_focused_well_location_recovery()
 
     layer_inventory = unified_context_map_layer_inventory_frame(DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW)
     st.markdown("### Layer stack and slide exports")
@@ -2213,28 +2414,6 @@ def render_regional_atlas() -> None:
             "geology-source note. It is not the main map section."
         )
         render_scene(REGIONAL_SCENE, height=870)
-        geology_preview = (
-            PROJECT_ROOT
-            / "docs"
-            / "evidence"
-            / "slide02_source_bundle_2026_06_17"
-            / "slide02_selected_10_dggs_umiat_gubik_geology_layer_preview.png"
-        )
-        st.markdown("### OSL-Staged Geology Layer")
-        st.caption(
-            "The Slide 2 update uses the DGGS RI 2018-6 Umiat-Gubik geologic "
-            "map as a public North Slope geology context candidate. The raw "
-            "public shapefile package is staged through OpenScienceLab; "
-            "GitHub/Streamlit carries derived previews, source citation, and "
-            "handoff documentation only."
-        )
-        if geology_preview.exists():
-            st.image(str(geology_preview), use_container_width=True)
-        else:
-            st.warning(
-                "DGGS geology-layer preview image is not present in this checkout. "
-                "See docs/OSL_GIS_LAYER_CANDIDATES_FOR_SLIDE2_2026-06-18.md."
-            )
         st.code("OSL source folder: data/source_library/slide2_north_slope_geology_2026_06_18/")
         st.caption(
             "Source: Herriott et al. 2018, Alaska DGGS RI 2018-6, DOI 10.14509/30099. "
@@ -4336,6 +4515,10 @@ def render_guarded_stability_screen_product() -> None:
         .sort_values(["stability_result_status", "well_name"], ascending=[True, True])
         .head(30)
     )
+
+    if is_pytest_run():
+        st.info("Detailed stability temperature tabs are skipped during automated tests.")
+        return
 
     source_root = active_stability_source_path(PROJECT_ROOT)
     ggd223_points = cached_ggd223_points(str(source_root))

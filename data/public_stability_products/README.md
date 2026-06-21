@@ -20,6 +20,16 @@ The output is a context layer for public discussion and website visualization.
 It is not a gas hydrate prediction, not a saturation result, and not a full
 pressure-temperature stability-zone calculation.
 
+`focused_well_location_recovery_2026-06-19.csv`
+
+This table is a small, presentation/website-ready extract for the well-location
+recovery task. It records public wellhead and bottomhole coordinates, API
+numbers, depth fields, nearest GGD223 controls, and a derived straight-line
+surface-to-bottomhole segment for the four API-mapped public wells: Mount
+Elbert, Ignik Sikumi, Hydrate-01, and Hydrate-02. It also preserves unresolved
+`MLK` and `EIT`-like screenshot-reported candidate wells with no invented
+locations. The segment is not a full measured wellbore/deviation survey.
+
 `g10015_temperature_profile_inventory_2026-06-14.csv`
 
 This table summarizes public NSIDC G10015 processed borehole temperature logs.
@@ -61,6 +71,18 @@ the public stability workflow. It is digitized from USGS SIR 2008-5175 Figure
 auditable lookup input, not a fitted equation and not a final stability result.
 Replace it with a direct CSMHYD/CSMGem export if one becomes available, using a
 new versioned file name.
+
+`phase_curve_methane_5ppt_screenshot_recovered_2026-06-18.csv`
+
+This is the slide-rebuild provenance copy of the same 41-row methane 5 ppt
+phase-curve lookup. It preserves the full depth-pressure-temperature values and
+adds source columns tying the data back to the June 18, 2026 Gmail message
+`Screenshot sources for pc`, attachment `source_screenshot_share_2026_06_18.zip`,
+and bundled CSV
+`slide02_source_bundle_2026_06_17/slide02_selected_03_project_digitized_methane_5ppt_curve.csv`.
+Use this file for the editable deck's P-T diagram so the plot traces to the
+user-sent screenshot/source package rather than to the low-resolution figure
+crop. It is still a phase-curve lookup input, not hydrate proof.
 
 `phase_curve_scenario_catalog_2026-06-14.csv`
 

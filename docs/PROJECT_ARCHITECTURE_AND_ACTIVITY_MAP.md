@@ -128,6 +128,15 @@ results/discussion plan, and Word companion science support. Whole-slide
 screenshot/raster panels are not the desired final deck format when the user
 needs selectable/editable text, labels, and callouts.
 
+As of 2026-06-19, editable-deck conversion also has a source-image recovery
+gate. Before final slide visuals are rebuilt, the original or closest verified
+source-backed image, map, plot, equation, or figure must be recovered and
+logged with allowed use. Use the image/source recovery table in
+`docs/project_blueprints/EDITABLE_DECK_REBUILD_SOURCE_OF_TRUTH_2026-06-19.md`
+and the delegated handoff before using any scientific visual. Low-resolution
+screenshots, generic AI images, and whole-slide screenshots are not acceptable
+final source figures.
+
 The active near-term ML scope is the four wells represented by the three
 available datasheets/workbooks. Older "about 3 of 71 datasets" language remains
 schema-history context, but the current build should go deeper on those four
@@ -487,3 +496,6 @@ and approved-data figures become available.
 | 2026-06-18 | Added landmark overlays to website 2D well maps | Updated the stability-status and temperature-coverage Plotly maps to load the OSL basemap landmark package when present, draw DNR unit outlines, AKDOT roads, highlighted Dalton/Deadhorse roads, Trans-Alaska Pipeline geometry, Census/GNIS community labels, and public-well field labels while preserving the stability-admissibility-only guardrail. |
 | 2026-06-18 | Exported the corrected slide-3 2D well/stability map | Added `slide3_correct_2d_well_stability_map_2026_06_18.png` under the website well-map presentation assets. The PNG uses the updated public context overlays and an explicit caveat that DNR units, roads, TAPS, communities, and field labels are orientation context, not hydrate evidence. |
 | 2026-06-18 | Unified the website North Slope map stack | Made `Unified 2D North Slope Map For Slides 2 And 7` the main Regional Map view. The unified map now combines Geoscience Orientation layers, DGGS RI 2018-6 Umiat-Gubik geology preview, GGD223 `pf_depth_m` controls, USGS hydrate AU outlines, public stability-screen status points, DNR units, AKDOT roads, Dalton/Deadhorse roads, TAPS, communities, and public field labels; older geoscience/DGGS/status-only maps are retained as reference views. Exported `unified_north_slope_well_stability_context_map_2026_06_18.png` and `unified_north_slope_slide_export_callout_space_2026_06_18.png` with explicit context/admissibility-only guardrails and documented GitHub-safe versus OSL-only layers plus local PC map findings. |
+| 2026-06-19 | Added editable-deck source-image recovery gate | Updated the editable rebuild source of truth and delegated handoff so final slide visuals require original or closest verified source-backed images, maps, CSV-derived plots, equations, and figures before rebuild. Added the required search order, allowed-use labels for GitHub/Drive/OSL, and an image/source recovery table covering slides 1-9 with current local, Drive, Gmail, and placeholder status. |
+| 2026-06-19 | Recovered slide P-T CSV provenance copy | Added `data/public_stability_products/phase_curve_methane_5ppt_screenshot_recovered_2026-06-18.csv`, a 41-row methane 5 ppt depth-pressure-temperature lookup with source columns tying the slide P-T plot data to the June 18 Gmail `Screenshot sources for pc` source package. |
+| 2026-06-19 | Added focused well-location/API recovery and website panel | Added `data/public_stability_products/focused_well_location_recovery_2026-06-19.csv` with public Alaska DNR/AOGCC surface-hole and bottom-hole endpoints for Mount Elbert, Ignik Sikumi, Hydrate-01, and Hydrate-02; preserved `MLK` and probable `EIT`/`E1T`/`ETG` as unresolved screenshot-reported separate well candidates; updated the Streamlit Regional Map with a focused well-location/path panel; and created the V5.6 Word companion update with well names, API numbers, coordinates, and path caveats. |
