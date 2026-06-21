@@ -9,6 +9,17 @@ organized for the Alaska North Slope gas hydrate project.
   path, copied-library path, file size, and modification time.
 - `source_index.md` summarizes the organized source groups and gives orientation
   snippets for later citation work.
+- `source_inventory_2026-06-17.csv`,
+  `SOURCE_ORGANIZATION_REPORT_2026-06-17.md`,
+  `SOURCE_GAPS_AND_DOWNLOADS_2026-06-17.md`, and
+  `DRIVE_GMAIL_SOURCE_HANDOFF_2026-06-17.md` are the current Gmail/Drive source
+  intake authority from the PC organization pass. They record the Drive folder,
+  verified Gmail attachments, organized raw-PDF names, missing papers, and the
+  rule that raw PDFs remain Drive-only until license and size are reviewed.
+- `../../01_pipeline/build_source_intake_inventory.py` can regenerate the same
+  public-safe source inventory/report naming convention from local Drive/Gmail
+  folders. Use it for future source drops instead of creating parallel
+  timestamped formats.
 - `stability_source_bundle_2026_06_13.md` documents the OpenScienceLab stability
   source bundle behind the current public stability products. Pair it with
   `../STABILITY_CALCULATION_PLAN.md` before implementing the temperature model
@@ -29,7 +40,17 @@ library is being used to support a future approved-data workflow:
 5. results, uncertainty, and producibility discussion.
 
 The broad manuscript remains useful as a synthesis/source accumulation, while
-the classification-methods draft is the sharper project-facing document.
+the paper-sources-only equation-focused Word document is now the main research
+paper working copy:
+
+```text
+docs/project_blueprints/North_Slope_Gas_Hydrate_Equation_Focused_Research_Overview_Paper_Sources_Only_2026-06-17.docx
+```
+
+The next source pass should use the organized Drive source folder and this
+index. The Drive PDFs, screenshots, local paths, and Gmail attachment files are
+internal evidence/navigation aids; only reviewed manifests, notes, and
+public-safe derived visuals belong in GitHub.
 
 ## What Is Not Included
 
