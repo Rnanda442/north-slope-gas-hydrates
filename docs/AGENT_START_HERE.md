@@ -247,9 +247,9 @@ Run the full suite before committing meaningful changes:
 python -m pytest
 ```
 
-Expected current result: `117 passed, 2 skipped` as of the 2026-06-17 V5.5
-deck update on top of the DOE model-run tracker review board. Update this count
-only after verifying it locally.
+Expected current result: `122 passed, 2 skipped` as of the 2026-06-18
+project-revision-base merge with the unified website map update. Update this
+count only after verifying it locally.
 
 Current test files:
 

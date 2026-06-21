@@ -44,6 +44,9 @@ Public GitHub and Streamlit must not show:
 - Train two linked but separate outputs: occurrence classification and
   saturation regression. Occurrence is a target/validation label, not something
   measured by the stability screen.
+- Treat approved saturation targets as fractions on a 0-1 scale. Preserve
+  original headers and unit metadata, and still verify each recovered sheet
+  before training.
 - Use train-only 0-1 scaling for numeric predictors after the validation split.
   Depth stays the well/depth alignment and context axis, not automatically a
   normalized predictor. Units must stay visible beside original headers.
@@ -226,7 +229,8 @@ Stability-admissibility status cannot fill any occurrence-label field.
 |---|---|
 | Depth | Preserve original feet/meters flag; canonical runtime depth is meters. |
 | Density | Convert kg/m3 to g/cc when equations expect g/cc; preserve source unit. |
-| Porosity/saturation | Record whether source is fraction 0-1 or percent 0-100 before modeling. |
+| Porosity | Record whether source is fraction 0-1 or percent 0-100 before modeling. |
+| Saturation targets | Current project decision: hydrate and water-saturation target/reference fields are fractions on a 0-1 scale; preserve source metadata and verify sheet-level consistency before training. |
 | Sonic/velocity | Distinguish direct velocity from slowness-derived velocity; do not mix `DT`/`DTS` with `Vp`/`Vs` without provenance. |
 | Resistivity | Preserve tool mnemonic; unconfirmed `AO90`/`AF90` stays blocked from predictors. |
 | Caliper | Preserve inches/mm and reference hole diameter before washout flags. |

@@ -4,7 +4,9 @@ import base64
 from collections import Counter
 from html import escape
 import json
+import os
 from pathlib import Path
+import unicodedata
 
 import numpy as np
 import pandas as pd
@@ -156,6 +158,29 @@ V5_3_WEBSITE_CAPTURE_DIR = (
     / "project_blueprints"
     / "presentation_assets"
     / "v5_3_website_captures"
+)
+WEBSITE_WELL_MAP_ASSET_DIR = (
+    PROJECT_ROOT
+    / "docs"
+    / "project_blueprints"
+    / "presentation_assets"
+    / "website_well_maps_2026_06_18"
+)
+UNIFIED_CONTEXT_MAP_EXPORT = (
+    WEBSITE_WELL_MAP_ASSET_DIR
+    / "unified_north_slope_well_stability_context_map_2026_06_18.png"
+)
+UNIFIED_CONTEXT_MAP_SLIDE_EXPORT = (
+    WEBSITE_WELL_MAP_ASSET_DIR
+    / "unified_north_slope_slide_export_callout_space_2026_06_18.png"
+)
+PUBLIC_GIS_PRODUCTS_DIR = PROJECT_ROOT / "data" / "public_gis_products"
+NORTH_SLOPE_BOROUGH_BOUNDARY = (
+    PUBLIC_GIS_PRODUCTS_DIR / "north_slope_borough_boundary_tiger2025.geojson"
+)
+SLIDE02_SOURCE_BUNDLE_DIR = PROJECT_ROOT / "docs" / "evidence" / "slide02_source_bundle_2026_06_17"
+DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW = (
+    SLIDE02_SOURCE_BUNDLE_DIR / "slide02_selected_11_dggs_umiat_gubik_geology_layer_slide_map.png"
 )
 FULL_WORKFLOW_DECK = (
     PROJECT_ROOT
@@ -401,6 +426,32 @@ TEMPERATURE_PROXY_TIER_DETAILS = {
         "opacity": 0.55,
     },
 }
+BASEMAP_LANDMARK_DIR_NAME = "basemap_landmarks_2026_06_18"
+BASEMAP_LANDMARK_BBOX = {
+    "min_lon": -157.5,
+    "max_lon": -144.5,
+    "min_lat": 68.5,
+    "max_lat": 71.7,
+}
+BASEMAP_LANDMARK_FILES = {
+    "units": "alaska_dnr_unit_boundary_current_north_slope_clip.geojson",
+    "roads": "alaska_akdot_roads_north_slope_clip.geojson",
+    "pipeline": "alaska_dnr_trans_alaska_pipeline.geojson",
+    "gnis_places": "usgs_gnis_places_north_slope_clip.geojson",
+    "census_places": "census_tiger_2025_alaska_places.zip",
+}
+FIELD_LABEL_ORDER = [
+    "PRUDHOE BAY",
+    "KUPARUK RIVER",
+    "MILNE POINT",
+    "COLVILLE RIVER",
+    "ENDICOTT",
+    "NIKAITCHUQ",
+    "NORTHSTAR",
+    "PIKKA",
+    "PT THOMSON",
+    "OOOGURUK",
+]
 MASTER_2D = PROJECT_ROOT / "03_data_final" / "master_layers" / "north_slope_master_2d_layers.parquet"
 STRUCTURAL_HORIZONS = ["NStopo", "NSLCU", "NSshublik", "NSbasement"]
 CONTEXT_OVERLAYS = [
@@ -1029,7 +1080,17 @@ def load_regional_context() -> pd.DataFrame:
         MASTER_2D,
         columns=["layer_name", "feature_id", "vertex_order", "lon", "lat", "depth_m", "au_name"],
     )
-    return layers[layers["layer_name"].isin(["extent", "assessment_units", "wells"])].copy()
+    return layers[
+        layers["layer_name"].isin(
+            [
+                "extent",
+                "assessment_units",
+                "wells",
+                "seismic_2d",
+                "seismic_3d_inventory",
+            ]
+        )
+    ].copy()
 
 
 @st.cache_data
@@ -2061,60 +2122,124 @@ def render_sweet_spot_page() -> None:
 
 def render_regional_atlas() -> None:
     st.markdown('<div class="atlas-kicker">Regional context</div>', unsafe_allow_html=True)
-    st.title("Regional Atlas")
+    st.title("Unified 2D North Slope Map For Slides 2 And 7")
     st.write(
-        "This interactive map is the existing regional visualization from the "
-        "notebook workflow. It brings together the North Slope extent, assessment "
-        "units, 2D seismic lines, 3D seismic footprints, and well locations."
+        "One public-safe map section combines the Geoscience Orientation layers, "
+        "the Census/TIGER North Slope Borough boundary, DGGS Umiat-Gubik geology "
+        "preview, GGD223 permafrost controls, USGS gas hydrate assessment units, "
+        "stability-screen status points, and OSL desktop GIS landmarks for North "
+        "Slope orientation."
     )
     cols = st.columns(3)
-    cols[0].metric("Assessment units", "6")
-    cols[1].metric("2D seismic surveys", "26")
-    cols[2].metric("3D seismic footprints", "36")
-    st.markdown("### Geoscience Orientation Map")
-    st.caption(
-        "This GIS view is for geoscience orientation: public North Slope geology/"
-        "assessment units, 2D seismic lines, 3D seismic footprints, public wells, "
-        "and field-area labels. It is context only, not occurrence or saturation evidence."
+    screen = cached_stability_screen(str(PROJECT_ROOT))
+    source_root = active_stability_source_path(PROJECT_ROOT)
+    permafrost_points = cached_ggd223_points(str(source_root))
+    assessment_units = cached_hydrate_assessment_units(str(source_root))
+    calculated_count = int(screen["stability_result_status"].eq("calculated").sum())
+    blocked_count = int(
+        screen["stability_result_status"]
+        .fillna("")
+        .str.startswith("blocked")
+        .sum()
     )
+    cols[0].metric("Screen wells", f"{len(screen):,}")
+    cols[1].metric("GGD223 controls", f"{len(permafrost_points):,}")
+    cols[2].metric("Calculated intervals", f"{calculated_count:,}")
+    st.warning(
+        "Context/orientation only. Stability-screen status does not prove hydrate "
+        "occurrence, saturation, or trained-model evidence."
+    )
+    st.caption(
+        f"{blocked_count:,} rows are blocked by public-source gates under the "
+        "current methane 5 ppt screen. Toggle legend groups to compare context "
+        "layers with status categories."
+    )
+    landmark_source_dir = default_basemap_landmark_source_dir(PROJECT_ROOT)
+    st.caption(unified_context_map_source_caveat_caption(landmark_source_dir))
     st.plotly_chart(
-        build_north_slope_geoscience_orientation_figure(),
+        build_unified_north_slope_context_map(
+            screen,
+            permafrost_points,
+            assessment_units,
+        ),
         use_container_width=True,
         config={"displayModeBar": True, "responsive": True},
+        key="regional_unified_context_map",
     )
-    st.info(
-        "Use the Plotly controls inside the map to zoom and inspect layers. "
-        "The well-color selector switches the active well comparison."
-    )
-    geology_preview = (
-        PROJECT_ROOT
-        / "docs"
-        / "evidence"
-        / "slide02_source_bundle_2026_06_17"
-        / "slide02_selected_10_dggs_umiat_gubik_geology_layer_preview.png"
-    )
-    st.markdown("### OSL-Staged Geology Layer")
-    st.caption(
-        "The Slide 2 update now uses the DGGS RI 2018-6 Umiat-Gubik geologic "
-        "map as the public North Slope geology context. The raw public "
-        "shapefile package is staged through OpenScienceLab; GitHub/Streamlit "
-        "carries this public-safe derived preview, source citation, and "
-        "handoff documentation."
-    )
-    if geology_preview.exists():
-        st.image(str(geology_preview), use_container_width=True)
-    else:
-        st.warning(
-            "DGGS geology-layer preview image is not present in this checkout. "
-            "See docs/OSL_GIS_LAYER_CANDIDATES_FOR_SLIDE2_2026-06-18.md."
+
+    layer_inventory = unified_context_map_layer_inventory_frame(DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW)
+    st.markdown("### Layer stack and slide exports")
+    layer_cols = st.columns([1.35, 0.9])
+    with layer_cols[0]:
+        st.dataframe(layer_inventory, use_container_width=True, hide_index=True)
+        for export_label, export_path, help_text in [
+            (
+                "Download full unified map PNG",
+                UNIFIED_CONTEXT_MAP_EXPORT,
+                "Large static export with the unified map and source/caveat caption.",
+            ),
+            (
+                "Download slide-callout version PNG",
+                UNIFIED_CONTEXT_MAP_SLIDE_EXPORT,
+                "Slide export leaves a callout lane so labels can be added as editable deck objects.",
+            ),
+        ]:
+            if export_path.exists():
+                st.download_button(
+                    export_label,
+                    export_path.read_bytes(),
+                    file_name=export_path.name,
+                    mime="image/png",
+                    help=help_text,
+                )
+            else:
+                st.caption(f"{export_path.name} has not been generated in this checkout yet.")
+    with layer_cols[1]:
+        st.markdown("#### DGGS RI 2018-6 geology inset")
+        st.caption(
+            "Public Umiat-Gubik geology preview for map units, contacts/faults, "
+            "folds, stations, and structural labels. Raw/simplified DGGS geometry "
+            "stays in OSL/source-library handling until a clean public layer is committed."
         )
-    st.code("OSL source folder: data/source_library/slide2_north_slope_geology_2026_06_18/")
-    st.caption(
-        "Source: Herriott et al. 2018, Alaska DGGS RI 2018-6, DOI 10.14509/30099. "
-        "Geology context only; not hydrate occurrence, saturation, validation, or ML output."
-    )
-    with st.expander("Original full interactive regional map", expanded=False):
+        if DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW.exists():
+            st.image(str(DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW), use_container_width=True)
+        else:
+            st.warning("DGGS geology preview is missing from this checkout.")
+
+    with st.expander("Reference-only legacy map views and source card"):
+        st.caption(
+            "The older notebook scene is retained as reference for public geology, "
+            "seismic coverage, 3D seismic footprints, and the DGGS RI 2018-6 "
+            "geology-source note. It is not the main map section."
+        )
         render_scene(REGIONAL_SCENE, height=870)
+        geology_preview = (
+            PROJECT_ROOT
+            / "docs"
+            / "evidence"
+            / "slide02_source_bundle_2026_06_17"
+            / "slide02_selected_10_dggs_umiat_gubik_geology_layer_preview.png"
+        )
+        st.markdown("### OSL-Staged Geology Layer")
+        st.caption(
+            "The Slide 2 update uses the DGGS RI 2018-6 Umiat-Gubik geologic "
+            "map as a public North Slope geology context candidate. The raw "
+            "public shapefile package is staged through OpenScienceLab; "
+            "GitHub/Streamlit carries derived previews, source citation, and "
+            "handoff documentation only."
+        )
+        if geology_preview.exists():
+            st.image(str(geology_preview), use_container_width=True)
+        else:
+            st.warning(
+                "DGGS geology-layer preview image is not present in this checkout. "
+                "See docs/OSL_GIS_LAYER_CANDIDATES_FOR_SLIDE2_2026-06-18.md."
+            )
+        st.code("OSL source folder: data/source_library/slide2_north_slope_geology_2026_06_18/")
+        st.caption(
+            "Source: Herriott et al. 2018, Alaska DGGS RI 2018-6, DOI 10.14509/30099. "
+            "Geology context only; not hydrate occurrence, saturation, validation, or ML output."
+        )
 
 
 def render_stability_source_bundle() -> None:
@@ -2400,7 +2525,842 @@ def render_stability_input_scaffold_product() -> None:
     )
 
 
-def build_stability_screen_map(screen: pd.DataFrame) -> go.Figure:
+def default_basemap_landmark_source_dir(project_root: Path) -> Path:
+    override = os.environ.get("NORTH_SLOPE_BASEMAP_SOURCE_DIR")
+    if override:
+        return Path(override).expanduser()
+    return project_root / "data" / "source_library" / BASEMAP_LANDMARK_DIR_NAME
+
+
+def clean_map_label(value: object) -> str:
+    text = str(value or "").replace("City of ", "").strip()
+    text = unicodedata.normalize("NFKD", text)
+    text = "".join(character for character in text if not unicodedata.combining(character))
+    return " ".join(text.split())
+
+
+def load_geojson_features(path: Path) -> list[dict[str, object]]:
+    if not path.exists():
+        return []
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    if payload.get("type") != "FeatureCollection":
+        return []
+    return [
+        feature
+        for feature in payload.get("features", [])
+        if isinstance(feature, dict) and isinstance(feature.get("geometry"), dict)
+    ]
+
+
+def geojson_geometry_paths(geometry: dict[str, object]) -> list[list[list[float]]]:
+    geometry_type = geometry.get("type")
+    coordinates = geometry.get("coordinates")
+    if not coordinates:
+        return []
+    if geometry_type == "LineString":
+        return [coordinates]
+    if geometry_type == "MultiLineString":
+        return list(coordinates)
+    if geometry_type == "Polygon":
+        return list(coordinates)
+    if geometry_type == "MultiPolygon":
+        return [ring for polygon in coordinates for ring in polygon]
+    return []
+
+
+def sampled_coordinate_path(
+    coordinates: list[list[float]],
+    max_points: int = 650,
+) -> list[list[float]]:
+    if len(coordinates) <= max_points:
+        return coordinates
+    step = max(1, len(coordinates) // max_points)
+    sampled = coordinates[::step]
+    if sampled[-1] != coordinates[-1]:
+        sampled.append(coordinates[-1])
+    return sampled
+
+
+def feature_lon_lat_arrays(
+    features: list[dict[str, object]],
+    max_points_per_path: int = 650,
+) -> tuple[list[float | None], list[float | None]]:
+    lon_values: list[float | None] = []
+    lat_values: list[float | None] = []
+    for feature in features:
+        for coordinate_path in geojson_geometry_paths(feature.get("geometry", {})):
+            path_lon: list[float] = []
+            path_lat: list[float] = []
+            for point in sampled_coordinate_path(coordinate_path, max_points_per_path):
+                if not isinstance(point, (list, tuple)) or len(point) < 2:
+                    continue
+                try:
+                    lon = float(point[0])
+                    lat = float(point[1])
+                except (TypeError, ValueError):
+                    continue
+                if (
+                    BASEMAP_LANDMARK_BBOX["min_lon"] - 1
+                    <= lon
+                    <= BASEMAP_LANDMARK_BBOX["max_lon"] + 1
+                    and BASEMAP_LANDMARK_BBOX["min_lat"] - 1
+                    <= lat
+                    <= BASEMAP_LANDMARK_BBOX["max_lat"] + 1
+                ):
+                    path_lon.append(lon)
+                    path_lat.append(lat)
+            if path_lon:
+                lon_values.extend(path_lon + [None])
+                lat_values.extend(path_lat + [None])
+    return lon_values, lat_values
+
+
+def add_geojson_line_trace(
+    figure: go.Figure,
+    features: list[dict[str, object]],
+    name: str,
+    color: str,
+    width: float,
+    opacity: float,
+    max_points_per_path: int = 650,
+    showlegend: bool = False,
+) -> None:
+    lon_values, lat_values = feature_lon_lat_arrays(features, max_points_per_path)
+    if not lon_values:
+        return
+    figure.add_trace(
+        go.Scattermapbox(
+            lon=lon_values,
+            lat=lat_values,
+            mode="lines",
+            name=name,
+            legendgroup=name,
+            showlegend=showlegend,
+            hoverinfo="skip",
+            opacity=opacity,
+            line={"color": color, "width": width},
+        )
+    )
+
+
+def road_name_blob(feature: dict[str, object]) -> str:
+    properties = feature.get("properties", {}) or {}
+    fields = [
+        "Route_Name",
+        "Route_Name_Unique",
+        "Route_Name_Desc_1",
+        "Route_Name_Desc_2",
+        "Route_ID",
+    ]
+    return " ".join(str(properties.get(field) or "") for field in fields)
+
+
+def point_coordinates_from_geometry(geometry: dict[str, object]) -> list[tuple[float, float]]:
+    geometry_type = geometry.get("type")
+    coordinates = geometry.get("coordinates")
+    if not coordinates:
+        return []
+    if geometry_type == "Point":
+        coordinates = [coordinates]
+    elif geometry_type != "MultiPoint":
+        return []
+    points = []
+    for point in coordinates:
+        if not isinstance(point, (list, tuple)) or len(point) < 2:
+            continue
+        try:
+            lon = float(point[0])
+            lat = float(point[1])
+        except (TypeError, ValueError):
+            continue
+        points.append((lon, lat))
+    return points
+
+
+def load_gnis_place_labels(source_dir: Path) -> list[dict[str, object]]:
+    features = load_geojson_features(source_dir / BASEMAP_LANDMARK_FILES["gnis_places"])
+    labels: list[dict[str, object]] = []
+    for feature in features:
+        label = clean_map_label((feature.get("properties", {}) or {}).get("gaz_name"))
+        if not label:
+            continue
+        for lon, lat in point_coordinates_from_geometry(feature.get("geometry", {})):
+            labels.append({"label": label, "lat": lat, "lon": lon, "source": "USGS GNIS"})
+    return labels
+
+
+def load_census_place_labels(source_dir: Path) -> list[dict[str, object]]:
+    path = source_dir / BASEMAP_LANDMARK_FILES["census_places"]
+    if not path.exists():
+        return []
+    try:
+        import geopandas as gpd
+
+        places = gpd.read_file(f"zip://{path.resolve()}")
+        if places.crs is not None and places.crs.to_epsg() != 4326:
+            places = places.to_crs("EPSG:4326")
+    except Exception:
+        return []
+
+    labels: list[dict[str, object]] = []
+    for _, row in places.iterrows():
+        label = clean_map_label(row.get("NAME") or row.get("NAMELSAD"))
+        if not label:
+            continue
+        try:
+            lat = float(row.get("INTPTLAT"))
+            lon = float(row.get("INTPTLON"))
+        except (TypeError, ValueError):
+            centroid = row.geometry.centroid if row.geometry is not None else None
+            if centroid is None:
+                continue
+            lat = float(centroid.y)
+            lon = float(centroid.x)
+        if (
+            BASEMAP_LANDMARK_BBOX["min_lon"] <= lon <= BASEMAP_LANDMARK_BBOX["max_lon"]
+            and BASEMAP_LANDMARK_BBOX["min_lat"] <= lat <= BASEMAP_LANDMARK_BBOX["max_lat"]
+        ):
+            labels.append({"label": label, "lat": lat, "lon": lon, "source": "US Census"})
+    return labels
+
+
+def deduplicate_place_labels(labels: list[dict[str, object]]) -> list[dict[str, object]]:
+    deduped: list[dict[str, object]] = []
+    seen: set[str] = set()
+    for label in labels:
+        text = clean_map_label(label.get("label")).lower()
+        if not text or text in seen:
+            continue
+        seen.add(text)
+        deduped.append(label)
+    return deduped
+
+
+def load_basemap_landmark_layers(source_dir: Path) -> dict[str, object]:
+    source_dir = Path(source_dir)
+    roads = load_geojson_features(source_dir / BASEMAP_LANDMARK_FILES["roads"])
+    key_roads = [
+        feature
+        for feature in roads
+        if any(term in road_name_blob(feature).lower() for term in ["dalton", "deadhorse"])
+    ]
+    local_roads = [feature for feature in roads if feature not in key_roads]
+    return {
+        "source_dir": str(source_dir),
+        "borough_boundary": load_geojson_features(NORTH_SLOPE_BOROUGH_BOUNDARY),
+        "units": load_geojson_features(source_dir / BASEMAP_LANDMARK_FILES["units"]),
+        "local_roads": local_roads,
+        "key_roads": key_roads,
+        "pipeline": load_geojson_features(source_dir / BASEMAP_LANDMARK_FILES["pipeline"]),
+        "place_labels": deduplicate_place_labels(
+            load_census_place_labels(source_dir) + load_gnis_place_labels(source_dir)
+        ),
+    }
+
+
+@st.cache_data(show_spinner=False)
+def cached_basemap_landmark_layers(source_dir: str) -> dict[str, object]:
+    return load_basemap_landmark_layers(Path(source_dir))
+
+
+def public_field_label_frame(map_frame: pd.DataFrame, max_labels: int = 10) -> pd.DataFrame:
+    required_columns = {"field", "lat", "lon"}
+    if not required_columns.issubset(map_frame.columns):
+        return pd.DataFrame(columns=["label", "well_count", "lat", "lon"])
+    labels = map_frame[["field", "lat", "lon"]].copy()
+    labels["field"] = labels["field"].fillna("").astype(str).str.strip()
+    labels["lat"] = pd.to_numeric(labels["lat"], errors="coerce")
+    labels["lon"] = pd.to_numeric(labels["lon"], errors="coerce")
+    labels = labels.dropna(subset=["field", "lat", "lon"])
+    labels = labels[
+        labels["field"].ne("")
+        & ~labels["field"].str.startswith("*")
+        & labels["field"].str.lower().ne("nan")
+    ]
+    if labels.empty:
+        return pd.DataFrame(columns=["label", "well_count", "lat", "lon"])
+
+    grouped = (
+        labels.groupby("field", as_index=False)
+        .agg(well_count=("field", "size"), lat=("lat", "median"), lon=("lon", "median"))
+        .sort_values("well_count", ascending=False)
+    )
+    grouped = grouped[
+        grouped["field"].isin(FIELD_LABEL_ORDER) | grouped["well_count"].ge(20)
+    ].copy()
+    if grouped.empty:
+        return pd.DataFrame(columns=["label", "well_count", "lat", "lon"])
+    order_lookup = {name: index for index, name in enumerate(FIELD_LABEL_ORDER)}
+    grouped["sort_order"] = grouped["field"].map(order_lookup).fillna(999).astype(int)
+    grouped["label"] = grouped["field"].str.title()
+    grouped = grouped.sort_values(["sort_order", "well_count"], ascending=[True, False])
+    return grouped[["label", "well_count", "lat", "lon"]].head(max_labels)
+
+
+def add_north_slope_basemap_line_layers(
+    figure: go.Figure,
+    landmarks: dict[str, object],
+    showlegend: bool = False,
+) -> None:
+    add_geojson_line_trace(
+        figure,
+        landmarks.get("borough_boundary", []),
+        "North Slope Borough boundary",
+        "#0f172a",
+        3.2,
+        0.88,
+        max_points_per_path=2200,
+        showlegend=showlegend,
+    )
+    add_geojson_line_trace(
+        figure,
+        landmarks.get("units", []),
+        "DNR oil/gas unit outlines",
+        "#334155",
+        1.15,
+        0.55,
+        showlegend=showlegend,
+    )
+    add_geojson_line_trace(
+        figure,
+        landmarks.get("local_roads", []),
+        "AKDOT local roads",
+        "#94a3b8",
+        1,
+        0.38,
+        max_points_per_path=400,
+        showlegend=showlegend,
+    )
+    add_geojson_line_trace(
+        figure,
+        landmarks.get("key_roads", []),
+        "Dalton/Deadhorse roads",
+        "#111827",
+        2.6,
+        0.74,
+        max_points_per_path=900,
+        showlegend=showlegend,
+    )
+    add_geojson_line_trace(
+        figure,
+        landmarks.get("pipeline", []),
+        "Trans-Alaska Pipeline",
+        "#b45309",
+        2.2,
+        0.7,
+        max_points_per_path=900,
+        showlegend=showlegend,
+    )
+
+
+def add_map_label_trace(
+    figure: go.Figure,
+    frame: pd.DataFrame,
+    name: str,
+    color: str,
+    size: int,
+    textposition: str,
+) -> None:
+    if frame.empty:
+        return
+    figure.add_trace(
+        go.Scattermapbox(
+            lon=frame["lon"],
+            lat=frame["lat"],
+            mode="text",
+            text=frame["label"],
+            name=name,
+            showlegend=False,
+            hovertemplate="%{text}<extra></extra>",
+            textfont={"size": size, "color": color},
+            textposition=textposition,
+        )
+    )
+
+
+def add_north_slope_basemap_label_layers(
+    figure: go.Figure,
+    map_frame: pd.DataFrame,
+    landmarks: dict[str, object],
+) -> None:
+    field_labels = public_field_label_frame(map_frame)
+    add_map_label_trace(
+        figure,
+        field_labels,
+        "Public well field labels",
+        "#111827",
+        14,
+        "top center",
+    )
+    field_label_names = {clean_map_label(label).lower() for label in field_labels["label"]}
+    place_labels = pd.DataFrame(landmarks.get("place_labels", []))
+    if not place_labels.empty:
+        place_labels["label"] = place_labels["label"].map(clean_map_label)
+        place_labels = place_labels[
+            ~place_labels["label"].str.lower().isin(field_label_names)
+        ].head(8)
+        add_map_label_trace(
+            figure,
+            place_labels,
+            "Community labels",
+            "#475569",
+            12,
+            "bottom center",
+        )
+
+
+def map_landmark_source_caption(landmark_source_dir: Path) -> str:
+    return (
+        "Landmark overlays load from "
+        f"`{project_relative_or_absolute(landmark_source_dir)}` when present: "
+        "Alaska DNR unit boundaries, AKDOT roads, Census/GNIS place labels, "
+        "Trans-Alaska Pipeline geometry, and public well field centroids."
+    )
+
+
+def sampled_feature_path_arrays_from_frame(
+    frame: pd.DataFrame,
+    max_features: int = 180,
+    max_points_per_feature: int = 220,
+) -> tuple[list[float | None], list[float | None]]:
+    required = {"feature_id", "vertex_order", "lon", "lat"}
+    if frame.empty or not required.issubset(frame.columns):
+        return [], []
+
+    rows = frame[["feature_id", "vertex_order", "lon", "lat"]].copy()
+    rows["lon"] = pd.to_numeric(rows["lon"], errors="coerce")
+    rows["lat"] = pd.to_numeric(rows["lat"], errors="coerce")
+    rows = rows.dropna(subset=["feature_id", "vertex_order", "lon", "lat"])
+    if rows.empty:
+        return [], []
+
+    feature_ids = rows["feature_id"].drop_duplicates().tolist()
+    if len(feature_ids) > max_features:
+        step = max(1, len(feature_ids) // max_features)
+        feature_ids = feature_ids[::step][:max_features]
+    rows = rows[rows["feature_id"].isin(feature_ids)]
+
+    lon_values: list[float | None] = []
+    lat_values: list[float | None] = []
+    for _, feature_rows in rows.groupby("feature_id", sort=False):
+        feature_rows = feature_rows.sort_values("vertex_order")
+        if len(feature_rows) > max_points_per_feature:
+            step = max(1, len(feature_rows) // max_points_per_feature)
+            feature_rows = feature_rows.iloc[::step].copy()
+        lon_values.extend(feature_rows["lon"].astype(float).tolist() + [None])
+        lat_values.extend(feature_rows["lat"].astype(float).tolist() + [None])
+    return lon_values, lat_values
+
+
+def add_master_context_line_mapbox_layer(
+    figure: go.Figure,
+    context: pd.DataFrame,
+    layer_name: str,
+    name: str,
+    color: str,
+    width: float,
+    opacity: float,
+    max_features: int,
+    max_points_per_feature: int,
+    showlegend: bool = True,
+) -> None:
+    layer = context[context["layer_name"].eq(layer_name)].copy()
+    lon_values, lat_values = sampled_feature_path_arrays_from_frame(
+        layer,
+        max_features=max_features,
+        max_points_per_feature=max_points_per_feature,
+    )
+    if not lon_values:
+        return
+    figure.add_trace(
+        go.Scattermapbox(
+            lon=lon_values,
+            lat=lat_values,
+            mode="lines",
+            name=name,
+            legendgroup="Geoscience orientation",
+            showlegend=showlegend,
+            hoverinfo="skip",
+            opacity=opacity,
+            line={"color": color, "width": width},
+        )
+    )
+
+
+def add_public_well_reference_mapbox_layer(
+    figure: go.Figure,
+    context: pd.DataFrame,
+    max_points: int = 1800,
+) -> None:
+    wells = context[context["layer_name"].eq("wells")].copy()
+    if wells.empty:
+        return
+    wells["lon"] = pd.to_numeric(wells["lon"], errors="coerce")
+    wells["lat"] = pd.to_numeric(wells["lat"], errors="coerce")
+    wells = wells.dropna(subset=["lon", "lat"]).sort_values(["lon", "lat"])
+    if len(wells) > max_points:
+        step = max(1, len(wells) // max_points)
+        wells = wells.iloc[::step].head(max_points)
+    figure.add_trace(
+        go.Scattermapbox(
+            lon=wells["lon"],
+            lat=wells["lat"],
+            mode="markers",
+            name="Public well reference points",
+            legendgroup="Geoscience orientation",
+            marker={"size": 3, "color": "#64748b", "opacity": 0.32},
+            hovertemplate="Public well context<extra></extra>",
+        )
+    )
+
+
+def add_geoscience_orientation_mapbox_layers(
+    figure: go.Figure,
+    geoscience_context: pd.DataFrame | None = None,
+) -> None:
+    context = geoscience_context.copy() if geoscience_context is not None else load_regional_context()
+    if context.empty:
+        return
+    add_master_context_line_mapbox_layer(
+        figure,
+        context,
+        "assessment_units",
+        "Public assessment-unit context",
+        "rgba(20, 123, 133, 0.55)",
+        1.2,
+        0.38,
+        max_features=80,
+        max_points_per_feature=420,
+        showlegend=True,
+    )
+    add_master_context_line_mapbox_layer(
+        figure,
+        context,
+        "seismic_2d",
+        "2D seismic coverage",
+        "rgba(14, 165, 233, 0.38)",
+        0.8,
+        0.42,
+        max_features=260,
+        max_points_per_feature=130,
+        showlegend=True,
+    )
+    add_master_context_line_mapbox_layer(
+        figure,
+        context,
+        "seismic_3d_inventory",
+        "3D seismic footprints",
+        "rgba(249, 115, 22, 0.56)",
+        1.0,
+        0.46,
+        max_features=120,
+        max_points_per_feature=180,
+        showlegend=True,
+    )
+    add_master_context_line_mapbox_layer(
+        figure,
+        context,
+        "extent",
+        "North Slope study boundary",
+        "#0f172a",
+        2.5,
+        0.86,
+        max_features=8,
+        max_points_per_feature=20,
+        showlegend=True,
+    )
+    add_public_well_reference_mapbox_layer(figure, context)
+
+
+def unified_context_map_layer_inventory_frame(
+    dggs_preview_path: Path | None = None,
+) -> pd.DataFrame:
+    dggs_path = dggs_preview_path or DGGS_UMIAT_GUBIK_GEOLOGY_PREVIEW
+    dggs_status = "available as public-safe preview" if dggs_path.exists() else "missing preview"
+    rows = [
+        {
+            "layer_group": "Regional Boundary",
+            "layer": "North Slope Borough boundary",
+            "source": project_relative_or_absolute(NORTH_SLOPE_BOROUGH_BOUNDARY),
+            "shown_as": "bold map outline",
+            "slide_use": "Slide 2 and Slide 7 geographic edge/context",
+            "guardrail": "administrative/geographic context only; not hydrate evidence",
+        },
+        {
+            "layer_group": "Geoscience Orientation",
+            "layer": "study boundary, public wells, 2D seismic, 3D seismic, public assessment-unit context",
+            "source": "03_data_final/master_layers/north_slope_master_2d_layers.parquet",
+            "shown_as": "interactive map traces",
+            "slide_use": "Slide 2 setting and Slide 7 context",
+            "guardrail": "regional orientation only; not hydrate evidence",
+        },
+        {
+            "layer_group": "DGGS RI 2018-6",
+            "layer": "Umiat-Gubik geology preview: map units, contacts/faults, folds, stations, Umiat/Gubik labels",
+            "source": project_relative_or_absolute(dggs_path),
+            "shown_as": dggs_status,
+            "slide_use": "geology inset or editable callout anchor",
+            "guardrail": "public geology context only; raw shapefile package remains OSL/source-library controlled",
+        },
+        {
+            "layer_group": "Stability Source Controls",
+            "layer": "GGD223 permafrost-depth controls and USGS gas hydrate assessment-unit outlines",
+            "source": "public stability snapshot plus active stability source path",
+            "shown_as": "map points, colorbar, and AU outlines",
+            "slide_use": "P-T/stability context",
+            "guardrail": "source controls only; not occurrence or saturation",
+        },
+        {
+            "layer_group": "Screen Status",
+            "layer": "2D stability-screen status points",
+            "source": "data/public_stability_products/stability_screen_2026-06-14_methane_5ppt_v1.csv",
+            "shown_as": "status-colored public well points",
+            "slide_use": "Slide 7 guarded screen status",
+            "guardrail": "stability-admissibility only; not hydrate proof or model output",
+        },
+        {
+            "layer_group": "OSL Desktop GIS",
+            "layer": "DNR units, AKDOT roads, Dalton/Deadhorse roads, TAPS, communities, field labels",
+            "source": "data/source_library/basemap_landmarks_2026_06_18/ when present",
+            "shown_as": "map outlines, routes, pipeline, and labels",
+            "slide_use": "geoscience orientation and field-location callouts",
+            "guardrail": "orientation only; no private approved rows",
+        },
+    ]
+    return pd.DataFrame(rows)
+
+
+def unified_context_map_source_caveat_caption(landmark_source_dir: Path) -> str:
+    return (
+        "Unified public-safe map section: Geoscience Orientation master layers, "
+        "Census/TIGER North Slope Borough boundary, DGGS RI 2018-6 Umiat-Gubik "
+        "public geology preview, GGD223 controls, USGS gas hydrate assessment "
+        "units, stability-screen status points, and OSL-staged "
+        "DNR/AKDOT/TAPS/community/field landmarks. Context and stability-"
+        "admissibility only; these layers do not prove hydrate occurrence, "
+        "saturation, producibility, or trained-model results. "
+        f"OSL landmark source: `{project_relative_or_absolute(landmark_source_dir)}`."
+    )
+
+
+def add_hydrate_assessment_unit_mapbox_layers(
+    figure: go.Figure,
+    assessment_units,
+    showlegend: bool = True,
+) -> None:
+    if assessment_units.empty:
+        return
+    show_assessment_legend = showlegend
+    for _, row in assessment_units.iterrows():
+        assessment_name = row.get("ASSESSNAME", "Gas hydrate assessment unit")
+        for polygon in polygon_parts(row.geometry):
+            x, y = polygon.exterior.xy
+            figure.add_trace(
+                go.Scattermapbox(
+                    lon=list(x),
+                    lat=list(y),
+                    mode="lines",
+                    name="USGS hydrate AU outlines",
+                    legendgroup="USGS hydrate AU outlines",
+                    showlegend=show_assessment_legend,
+                    line={"color": "#d97706", "width": 2.2},
+                    opacity=0.78,
+                    hovertemplate=(
+                        f"<b>{escape(str(assessment_name))}</b><br>"
+                        "USGS gas hydrate assessment unit<extra></extra>"
+                    ),
+                )
+            )
+            show_assessment_legend = False
+
+
+def add_ggd223_permafrost_mapbox_layer(
+    figure: go.Figure,
+    permafrost_points: pd.DataFrame,
+) -> None:
+    if permafrost_points.empty:
+        return
+    points = permafrost_points.copy()
+    points["latitude"] = pd.to_numeric(points.get("latitude"), errors="coerce")
+    points["longitude"] = pd.to_numeric(points.get("longitude"), errors="coerce")
+    points["permafrost_depth_m"] = pd.to_numeric(
+        points.get("permafrost_depth_m"),
+        errors="coerce",
+    )
+    points["elevation_m"] = pd.to_numeric(points.get("elevation_m"), errors="coerce")
+    points = points.dropna(subset=["latitude", "longitude", "permafrost_depth_m"])
+    if points.empty:
+        return
+    figure.add_trace(
+        go.Scattermapbox(
+            lon=points["longitude"],
+            lat=points["latitude"],
+            mode="markers",
+            name="GGD223 pf_depth_m controls",
+            legendgroup="GGD223 pf_depth_m controls",
+            marker={
+                "size": 10,
+                "color": points["permafrost_depth_m"],
+                "colorscale": "Viridis",
+                "opacity": 0.88,
+                "colorbar": {"title": {"text": "pf_depth_m"}},
+            },
+            text=points["well_designation"],
+            customdata=points[["code", "permafrost_depth_m", "elevation_m"]],
+            hovertemplate=(
+                "<b>%{text}</b><br>"
+                "Code: %{customdata[0]}<br>"
+                "pf_depth_m: %{customdata[1]} m<br>"
+                "Elevation: %{customdata[2]} m<br>"
+                "Lon/lat: %{lon:.2f}, %{lat:.2f}<extra></extra>"
+            ),
+        )
+    )
+
+
+def add_stability_status_mapbox_layers(
+    figure: go.Figure,
+    map_frame: pd.DataFrame,
+) -> None:
+    statuses = list(STABILITY_SCREEN_STATUS_STYLES)
+    extra_statuses = [
+        status
+        for status in sorted(map_frame["stability_result_status"].dropna().unique())
+        if status not in STABILITY_SCREEN_STATUS_STYLES
+    ]
+    for status in statuses + extra_statuses:
+        style = STABILITY_SCREEN_STATUS_STYLES.get(
+            status,
+            {
+                "label": status,
+                "color": "#475569",
+                "size": 6,
+                "opacity": 0.55,
+            },
+        )
+        subset = map_frame[map_frame["stability_result_status"].eq(status)].copy()
+        if subset.empty:
+            continue
+        hover_text = (
+            "<b>"
+            + subset["well_name"].fillna("Unnamed well").astype(str)
+            + "</b><br>Status: "
+            + subset["stability_result_status"].fillna("missing").astype(str)
+            + "<br>Confidence: "
+            + subset["stability_confidence"].fillna("missing").astype(str)
+            + "<br>TVD: "
+            + subset["tvd_m"].round(1).astype(str)
+            + " m<br>Top/Base: "
+            + subset["stability_top_m"].round(1).astype(str)
+            + " / "
+            + subset["stability_base_m"].round(1).astype(str)
+            + " m<br>Thickness: "
+            + subset["stability_thickness_m"].round(1).astype(str)
+            + " m"
+        )
+        figure.add_trace(
+            go.Scattermapbox(
+                lat=subset["lat"],
+                lon=subset["lon"],
+                mode="markers",
+                name=style["label"],
+                legendgroup="Stability-screen status",
+                marker={
+                    "size": style["size"],
+                    "color": style["color"],
+                    "opacity": style["opacity"],
+                },
+                text=hover_text,
+                hovertemplate="%{text}<extra></extra>",
+            )
+        )
+
+
+def prepared_stability_map_frame(screen: pd.DataFrame) -> pd.DataFrame:
+    map_frame = screen.copy()
+    for column in [
+        "lat",
+        "lon",
+        "stability_top_m",
+        "stability_base_m",
+        "stability_thickness_m",
+        "tvd_m",
+    ]:
+        map_frame[column] = pd.to_numeric(map_frame.get(column), errors="coerce")
+    return map_frame.dropna(subset=["lat", "lon"])
+
+
+def build_unified_north_slope_context_map(
+    screen: pd.DataFrame,
+    permafrost_points: pd.DataFrame,
+    assessment_units,
+    landmark_source_dir: Path | None = None,
+    geoscience_context: pd.DataFrame | None = None,
+) -> go.Figure:
+    map_frame = prepared_stability_map_frame(screen)
+    figure = go.Figure()
+    if map_frame.empty:
+        figure.update_layout(
+            height=640,
+            margin={"l": 0, "r": 0, "t": 46, "b": 0},
+            annotations=[
+                {
+                    "text": "No latitude/longitude values available for the screen.",
+                    "xref": "paper",
+                    "yref": "paper",
+                    "x": 0.5,
+                    "y": 0.5,
+                    "showarrow": False,
+                }
+            ],
+        )
+        return figure
+
+    source_dir = (
+        Path(landmark_source_dir)
+        if landmark_source_dir
+        else default_basemap_landmark_source_dir(PROJECT_ROOT)
+    )
+    landmarks = cached_basemap_landmark_layers(str(source_dir))
+    add_geoscience_orientation_mapbox_layers(figure, geoscience_context)
+    add_north_slope_basemap_line_layers(figure, landmarks, showlegend=True)
+    add_hydrate_assessment_unit_mapbox_layers(figure, assessment_units)
+    add_ggd223_permafrost_mapbox_layer(figure, permafrost_points)
+    add_stability_status_mapbox_layers(figure, map_frame)
+    add_north_slope_basemap_label_layers(figure, map_frame, landmarks)
+
+    figure.update_layout(
+        title={
+            "text": "Unified 2D North Slope Map: geology, controls, landmarks, and stability status",
+            "x": 0,
+            "xanchor": "left",
+        },
+        height=660,
+        margin={"l": 0, "r": 0, "t": 58, "b": 0},
+        legend={
+            "orientation": "h",
+            "yanchor": "bottom",
+            "y": 1.02,
+            "xanchor": "left",
+            "x": 0,
+            "itemsizing": "constant",
+        },
+        mapbox={
+            "style": "carto-positron",
+            "center": {"lat": 70.35, "lon": -150.4},
+            "zoom": 4.35,
+        },
+    )
+    return figure
+
+
+def build_stability_screen_map(
+    screen: pd.DataFrame,
+    landmark_source_dir: Path | None = None,
+) -> go.Figure:
     map_frame = screen.copy()
     map_frame["lat"] = pd.to_numeric(map_frame.get("lat"), errors="coerce")
     map_frame["lon"] = pd.to_numeric(map_frame.get("lon"), errors="coerce")
@@ -2436,6 +3396,13 @@ def build_stability_screen_map(screen: pd.DataFrame) -> go.Figure:
 
     center_lat = float(map_frame["lat"].median())
     center_lon = float(map_frame["lon"].median())
+    source_dir = (
+        Path(landmark_source_dir)
+        if landmark_source_dir
+        else default_basemap_landmark_source_dir(PROJECT_ROOT)
+    )
+    landmarks = cached_basemap_landmark_layers(str(source_dir))
+    add_north_slope_basemap_line_layers(figure, landmarks)
     statuses = list(STABILITY_SCREEN_STATUS_STYLES)
     extra_statuses = [
         status
@@ -2487,6 +3454,7 @@ def build_stability_screen_map(screen: pd.DataFrame) -> go.Figure:
                 hovertemplate="%{text}<extra></extra>",
             )
         )
+    add_north_slope_basemap_label_layers(figure, map_frame, landmarks)
 
     figure.update_layout(
         height=560,
@@ -2499,7 +3467,7 @@ def build_stability_screen_map(screen: pd.DataFrame) -> go.Figure:
             "x": 0,
         },
         mapbox={
-            "style": "open-street-map",
+            "style": "carto-positron",
             "center": {"lat": center_lat, "lon": center_lon},
             "zoom": 4.0,
         },
@@ -2608,7 +3576,7 @@ def build_selected_well_phase_audit_figure(
                 x=curve["equilibrium_temperature_c"],
                 y=curve["source_depth_m"],
                 mode="lines",
-                name="Methane 5 ppt phase boundary",
+                name="Methane 5 ppt CSV phase boundary",
                 line={"color": "#111827", "width": 3},
                 hovertemplate=(
                     "Phase boundary<br>Depth: %{y:.1f} m"
@@ -2647,7 +3615,7 @@ def build_selected_well_phase_audit_figure(
                 x=sampled_profile["temperature_c"],
                 y=sampled_profile["depth_m"],
                 mode="lines",
-                name="Sampled measured G10015 profile",
+                name="G10015 measured temperature profile",
                 line={"color": "#16a34a", "width": 3},
                 customdata=sampled_profile[["file_name", "sample_method"]],
                 hovertemplate=(
@@ -2676,7 +3644,7 @@ def build_selected_well_phase_audit_figure(
                 x=model["temperature_model_c"],
                 y=model["depth_m"],
                 mode="lines+markers",
-                name="OSL modeled temperature key depths",
+                name="Modeled well temperature key depths",
                 line={"color": "#2563eb", "width": 3},
                 marker={"size": 9},
                 customdata=model[
@@ -2693,6 +3661,51 @@ def build_selected_well_phase_audit_figure(
                     "<br>Method: %{customdata[1]}"
                     "<br>Status: %{customdata[2]}<extra></extra>"
                 ),
+            )
+        )
+
+    stability_top = pd.to_numeric(
+        pd.Series([screen_row.get("stability_top_m")]),
+        errors="coerce",
+    ).iloc[0]
+    stability_base = pd.to_numeric(
+        pd.Series([screen_row.get("stability_base_m")]),
+        errors="coerce",
+    ).iloc[0]
+    stability_thickness = pd.to_numeric(
+        pd.Series([screen_row.get("stability_thickness_m")]),
+        errors="coerce",
+    ).iloc[0]
+    has_stability_range = (
+        pd.notna(stability_top)
+        and pd.notna(stability_base)
+        and float(stability_base) > float(stability_top)
+    )
+    if has_stability_range:
+        range_label = "Modeled stability-admissibility range"
+        if pd.notna(stability_thickness):
+            range_label = f"{range_label}: {float(stability_thickness):.1f} m"
+        figure.add_hrect(
+            y0=float(stability_top),
+            y1=float(stability_base),
+            fillcolor="rgba(249, 115, 22, 0.14)",
+            line_width=0,
+            layer="below",
+            annotation_text=range_label,
+            annotation_position="top left",
+        )
+        figure.add_trace(
+            go.Scatter(
+                x=[None],
+                y=[None],
+                mode="markers",
+                name="Modeled stability range",
+                marker={
+                    "size": 12,
+                    "color": "rgba(249, 115, 22, 0.35)",
+                    "symbol": "square",
+                },
+                hoverinfo="skip",
             )
         )
 
@@ -2769,6 +3782,8 @@ def build_selected_well_phase_audit_figure(
     max_depth_candidates.extend(float(depth) for depth in plotted_depths if pd.notna(depth))
     if screen_points:
         max_depth_candidates.append(float(pd.DataFrame(screen_points)["depth_m"].max()))
+    if has_stability_range:
+        max_depth_candidates.extend([float(stability_top), float(stability_base)])
     max_depth = max(max_depth_candidates) if max_depth_candidates else 1000.0
 
     figure.update_layout(
@@ -2781,6 +3796,72 @@ def build_selected_well_phase_audit_figure(
     )
     figure.update_yaxes(autorange="reversed", range=[max_depth * 1.03, 0])
     return figure
+
+
+def first_nonempty_column_value(
+    frame: pd.DataFrame,
+    column: str,
+    default: str,
+) -> str:
+    if frame.empty or column not in frame.columns:
+        return default
+    values = frame[column].dropna().astype(str).str.strip()
+    values = values[values.ne("")]
+    if values.empty:
+        return default
+    return values.iloc[0]
+
+
+def stability_screen_source_method_frame(phase_curve: pd.DataFrame) -> pd.DataFrame:
+    citation = first_nonempty_column_value(
+        phase_curve,
+        "source_citation",
+        "Lee et al. 2008 USGS SIR 2008-5175 Fig. 1A",
+    )
+    extraction_method = first_nonempty_column_value(
+        phase_curve,
+        "source_extraction_method",
+        "digitized phase-boundary lookup",
+    ).replace("_", " ")
+    gas_assumption = first_nonempty_column_value(
+        phase_curve,
+        "gas_composition_assumption",
+        "100_percent_methane",
+    ).replace("_", " ")
+    salinity = first_nonempty_column_value(
+        phase_curve,
+        "salinity_ppt_assumption",
+        "5",
+    )
+
+    return pd.DataFrame(
+        [
+            {
+                "Step": "1. Public well scaffold",
+                "Source used": "Alaska DNR public Arctic Slope well locations and public depth fields.",
+                "How the website uses it": "Maps 8,084 public wells and defines the public depth basis for screening.",
+                "Guardrail": "Public scaffold only; no approved runtime rows or hydrate detections are loaded.",
+            },
+            {
+                "Step": "2. Temperature controls",
+                "Source used": "NSIDC G10015 temperature profiles with NSIDC GGD223 permafrost-control context.",
+                "How the website uses it": "Uses matched or representative measured-temperature controls where public-source gates pass; missing controls stay blank.",
+                "Guardrail": "G10015 is the temperature source, not the methane phase-curve CSV/screenshot.",
+            },
+            {
+                "Step": "3. Methane phase curve",
+                "Source used": f"{citation}; {gas_assumption}; {salinity} ppt salinity; {extraction_method}.",
+                "How the website uses it": "Replots the CSV points as the methane 5 ppt phase boundary and compares modeled well temperature against it.",
+                "Guardrail": "The CSV/PNG curve is a phase-boundary input; it is not a G10015 temperature profile and not occurrence evidence.",
+            },
+            {
+                "Step": "4. Stability range",
+                "Source used": "Guarded public stability-screen CSV generated from the public scaffold, temperature model, hydrostatic pressure, and phase curve.",
+                "How the website uses it": "Reports top, base, and thickness where modeled temperature is at or below the methane phase boundary.",
+                "Guardrail": "This is pressure-temperature admissibility only; logs, core, NMR, and labels validate occurrence or saturation separately.",
+            },
+        ]
+    )
 
 
 def stability_blank_reason_summary_frame(screen: pd.DataFrame) -> pd.DataFrame:
@@ -3070,7 +4151,10 @@ def temperature_proxy_tier_summary_frame(audit: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def build_temperature_proxy_map(audit: pd.DataFrame) -> go.Figure:
+def build_temperature_proxy_map(
+    audit: pd.DataFrame,
+    landmark_source_dir: Path | None = None,
+) -> go.Figure:
     map_frame = audit.dropna(subset=["lat", "lon"]).copy()
     figure = go.Figure()
     if map_frame.empty:
@@ -3078,6 +4162,13 @@ def build_temperature_proxy_map(audit: pd.DataFrame) -> go.Figure:
 
     center_lat = float(map_frame["lat"].median())
     center_lon = float(map_frame["lon"].median())
+    source_dir = (
+        Path(landmark_source_dir)
+        if landmark_source_dir
+        else default_basemap_landmark_source_dir(PROJECT_ROOT)
+    )
+    landmarks = cached_basemap_landmark_layers(str(source_dir))
+    add_north_slope_basemap_line_layers(figure, landmarks)
     ordered_tiers = list(TEMPERATURE_PROXY_TIER_DETAILS)
     for tier in ordered_tiers:
         subset = map_frame[map_frame["temperature_proxy_tier"].eq(tier)]
@@ -3111,6 +4202,7 @@ def build_temperature_proxy_map(audit: pd.DataFrame) -> go.Figure:
                 hovertemplate="%{text}<extra></extra>",
             )
         )
+    add_north_slope_basemap_label_layers(figure, map_frame, landmarks)
 
     figure.update_layout(
         height=560,
@@ -3123,7 +4215,7 @@ def build_temperature_proxy_map(audit: pd.DataFrame) -> go.Figure:
             "x": 0,
         },
         mapbox={
-            "style": "open-street-map",
+            "style": "carto-positron",
             "center": {"lat": center_lat, "lon": center_lon},
             "zoom": 4.0,
         },
@@ -3247,6 +4339,7 @@ def render_guarded_stability_screen_product() -> None:
 
     source_root = active_stability_source_path(PROJECT_ROOT)
     ggd223_points = cached_ggd223_points(str(source_root))
+    assessment_units = cached_hydrate_assessment_units(str(source_root))
     inventory = cached_g10015_temperature_inventory(str(PROJECT_ROOT))
     control_crosswalk = g10015_temperature_control_crosswalk_frame(inventory, ggd223_points)
     proxy_audit = temperature_proxy_candidate_audit_frame(screen, control_crosswalk)
@@ -3255,6 +4348,32 @@ def render_guarded_stability_screen_product() -> None:
     temperature_model = cached_stability_temperature_model(str(PROJECT_ROOT))
     phase_curve = cached_methane_phase_curve(str(PROJECT_ROOT))
     sampled_profile_points = cached_g10015_temperature_profile_points(str(PROJECT_ROOT))
+
+    with st.expander("Sources And How The Stability Screen Works", expanded=True):
+        st.markdown(
+            """
+The map and selected-well plot show a **stability-admissibility range**, not a
+single hydrate depth. A calculated row has a modeled top, base, and thickness
+where the well-temperature model is cold enough relative to the methane 5 ppt
+phase boundary. That range only says hydrate could be thermodynamically
+allowed; occurrence and saturation still require log, core, NMR, or other
+validated target evidence.
+
+The Drive CSV-curve screenshot belongs to the methane 5 ppt phase-boundary
+input. It should not be treated as a G10015 temperature-profile screenshot.
+"""
+        )
+        st.dataframe(
+            stability_screen_source_method_frame(phase_curve),
+            use_container_width=True,
+            hide_index=True,
+        )
+        st.info(
+            "Current baseline: 100 percent methane / methane-dominant, 5 ppt "
+            "salinity, hydrostatic pressure assumption. Mixed gas composition "
+            "or a different salinity would need a separately sourced curve and "
+            "mentor approval before becoming a baseline screen."
+        )
 
     status_tab, blanks_tab, temperature_tab, intervals_tab, tables_tab = st.tabs(
         [
@@ -3267,17 +4386,38 @@ def render_guarded_stability_screen_product() -> None:
     )
 
     with status_tab:
-        st.markdown("##### 2D Screen Status Map")
+        st.markdown("##### Unified North Slope Well + Stability Context Map")
         st.caption(
-            "Point colors show calculation status only. Blue means the baseline "
-            "screen could calculate an interval for that well; it does not mean "
-            "hydrate was detected."
+            "This replaces the older 2D Screen Status Map with the same status "
+            "categories plus USGS AU outlines, GGD223 pf_depth_m controls, DNR "
+            "units, roads, TAPS, and field labels."
         )
+        st.warning(
+            "Context/orientation only. Stability-screen status does not prove hydrate "
+            "occurrence, saturation, or trained-model evidence."
+        )
+        st.caption(map_landmark_source_caption(default_basemap_landmark_source_dir(PROJECT_ROOT)))
         st.plotly_chart(
-            build_stability_screen_map(screen),
+            build_unified_north_slope_context_map(
+                screen,
+                ggd223_points,
+                assessment_units,
+            ),
             use_container_width=True,
             config={"displayModeBar": True, "responsive": True},
+            key="stability_unified_context_map",
         )
+        with st.expander("Reference: status-only 2D screen map"):
+            st.caption(
+                "Status colors are identical to the unified map. This legacy view "
+                "is retained only for before/after comparison."
+            )
+            st.plotly_chart(
+                build_stability_screen_map(screen),
+                use_container_width=True,
+                config={"displayModeBar": True, "responsive": True},
+                key="stability_status_only_reference_map",
+            )
         left, right = st.columns(2)
         left.dataframe(status_counts, use_container_width=True, hide_index=True)
         right.dataframe(confidence_counts, use_container_width=True, hide_index=True)
@@ -3328,6 +4468,7 @@ def render_guarded_stability_screen_product() -> None:
             "Proxy tiers are planning labels only. They do not fill blank "
             "top/base/thickness values and are not part of the baseline screen."
         )
+        st.caption(map_landmark_source_caption(default_basemap_landmark_source_dir(PROJECT_ROOT)))
         st.plotly_chart(
             build_temperature_proxy_map(proxy_audit),
             use_container_width=True,
@@ -3357,15 +4498,15 @@ Source anchors: [NSIDC G10015](https://nsidc.org/data/g10015/versions/1),
     with intervals_tab:
         st.markdown("##### Selected Well Temperature/Phase Audit")
         st.caption(
-            "This plot uses committed public products: the methane 5 ppt phase "
-            "boundary, sampled measured G10015 profile points when exported, "
-            "OSL modeled temperature at key depths, and screen top/base "
-            "markers where available."
+            "This plot uses committed public products: the methane 5 ppt CSV "
+            "phase boundary, sampled measured G10015 temperature-profile points "
+            "when exported, modeled well temperature at key depths, and a shaded "
+            "screen top-to-base range where available."
         )
         if sampled_profile_points.empty:
             st.info(
                 "The sampled measured G10015 profile export is not committed yet. "
-                "Run the public stability rebuild in OSL to add full curve traces."
+                "Run the public stability rebuild in OSL to add full temperature-profile traces."
             )
         selection_source = screen.copy()
         selection_source["selection_priority"] = selection_source[
@@ -5682,10 +6823,16 @@ def render_presentation_exports() -> None:
 
     export_specs = [
         (
-            "North Slope Map",
-            V5_3_WEBSITE_CAPTURE_DIR / "02_explore_regional_map.png",
-            "Current website regional-map capture for slide context",
-            "north_slope_map",
+            "Unified North Slope Map",
+            UNIFIED_CONTEXT_MAP_EXPORT,
+            "Large unified public Census/TIGER borough boundary, geoscience, DGGS-preview, stability-status, GGD223, USGS AU, DNR unit, road, TAPS, and field-label context map",
+            "unified_north_slope_map",
+        ),
+        (
+            "Unified Map With Callout Space",
+            UNIFIED_CONTEXT_MAP_SLIDE_EXPORT,
+            "Slide 2/7 export with a right-side lane for editable PowerPoint or Google Slides callouts",
+            "unified_north_slope_map_callout_space",
         ),
         (
             "Hydrate Context",
@@ -5942,7 +7089,7 @@ def render_schema_coverage_architecture() -> None:
             {
                 "Blocked item": "Occurrence and saturation labels",
                 "Current handling": "target-only headers visible, zero public target rows",
-                "Decision needed": "official target authority and unit convention",
+                "Decision needed": "official target authority and sheet-level fraction 0-1 verification",
             },
             {
                 "Blocked item": "Validation split",
@@ -6086,7 +7233,7 @@ def render_schema_coverage_architecture() -> None:
             {
                 "Decision box": "Y-only target rule",
                 "Current rule": "Sgh, S_h, Sh, NMR_SAT, Hydrate Saturation, Swr, phase labels, and occurrence labels never enter X_allowed.",
-                "Open point": "Mentor must choose official target authority and unit convention.",
+                "Open point": "Mentor must choose official target authority; saturation targets are expected as fractions 0-1.",
             },
             {
                 "Decision box": "Caliper coverage first",
@@ -6106,7 +7253,7 @@ def render_schema_coverage_architecture() -> None:
             {
                 "Decision box": "Saturation task",
                 "Current rule": "Saturation regression is linked to but separate from occurrence classification.",
-                "Open point": "Choose authoritative saturation field and fraction/percent convention.",
+                "Open point": "Choose authoritative saturation field; preserve fraction 0-1 target convention.",
             },
         ]
     )
@@ -6352,7 +7499,7 @@ def render_schema_coverage_architecture() -> None:
             {
                 "Stage": "Unit and QC layer",
                 "Feature path": "Normalize depth, density, velocity/slowness, porosity, resistivity, and caliper status.",
-                "Target path": "Confirm target units as fraction or percent before labels are used.",
+                "Target path": "Treat saturation targets as fractions 0-1 and verify sheet-level consistency before labels are used.",
             },
             {
                 "Stage": "Leakage barrier",

@@ -133,7 +133,7 @@ def test_occurrence_targets_require_source_confidence_interval_policy():
     assert approved_report["occurrence_target_authority_present"] is True
 
 
-def test_saturation_targets_require_fraction_or_percent_policy():
+def test_saturation_targets_require_fraction_policy():
     report = validate_approved_data_intake(
         ["DEPTH", "GR", "Rt", "Sh"],
         project_root=PROJECT_ROOT,
@@ -262,13 +262,19 @@ def test_missing_log_adapter_requires_explicit_option():
 def test_new_saturation_authority_requires_authoritative_field_and_unit():
     table = load_approved_data_field_role_table(PROJECT_ROOT)
     blocked = validate_saturation_target_authority(["DEPTH", "GR", "Sh"], table)
-    ready = validate_saturation_target_authority(
+    percent_blocked = validate_saturation_target_authority(
         ["DEPTH", "GR", "Sh"],
         table,
         metadata={"authoritative_saturation_field": "Sh", "saturation_unit_convention": "percent"},
     )
+    ready = validate_saturation_target_authority(
+        ["DEPTH", "GR", "Sh"],
+        table,
+        metadata={"authoritative_saturation_field": "Sh", "saturation_unit_convention": "fraction"},
+    )
 
     assert blocked["authority_present"] is False
+    assert percent_blocked["authority_present"] is False
     assert ready["authority_present"] is True
 
 

@@ -135,8 +135,8 @@ Ground-truth or calibration tracks should be visually isolated from ML inputs.
 5. Is `S_wr` measured, assumed, or calculated?
 6. Which sheets correspond to which source units or wells?
 7. What interpolation or matching rule created `Depth correspondence at ML data`?
-8. Are hydrate saturation fields fractions from 0 to 1 or percentages from 0
-   to 100?
+8. Hydrate saturation fields are currently treated as fractions from 0 to 1;
+   confirm recovered sheets follow that convention before training.
 9. Which field provides the authoritative saturation target, and is it supplied,
    NMR-derived, core-calibrated, or interpreted, for the approximately 20%
    known-well cohort?

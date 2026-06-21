@@ -50,6 +50,9 @@ available.
 - Occurrence evidence can come from core or pressure-core observations,
   NMR/core-derived saturation, validated log interpretation, or documented
   seismic indicators. Stability remains context/admissibility only.
+- Saturation targets are expected as fractions on a 0-1 scale. Preserve the
+  original header/unit metadata, but do not convert them to percent for model
+  targets.
 - Split by whole well, compartment, or geography before preprocessing. Numeric
   predictors get train-only 0-1 scaling after split. Depth remains the
   alignment/context axis unless mentor approves it as a predictor.
@@ -117,7 +120,7 @@ Occurrence and saturation are linked but separate tasks.
 | Task | Output | Target authority needed |
 |---|---|---|
 | Occurrence classification | `P(hydrate)` and calibrated occurrence class | Mentor-approved occurrence label policy from core/pressure-core observations, NMR/core-derived saturation threshold, validated log interpretation, or seismic indicator policy. |
-| Saturation regression | `Sh_pred` with uncertainty | Mentor-approved saturation target among `Sgh`, `S_h`, `Sh`, `NMR_SAT`, or `Hydrate Saturation`, including fraction/percent convention. |
+| Saturation regression | `Sh_pred` with uncertainty | Mentor-approved saturation target among `Sgh`, `S_h`, `Sh`, `NMR_SAT`, or `Hydrate Saturation`; current unit convention is fraction 0-1. |
 
 Stability cannot create either target. Stability may enter `X_allowed` only as
 context, mask, confidence, caveat, or blocked reason if approved.

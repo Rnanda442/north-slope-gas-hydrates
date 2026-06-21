@@ -2,94 +2,70 @@
 
 ## Prompts Worked On
 
-- Prompt 5: four-well data, core, lithology, and location recovery.
-- Prompt 7: Slide 4 simplified ML architecture and two-minute script.
-- Prompt 9: Slide 6 high-level visual cleanup.
-- Delegation/coordination prompts for collecting PC/laptop chat reports.
+- Prompt 5: four-well data, core, lithology, and location recovery, handled as public-safe source/header planning only.
+- Prompt 7: Slide 4 simplified ML architecture and two-minute audience script.
+- Prompt 9: Slide 6 high-level visual cleanup after moving equation detail to Slide 5.
+- Coordination prompt: collect delegated chat handoff reports into one integration branch and create the slide-finishing index/checklist for main Codex.
 
 ## Done
 
-- Verified from the committed source-safe notes that `MTE` / `Well-MTE` maps to
-  Mount Elbert and `IGS` / `Well-IGS` maps to Ignik Sikumi.
-- Identified `MTE_refined` and `IGS_refined` as unresolved workbook-stage
-  questions, not verified separate wells.
-- Flagged `MLK` and `ETG` as unverified names because they were not found in
-  the committed docs reviewed here.
-- Planned Slide 4 as a simple audience-facing workflow: inputs, preparation,
-  leakage barrier, separate occurrence/saturation paths, validation, and
-  reviewed exports.
-- Wrote a two-minute Slide 4 talk track.
-- Planned Slide 6 as a high-level four-well evidence-review visual instead of
-  the current crowded equation/unit-gate raster panel.
-- Confirmed current Slide 6 in the active V5.5 deck is a single picture shape,
-  meaning it is not editable as native slide text/shapes.
-- Created and pushed the earlier handoff report:
-  `docs/delegated_work/2026-06-18/main_codex_thread_PROMPT_RESULTS.md`.
+- Created a public-safe delegated handoff for the main Codex thread covering Prompts 5, 7, and 9.
+- Recorded the Prompt 5 finding that MTE/Mount Elbert and IGS/Ignik Sikumi are supported by the committed public-safe notes/sources, while `MTE_refined` and `IGS_refined` still need workbook/header-only confirmation as refined sheet stages versus actual wells.
+- Kept MLK and ETG as unresolved names because they were not verified in the public-safe metadata handled in this chat.
+- Planned Slide 4 as a simpler audience-facing workflow: approved inputs, preparation/QC, leakage barrier, separate occurrence and saturation paths, validation, and reviewed outputs.
+- Planned Slide 6 as a high-level four-well evidence-review board instead of another dense equation or unit-gate raster.
+- Fetched and inspected delegated branches matching `codex/delegated-*-20260618`.
+- Found and imported the public-safe handoff from `origin/codex/delegated-main_codex_thread-20260618`.
+- Created the consolidated delegated-work index and slide-finishing checklist for the main Codex session.
+- Preserved the current unified-map base and did not merge older-base deletes or unsafe/non-handoff material.
+- Excluded approved rows, raw workbooks, private screenshots, row-level predictions, trained models, fitted scalers, runtime manifests, credentialed PDFs, and heavy raw source bundles.
 
 ## Still Needed
 
-- Pull the actual four PC/laptop chat reports once those chats provide branch,
-  commit, and report paths.
-- Confirm the real four-well mapping from the three approved workbooks using
-  header-only workbook metadata or `wellnametodataset.txt`.
-- Decide whether `MTE_refined` and `IGS_refined` are refined sheets or separate
-  wells.
-- Verify whether `MLK` or `ETG` are real well aliases from screenshots,
-  workbook metadata, or source captions.
-- Review the existing local uncommitted deck/builder/PNG changes separately;
-  this thread did not claim ownership of those changes.
-- Build the actual editable Slide 4 and Slide 6 in the deck.
-- Confirm final source-backed equation set for Slide 5.
-- Confirm which unified map export is accepted for Slide 2 and Slide 7.
+- Main Codex should decide whether the other delegated chats will push missing handoff branches or whether to proceed from the current integration docs and pasted chat responses.
+- Header-only DOE/OSL output is still needed to confirm the actual three-workbook/four-well mapping and whether `MTE_refined`/`IGS_refined` are processed views.
+- Verified four-well locations, lithology, core, NMR, pressure-core, and saturation authority still need source confirmation before the deck names four separate wells.
+- Slide 3 still needs the actual editable log-signal, lithology, and core/NMR calibration graphic.
+- Slide 4 still needs to be built as editable slide content from the simplified architecture plan.
+- Slide 5 still needs the equation-only rebuild and source verification for every equation/card.
+- Slide 6 still needs the high-level evidence-review rebuild and a decision on which text moves to Word or speaker notes.
+- Slide 7 should use the unified North Slope map as context only, not as an ML overlay or hydrate-proof result.
+- Slides 8 and 9 still need guarded planned-results and built/not-claimed/next-action slides with no unsupported predictions or model metrics.
+- Stashed/local deck-builder and header-verification work should be reviewed separately before reuse; do not overwrite or drop it.
 
 ## Files / Assets
 
-Created by this thread:
-
-- `docs/delegated_work/2026-06-18/main_codex_thread_PROMPT_RESULTS.md`
-- `docs/delegated_work/2026-06-19/main_codex_thread_done_needed.md`
-
-Pre-existing local modified files observed but not created or staged by this
-handoff:
-
-- `data/public_ml_products/source_visual_inventory_2026-06-16.csv`
-- `docs/CURRENT_ARTIFACT_INDEX.md`
-- `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md`
-- `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`
-- active V5.5 deck and companion binaries
-- multiple regenerated V5.5 slide panel PNGs
-- untracked `slide_05_equation_cards_v5_5.png`
-- `tests/test_source_visual_inventory.py`
+- Created/imported: `docs/delegated_work/2026-06-18/main_codex_thread_PROMPT_RESULTS.md`.
+- Created: `docs/delegated_work/2026-06-18/DELEGATED_WORK_INDEX_2026-06-18.md`.
+- Created: `docs/delegated_work/2026-06-18/SLIDE_FINISHING_NEEDS_2026-06-18.md`.
+- Created by this handoff: `docs/delegated_work/2026-06-19/main_codex_thread_done_needed.md`.
+- Existing unified map assets to use next: `docs/project_blueprints/presentation_assets/website_well_maps_2026_06_18/`.
+- Not staged by this handoff: unrelated local changes in `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx` and `docs/project_blueprints/append_v55_companion_source_notes.py`.
+- Known stash to review later: header-only well/sheet verification work was preserved in a stash and should be inspected before any reuse.
 
 ## Branch / Commit
 
-Earlier pushed handoff:
-
-- Branch: `codex/delegated-main_codex_thread-20260618`
-- Commit: `0c49412ab6ff09d39f48ef62cef8416318a82926`
-
-This 2026-06-19 done/needed report should be committed on the same branch unless
-the user asks for a separate branch.
+- Integration branch pushed before this report: `codex/delegated-slide-intake-20260618`.
+- Previous pushed branch head before this report: `62d25f9`.
+- Main content commit in that branch: `62224ae`.
+- This report will be committed and pushed as the next branch commit.
 
 ## Slides Affected
 
-- Slide 3: needs four-well log-signal, lithology, and core/NMR source
-  verification.
-- Slide 4: ready to build from the simplified ML architecture plan and
-  two-minute script.
-- Slide 5: needs final source-backed equation set.
-- Slide 6: should become a high-level four-well evidence-review visual.
-- Slide 7: should use stability map as context only.
-- Slides 8-9: should stay guarded results/discussion plan slides, not final
-  results.
+- Slide 2: indirectly affected through the unified-map source assets and context-map direction.
+- Slide 3: affected by the four-well/log-signal/lithology/core evidence planning.
+- Slide 4: directly affected by the simplified ML architecture plan.
+- Slide 5: indirectly affected because equations should move there as a standalone slide.
+- Slide 6: directly affected by the high-level evidence-review cleanup plan.
+- Slide 7: affected by the unified map as context-only results/discussion framing.
+- Slide 8: affected by the planned four-well result-review logic.
+- Slide 9: affected by the built/not-claimed/next-actions closing structure.
 
 ## Main Codex Next Steps
 
-1. Get the four PC/laptop chat branch names, commit hashes, and report paths.
-2. Pull the actual delegated reports and create one accumulated slide next-step
-   overview.
-3. Review the local uncommitted equation/deck-builder changes before deciding
-   whether to keep them.
-4. Verify four-well identities and core/lithology/NMR evidence before finalizing
-   Slides 3 and 6.
-5. Build editable Slide 4 and Slide 6 from the plans already produced here.
+1. Pull the integration branch: `git pull origin codex/delegated-slide-intake-20260618`.
+2. Read this handoff plus the 2026-06-18 delegated-work index, slide-finishing checklist, and `main_codex_thread_PROMPT_RESULTS.md`.
+3. Ask whether the missing delegated branches will be pushed; if not, use pasted final responses from those chats as additional handoff input.
+4. Review local/stashed deck-builder and header-only verification changes before deciding what to keep.
+5. Build the next deck pass from public-safe assets only: Slide 7 map context, Slide 8 planned review logic, Slide 9 close, then Slide 3/4/5/6 editable rebuilds.
+6. Keep approved workbook rows, raw data, row-level predictions, trained models, fitted scalers, private screenshots, credentialed PDFs, and heavy raw source bundles out of GitHub.

@@ -24,7 +24,7 @@ X_allowed_candidate,stability_context_placeholder,context,optional,mixed,summary
 Y_target_registry,target_name,target_only,yes,string,metadata_only,Original target label name.
 Y_target_registry,target_task,target_only,yes,string,metadata_only,occurrence_classification or saturation_regression or calibration_reference.
 Y_target_registry,source_evidence_type,target_only,yes,string,metadata_only,Core pressure-core NMR/core log interpretation or seismic evidence type.
-Y_target_registry,unit,target_only,yes,string,metadata_only,Fraction percent categorical or boolean unit convention.
+Y_target_registry,unit,target_only,yes,string,metadata_only,Fraction 0-1 for saturation targets; categorical or boolean for occurrence labels.
 Y_target_registry,allowed_use,target_only,yes,string,metadata_only,Training validation calibration or review use.
 Y_target_registry,confidence,target_only,yes,string,metadata_only,Approved label confidence.
 Y_target_registry,caveat,target_only,yes,string,metadata_only,Target authority caveat and uncertainty note.

@@ -1,0 +1,6 @@
+slide_number,slide_role,shape_count,picture_shapes,text_shapes,line_or_connector_shapes,raster_only_flag,manual_editability_status,notes
+3,"log signal, lithology, and core/NMR calibration scaffold",130,0,35,58,no,editable_candidate,"Source images may remain raster, but labels, callouts, captions, lanes, and equation cards are native PowerPoint objects."
+4,simplified ML architecture,33,0,18,6,no,editable_candidate,"Source images may remain raster, but labels, callouts, captions, lanes, and equation cards are native PowerPoint objects."
+5,equation transformations,55,0,33,0,no,editable_candidate,"Source images may remain raster, but labels, callouts, captions, lanes, and equation cards are native PowerPoint objects."
+6,four-well evidence review board,58,0,35,0,no,editable_candidate,"Source images may remain raster, but labels, callouts, captions, lanes, and equation cards are native PowerPoint objects."
+7,stability context map,22,1,14,0,no,editable_candidate,"Source images may remain raster, but labels, callouts, captions, lanes, and equation cards are native PowerPoint objects."

@@ -268,12 +268,11 @@ V5.4 as the source baseline and V5.3 as flawed reference only.
   scaffold views.
 - Tests exist in `tests/test_well_log_engine.py` and
   `tests/test_runtime_skeleton.py`.
-- The full project test suite passed after the DOE model-run tracker
-  review-board update and V5.5 deck update: 117 tests passed and 2 were
-  skipped after adding the tracker review-board tests and regenerating the
-  V5.5 deck, companion, slide panels, contact sheet, source visual inventory,
-  and Presentation Exports wiring. Update this count only after a fresh local
-  pytest run.
+- The full project test suite passed after the project-revision-base merge and
+  unified website map update: 122 tests passed and 2 were skipped after adding
+  the DOE tracker/review-board tests, V5.5 deck assets, source visual
+  inventory updates, and unified map tests. Update this count only after a
+  fresh local pytest run.
 - Public GIS layers, notebooks, structural surfaces, and Plotly exports are
   present.
 - Two working Word drafts and a rebuilt 2026-06-13 local research-overview
