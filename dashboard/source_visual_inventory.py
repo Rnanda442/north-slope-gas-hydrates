@@ -21,6 +21,18 @@ SOURCE_VISUAL_INVENTORY_COLUMNS = [
     "guardrail",
 ]
 
+SOURCE_CARD_COLUMNS = [
+    "source_title",
+    "source_category",
+    "project_claim_supported",
+    "allowed_use",
+    "not_allowed_use",
+    "related_slide_website_section",
+    "source_status",
+    "visual_status",
+    "public_safe_link_or_path",
+]
+
 PASS_QA_STATUSES = {
     "pass_public_safe",
     "pass_source_backed",
@@ -167,3 +179,74 @@ def source_visual_inventory_summary_frame(
         },
     ]
     return pd.DataFrame(rows)
+
+
+def _cell_text(row: pd.Series, column: str) -> str:
+    value = row.get(column, "")
+    if pd.isna(value):
+        return ""
+    return str(value).strip()
+
+
+def _humanize_token(value: str) -> str:
+    text = value.replace("_", " ").replace("-", " ").strip()
+    return " ".join(text.split()).title()
+
+
+def _source_card_category(row: pd.Series) -> str:
+    visual_type = _cell_text(row, "visual_type").lower()
+    source_status = _cell_text(row, "source_status").lower()
+
+    if "source_backed" in source_status:
+        if "curve" in visual_type or "data" in visual_type:
+            return "Source-backed data"
+        return "Source-backed visual"
+    if "website_capture" in visual_type:
+        return "Website capture"
+    if "contact_sheet" in visual_type:
+        return "Visual QA artifact"
+    if "project_generated" in source_status or "project_generated" in visual_type:
+        return "Project-generated public visual"
+    return _humanize_token(visual_type or source_status or "Source item")
+
+
+def _source_card_claim(row: pd.Series) -> str:
+    use = _cell_text(row, "slide_or_site_use")
+    provenance = _cell_text(row, "provenance")
+    if use and provenance:
+        return f"{use}. Source reason: {provenance}"
+    return use or provenance or "Project source provenance and reuse context."
+
+
+def _source_card_not_allowed_use(row: pd.Series) -> str:
+    guardrail = _cell_text(row, "guardrail")
+    if guardrail:
+        return guardrail
+    return (
+        "Do not use for hydrate proof, occurrence prediction, saturation prediction, "
+        "validated model performance, approved rows, or restricted identifiers."
+    )
+
+
+def source_card_frame(inventory: pd.DataFrame) -> pd.DataFrame:
+    """Return public-safe source cards derived from the visual inventory rows."""
+    if inventory.empty:
+        return pd.DataFrame(columns=SOURCE_CARD_COLUMNS)
+
+    rows: list[dict[str, str]] = []
+    for _, row in inventory.iterrows():
+        rows.append(
+            {
+                "source_title": _cell_text(row, "artifact") or _cell_text(row, "visual_id"),
+                "source_category": _source_card_category(row),
+                "project_claim_supported": _source_card_claim(row),
+                "allowed_use": _cell_text(row, "allowed_use"),
+                "not_allowed_use": _source_card_not_allowed_use(row),
+                "related_slide_website_section": _cell_text(row, "slide_or_site_use"),
+                "source_status": _cell_text(row, "source_status"),
+                "visual_status": _cell_text(row, "qa_status"),
+                "public_safe_link_or_path": _cell_text(row, "path"),
+            }
+        )
+
+    return pd.DataFrame(rows, columns=SOURCE_CARD_COLUMNS)
