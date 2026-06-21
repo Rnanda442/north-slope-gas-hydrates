@@ -1,0 +1,8 @@
+well_case,api_number,object_id,split,split_reason,locked_for_validation,notes
+MTE,50029233020000,6085,train,Mount Elbert log/NMR and core-source context are expected training/calibration inputs after approved-row review,false,Change split only before fitting preprocessing or model weights.
+IGS,50029234430000,6310,train,Ignik Sikumi has log/NMR-derived Sgh support but unresolved actual core rows,false,Keep core status caveat visible in outputs.
+Hydrate-01,50029236130000,6482,validation,Hydrate-01 has sidewall pressure-core support and should validate pressure-core/log behavior,true,Use approved/public pressure-core rows as overlay or validation after review.
+HYDRATE 02,50029237280000,6596,test,HYDRATE 02 has strongest pressure-core support and should remain held out until workflow is locked,true,Use for blind or late-stage validation where enough labels exist.
+Hydrate-01 associated anchor,50029200620000,200,review,Associated Kuparuk anchor for Hydrate-01 literature context,true,Do not mix with Hydrate-01 primary well unless intentionally reviewed.
+HYDRATE 02 associated well,50029237370000,6604,review,Associated HYDRATE P1 test well context,true,Not a default training well.
+HYDRATE 02 associated well,50029237320000,6599,review,Associated HYDRATE P2 test well context,true,Not a default training well.
