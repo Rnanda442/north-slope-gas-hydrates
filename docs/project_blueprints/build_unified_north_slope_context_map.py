@@ -21,6 +21,7 @@ ASSET_DIR = (
 )
 PNG_PATH = ASSET_DIR / "unified_north_slope_well_stability_context_map_2026_06_18.png"
 SLIDE_PNG_PATH = ASSET_DIR / "unified_north_slope_slide_export_callout_space_2026_06_18.png"
+SLIDE2_INSERT_PATH = ASSET_DIR / "unified_north_slope_slide2_map_insert_2026_06_21.png"
 PUBLIC_STABILITY = ROOT / "data" / "public_stability_products"
 PUBLIC_GIS_PRODUCTS = ROOT / "data" / "public_gis_products"
 PUBLIC_ML_PRODUCTS = ROOT / "data" / "public_ml_products"
@@ -807,6 +808,7 @@ def draw_map() -> Path:
     )
     img.convert("RGB").save(PNG_PATH, quality=96)
     draw_slide_callout_export(img.convert("RGB"))
+    draw_slide2_map_insert(img.convert("RGB"))
     return PNG_PATH
 
 
@@ -874,6 +876,45 @@ def draw_slide_callout_export(full_map: Image.Image) -> Path:
     )
     slide.save(SLIDE_PNG_PATH, quality=96)
     return SLIDE_PNG_PATH
+
+
+def draw_slide2_map_insert(full_map: Image.Image) -> Path:
+    insert_w, insert_h = 2600, 1900
+    insert = Image.new("RGB", (insert_w, insert_h), WHITE)
+    draw = ImageDraw.Draw(insert, "RGBA")
+    crop = full_map.crop((820, 330, 2785, 1680))
+    crop_resized = crop.resize((insert_w, 1550), Image.Resampling.LANCZOS)
+    insert.paste(crop_resized, (0, 0))
+    draw.rectangle((0, 0, insert_w - 1, 1549), outline=(112, 139, 154), width=4)
+
+    draw.rectangle((0, 1550, insert_w, insert_h), fill=(244, 248, 249))
+    draw.text(
+        (52, 1600),
+        "Focused map layers",
+        font=font(54, True),
+        fill=NAVY,
+    )
+    legend_items = [
+        ("stable range", BLUE),
+        ("MTE", PROJECT_WELL_COLORS["MTE"]),
+        ("IGS", PROJECT_WELL_COLORS["IGS"]),
+        ("Hydrate-01", PROJECT_WELL_COLORS["Hydrate-01"]),
+        ("HYDRATE 02", PROJECT_WELL_COLORS["HYDRATE 02"]),
+    ]
+    x = 52
+    y = 1695
+    for label, color in legend_items:
+        draw_circle(draw, (x + 22, y + 20), 21, color, 250)
+        draw.text((x + 58, y - 2), label, font=font(42, True), fill=INK)
+        x += 465 if label == "stable range" else 360
+    draw.text(
+        (52, 1814),
+        "Blocked/background wells and GGD control dots hidden in default slide view; stability context is not hydrate proof.",
+        font=font(34),
+        fill=MUTED,
+    )
+    insert.save(SLIDE2_INSERT_PATH, quality=96)
+    return SLIDE2_INSERT_PATH
 
 
 if __name__ == "__main__":
