@@ -8,6 +8,9 @@ script at a time.
 
 ## Current Blocks
 
+- `../doe_jupyter_runtime_pack/` - notebook-first transfer folder for DOE
+  Jupyter. It wraps the full repo pipeline, graph exports, and local config
+  template in one GitHub-downloadable folder.
 - `notebook_header_scan_cell.py` - copy the whole file into one Jupyter cell.
   It scans the three curated Excel workbooks, prints likely target headers, and
   writes local CSV summaries.
