@@ -1,0 +1,57 @@
+name: Assemble revised DOE master notebook
+
+on:
+  push:
+    branches:
+      - chatgpt/master-notebook-rebuild-20260622
+    paths:
+      - .github/notebook_payload/TRIGGER
+
+permissions:
+  contents: write
+
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chatgpt/master-notebook-rebuild-20260622
+          fetch-depth: 0
+
+      - name: Assemble and validate notebook
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import base64
+          import gzip
+          import hashlib
+          import json
+          
+          payload_dir = Path('.github/notebook_payload')
+          encoded = ''.join(path.read_text(encoding='utf-8').strip() for path in sorted(payload_dir.glob('part*.b64')))
+          notebook_bytes = gzip.decompress(base64.b64decode(encoded))
+          expected = 'df8a774e938758b66d1949d014739e7d72f39b38998141932c942e5cf1d75996'
+          actual = hashlib.sha256(notebook_bytes).hexdigest()
+          if actual != expected:
+              raise SystemExit(f'Notebook checksum mismatch: {actual} != {expected}')
+          notebook = json.loads(notebook_bytes.decode('utf-8'))
+          if notebook.get('nbformat') != 4 or len(notebook.get('cells', [])) < 10:
+              raise SystemExit('Notebook structure validation failed')
+          target = Path('doe_anaconda_final_kit/DOE_MASTER_FULL_PIPELINE.ipynb')
+          target.parent.mkdir(parents=True, exist_ok=True)
+          target.write_bytes(notebook_bytes)
+          print(f'Wrote {target} ({len(notebook_bytes)} bytes, {len(notebook["cells"])} cells)')
+          PY
+
+      - name: Commit assembled notebook and remove transfer files
+        shell: bash
+        run: |
+          rm -rf .github/notebook_payload
+          rm -f .github/workflows/assemble-master-notebook.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add doe_anaconda_final_kit/DOE_MASTER_FULL_PIPELINE.ipynb .github
+          git commit -m "Rebuild DOE master pipeline from original four-well workbooks"
+          git push origin HEAD:chatgpt/master-notebook-rebuild-20260622
