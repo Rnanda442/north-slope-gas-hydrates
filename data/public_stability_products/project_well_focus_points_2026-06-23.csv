@@ -1,0 +1,5 @@
+well_label,map_role,latitude,longitude,marker_color,marker_symbol,coordinate_note
+MTE / Mt. Elbert,verified public project anchor; coordinate from directional-survey surface cluster when available,70.4918022,-148.6963651,#b31942,circle,Public directional-survey surface station cluster; verify exact presentation label before final claims.
+IGS / Ignik Sikumi,verified public project anchor; approximate presentation focus marker,70.515,-148.682,#0f766e,circle,Approximate focus marker for interactive context; verify exact public coordinate before claims.
+Hydrate-01,working project well label; metadata unresolved,70.455,-148.56,#7c3aed,circle,Presentation focus marker; refined workbook sheet metadata remains unresolved until separately verified.
+HYDRATE 02,working project well label; metadata unresolved,70.61,-148.12,#f97316,circle,Presentation focus marker; refined workbook sheet metadata remains unresolved until separately verified.
