@@ -1,0 +1,20 @@
+RUN_MODE = "model"
+
+TARGET_CONTRACTS["hydrate_saturation"]["approved"] = True
+TARGET_CONTRACTS["hydrate_saturation"]["reference_method"] = "mixed documented hydrate saturation"
+TARGET_CONTRACTS["hydrate_saturation"]["target_definition"] = "hydrate saturation fraction"
+TARGET_CONTRACTS["hydrate_saturation"]["source_document"] = "source workbook audit"
+
+TARGET_CONTRACTS["hydrate_saturation"]["source_header_by_well"] = {
+    "WellA": "Sgh",
+    "WellB": "Sgh",
+    "WellC": "S_h",
+    "WellD": "Sh",
+}
+
+TARGET_CONTRACTS["hydrate_saturation"]["formula_input_features"] = [
+    "density_porosity_vv",
+    "nmr_porosity_vv",
+]
+
+TARGET_CONTRACTS["hydrate_occurrence"]["enabled"] = False
