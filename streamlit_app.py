@@ -1,9 +1,9 @@
 from dashboard import app as dashboard_app
-from dashboard import map_code_integration as map_integration
+from dashboard import mapbox_map as north_slope_map
 
 
 def render_regional_map() -> None:
-    map_integration.render_regional_atlas_v3(dashboard_app)
+    north_slope_map.render_regional_atlas_mapbox(dashboard_app)
 
 
 dashboard_app.render_regional_atlas = render_regional_map
