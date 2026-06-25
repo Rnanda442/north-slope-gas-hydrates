@@ -1,9 +1,9 @@
 from dashboard import app as dashboard_app
-from dashboard import mapbox_map_clean
+from dashboard import static_png_review
 
 
 def render_regional_map() -> None:
-    mapbox_map_clean.render_regional_atlas_clean(dashboard_app)
+    static_png_review.render_regional_atlas_with_static_png_review(dashboard_app)
 
 
 dashboard_app.render_regional_atlas = render_regional_map
