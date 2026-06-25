@@ -1,8 +1,12 @@
 from dashboard import app as dashboard_app
-from dashboard.map_v2 import render_regional_atlas_v2
+from dashboard import map_code_integration as map_integration
 
 
-dashboard_app.render_regional_atlas = lambda: render_regional_atlas_v2(dashboard_app)
+def render_regional_map() -> None:
+    map_integration.render_regional_atlas_v3(dashboard_app)
+
+
+dashboard_app.render_regional_atlas = render_regional_map
 main = dashboard_app.main
 
 
