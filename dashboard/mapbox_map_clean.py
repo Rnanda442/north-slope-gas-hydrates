@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import pandas as pd
 import plotly.graph_objects as go
 
@@ -7,66 +9,68 @@ from dashboard import map_v2
 from dashboard import mapbox_map as base
 
 
-# Interactive recreation of the original North Slope drawing.  This file does
-# not invent a new map; it forces the website map to use the same approximate
-# crop, layer stack, opacity hierarchy, and four-well emphasis as the static
-# slide/reference map.
-base.CODE_MAP_CENTER = {"lat": 70.36, "lon": -150.20, "zoom": 5.18}
-base.FOUR_WELL_CENTER = {"lat": 70.36, "lon": -149.30, "zoom": 7.30}
-base.AU_COLORS = {
-    "Brookian Foreset-Bottomset": "rgba(20, 123, 133, 0.18)",
-    "Brookian Topset": "rgba(52, 144, 220, 0.13)",
-    "Beaufortian Strata North": "rgba(245, 158, 11, 0.12)",
-    "Beaufortian Strata South": "rgba(245, 158, 11, 0.08)",
-    "Ellesmerian Strata North": "rgba(111, 105, 190, 0.13)",
-    "Ellesmerian Strata South": "rgba(111, 105, 190, 0.09)",
+PRIMARY_WELL_CASES = ["MTE", "IGS", "Hydrate-01", "HYDRATE 02"]
+PROJECT_WELL_COLORS = {
+    "MTE": "#be123c",
+    "IGS": "#0f766e",
+    "Hydrate-01": "#7c3aed",
+    "HYDRATE 02": "#ea580c",
 }
-base.AU_LINE_COLORS = {
-    "Brookian Foreset-Bottomset": "rgba(20, 123, 133, 0.76)",
-    "Brookian Topset": "rgba(52, 144, 220, 0.72)",
-    "Beaufortian Strata North": "rgba(217, 119, 6, 0.70)",
-    "Beaufortian Strata South": "rgba(180, 83, 9, 0.66)",
-    "Ellesmerian Strata North": "rgba(111, 105, 190, 0.72)",
-    "Ellesmerian Strata South": "rgba(81, 69, 160, 0.66)",
+DISPLAY_OFFSETS = {
+    # marker offsets are only for readability on the public presentation map;
+    # hover text keeps the public bottomhole coordinate available.
+    "MTE": {"lon": -0.035, "lat": 0.030, "position": "top left"},
+    "IGS": {"lon": -0.020, "lat": -0.020, "position": "bottom right"},
+    "Hydrate-01": {"lon": -0.070, "lat": -0.055, "position": "bottom left"},
+    "HYDRATE 02": {"lon": 0.070, "lat": 0.050, "position": "top right"},
 }
-base.FIELD_LABELS = [
-    {"label": "Great Mooses Tooth", "lon": -153.12, "lat": 70.15},
-    {"label": "Colville River", "lon": -151.47, "lat": 70.44},
-    {"label": "Pikka", "lon": -150.52, "lat": 70.53},
-    {"label": "Kuparuk River", "lon": -149.90, "lat": 70.20},
-    {"label": "Milne Point", "lon": -149.55, "lat": 70.68},
-    {"label": "Nikaitchuq", "lon": -149.28, "lat": 70.86},
-    {"label": "Prudhoe Bay", "lon": -148.57, "lat": 70.30},
-    {"label": "Northstar", "lon": -147.48, "lat": 70.78},
+FIELD_LABELS = [
+    {"label": "Greater Mooses Tooth", "lon": -153.15, "lat": 70.05, "size": 13},
+    {"label": "Colville River", "lon": -151.55, "lat": 70.39, "size": 13},
+    {"label": "Pikka", "lon": -150.65, "lat": 70.46, "size": 13},
+    {"label": "Kuparuk River", "lon": -149.95, "lat": 70.17, "size": 13},
+    {"label": "Milne Point", "lon": -149.55, "lat": 70.66, "size": 13},
+    {"label": "Nikaitchuq", "lon": -149.28, "lat": 70.84, "size": 13},
+    {"label": "Prudhoe Bay", "lon": -148.58, "lat": 70.23, "size": 13},
+    {"label": "Northstar", "lon": -147.48, "lat": 70.78, "size": 13},
 ]
-base.CORRIDOR_LINES = [
-    {
-        "name": "TAPS / Dalton corridor",
-        "lon": [-148.64, -148.56, -148.49, -148.44, -148.38, -148.34],
-        "lat": [70.44, 70.17, 69.91, 69.64, 69.38, 69.12],
-        "color": "rgba(146, 64, 14, 0.88)",
-        "width": 4,
-    },
+MANUAL_TAPS_LINE = {
+    "lon": [-148.63, -148.57, -148.51, -148.46, -148.40, -148.35],
+    "lat": [70.45, 70.18, 69.92, 69.64, 69.38, 69.14],
+}
+FIELD_TREND_GUIDES = [
     {
         "name": "Public field trend guide",
-        "lon": [-153.45, -152.25, -150.90, -149.60, -148.50, -147.20],
-        "lat": [70.03, 70.20, 70.32, 70.42, 70.40, 70.34],
-        "color": "rgba(15, 118, 110, 0.52)",
-        "width": 2,
+        "lon": [-153.4, -152.1, -150.85, -149.65, -148.45, -147.25],
+        "lat": [70.02, 70.20, 70.32, 70.41, 70.39, 70.33],
+        "color": "rgba(15, 118, 110, 0.58)",
+        "width": 2.4,
+    },
+    {
+        "name": "Regional structural guide",
+        "lon": [-153.6, -152.5, -151.4, -150.1, -148.9, -147.7],
+        "lat": [69.50, 69.62, 69.78, 69.95, 70.05, 70.10],
+        "color": "rgba(8, 83, 104, 0.45)",
+        "width": 1.6,
     },
 ]
-
-TEXT_POSITIONS = {
-    "MTE": "top left",
-    "IGS": "bottom right",
-    "Hydrate-01": "bottom left",
-    "HYDRATE 02": "top right",
-}
-SHORT_LABELS = {
-    "MTE": "MTE / Mount Elbert",
-    "IGS": "IGS / Ignik Sikumi",
-    "Hydrate-01": "Hydrate-01",
-    "HYDRATE 02": "HYDRATE 02",
+CENTER_FOR_REFERENCE = {"lat": 70.28, "lon": -149.95, "zoom": 5.65}
+FULL_CONTEXT_CENTER = {"lat": 70.1, "lon": -151.1, "zoom": 4.7}
+FOUR_WELL_CENTER = {"lat": 70.36, "lon": -149.3, "zoom": 7.6}
+LAYER_STYLES = {
+    "assessment": {
+        "line": "rgba(8, 83, 104, 0.70)",
+        "width": 2.0,
+        "fill": "rgba(20, 123, 133, 0.12)",
+    },
+    "field_unit": {
+        "line": "rgba(100, 116, 139, 0.72)",
+        "width": 1.2,
+        "fill": "rgba(148, 163, 184, 0.08)",
+    },
+    "road": {"line": "rgba(234, 88, 12, 0.60)", "width": 1.0, "fill": None},
+    "extent": {"line": "rgba(8, 83, 104, 0.96)", "width": 3.2, "fill": None},
+    "fault_contact": {"line": "rgba(8, 83, 104, 0.46)", "width": 1.3, "fill": None},
 }
 
 
@@ -74,14 +78,29 @@ def _as_number(series: pd.Series) -> pd.Series:
     return pd.to_numeric(series, errors="coerce")
 
 
+def _sample_rows(frame: pd.DataFrame, max_rows: int) -> pd.DataFrame:
+    if len(frame) <= max_rows:
+        return frame
+    step = max(1, len(frame) // max_rows)
+    return frame.iloc[::step].head(max_rows)
+
+
+def _context(app_module) -> pd.DataFrame:
+    master_2d = getattr(app_module, "MASTER_2D", None)
+    columns = ["layer_name", "feature_id", "vertex_order", "lon", "lat", "depth_m", "au_name"]
+    if master_2d is not None and Path(master_2d).exists():
+        return pd.read_parquet(Path(master_2d), columns=columns).copy()
+    return app_module.load_regional_context().copy()
+
+
 def _primary_cases(case_index: pd.DataFrame) -> pd.DataFrame:
     if case_index.empty:
         return pd.DataFrame()
     frame = case_index[
-        case_index["well_case"].isin(base.PRIMARY_WELLS)
+        case_index["well_case"].isin(PRIMARY_WELL_CASES)
         & case_index["case_role"].isin(map_v2.PRIMARY_CASE_ROLES)
     ].copy()
-    frame["well_case"] = pd.Categorical(frame["well_case"], base.PRIMARY_WELLS, ordered=True)
+    frame["well_case"] = pd.Categorical(frame["well_case"], PRIMARY_WELL_CASES, ordered=True)
     return frame.sort_values("well_case")
 
 
@@ -95,90 +114,171 @@ def _with_plot_locations(frame: pd.DataFrame) -> pd.DataFrame:
         "true_vertical_depth_ft",
         "driller_total_depth_ft",
     ]:
-        if column in frame:
+        if column in frame.columns:
             frame[column] = _as_number(frame[column])
     frame["plot_lat"] = frame["bottomhole_latitude"].fillna(frame["wellhead_latitude"])
     frame["plot_lon"] = frame["bottomhole_longitude"].fillna(frame["wellhead_longitude"])
     return frame.dropna(subset=["plot_lat", "plot_lon"])
 
 
-def _replicated_add_context_lines(
+def _layer_matches(layer_name: str, keywords: list[str], exclude: list[str] | None = None) -> bool:
+    text = str(layer_name).lower().replace("-", "_").replace(" ", "_")
+    if exclude and any(word in text for word in exclude):
+        return False
+    return any(word in text for word in keywords)
+
+
+def _add_layer_by_keywords(
     figure: go.Figure,
     context: pd.DataFrame,
-    layer_name: str,
-    name: str,
-    color: str,
-    width: float,
-    max_features: int,
-    max_points: int,
-    fill: str | None = None,
-    fillcolor: str | None = None,
-) -> None:
-    layer = context[context["layer_name"].eq(layer_name)].copy()
-    if layer.empty:
-        return
+    keywords: list[str],
+    label: str,
+    style_key: str,
+    max_features: int = 90,
+    max_points: int = 500,
+    exclude: list[str] | None = None,
+) -> int:
+    if context.empty or "layer_name" not in context.columns or "feature_id" not in context.columns:
+        return 0
+    names = [name for name in context["layer_name"].dropna().unique() if _layer_matches(str(name), keywords, exclude)]
+    if not names:
+        return 0
+    layer = context[context["layer_name"].isin(names)].copy()
     layer["lon"] = _as_number(layer["lon"])
     layer["lat"] = _as_number(layer["lat"])
-    layer = layer.dropna(subset=["feature_id", "vertex_order", "lon", "lat"])
+    layer = layer.dropna(subset=["feature_id", "lon", "lat"])
+    if layer.empty:
+        return 0
+    style = LAYER_STYLES[style_key]
     feature_ids = layer["feature_id"].drop_duplicates().tolist()
     if len(feature_ids) > max_features:
         step = max(1, len(feature_ids) // max_features)
         feature_ids = feature_ids[::step][:max_features]
     layer = layer[layer["feature_id"].isin(feature_ids)]
+    count = 0
     showlegend = True
     for _, rows in layer.groupby("feature_id", sort=False):
-        rows = base._sample_rows(rows.sort_values("vertex_order"), max_points)
+        if "vertex_order" in rows.columns:
+            rows = rows.sort_values("vertex_order")
+        rows = _sample_rows(rows, max_points)
+        fill = "toself" if style.get("fill") and len(rows) > 2 else None
         figure.add_trace(
             go.Scattermapbox(
                 lon=rows["lon"],
                 lat=rows["lat"],
                 mode="lines",
-                name=name,
-                showlegend=showlegend,
                 fill=fill,
-                fillcolor=fillcolor,
-                line={"color": color, "width": width},
-                hovertemplate=f"<b>{name}</b><extra></extra>",
+                fillcolor=style.get("fill"),
+                name=label,
+                showlegend=showlegend,
+                legendgroup=label,
+                line={"color": style["line"], "width": style["width"]},
+                hovertemplate=f"<b>{label}</b><br>Public map context layer<extra></extra>",
             )
         )
         showlegend = False
+        count += 1
+    return count
 
 
-def _replicated_add_case_points(figure: go.Figure, rows: pd.DataFrame) -> None:
-    rows = _with_plot_locations(rows)
-    if rows.empty:
-        return
-    primary = rows[rows["well_case"].isin(base.PRIMARY_WELLS)].copy()
-    optional = rows[~rows["well_case"].isin(base.PRIMARY_WELLS)].copy()
-
-    for row in primary.itertuples(index=False):
-        well_case = str(row.well_case)
-        color = base.WELL_COLORS.get(well_case, "#0f172a")
-        label = SHORT_LABELS.get(well_case, str(row.map_label))
-        position = TEXT_POSITIONS.get(well_case, "top right")
+def _add_manual_lines(figure: go.Figure) -> None:
+    figure.add_trace(
+        go.Scattermapbox(
+            lon=MANUAL_TAPS_LINE["lon"],
+            lat=MANUAL_TAPS_LINE["lat"],
+            mode="lines",
+            name="TAPS / Dalton corridor",
+            line={"color": "rgba(120, 53, 15, 0.94)", "width": 4.0},
+            hovertemplate="<b>TAPS / Dalton corridor</b><extra></extra>",
+        )
+    )
+    for line in FIELD_TREND_GUIDES:
         figure.add_trace(
             go.Scattermapbox(
-                lon=[row.plot_lon],
-                lat=[row.plot_lat],
+                lon=line["lon"],
+                lat=line["lat"],
+                mode="lines",
+                name=line["name"],
+                showlegend=False,
+                line={"color": line["color"], "width": line["width"]},
+                hovertemplate=f"<b>{line['name']}</b><extra></extra>",
+            )
+        )
+
+
+def _add_field_labels(figure: go.Figure) -> None:
+    # white halo pass
+    figure.add_trace(
+        go.Scattermapbox(
+            lon=[item["lon"] for item in FIELD_LABELS],
+            lat=[item["lat"] for item in FIELD_LABELS],
+            text=[item["label"] for item in FIELD_LABELS],
+            mode="text",
+            showlegend=False,
+            hoverinfo="skip",
+            textfont={"size": 15, "color": "#ffffff"},
+        )
+    )
+    figure.add_trace(
+        go.Scattermapbox(
+            lon=[item["lon"] for item in FIELD_LABELS],
+            lat=[item["lat"] for item in FIELD_LABELS],
+            text=[item["label"] for item in FIELD_LABELS],
+            mode="text",
+            showlegend=False,
+            hoverinfo="skip",
+            textfont={"size": 13, "color": "#0f172a"},
+        )
+    )
+
+
+def _add_project_wells(figure: go.Figure, case_index: pd.DataFrame) -> None:
+    wells = _with_plot_locations(_primary_cases(case_index))
+    if wells.empty:
+        return
+    for row in wells.itertuples(index=False):
+        well_case = str(row.well_case)
+        color = PROJECT_WELL_COLORS.get(well_case, "#0f172a")
+        offset = DISPLAY_OFFSETS.get(well_case, {"lon": 0.0, "lat": 0.0, "position": "top right"})
+        display_lon = float(row.plot_lon) + float(offset["lon"])
+        display_lat = float(row.plot_lat) + float(offset["lat"])
+        label = str(row.map_label)
+        position = str(offset["position"])
+        # subtle connector only when display point is offset from the public coordinate
+        if abs(display_lon - float(row.plot_lon)) > 0.001 or abs(display_lat - float(row.plot_lat)) > 0.001:
+            figure.add_trace(
+                go.Scattermapbox(
+                    lon=[row.plot_lon, display_lon],
+                    lat=[row.plot_lat, display_lat],
+                    mode="lines",
+                    showlegend=False,
+                    hoverinfo="skip",
+                    line={"color": color, "width": 1.2},
+                )
+            )
+        figure.add_trace(
+            go.Scattermapbox(
+                lon=[display_lon],
+                lat=[display_lat],
+                text=[label],
                 mode="text",
                 showlegend=False,
-                text=[label],
+                hoverinfo="skip",
                 textposition=position,
                 textfont={"size": 16, "color": "#ffffff"},
-                hoverinfo="skip",
             )
         )
         figure.add_trace(
             go.Scattermapbox(
-                lon=[row.plot_lon],
-                lat=[row.plot_lat],
+                lon=[display_lon],
+                lat=[display_lat],
+                text=[label],
                 mode="markers+text",
                 name=label,
-                showlegend=True,
-                marker={"size": 16, "color": color, "opacity": 0.98},
-                text=[label],
+                showlegend=False,
                 textposition=position,
-                textfont={"size": 12, "color": "#0f172a"},
+                textfont={"size": 12, "color": color},
+                marker={"size": 17, "color": color, "opacity": 0.98, "line": {"color": "white", "width": 1.6}},
                 customdata=[
                     [
                         row.verified_public_well_name,
@@ -188,6 +288,8 @@ def _replicated_add_case_points(figure: go.Figure, rows: pd.DataFrame) -> None:
                         row.driller_total_depth_ft,
                         row.evidence_status,
                         row.website_use_note,
+                        row.plot_lon,
+                        row.plot_lat,
                     ]
                 ],
                 hovertemplate=(
@@ -198,105 +300,121 @@ def _replicated_add_case_points(figure: go.Figure, rows: pd.DataFrame) -> None:
                     "TVD / TD: %{customdata[3]} / %{customdata[4]} ft<br>"
                     "Evidence: %{customdata[5]}<br>"
                     "Website use: %{customdata[6]}<br>"
-                    "Lon/lat: %{lon:.5f}, %{lat:.5f}<extra></extra>"
+                    "Public coordinate lon/lat: %{customdata[7]:.5f}, %{customdata[8]:.5f}<extra></extra>"
                 ),
             )
         )
 
-    if optional.empty:
-        return
-    for role, group in optional.groupby("case_role", dropna=False):
-        role_key = str(role)
-        figure.add_trace(
-            go.Scattermapbox(
-                lon=group["plot_lon"],
-                lat=group["plot_lat"],
-                mode="markers",
-                showlegend=False,
-                name=base.ROLE_LABELS.get(role_key, role_key),
-                marker={"size": 8, "color": base.ROLE_COLORS.get(role_key, "#475569"), "opacity": 0.70},
-                text=group["map_label"],
-                hovertemplate="<b>%{text}</b><br>Optional associated public anchor<extra></extra>",
-            )
-        )
 
-
-def _add_static_style_backdrop(figure: go.Figure) -> None:
-    """Add pale ocean/land rectangles to mimic the original drawing's quiet base."""
-    # The basemap is still there for interactivity, but these fills make the map
-    # read more like the original static drawing and less like a generic web map.
+def _add_optional_public_wells(figure: go.Figure, app_module) -> int:
+    wells = app_module.load_north_slope_wells().copy()
+    if wells.empty:
+        return 0
+    wells["lon"] = _as_number(wells["lon"])
+    wells["lat"] = _as_number(wells["lat"])
+    wells = wells.dropna(subset=["lon", "lat"])
+    wells = wells[wells["lon"].between(-154.5, -146.7) & wells["lat"].between(69.2, 71.0)]
+    wells = _sample_rows(wells.sort_values(["lon", "lat"]), 650)
+    if wells.empty:
+        return 0
     figure.add_trace(
         go.Scattermapbox(
-            lon=[-157.2, -145.4, -145.4, -157.2, -157.2],
-            lat=[71.15, 71.15, 68.90, 68.90, 71.15],
-            mode="lines",
-            fill="toself",
-            fillcolor="rgba(218, 235, 239, 0.32)",
-            line={"color": "rgba(218,235,239,0.0)", "width": 0},
-            showlegend=False,
-            hoverinfo="skip",
-            name="Pale map backdrop",
+            lon=wells["lon"],
+            lat=wells["lat"],
+            mode="markers",
+            name="Public well background",
+            marker={"size": 3.0, "color": "rgba(15,23,42,0.20)"},
+            hovertemplate="Public well<br>Lon/lat: %{lon:.3f}, %{lat:.3f}<extra></extra>",
         )
     )
+    return len(wells)
 
 
-def build_reference_replicated_map(
+def build_reference_style_no_seismic_map(
     app_module,
     case_index: pd.DataFrame,
     mode: str,
-    show_background_wells: bool,
     show_assessment_units: bool,
-    show_labels: bool,
-    show_seismic: bool,
-    show_optional: bool,
-) -> go.Figure:
-    context = base._context(app_module)
-    rows = case_index.copy() if show_optional else _primary_cases(case_index)
-    center = base._center_for_mode(mode, case_index)
+    show_units_roads_taps: bool,
+    show_geologic_lines: bool,
+    show_public_wells: bool,
+    show_extent: bool,
+) -> tuple[go.Figure, dict[str, int]]:
+    context = _context(app_module)
     figure = go.Figure()
+    counts: dict[str, int] = {}
 
-    # Original drawing order: quiet base -> AU/geology fills -> seismic/unit
-    # outlines -> boundary/corridor -> labels -> project wells.
-    _add_static_style_backdrop(figure)
     if show_assessment_units:
-        base._add_assessment_units(figure, context, True)
-    if show_seismic:
-        _replicated_add_context_lines(
+        counts["assessment_units"] = _add_layer_by_keywords(
             figure,
             context,
-            "seismic_3d_inventory",
-            "3D seismic / public footprint",
-            "rgba(234,88,12,0.46)",
-            1.0,
+            ["assessment", "au"],
+            "Hydrate assessment-unit context",
+            "assessment",
             max_features=80,
-            max_points=320,
-            fill="toself",
-            fillcolor="rgba(234,88,12,0.10)",
+            max_points=700,
+            exclude=["seismic"],
         )
-        _replicated_add_context_lines(
+    if show_units_roads_taps:
+        counts["field_unit_outlines"] = _add_layer_by_keywords(
             figure,
             context,
-            "seismic_2d",
-            "2D seismic coverage",
-            "rgba(14,165,233,0.34)",
-            0.75,
-            max_features=180,
-            max_points=240,
+            ["field", "unit", "pool"],
+            "Field / unit outline",
+            "field_unit",
+            max_features=120,
+            max_points=500,
+            exclude=["seismic"],
         )
-    _replicated_add_context_lines(figure, context, "extent", "North Slope study boundary", "#0f172a", 2.2, 8, 50)
-    if show_labels:
-        base._add_coded_labels(figure, mode, True)
-    if show_background_wells:
-        base._add_background_wells(figure, app_module, mode, True)
-    if not rows.empty:
-        # Keep paths very subtle; the original screenshot primarily read as points.
-        base._add_well_paths(figure, rows)
-        _replicated_add_case_points(figure, rows)
+        counts["road_corridor"] = _add_layer_by_keywords(
+            figure,
+            context,
+            ["road"],
+            "Road corridor",
+            "road",
+            max_features=80,
+            max_points=500,
+            exclude=["seismic"],
+        )
+    if show_geologic_lines:
+        counts["fault_contacts_geology"] = _add_layer_by_keywords(
+            figure,
+            context,
+            ["fault", "contact", "geology", "fold"],
+            "Fault/contact/geology line",
+            "fault_contact",
+            max_features=120,
+            max_points=500,
+            exclude=["seismic"],
+        )
+    if show_extent:
+        counts["study_boundary"] = _add_layer_by_keywords(
+            figure,
+            context,
+            ["extent", "boundary"],
+            "North Slope study boundary",
+            "extent",
+            max_features=8,
+            max_points=80,
+            exclude=["seismic"],
+        )
+
+    _add_manual_lines(figure)
+    _add_field_labels(figure)
+    if show_public_wells:
+        counts["public_wells"] = _add_optional_public_wells(figure, app_module)
+    _add_project_wells(figure, case_index)
+
+    center = CENTER_FOR_REFERENCE
+    if mode == "Four-well close-up":
+        center = FOUR_WELL_CENTER
+    elif mode == "Full North Slope context":
+        center = FULL_CONTEXT_CENTER
 
     figure.update_layout(
-        title={"text": f"North Slope public 2D map: {mode}", "x": 0.01, "font": {"size": 16}},
-        height=660 if mode == "Code-built source map" else 650,
-        margin={"l": 0, "r": 0, "t": 45, "b": 0},
+        title={"text": "North Slope reference-style project well map", "x": 0.01, "font": {"size": 17}},
+        height=680 if mode == "Code-built source map" else 650,
+        margin={"l": 0, "r": 0, "t": 48, "b": 0},
         paper_bgcolor="white",
         showlegend=False,
         mapbox={
@@ -307,33 +425,31 @@ def build_reference_replicated_map(
             "pitch": 0,
         },
     )
-    return figure
+    return figure, counts
 
 
 def render_regional_atlas_clean(app_module) -> None:
     st = app_module.st
     project_root = app_module.PROJECT_ROOT
     case_index = map_v2.load_four_well_case_index(project_root)
-    context = base._context(app_module)
     primary = _primary_cases(case_index)
-    optional = case_index[~case_index["well_case"].isin(base.PRIMARY_WELLS)].copy() if not case_index.empty else pd.DataFrame()
 
     st.markdown('<div class="atlas-kicker">Regional context</div>', unsafe_allow_html=True)
     st.title("Regional 2D Map")
     st.write(
-        "Interactive recreation of the original North Slope drawing: same central crop, same layer order, same field-label logic, and the correct four project wells shown by default."
+        "Reference-style rebuild of the North Slope map: same central crop/label logic as the slide map, corrected four-well names, and seismic layers removed from the default map."
     )
     st.warning(
-        "Public-source context only: this map does not show approved log rows, core rows, trained models, predictions, hydrate occurrence, or saturation results."
+        "Public-source context only. This map does not show approved log rows, core rows, trained models, predictions, hydrate occurrence, or saturation results."
     )
 
-    metrics = st.columns(4)
-    metrics[0].metric("Correct project wells", f"{len(primary):,}")
-    metrics[1].metric("Optional anchors hidden", f"{len(optional):,}")
-    metrics[2].metric("Public wells default", "Off")
-    metrics[3].metric("Assessment units", f"{context[context['layer_name'].eq('assessment_units')]['au_name'].nunique():,}")
+    metric_cols = st.columns(4)
+    metric_cols[0].metric("Correct project wells", f"{len(primary):,}")
+    metric_cols[1].metric("Seismic layers", "Removed")
+    metric_cols[2].metric("Public wells default", "Off")
+    metric_cols[3].metric("Map purpose", "Context only")
 
-    controls = st.columns([1.2, 1, 1, 1, 1, 1])
+    controls = st.columns([1.25, 1, 1, 1, 1, 1])
     with controls[0]:
         mode = st.radio(
             "Map focus",
@@ -341,75 +457,67 @@ def render_regional_atlas_clean(app_module) -> None:
             index=0,
         )
     with controls[1]:
-        show_background_wells = st.checkbox("Public wells", value=False)
-    with controls[2]:
         show_assessment_units = st.checkbox("Assessment units", value=True)
+    with controls[2]:
+        show_units_roads_taps = st.checkbox("Units / TAPS", value=True)
     with controls[3]:
-        show_labels = st.checkbox("Field labels", value=True)
+        show_geologic_lines = st.checkbox("Geology lines", value=True)
     with controls[4]:
-        show_seismic = st.checkbox("Seismic context", value=True)
+        show_public_wells = st.checkbox("Public wells", value=False)
     with controls[5]:
-        show_optional = st.checkbox("Optional anchors", value=False)
+        show_extent = st.checkbox("Study boundary", value=True)
 
-    figure = build_reference_replicated_map(
+    figure, counts = build_reference_style_no_seismic_map(
         app_module,
         case_index,
-        mode,
-        show_background_wells,
-        show_assessment_units,
-        show_labels,
-        show_seismic,
-        show_optional,
+        mode=mode,
+        show_assessment_units=show_assessment_units,
+        show_units_roads_taps=show_units_roads_taps,
+        show_geologic_lines=show_geologic_lines,
+        show_public_wells=show_public_wells,
+        show_extent=show_extent,
     )
 
     if mode == "Code-built source map":
-        map_col, curve_col = st.columns([2.25, 1])
+        map_col, curve_col = st.columns([2.35, 1])
         with map_col:
             st.plotly_chart(figure, use_container_width=True, config={"displayModeBar": True, "responsive": True})
         with curve_col:
             st.plotly_chart(base.build_stability_inset(project_root), use_container_width=True, config={"displayModeBar": True, "responsive": True})
-            st.caption("Inset recreates the public stability concept interactively from the digitized methane 5 ppt phase curve.")
+            st.caption("Inset is public thermodynamic context only; it is not hydrate proof.")
     else:
         st.plotly_chart(figure, use_container_width=True, config={"displayModeBar": True, "responsive": True})
 
     st.caption(
-        "Default layer stack: pale map backdrop, assessment/geology context, 3D footprints, 2D seismic, study boundary, TAPS/field guide, field labels, and the four project wells."
-    )
-
-    st.download_button(
-        "Download interactive 2D map HTML",
-        figure.to_html(include_plotlyjs="cdn", full_html=True).encode("utf-8"),
-        "north_slope_reference_replicated_interactive_map.html",
-        "text/html",
-        key="download_reference_replicated_map_html",
+        "Default visible layers: assessment context, unit/field outlines where available, TAPS/field-guide lines, geologic/context lines, study boundary, manual field labels, and the four project wells. Seismic layers are not drawn."
     )
 
     with st.expander("Correct four project wells", expanded=True):
-        columns = [
-            "well_case",
-            "map_label",
-            "verified_public_well_name",
-            "field",
-            "current_status",
-            "wellhead_latitude",
-            "wellhead_longitude",
-            "bottomhole_latitude",
-            "bottomhole_longitude",
-            "true_vertical_depth_ft",
-            "driller_total_depth_ft",
-            "evidence_status",
-            "workbook_mapping_status",
-            "website_use_note",
-        ]
-        st.dataframe(primary[[column for column in columns if column in primary.columns]], use_container_width=True, hide_index=True)
-
-    with st.expander("Optional associated public anchors", expanded=False):
-        if optional.empty:
-            st.info("No associated public-anchor rows are available.")
+        if primary.empty:
+            st.info("No primary project-well rows were found in the public four-well index.")
         else:
-            columns = ["well_case", "case_role", "map_label", "verified_public_well_name", "field", "current_status", "website_use_note", "remaining_question"]
-            st.dataframe(optional[[column for column in columns if column in optional.columns]], use_container_width=True, hide_index=True)
+            columns = [
+                "well_case",
+                "map_label",
+                "verified_public_well_name",
+                "field",
+                "current_status",
+                "bottomhole_latitude",
+                "bottomhole_longitude",
+                "true_vertical_depth_ft",
+                "driller_total_depth_ft",
+                "evidence_status",
+                "website_use_note",
+            ]
+            st.dataframe(primary[[column for column in columns if column in primary.columns]], use_container_width=True, hide_index=True)
 
-    with st.expander("Reference-only legacy regional scene", expanded=False):
-        st.caption("The older generated scene is retained only as a reference. The map above is the primary website map.")
-        app_module.render_scene(app_module.REGIONAL_SCENE, height=870)
+    with st.expander("Layer counts and audit", expanded=False):
+        st.dataframe(pd.DataFrame([{"layer_group": key, "features_drawn": value} for key, value in counts.items()]), use_container_width=True, hide_index=True)
+
+    st.download_button(
+        "Download reference-style map HTML",
+        figure.to_html(include_plotlyjs="cdn", full_html=True).encode("utf-8"),
+        "north_slope_reference_style_no_seismic_map.html",
+        "text/html",
+        key="download_reference_style_no_seismic_map_html",
+    )
