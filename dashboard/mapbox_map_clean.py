@@ -7,19 +7,20 @@ from dashboard import map_v2
 from dashboard import mapbox_map as base
 
 
-# Cleaner mobile-first view after visual QA.  The previous map was technically
-# interactive but still looked too crowded on a phone because background wells,
-# labels, and primary-well text were all plotted in the same place.
-base.CODE_MAP_CENTER = {"lat": 70.30, "lon": -150.05, "zoom": 5.35}
-base.FOUR_WELL_CENTER = {"lat": 70.36, "lon": -149.28, "zoom": 7.70}
+# Mobile-first clean view after live Streamlit QA.
+# Goal: match the original reference map style more closely: central North Slope,
+# readable field labels, correct four wells, no long crossing leader lines, and no
+# oversized Plotly legend stealing the phone screen.
+base.CODE_MAP_CENTER = {"lat": 70.34, "lon": -150.15, "zoom": 5.05}
+base.FOUR_WELL_CENTER = {"lat": 70.35, "lon": -149.32, "zoom": 7.45}
 base.FIELD_LABELS = [
     {"label": "Great Mooses Tooth", "lon": -153.05, "lat": 70.10},
-    {"label": "Colville River", "lon": -151.30, "lat": 70.37},
-    {"label": "Pikka", "lon": -150.58, "lat": 70.50},
-    {"label": "Kuparuk River", "lon": -149.92, "lat": 70.16},
-    {"label": "Milne Point", "lon": -149.58, "lat": 70.66},
+    {"label": "Colville River", "lon": -151.32, "lat": 70.40},
+    {"label": "Pikka", "lon": -150.58, "lat": 70.52},
+    {"label": "Kuparuk River", "lon": -149.92, "lat": 70.15},
+    {"label": "Milne Point", "lon": -149.58, "lat": 70.67},
     {"label": "Nikaitchuq", "lon": -149.34, "lat": 70.83},
-    {"label": "Prudhoe Bay", "lon": -148.55, "lat": 70.24},
+    {"label": "Prudhoe Bay", "lon": -148.55, "lat": 70.20},
     {"label": "Northstar", "lon": -147.58, "lat": 70.77},
 ]
 base.CORRIDOR_LINES = [
@@ -27,23 +28,29 @@ base.CORRIDOR_LINES = [
         "name": "TAPS / Dalton corridor",
         "lon": [-148.60, -148.54, -148.49, -148.44, -148.38, -148.34],
         "lat": [70.39, 70.15, 69.90, 69.64, 69.38, 69.12],
-        "color": "#92400e",
+        "color": "rgba(146, 64, 14, 0.86)",
         "width": 4,
     },
     {
         "name": "Public field trend guide",
         "lon": [-153.40, -152.20, -150.85, -149.60, -148.55, -147.25],
         "lat": [70.02, 70.20, 70.31, 70.41, 70.39, 70.33],
-        "color": "#0f766e",
+        "color": "rgba(15, 118, 110, 0.56)",
         "width": 2,
     },
 ]
 
-PRIMARY_LABEL_POINTS = {
-    "MTE": {"lon": -149.82, "lat": 70.63, "label": "MTE / Mount Elbert"},
-    "IGS": {"lon": -148.88, "lat": 70.12, "label": "IGS / Ignik Sikumi"},
-    "Hydrate-01": {"lon": -149.88, "lat": 70.00, "label": "Hydrate-01"},
-    "HYDRATE 02": {"lon": -148.56, "lat": 70.58, "label": "HYDRATE 02"},
+TEXT_POSITIONS = {
+    "MTE": "top left",
+    "IGS": "bottom right",
+    "Hydrate-01": "bottom left",
+    "HYDRATE 02": "top right",
+}
+SHORT_LABELS = {
+    "MTE": "MTE / Mount Elbert",
+    "IGS": "IGS / Ignik Sikumi",
+    "Hydrate-01": "Hydrate-01",
+    "HYDRATE 02": "HYDRATE 02",
 }
 
 
@@ -90,18 +97,20 @@ def _clean_add_case_points(figure: go.Figure, rows: pd.DataFrame) -> None:
     for row in primary.itertuples(index=False):
         well_case = str(row.well_case)
         color = base.WELL_COLORS.get(well_case, "#0f172a")
-        label_point = PRIMARY_LABEL_POINTS.get(
-            well_case,
-            {"lon": row.plot_lon + 0.15, "lat": row.plot_lat + 0.10, "label": str(row.map_label)},
-        )
+        label = SHORT_LABELS.get(well_case, str(row.map_label))
+        position = TEXT_POSITIONS.get(well_case, "top right")
+
+        # White halo first, then colored marker/text. This keeps labels readable
+        # without long leader lines crossing the map.
         figure.add_trace(
             go.Scattermapbox(
-                lon=[row.plot_lon, label_point["lon"]],
-                lat=[row.plot_lat, label_point["lat"]],
-                mode="lines",
-                name="Project-well label leader",
+                lon=[row.plot_lon],
+                lat=[row.plot_lat],
+                mode="text",
                 showlegend=False,
-                line={"color": color, "width": 2},
+                text=[label],
+                textposition=position,
+                textfont={"size": 16, "color": "#ffffff"},
                 hoverinfo="skip",
             )
         )
@@ -109,9 +118,13 @@ def _clean_add_case_points(figure: go.Figure, rows: pd.DataFrame) -> None:
             go.Scattermapbox(
                 lon=[row.plot_lon],
                 lat=[row.plot_lat],
-                mode="markers",
-                name=str(row.map_label),
-                marker={"size": 18, "color": color, "opacity": 0.98},
+                mode="markers+text",
+                name=label,
+                showlegend=False,
+                marker={"size": 17, "color": color, "opacity": 0.98},
+                text=[label],
+                textposition=position,
+                textfont={"size": 12, "color": "#0f172a"},
                 customdata=[
                     [
                         row.verified_public_well_name,
@@ -124,7 +137,7 @@ def _clean_add_case_points(figure: go.Figure, rows: pd.DataFrame) -> None:
                     ]
                 ],
                 hovertemplate=(
-                    f"<b>{row.map_label}</b><br>"
+                    f"<b>{label}</b><br>"
                     "Public well: %{customdata[0]}<br>"
                     "Field: %{customdata[1]}<br>"
                     "Status: %{customdata[2]}<br>"
@@ -133,29 +146,6 @@ def _clean_add_case_points(figure: go.Figure, rows: pd.DataFrame) -> None:
                     "Website use: %{customdata[6]}<br>"
                     "Lon/lat: %{lon:.5f}, %{lat:.5f}<extra></extra>"
                 ),
-            )
-        )
-        # Plot a white halo text layer first so the label stays readable on mobile.
-        figure.add_trace(
-            go.Scattermapbox(
-                lon=[label_point["lon"]],
-                lat=[label_point["lat"]],
-                mode="text",
-                showlegend=False,
-                text=[label_point["label"]],
-                textfont={"size": 16, "color": "#ffffff"},
-                hoverinfo="skip",
-            )
-        )
-        figure.add_trace(
-            go.Scattermapbox(
-                lon=[label_point["lon"]],
-                lat=[label_point["lat"]],
-                mode="text",
-                showlegend=False,
-                text=[label_point["label"]],
-                textfont={"size": 14, "color": "#0f172a"},
-                hoverinfo="skip",
             )
         )
 
@@ -168,8 +158,9 @@ def _clean_add_case_points(figure: go.Figure, rows: pd.DataFrame) -> None:
                 lon=group["plot_lon"],
                 lat=group["plot_lat"],
                 mode="markers",
+                showlegend=False,
                 name=base.ROLE_LABELS.get(role_key, role_key),
-                marker={"size": 9, "color": base.ROLE_COLORS.get(role_key, "#475569"), "opacity": 0.78},
+                marker={"size": 8, "color": base.ROLE_COLORS.get(role_key, "#475569"), "opacity": 0.70},
                 text=group["map_label"],
                 hovertemplate="<b>%{text}</b><br>Optional associated public anchor<extra></extra>",
             )
@@ -177,7 +168,6 @@ def _clean_add_case_points(figure: go.Figure, rows: pd.DataFrame) -> None:
 
 
 def render_regional_atlas_clean(app_module) -> None:
-    # Patch the internal point renderer before building the map.
     base._add_case_points = _clean_add_case_points
 
     st = app_module.st
@@ -190,7 +180,7 @@ def render_regional_atlas_clean(app_module) -> None:
     st.markdown('<div class="atlas-kicker">Regional context</div>', unsafe_allow_html=True)
     st.title("Regional 2D Map")
     st.write(
-        "This cleaned default view is designed to match the reference map: central North Slope extent, readable field labels, the TAPS/Dalton corridor, seismic and assessment context, and only the four project wells shown by default."
+        "Cleaned to match the reference map: central North Slope extent, readable field labels, TAPS/Dalton corridor, seismic and assessment context, and only the four project wells shown by default."
     )
     st.warning(
         "Public-source context only: this map does not show approved log rows, core rows, trained models, predictions, hydrate occurrence, or saturation results."
@@ -231,13 +221,14 @@ def render_regional_atlas_clean(app_module) -> None:
         show_optional,
     )
     figure.update_layout(
-        title={"text": f"North Slope public 2D map: {mode}", "x": 0.01, "font": {"size": 17}},
-        legend={"orientation": "h", "y": -0.09, "x": 0, "font": {"size": 9}},
-        height=700 if mode == "Code-built source map" else 670,
+        title={"text": f"North Slope public 2D map: {mode}", "x": 0.01, "font": {"size": 16}},
+        showlegend=False,
+        height=660 if mode == "Code-built source map" else 650,
+        margin={"l": 0, "r": 0, "t": 45, "b": 0},
     )
 
     if mode == "Code-built source map":
-        map_col, curve_col = st.columns([2.15, 1])
+        map_col, curve_col = st.columns([2.25, 1])
         with map_col:
             st.plotly_chart(figure, use_container_width=True, config={"displayModeBar": True, "responsive": True})
         with curve_col:
@@ -245,6 +236,10 @@ def render_regional_atlas_clean(app_module) -> None:
             st.caption("Inset recreates the public stability concept interactively from the digitized methane 5 ppt phase curve.")
     else:
         st.plotly_chart(figure, use_container_width=True, config={"displayModeBar": True, "responsive": True})
+
+    st.caption(
+        "Visible by default: assessment units, seismic context, field labels, TAPS/Dalton corridor, and the four project wells. Public background wells and optional anchors are available by toggle."
+    )
 
     st.download_button(
         "Download interactive 2D map HTML",
