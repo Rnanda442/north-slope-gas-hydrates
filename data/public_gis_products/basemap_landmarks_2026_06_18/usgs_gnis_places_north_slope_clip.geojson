@@ -1,0 +1,73 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -150.989705910653,
+            70.2134825340456
+          ]
+        ],
+        "type": "MultiPoint"
+      },
+      "properties": {
+        "OBJECTID": 4815,
+        "gaz_name": "City of Nuiqsut"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -157.383538055661,
+            70.4810104707067
+          ],
+          [
+            -157.512876735684,
+            70.4673742681441
+          ],
+          [
+            -157.506487010983,
+            70.5081388877926
+          ],
+          [
+            -157.370109450398,
+            70.5189996606475
+          ]
+        ],
+        "type": "MultiPoint"
+      },
+      "properties": {
+        "OBJECTID": 3284,
+        "gaz_name": "City of Atqasuk"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -156.757186338607,
+            71.2730870714164
+          ],
+          [
+            -156.90851873853,
+            71.2342772026357
+          ],
+          [
+            -156.81237308314,
+            71.2400012600087
+          ]
+        ],
+        "type": "MultiPoint"
+      },
+      "properties": {
+        "OBJECTID": 26746,
+        "gaz_name": "City of Utqiag\u0307vik"
+      },
+      "type": "Feature"
+    }
+  ],
+  "type": "FeatureCollection"
+}

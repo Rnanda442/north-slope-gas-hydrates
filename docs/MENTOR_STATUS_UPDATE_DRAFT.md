@@ -107,7 +107,8 @@ results, or hydrate proof.
 
 1. Which of `Sgh`, `S_h`, `Sh`, or `NMR_SAT` should be treated as the
    authoritative saturation target when multiple exist?
-2. Are saturation values fractions or percentages in each sheet?
+2. Please confirm the recovered sheets consistently store saturation values as
+   fractions from 0 to 1.
 3. Should occurrence labels be derived from saturation thresholds, interpreted
    phase labels, or mentor-reviewed intervals?
 4. Are `MTE`, `IGS`, `MTE_refined`, and `IGS_refined` separate wells, separate

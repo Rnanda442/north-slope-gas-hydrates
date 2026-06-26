@@ -6,6 +6,6 @@ IV-04,hydrate_response_curve_family,Rt or RES or NMRPHI or Vp or Vs or impedance
 IV-05,target_leakage_barrier,X_allowed_candidate and Y_target_registry,No target_only or calibration_reference column appears in X_allowed,target_leakage_risk_in_x_allowed,Y-only labels must bypass predictors.
 IV-06,unresolved_mnemonics,source_column_registry,Unresolved fields such as AO90 or AF90 stay blocked until confirmed,unresolved_header,Fail closed when tool mnemonic is not confirmed.
 IV-07,occurrence_authority,Y_target_registry,Occurrence target has evidence type interval policy confidence and caveat,occurrence_target_requires_source_confidence_interval_policy,Occurrence is target evidence not stability output.
-IV-08,saturation_unit_policy,Y_target_registry,Saturation target has fraction or percent convention,saturation_target_requires_fraction_or_percent_unit_policy,Saturation labels need unit authority before regression.
+IV-08,saturation_unit_policy,Y_target_registry,Saturation target has fraction 0-1 convention recorded,saturation_target_requires_fraction_or_percent_unit_policy,Saturation labels need unit authority before regression.
 IV-09,whole_well_split,well_depth_index,Split group is assigned before preprocessing,whole_well_split_required_before_train_only_preprocessing,Preprocessing must be fit only on training wells.
 IV-10,public_boundary,public_release_status,Approved row values stay inside approved runtime,approved_rows_not_loaded_public_safe_validator,Public repo can show schema and summaries only.

@@ -107,7 +107,7 @@ These summary artifacts can be copied back after review:
 - MTE/IGS/refined sheet confirmation;
 - split candidate identifier summaries, with restricted identifiers anonymized;
 - occurrence evidence field presence;
-- saturation unit convention summary.
+- saturation fraction 0-1 consistency summary.
 
 ## Must Stay In OSL
 
@@ -138,7 +138,8 @@ For each workbook sheet or approved file, collect only public-safe summaries:
   processing stages, or source datasets;
 - split candidate identifiers or grouping fields, anonymized if restricted;
 - occurrence evidence fields and confidence fields;
-- saturation unit convention: fraction or percent;
+- whether saturation target/reference fields are consistently recorded as
+  fractions from 0 to 1;
 - whether stability context is allowed only as context, mask, confidence,
   caveat, or blocked reason.
 

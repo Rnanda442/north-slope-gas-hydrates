@@ -68,6 +68,28 @@ names, source families, units, dtypes, model roles, public-display status, and
 caveats. It includes V5.1 variable-fingerprint and mentor-question metadata,
 but no approved row values.
 
+`four_well_core_evidence_registry_2026-06-20.csv`
+
+This is the public-safe evidence-status table for MTE, IGS, Hydrate-01, and
+HYDRATE 02. It records which wells currently have log/NMR support, core or
+pressure-core support, source-only support, or unresolved core-row status. It
+does not contain row-level core measurements.
+
+`four_well_log_table_template_2026-06-20.csv`
+
+`four_well_core_sample_template_2026-06-20.csv`
+
+`four_well_split_registry_template_2026-06-20.csv`
+
+`four_well_runtime_manifest_template_2026-06-20.csv`
+
+These are the DOE/local runtime templates used by
+`01_pipeline/run_four_well_ml_pipeline.py`. Copy them into an ignored local
+runtime folder such as `approved_runtime/four_well/`, populate them with
+approved rows on the DOE laptop, and keep the populated copies out of Git. The
+runner can also read separate screenshot-style CSV exports such as `MTE.csv`,
+`IGS.csv`, `MTE_refined.csv`, and `IGS_refined.csv`.
+
 `intake_readiness_reports/demo_header_audit_2026-06-15.csv`
 
 `intake_readiness_reports/demo_header_audit_2026-06-15.json`
@@ -93,6 +115,10 @@ The schema-only templates are:
 - `model_run_tracker_summary_template_2026-06-16.csv`
 - `model_run_feature_audit_template_2026-06-16.csv`
 - `model_run_stability_join_template_2026-06-16.csv`
+- `four_well_log_table_template_2026-06-20.csv`
+- `four_well_core_sample_template_2026-06-20.csv`
+- `four_well_split_registry_template_2026-06-20.csv`
+- `four_well_runtime_manifest_template_2026-06-20.csv`
 
 These files are headers/schema only. They do not contain approved LAS/CSV/core
 rows, private workbook rows, occurrence probabilities, saturation predictions,

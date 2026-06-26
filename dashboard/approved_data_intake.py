@@ -106,6 +106,7 @@ SATURATION_UNIT_ALIASES = {
     "unit_convention",
     "fraction_or_percent_policy",
 }
+SATURATION_FRACTION_UNITS = {"fraction", "fraction_0_1", "0-1", "0_to_1"}
 STABILITY_CONTEXT_ALIASES = {
     "public stability context",
     "stability_context_features",
@@ -354,7 +355,7 @@ def build_variable_fingerprints(field_role_table: pd.DataFrame) -> pd.DataFrame:
         if unresolved_like:
             mentor_question = "Resolve header meaning or processing stage before model use."
         elif target_like:
-            mentor_question = "Confirm target authority, unit convention, and validation use."
+            mentor_question = "Confirm target authority, fraction 0-1 convention, and validation use."
         elif depth_like:
             mentor_question = "Confirm whether depth is alignment/context only or allowed as a predictor."
         elif "caliper" in original_key:
@@ -534,7 +535,7 @@ def validate_saturation_target_authority(
     saturation_fields = _saturation_rows(rows)["source_column"].tolist()
     authoritative_field = str((metadata or {}).get("authoritative_saturation_field", "")).strip()
     unit_convention = str((metadata or {}).get("saturation_unit_convention", "")).strip().lower()
-    authority_ready = authoritative_field in saturation_fields and unit_convention in {"fraction", "percent"}
+    authority_ready = authoritative_field in saturation_fields and unit_convention in SATURATION_FRACTION_UNITS
     return {
         "target_fields": saturation_fields,
         "authority_present": bool(saturation_fields) and authority_ready,
@@ -734,7 +735,11 @@ def validate_approved_data_intake(
     has_hydrate_response = _has_any(all_header_keys, HYDRATE_RESPONSE_ALIASES)
     has_split = split_registry_present or _has_any(all_header_keys, SPLIT_ALIASES)
     has_occurrence_metadata = occurrence_policy_present or len(all_header_keys & {normalize_header(a) for a in OCCURRENCE_METADATA_ALIASES}) >= 3
-    has_saturation_unit = bool(saturation_unit_convention) or _has_any(all_header_keys, SATURATION_UNIT_ALIASES)
+    normalized_saturation_unit = str(saturation_unit_convention or "").strip().lower()
+    has_saturation_unit = normalized_saturation_unit in SATURATION_FRACTION_UNITS or _has_any(
+        all_header_keys,
+        SATURATION_UNIT_ALIASES,
+    )
 
     minimum_viable_predictor_coverage = {
         "has_depth": has_depth,
@@ -847,7 +852,7 @@ def intake_validation_report_frame(report: dict[str, object]) -> pd.DataFrame:
         (
             "saturation_target_authority",
             bool(report.get("saturation_target_authority_present")),
-            "Requires saturation target plus fraction/percent policy.",
+            "Requires saturation target plus fraction 0-1 unit policy.",
         ),
         (
             "train_only_preprocessing_ready",
@@ -880,7 +885,7 @@ def intake_validator_contract_frame() -> pd.DataFrame:
             },
             {
                 "Contract area": "Saturation authority",
-                "Requirement": "Saturation targets need approved target source and fraction/percent unit convention.",
+                "Requirement": "Saturation targets need approved target source and fraction 0-1 unit convention.",
                 "Blocked if missing": "saturation_target_requires_fraction_or_percent_unit_policy",
             },
             {

@@ -21,10 +21,16 @@ final validation results.
 
 ## Current Data Position
 
-The project currently has only about 3 of the expected 71 approved-data
-datasets available for direct review. That is enough to design the schema,
-roles, leakage controls, and model architecture because the headers and
-screenshots show the real table structure. It is not enough to train final
+The 2026-06-18 project update narrows the active near-term ML scope: the three
+available approved datasheets/workbooks represent four wells, and those four
+wells are the working model scope until the user or mentor verifies otherwise.
+Older "about 3 of 71 datasets" language remains useful as historical schema
+context, but it is not the current presentation or runtime target. The next
+step is to verify the four well names/aliases, locations, log families,
+core/NMR/pressure-core evidence, lithology, and hydrate-saturation labels.
+
+The available headers and screenshots are enough to design schema roles,
+leakage controls, and model architecture. They are not enough to train final
 models, report performance, claim hydrate occurrence accuracy, or publish
 saturation results.
 
@@ -142,7 +148,7 @@ validation overlays after approved-data role and unit checks.
 
 ```mermaid
 flowchart LR
-    A["Available approved subset<br/>about 3 of 71 datasets<br/>headers/screenshots only in public repo"] --> B["Schema preservation<br/>original sheets and headers retained"]
+    A["Active approved subset<br/>three datasheets / four wells<br/>headers/screenshots only in public repo"] --> B["Schema preservation<br/>original sheets and headers retained"]
     B --> C["Role classification<br/>measured inputs / derived / QC / targets / calibration / unresolved"]
     C --> D["Unit normalization<br/>depth, density, velocity/slowness,<br/>porosity fraction/percent"]
     D --> E["QC and alignment<br/>caliper/washout, missingness,<br/>depth correspondence"]
@@ -258,8 +264,8 @@ validation without exposing approved data or overclaiming model performance.
 
 1. Which of `Sgh`, `S_h`, `Sh`, or `NMR_SAT` is the authoritative saturation
    target when multiple fields exist?
-2. Are saturation values fractions from 0 to 1 or percentages from 0 to 100 in
-   each sheet?
+2. Saturation values are currently treated as fractions from 0 to 1; confirm
+   each recovered sheet follows that convention before training.
 3. Should occurrence labels be derived from saturation thresholds, interpreted
    phase labels, or mentor-reviewed intervals?
 4. Are `MTE`, `IGS`, `MTE_refined`, and `IGS_refined` separate wells, separate
