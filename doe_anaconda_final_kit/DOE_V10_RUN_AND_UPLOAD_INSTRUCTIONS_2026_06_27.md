@@ -12,6 +12,13 @@ Keep this as the fallback only if V10 fails before it produces outputs:
 
 Run the V10 notebook on the DOE desktop against `~/Downloads/Northslopedatasets06052026`. Use the normal full run if the machine can sit for it. If the full Chong ANN sensitivity is too slow, restart the kernel, run `import os; os.environ["CHONG_RUNTIME_MODE"] = "quick_test"` in a temporary first cell before the notebook setup cell, then run V10 only as a smoke test. If PyTorch is unavailable in the DOE kernel, V10 should mark the Chong ANN tables as skipped/failed for that dependency and still continue to the export cell.
 
+If the Chong ANN block says `No module named 'torch'`, install PyTorch with
+the helper below. Do not install the package named `pytorch`; the real package
+name is `torch`.
+
+- `DOE_V10_INSTALL_TORCH_CODE_BLOCK.py`
+- `DOE_V10_INSTALL_TORCH_COMMANDS.md`
+
 After V10 finishes, the easiest handoff is one file from `~/Downloads/outputs_runtime/ml_master/`:
 
 - `share_packet_v10_chong_dphi_lock.zip`
