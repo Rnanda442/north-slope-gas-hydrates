@@ -49,6 +49,13 @@ That script opens a draft email with the share packet attached. It does not send
 automatically. Set the `PERSONAL_REVIEW_EMAIL` environment variable first if
 you want the `To:` field prefilled.
 
+The updated V10 notebook also includes a final optional code cell named
+`Optional: Open Outlook Draft With Share Packet`. Run it after the export cell
+if you want the notebook itself to open the Outlook draft. If you already have
+an older V10 notebook open, copy the same helper from:
+
+- `DOE_V10_SEND_SHARE_PACKET_CODE_BLOCK.py`
+
 ## Header Evidence To Check
 
 V10 treats the source screenshots as two separate data contracts:
