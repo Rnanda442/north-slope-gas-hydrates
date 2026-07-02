@@ -112,7 +112,30 @@ when multiple saturation labels exist, fraction-vs-percent target convention,
 occurrence-label provenance, train/validation/locked-test well assignment,
 caliper coverage sufficiency, and missing-log adapter permission.
 
-Use the V5.5 mentor update deck and companion as the current local
+### C. Latest project revision delegation direction
+
+The 2026-06-18 self-email `slide updates for the newest deck` is now captured
+in `docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md`. Use that file before
+delegating slide, website-map, equation-slide, source-research, four-well data
+recovery, Word companion, or PC/OSL sync tasks. It keeps the committed V5.5
+Slide 2 source update package as the last verified repo baseline, but treats
+the Gmail attachment as a needs-review deck that may contain better current
+visuals. The next work should be delegated by topic: editable deck conversion,
+unified 2D North Slope map, Slide 2 hydrate/context rebuild, four-well
+name/location/core/lithology recovery, Slide 3 log-signal/lithology rebuild,
+simplified ML architecture, equation-only slide, Slide 6 cleanup, Slides 7-9
+results/discussion plan, and Word companion science support. Whole-slide
+screenshot/raster panels are not the desired final deck format when the user
+needs selectable/editable text, labels, and callouts.
+
+The active near-term ML scope is the four wells represented by the three
+available datasheets/workbooks. Older "about 3 of 71 datasets" language remains
+schema-history context, but the current build should go deeper on those four
+wells: verify names/aliases, locations, core/NMR/pressure-core/lithology
+evidence, and hydrate saturation explanation before finalizing the model or
+slide story.
+
+Use the V5.5 Slide 2 source update deck and companion as the current committed
 presentation baseline. V5.4 is the source baseline, and the older Gmail-style
 prompt plus V5.2 diagrams remain provenance and visual authority. Treat V5.3
 as a flawed intermediate/reference, not the active mentor deck.
@@ -130,7 +153,7 @@ as a flawed intermediate/reference, not the active mentor deck.
 | Manuscript | `docs/project_blueprints/` | Two drafts recovered; the local research-overview Word deliverable was rebuilt on 2026-06-13 from the science-to-ML ladder, baseline source ledger, source-backed parameter movements, screening-envelope language, target leakage rules, model ladder, and validation plan; a 2026-06-15 pipeline status and forward workflow Word brief now exists for mentor/project review | Review the pipeline brief and rebuilt local DOCX, then calibrate claims against workbook formulas, approved labels, and recoverable range provenance before any results-bearing revision |
 | Presentation | Current local baseline is the V5.5 Slide 2 source update deck generated from `docs/project_blueprints/build_full_workflow_diagram_deliverables.py`: `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx`. It preserves the original personal opener, nine-slide spine, slide 3 parameter board, full complex workflow on slide 4, equations/unit gates on slide 6, and complex ML runtime architecture on slide 7. Slide 2 is now the accepted three-column context slide: what gas hydrate is, why the Alaska North Slope matters, and why P-T stability is a gate. It uses source-backed hydrate structure/type language with methane/Structure I baseline framing, a DGGS RI 2018-6 Umiat-Gubik central North Slope geology-layer preview, the USGS Arctic Alaska cross section, selected USGS/DOE stability visuals, and the stability-not-proof guardrail. The verified Drive copies are native Google Slides/Docs: `https://docs.google.com/presentation/d/1-35vfTIXAnWCiyKTLooJy80HBYliMBliE_z4CbggJC0` and `https://docs.google.com/document/d/1CyZkRgfAUSOOaRxXni0mcmFN2OQcc5pNOw8TOv44f0Q`. | Ready for mentor review | Use the V5.5 Slide 2 source update package for mentor review; preserve V5.4 and earlier V5.5 as provenance/reference |
 | Mentor and deliverable communication | `docs/MENTOR_STATUS_UPDATE_DRAFT.md`, `docs/WEEKDAY_PROGRESS_REPORT_TEMPLATE.md`, `docs/MENTOR_PROJECT_STATUS_PACKAGE_V5_WORKFLOW_2026-06-15.md`, `docs/DELIVERABLE_REFRESH_PLAN_STABILITY_AND_ML.md`, `docs/SLIDE_REMAKE_STORYBOARD_STABILITY_AND_ML.md`, `docs/FULL_PROJECT_ML_WORKFLOW_DIAGRAM.md`, `docs/PIPELINE_STATUS_AND_ML_WORKFLOW_BRIEF.md`, `docs/GMAIL_STYLE_V5_2_SLIDE_REMAKE_PROMPT_2026-06-15.md`, `docs/FINAL_DELIVERABLE_CONSOLIDATION_AND_CLEANUP_PLAN_2026-06-15.md`, `docs/FINAL_NINE_SLIDE_GAP_AND_DIAGRAM_REUSE_PLAN_2026-06-15.md`, `docs/FINAL_NEW_SLIDE_DECK_CREATION_PROMPT_2026-06-15.md` | Drafted public-safe stability-screen status language, mentor questions, weekday reporting template, a diagram-first refresh plan, a superseded first slide storyboard, the full project workflow map, Word-ready status/diagram briefs, a compact V5.2 mentor status package, a Gmail-style V5.2 slide-remake prompt, a final consolidation/cleanup plan, a slide-by-slide gap plan, the final deck-creation prompt, and the V5.5 mentor update package. V5.5 explains the DOE prototype and stability overlay without approved rows, fake metrics, hydrate-result claims, or stability-as-proof language. | Review V5.5 with mentor/user, then sync final Word/PPT language and clean up superseded copies only after approval |
-| Approved-data schema and ML architecture | `dashboard/approved_data_intake.py`, `dashboard/parameter_evidence.py`, `dashboard/source_visual_inventory.py`, `dashboard/runtime/three_dataset_pipeline.py`, `01_pipeline/validate_approved_data_headers.py`, `01_pipeline/inspect_three_dataset_headers.py`, `01_pipeline/run_three_dataset_ml_pipeline.py`, `docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`, `docs/DOE_THREE_DATASET_ML_PIPELINE_RUNBOOK_2026-06-16.md`, `data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv`, `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`, `data/public_ml_products/public_parameter_evidence_registry_2026-06-16.csv`, `data/public_ml_products/source_visual_inventory_2026-06-16.csv`, `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`, `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md` | Public-safe methodology layer records expected approved-data header families, preserves original headers, separates measured inputs, derived features, QC/alignment fields, calibration/reference fields, target-only saturation fields, and unresolved fields, and now includes V5.2 variable fingerprints, explicit intake readiness functions, CLI header audit reports, normalized parameter evidence bars, source-visual provenance QA, a DOE-local three-workbook sheet/header scanner and train/test runner, synthetic tests, OSL handoff docs, and schema-only runtime templates while only about 3 of 71 datasets are visible for design/runtime prototyping | Use this plan, validator, CLI header audit, three-dataset header scanner/runtime runner, parameter evidence registry, and source-visual inventory as the non-stability ML/readiness baseline; keep approved rows, predictions, fitted models, and row-level metrics in ignored runtime folders unless reviewed for public summary |
+| Approved-data schema and ML architecture | `dashboard/approved_data_intake.py`, `dashboard/parameter_evidence.py`, `dashboard/source_visual_inventory.py`, `dashboard/runtime/three_dataset_pipeline.py`, `01_pipeline/validate_approved_data_headers.py`, `01_pipeline/inspect_three_dataset_headers.py`, `01_pipeline/run_three_dataset_ml_pipeline.py`, `docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md`, `docs/DOE_THREE_DATASET_ML_PIPELINE_RUNBOOK_2026-06-16.md`, `data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv`, `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`, `data/public_ml_products/public_parameter_evidence_registry_2026-06-16.csv`, `data/public_ml_products/source_visual_inventory_2026-06-16.csv`, `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`, `docs/FIRST_MODEL_EXPERIMENT_PLAN_2026-06-15.md` | Public-safe methodology layer records expected approved-data header families, preserves original headers, separates measured inputs, derived features, QC/alignment fields, calibration/reference fields, target-only saturation fields, and unresolved fields, and now includes V5.2 variable fingerprints, explicit intake readiness functions, CLI header audit reports, normalized parameter evidence bars, source-visual provenance QA, a DOE-local three-workbook sheet/header scanner and train/test runner, synthetic tests, OSL handoff docs, and schema-only runtime templates. The active 2026-06-18 scope is four wells from three datasheets/workbooks, with deeper lithology/core recovery needed before final model storytelling. | Use this plan, validator, CLI header audit, three-dataset header scanner/runtime runner, parameter evidence registry, and source-visual inventory as the non-stability ML/readiness baseline; keep approved rows, predictions, fitted models, and row-level metrics in ignored runtime folders unless reviewed for public summary |
 | Excel design | Header screenshots recovered; workbook missing | Partial | Confirm formulas, units, and mnemonics from the workbook |
 | Source library | Index recovered; 2026-06-13 stability source bundle documented, uploaded locally in OpenScienceLab, connected to a Structural Explorer source panel, paired with a committed public snapshot fallback, extended with public Arctic Slope well-context, G10015 temperature-inventory, sampled G10015 profile points, stability input scaffold, guarded stability screen, public ML feature scaffold, target registry, and leakage guardrail products; the hydrate ML/physics intake also records downloaded OSTI PDFs, official source-page backups, Google Drive PDF references, and a needs-PDF manifest | In progress | Use OpenScienceLab as the heavy-data workbench, commit only derived public-safe stability products, digitize/georeference OM-222 if no ready GIS derivative is found, and continue recovering institution-accessible/public sources |
 | Git history | Connected and synchronized with GitHub | Complete | Preserve the normal commit-and-push workflow |
@@ -161,10 +184,11 @@ Status vocabulary: `Ready`, `In progress`, `Waiting`, `Blocked`, `Partial`,
 ## Current Priority
 
 Start future sessions with `docs/AGENT_START_HERE.md`,
-`docs/CURRENT_ARTIFACT_INDEX.md`, and `docs/PROJECT_PROMPT_LIBRARY.md` before
-diving into the longer project base. These files now define the short handoff
-layer for current state, authoritative files, guardrails, deliverables, tests,
-and reusable prompts.
+`docs/CURRENT_ARTIFACT_INDEX.md`, `docs/PROJECT_PROMPT_LIBRARY.md`, and
+`docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md` before diving into the
+longer project base. These files now define the short handoff layer for current
+state, authoritative files, guardrails, deliverables, tests, reusable prompts,
+and the current project-delegation direction.
 
 Improvement decisions should follow
 `docs/PROJECT_IMPROVEMENT_STRATEGY.md`. For the next Word, PowerPoint, or
@@ -215,10 +239,13 @@ non-stability ML layer, use
 `01_pipeline/validate_approved_data_headers.py`,
 `docs/OSL_APPROVED_DATA_HEADER_AUDIT_RUNBOOK_2026-06-15.md`, and the
 public-safe templates/reports under `data/public_ml_products/`, as the current
-schema-readiness and method baseline. Only about 3 of 71 datasets are visible
-for schema design, which supports intake planning, header-only OSL audit,
-validator testing, and architecture design but not final training, public model
-metrics, occurrence probabilities, or saturation predictions.
+schema-readiness and method baseline. The active 2026-06-18 ML scope is four
+wells from the three available datasheets/workbooks. Older 71-dataset language
+should be treated as historical schema context unless the user or mentor
+restores that broader scope. The near-term work is well-name verification,
+core/lithology recovery, header-only OSL audit, validator testing, architecture
+design, and guarded four-well runtime planning, not final training, public
+model metrics, occurrence probabilities, or saturation predictions.
 
 ### Priority 1: Confirm Inputs and Targets
 
@@ -450,3 +477,4 @@ and approved-data figures become available.
 | 2026-06-17 | Accepted Slide 2 direction and synced North Slope GIS context | Marked the three-column Slide 2 context layout as the accepted baseline, added `Explore North Slope > Regional Map > Geoscience Orientation Map` using public geology/assessment units, 2D seismic lines, 3D seismic footprints, field-area labels, study boundary, and public wells, regenerated the matching Slide 2 GIS asset, PPTX, DOCX, panel PNG, and contact sheet, and kept the stability and GIS layers as context only rather than occurrence or saturation evidence. |
 | 2026-06-18 | Corrected Slide 2 geology-layer and hydrate-structure source treatment | Verified DGGS RI 2018-6 Umiat-Gubik as the strongest public North Slope geology layer candidate for OSL, generated slide/handoff preview PNGs from its public shapefile package, built local ignored OSL upload package `osl_upload_packages/slide2_north_slope_geology_osl_upload_2026_06_18.zip`, recorded the user-reported OSL upload completion, switched the Slide 2 map from the generated orientation view to the DGGS geology-layer preview, recropped the World Atlas Fig. 1.1 hydrate-structure visual so sI/sII/sH are visible with sI highlighted, and documented the OSL/GitHub split without making hydrate occurrence, saturation, or model-output claims. |
 | 2026-06-18 | Hardened the GitHub-safe DOE ML workflow handoff | Expanded `.gitignore` for approved/runtime data, model binaries, local workbook packages, secrets, and DOE-only exports; added `01_pipeline/export_model_run_review_assets.py` for row-free Word/slide review tables and PNGs from ignored runtime summaries; updated the DOE runbooks with header-only, three-dataset, multi-saturation, and review-export commands; and added tests so summary exports avoid row-level predictions and training metrics by default. |
+| 2026-06-18 | Captured latest self-email project/deck direction and delegation prompts | Added `docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md` from the user's self-email `slide updates for the newest deck`, recorded the Gmail deck attachment as needs review, corrected the "whole-slide screenshot" issue into an editable-slide rule, narrowed the active ML scope to four wells from three datasheets/workbooks, and split the next work into copyable prompts for PC/OSL sync, Gmail deck intake, editable deck conversion, Slide 2 hydrate/context, unified website map, four-well source/core/lithology recovery, Slide 3 log/lithology, simplified ML architecture, equation-only slide, Slide 6 cleanup, Slides 7-9 results plan, and Word companion science support. |

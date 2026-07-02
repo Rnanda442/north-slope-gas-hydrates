@@ -80,12 +80,17 @@ The
 2026-06-15 pipeline status Word brief remains the plain-language review draft
 for explaining where the project stands now and how the approved-data ML
 pipeline should reach occurrence classification and saturation regression.
-The non-stability ML/schema readiness baseline is now
+The non-stability ML/schema readiness baseline is still
 `docs/APPROVED_DATA_SCHEMA_COVERAGE_AND_MODEL_ARCHITECTURE_PLAN.md` and
-`data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv`.
-Only about 3 of the expected 71 datasets are currently available, which is
-enough for schema and architecture design but not final training, performance
-metrics, or hydrate prediction claims.
+`data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv`, but
+the active near-term ML scope has been narrowed by the 2026-06-18 email update:
+the three available datasheets/workbooks represent four wells, and those four
+wells are the working ML pipeline scope until the user or mentor verifies
+otherwise. Older "about 3 of 71 datasets" language remains historical schema
+context, not the current build target. The project should now focus on
+verifying the four well names/aliases, finding their locations, and recovering
+core/NMR/pressure-core/lithology evidence so the model story can go deeper on
+lithology and hydrate saturation rather than claiming broad model coverage.
 The practical next-products layer is now defined by
 `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv`,
 `docs/APPROVED_DATA_INTAKE_SPEC_2026-06-15.md`,
@@ -148,6 +153,21 @@ Word visuals: it tracks V5.5 slide panels, V5.4/V5.3 reference panels,
 website captures, source-backed figures, authority diagrams, and contact
 sheets, and it flags uncited or AI-looking visuals before they enter the
 mentor-facing package.
+
+The 2026-06-18 self-email titled `slide updates for the newest deck` is the
+latest project/deck-direction layer. It says the attached V5.5 Slide 3 Signal
+Response QC-cleaned PPTX is the best review deck so far, but the attachment
+remains a needs-review Gmail/Drive artifact until it is downloaded, verified,
+and explicitly staged. Use
+`docs/PROJECT_REVISION_DELEGATION_BASE_2026-06-18.md` for the extracted
+direction and copyable delegation prompts. The next deck pass should convert
+whole-slide screenshot/raster panels into editable slide builds wherever
+practical, use larger source-backed or data-derived visuals, reduce on-slide
+citation clutter, keep text high-level and editable, combine the website/OSL
+North Slope maps into one clear 2D map, rebuild Slide 3 around log-signal
+movement plus lithology/coring context, replace the three-dataset prototype
+with an equation-only slide, and make Slides 7-9 a guarded results/discussion
+plan without unsupported model or hydrate claims.
 
 The active mentor-facing workflow package is now the V5.5 Slide 2 source update
 under
