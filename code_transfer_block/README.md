@@ -16,6 +16,10 @@ script at a time.
 - `multi_saturation_target_workflow.py` - standalone first-pass runtime that
   treats every saturation-like column as a separate Y-only regression target,
   then predicts unlabeled feature sheets where possible.
+- `v15_presentation_review_and_email.py` - after the V15 notebook finishes,
+  builds a compact row-free presentation review packet from the V15 outputs,
+  prints the files Codex needs to review how well the run worked, and opens a
+  saved Outlook draft with the packet attached.
 - `anaconda_commands.txt` - short command list for the DOE prompt.
 
 ## Guardrail
