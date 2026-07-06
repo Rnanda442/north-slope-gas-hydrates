@@ -17,3 +17,6 @@ python 01_pipeline\run_three_dataset_ml_pipeline.py --data-dir "C:\Users\rohan.n
 
 REM Run all saturation-like columns as separate target-only regression runs:
 python code_transfer_block\multi_saturation_target_workflow.py
+
+REM Open/save an Outlook draft for the latest V15 share packet, figures PDF, and clean summary:
+python code_transfer_block\open_v15_share_packet_email_draft.py
