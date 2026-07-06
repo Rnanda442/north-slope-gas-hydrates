@@ -20,6 +20,10 @@ script at a time.
   builds a compact row-free presentation review packet from the V15 outputs,
   prints the files Codex needs to review how well the run worked, and opens a
   saved Outlook draft with the packet attached.
+- `v15_after_notebook_copy_this_cell.py` - copy the entire file into one new
+  VS Code/Jupyter cell after the V15 notebook finishes. It builds the same
+  row-free review packet and opens a saved Outlook draft without manually
+  opening a terminal.
 - `anaconda_commands.txt` - short command list for the DOE prompt.
 
 ## Guardrail
