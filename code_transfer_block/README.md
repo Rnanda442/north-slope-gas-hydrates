@@ -21,9 +21,12 @@ script at a time.
   prints the files Codex needs to review how well the run worked, and opens a
   saved Outlook draft with the packet attached.
 - `v15_after_notebook_copy_this_cell.py` - copy the entire file into one new
-  VS Code/Jupyter cell after the V15 notebook finishes. It builds the same
-  row-free review packet and opens a saved Outlook draft without manually
-  opening a terminal.
+  VS Code/Jupyter cell after the V15 notebook finishes. It rebuilds a local
+  `Code output` folder with the V15 review files, figures, summaries,
+  manifests, WLC/checkpoint tables, and a fresh ZIP for Drive upload. If Google
+  Drive for Desktop exposes a synced `Code output` folder, it mirrors the
+  rebuilt folder there too. Row-level predictions and fitted models are
+  excluded by default and listed in an excluded-files manifest.
 - `anaconda_commands.txt` - short command list for the DOE prompt.
 
 ## Guardrail
