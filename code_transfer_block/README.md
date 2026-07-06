@@ -25,8 +25,10 @@ script at a time.
   `Code output` folder with the V15 review files, figures, summaries,
   manifests, WLC/checkpoint tables, and a fresh ZIP for Drive upload. If Google
   Drive for Desktop exposes a synced `Code output` folder, it mirrors the
-  rebuilt folder there too. Row-level predictions and fitted models are
-  excluded by default and listed in an excluded-files manifest.
+  rebuilt folder there too. If `rclone` is installed and configured with a
+  Google Drive remote named `gdrive`, it automatically syncs/replaces
+  `gdrive:Code output`. Row-level predictions and fitted models are excluded
+  by default and listed in an excluded-files manifest.
 - `anaconda_commands.txt` - short command list for the DOE prompt.
 
 ## Guardrail

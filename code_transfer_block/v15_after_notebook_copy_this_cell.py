@@ -2,7 +2,9 @@
 #
 # It rebuilds a local folder named "Code output" with the V15 files needed for
 # Codex/presentation review. If Google Drive for Desktop exposes a synced
-# "Code output" folder, it replaces that synced folder too.
+# "Code output" folder, it replaces that synced folder too. If rclone is
+# installed and has a Google Drive remote named "gdrive", it also syncs the
+# rebuilt folder directly to "gdrive:Code output".
 #
 # By default, it excludes row-level prediction CSVs, row-reliability tables,
 # old share-packet ZIPs, and fitted model files. Those files are listed in
@@ -47,6 +49,20 @@ INCLUDE_PRIVATE_ROW_OUTPUTS = str(
 MIRROR_TO_GOOGLE_DRIVE_DESKTOP = str(
     globals().get("MIRROR_TO_GOOGLE_DRIVE_DESKTOP", os.environ.get("V15_MIRROR_TO_GOOGLE_DRIVE_DESKTOP", "1"))
 ).strip().lower() not in {"0", "false", "no", "n"}
+
+RCLONE_SYNC_TO_GOOGLE_DRIVE = str(
+    globals().get("RCLONE_SYNC_TO_GOOGLE_DRIVE", os.environ.get("V15_RCLONE_SYNC_TO_GOOGLE_DRIVE", "1"))
+).strip().lower() not in {"0", "false", "no", "n"}
+RCLONE_REMOTE_NAME = str(
+    globals().get("RCLONE_REMOTE_NAME", os.environ.get("V15_RCLONE_REMOTE_NAME", "gdrive"))
+).strip().rstrip(":") or "gdrive"
+RCLONE_REMOTE_PATH = str(
+    globals().get(
+        "RCLONE_REMOTE_PATH",
+        os.environ.get("V15_RCLONE_REMOTE_PATH", f"{RCLONE_REMOTE_NAME}:{DRIVE_FOLDER_NAME}"),
+    )
+).strip()
+RCLONE_EXE = str(globals().get("RCLONE_EXE", os.environ.get("V15_RCLONE_EXE", ""))).strip()
 
 PRIVATE_TOKENS = (
     "prediction",
@@ -353,6 +369,151 @@ def mirror_to_drive_desktop(source_dir):
     return str(target)
 
 
+def find_rclone_exe():
+    if RCLONE_EXE:
+        if Path(RCLONE_EXE).exists() or shutil.which(RCLONE_EXE):
+            return RCLONE_EXE
+        return ""
+    found = shutil.which("rclone") or shutil.which("rclone.exe")
+    if found:
+        return found
+    if os.name == "nt":
+        for candidate in [
+            Path("C:/Program Files/rclone/rclone.exe"),
+            Path("C:/Program Files (x86)/rclone/rclone.exe"),
+            Path("C:/rclone/rclone.exe"),
+            Path.home() / "rclone" / "rclone.exe",
+        ]:
+            if candidate.exists():
+                return str(candidate)
+    return ""
+
+
+def rclone_remote_name_for_path():
+    if ":" in RCLONE_REMOTE_PATH:
+        remote_name = RCLONE_REMOTE_PATH.split(":", 1)[0].strip().rstrip(":")
+        if remote_name:
+            return remote_name
+    return RCLONE_REMOTE_NAME
+
+
+def rclone_setup_steps():
+    remote_name = rclone_remote_name_for_path()
+    return [
+        "One-time setup if this is the DOE desktop:",
+        "1. Install rclone or place rclone.exe somewhere on PATH.",
+        f"2. Run: rclone config",
+        f"3. Create a Google Drive remote named: {remote_name}",
+        "4. Choose your Google Drive account during the rclone browser sign-in.",
+        f"5. Rerun this notebook cell; it will sync to: {RCLONE_REMOTE_PATH}",
+    ]
+
+
+def rclone_remote_is_safe(remote_path):
+    if ":" not in remote_path:
+        return False
+    remote_name, folder_path = remote_path.split(":", 1)
+    if not remote_name.strip():
+        return False
+    folder_path = folder_path.strip().strip("/\\")
+    return bool(folder_path)
+
+
+def rclone_remote_exists(exe_path):
+    remote_name = rclone_remote_name_for_path()
+    try:
+        result = subprocess.run(
+            [exe_path, "listremotes"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except Exception:
+        return False
+    remote_labels = {line.strip().rstrip(":") for line in result.stdout.splitlines() if line.strip()}
+    return remote_name in remote_labels
+
+
+def sync_to_rclone_drive(source_dir):
+    status = {
+        "enabled": RCLONE_SYNC_TO_GOOGLE_DRIVE,
+        "status": "disabled",
+        "remote_path": RCLONE_REMOTE_PATH,
+        "rclone_exe": "",
+        "return_code": "",
+        "message": "",
+    }
+    if not RCLONE_SYNC_TO_GOOGLE_DRIVE:
+        status["message"] = "V15_RCLONE_SYNC_TO_GOOGLE_DRIVE disabled."
+        return status
+
+    if not rclone_remote_is_safe(RCLONE_REMOTE_PATH):
+        status["status"] = "unsafe_remote_path"
+        status["message"] = (
+            "Rclone remote path must include a folder, for example "
+            f"{RCLONE_REMOTE_NAME}:{DRIVE_FOLDER_NAME!s}. Refusing to sync to a remote root."
+        )
+        return status
+
+    exe_path = find_rclone_exe()
+    status["rclone_exe"] = exe_path
+    if not exe_path:
+        status["status"] = "rclone_not_found"
+        status["message"] = "rclone.exe was not found on PATH or in common install locations."
+        return status
+
+    if not rclone_remote_exists(exe_path):
+        status["status"] = "remote_not_configured"
+        status["message"] = f"rclone remote {rclone_remote_name_for_path()!r} is not configured on this machine."
+        return status
+
+    command = [
+        exe_path,
+        "sync",
+        str(source_dir),
+        RCLONE_REMOTE_PATH,
+        "--delete-excluded",
+        "--create-empty-src-dirs",
+        "--progress",
+    ]
+    print("\nRunning rclone Google Drive sync:")
+    print(" ".join(f'"{part}"' if " " in str(part) else str(part) for part in command))
+    try:
+        result = subprocess.run(command, check=False)
+    except Exception as exc:
+        status["status"] = "sync_error"
+        status["message"] = str(exc)
+        return status
+
+    status["return_code"] = result.returncode
+    if result.returncode == 0:
+        status["status"] = "synced"
+        status["message"] = f"Synced local Code output folder to {RCLONE_REMOTE_PATH}."
+    else:
+        status["status"] = "sync_failed"
+        status["message"] = f"rclone sync exited with return code {result.returncode}."
+    return status
+
+
+def rclone_status_lines(status):
+    if not status:
+        status = {"status": "not_attempted", "message": "Rclone sync has not run yet."}
+    lines = [
+        f"- status: {status.get('status', 'unknown')}",
+        f"- remote path: {status.get('remote_path', RCLONE_REMOTE_PATH)}",
+    ]
+    if status.get("rclone_exe"):
+        lines.append(f"- rclone executable: {status.get('rclone_exe')}")
+    if status.get("return_code") != "":
+        lines.append(f"- return code: {status.get('return_code')}")
+    if status.get("message"):
+        lines.append(f"- message: {status.get('message')}")
+    if status.get("status") in {"rclone_not_found", "remote_not_configured"}:
+        lines.extend(rclone_setup_steps())
+    return lines
+
+
 def zip_folder(source_dir, zip_path):
     if zip_path.exists():
         zip_path.unlink()
@@ -362,7 +523,17 @@ def zip_folder(source_dir, zip_path):
                 zf.write(path, arcname=str(Path(DRIVE_FOLDER_NAME) / path.relative_to(source_dir)))
 
 
-def write_start_here(path, files, checkpoint_dir, progress_rows, top_wlc_rows, excluded_rows, drive_mirror_path, zip_path):
+def write_start_here(
+    path,
+    files,
+    checkpoint_dir,
+    progress_rows,
+    top_wlc_rows,
+    excluded_rows,
+    drive_mirror_path,
+    zip_path,
+    rclone_status=None,
+):
     run_manifest = {}
     manifest_path = files.get("run_manifest")
     if manifest_path and manifest_path.exists():
@@ -381,6 +552,7 @@ def write_start_here(path, files, checkpoint_dir, progress_rows, top_wlc_rows, e
         f"Local Code output folder: {CODE_OUTPUT_DIR}",
         f"Code output ZIP: {zip_path}",
         f"Google Drive Desktop mirror: {drive_mirror_path or 'not detected'}",
+        f"rclone Google Drive sync target: {RCLONE_REMOTE_PATH}",
         "",
         "Best files for Codex/presentation review:",
         "- 01_review_ready_files/paper_figures_*.pdf",
@@ -427,7 +599,10 @@ def write_start_here(path, files, checkpoint_dir, progress_rows, top_wlc_rows, e
         f"Private/excluded output count: {len(excluded_rows)}",
         "See 02_generated_review_tables/excluded_private_outputs_manifest.csv for details.",
         "",
-        "If Google Drive Desktop was not detected, upload the Code output ZIP or the local Code output folder to your Drive folder named Code output.",
+        "rclone Google Drive sync status:",
+        *rclone_status_lines(rclone_status),
+        "",
+        "If Google Drive Desktop and rclone were not available, upload the Code output ZIP or the local Code output folder to your Drive folder named Code output.",
     ]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -614,6 +789,7 @@ write_start_here(
     excluded_rows,
     "",
     code_output_zip,
+    {"status": "not_attempted", "remote_path": RCLONE_REMOTE_PATH, "message": "Packaging is still in progress."},
 )
 drive_mirror_path = mirror_to_drive_desktop(CODE_OUTPUT_DIR)
 write_start_here(
@@ -625,6 +801,11 @@ write_start_here(
     excluded_rows,
     drive_mirror_path,
     code_output_zip,
+    {
+        "status": "will_attempt_after_zip",
+        "remote_path": RCLONE_REMOTE_PATH,
+        "message": "The notebook will try rclone sync after the ZIP is copied into this folder.",
+    },
 )
 if drive_mirror_path:
     shutil.copy2(start_here_txt, Path(drive_mirror_path) / start_here_txt.name)
@@ -632,6 +813,21 @@ zip_folder(CODE_OUTPUT_DIR, code_output_zip)
 shutil.copy2(code_output_zip, CODE_OUTPUT_DIR / code_output_zip.name)
 if drive_mirror_path:
     shutil.copy2(code_output_zip, Path(drive_mirror_path) / code_output_zip.name)
+
+rclone_status = sync_to_rclone_drive(CODE_OUTPUT_DIR)
+write_start_here(
+    start_here_txt,
+    files,
+    checkpoint_dir,
+    progress_rows,
+    top_wlc_rows,
+    excluded_rows,
+    drive_mirror_path,
+    code_output_zip,
+    rclone_status,
+)
+if drive_mirror_path:
+    shutil.copy2(start_here_txt, Path(drive_mirror_path) / start_here_txt.name)
 
 email_attachments = [code_output_zip, start_here_txt]
 for key in ["paper_figures_pdf", "clean_summary_xlsx"]:
@@ -645,13 +841,21 @@ print("=" * 35)
 print("Local Code output folder:", CODE_OUTPUT_DIR)
 print("Code output ZIP:", code_output_zip)
 print("Google Drive Desktop mirror:", drive_mirror_path or "not detected")
+print("rclone Google Drive sync:", rclone_status.get("status"), "-", rclone_status.get("message"))
 print("Copied file count:", len(copied_rows))
 print("Excluded private/output file count:", len(excluded_rows))
 print("Checkpoint WLC metric files:", len(progress_rows))
 print("Top WLC rows:", len(top_wlc_rows))
+if rclone_status.get("status") in {"rclone_not_found", "remote_not_configured"}:
+    print("\nRCLONE ONE-TIME SETUP:")
+    for step in rclone_setup_steps():
+        print(" -", step)
 print("\nUPLOAD/REPLACE IN GOOGLE DRIVE:")
-print(" - Upload this ZIP or folder to Drive folder named 'Code output':", code_output_zip)
-print(" - If Google Drive Desktop mirror is not detected, replace the Drive folder manually in the browser.")
+if rclone_status.get("status") == "synced":
+    print(" - Done automatically with rclone:", RCLONE_REMOTE_PATH)
+else:
+    print(" - Upload this ZIP or folder to Drive folder named 'Code output':", code_output_zip)
+    print(" - If Google Drive Desktop mirror is not detected and rclone is not configured, replace the Drive folder manually in the browser.")
 print("\nBEST FILES FOR CODEX REVIEW:")
 print(" -", start_here_txt)
 print(" -", tables_dir / "available_files_manifest.csv")
