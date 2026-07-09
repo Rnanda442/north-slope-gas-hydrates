@@ -1,6 +1,6 @@
 # Current Artifact Index
 
-Last updated: 2026-06-18
+Last updated: 2026-07-09
 
 This index lists the current authoritative, reference, superseded, and
 needs-review artifacts that future sessions are likely to touch. Status values
@@ -64,6 +64,7 @@ are limited to `active`, `superseded`, `reference`, and `needs review`.
 | DOE three-dataset ML CLI | `01_pipeline/run_three_dataset_ml_pipeline.py` | Local approved-runtime ML runner for the three current curated Excel workbooks | active | Yes | Reads first non-empty Excel sheet by default; writes only to ignored `outputs_runtime/` and `models_runtime/`. |
 | Three-dataset runtime module | `dashboard/runtime/three_dataset_pipeline.py` | Tested feature/target/model helper for the DOE three-workbook run | active | Yes | Reuses canonical header aliases, feature engineering, target-only leakage checks, train-only scaling, and baseline/MLP model options. |
 | DOE model-run tracker module | `dashboard/runtime/model_run_tracker.py` | Parses ignored local runtime summaries into website-ready run comparisons, target cards, feature/exclusion audits, validation-status summaries, public-safe exports, and stability-contract tables | active | Yes | Public code only; actual runtime outputs remain under ignored `outputs_runtime/` in DOE. |
+| DOE V16 final-focus Anaconda notebook | `doe_anaconda_final_kit/DOE_MASTER_ML_PIPELINE_EQUATION_FIRST_V16_CORE_AWARE_FINAL_FOCUS_ANN.ipynb` | Current GitHub-facing DOE/Anaconda notebook for the final-focus ANN run | active | Yes | Keeps runtime data in ignored DOE folders, writes compact row-free review artifacts, creates `Downloads/Northslopedatasets06052026/V16_output_review_<run_id>/`, and opens/saves an Outlook draft from the final export cell so no manual V16 transfer block is required. |
 | Code transfer block | `code_transfer_block/` | Copyable DOE/Jupyter snippets for moving small runnable code blocks without re-downloading the repo | active | Yes | Keep scripts standalone and public-safe; do not include approved rows or outputs. |
 | Approved data field role table | `data/public_ml_products/approved_data_field_role_table_2026-06-15.csv` | Header role and variable-fingerprint metadata | active | Yes | No approved row values. |
 | Approved schema coverage matrix | `data/public_ml_products/approved_schema_coverage_matrix_2026-06-15.csv` | Schema-level matrix for expected/visible approved-data families | active | Yes | About 3 of expected 71 datasets visible for design only. |
