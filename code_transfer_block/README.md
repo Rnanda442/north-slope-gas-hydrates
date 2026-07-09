@@ -29,7 +29,14 @@ script at a time.
   Google Drive remote named `gdrive`, it automatically syncs/replaces
   `gdrive:Code output`. Row-level predictions and fitted models are excluded
   by default and listed in an excluded-files manifest.
+- `open_v16_share_packet_email_draft.py` - run after the V16 notebook final
+  export cell. It copies the latest V16 row-free review packet into a new
+  `Downloads/Northslopedatasets06052026/V16_output_review_<run_id>/` folder and
+  opens a saved Outlook draft. It does not send email.
 - `anaconda_commands.txt` - short command list for the DOE prompt.
+
+The V15/V16 full notebooks are intentionally not duplicated here; the GitHub-facing
+copy belongs only in `doe_anaconda_final_kit/`.
 
 ## Guardrail
 
