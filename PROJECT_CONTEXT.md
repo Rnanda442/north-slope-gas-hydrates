@@ -1,6 +1,6 @@
 # North Slope Gas Hydrates Project Context
 
-Last updated: 2026-06-18
+Last updated: 2026-07-10
 
 ## Purpose
 
@@ -33,6 +33,15 @@ regional geology and stability context
 ```
 
 ## Current Focus
+
+The current DOE/Anaconda ML notebook is
+`doe_anaconda_final_kit/DOE_MASTER_ML_PIPELINE_EQUATION_FIRST_V19_PHYSICS_WEIGHTED_TRANSFER_ANN.ipynb`.
+V19 is a known-four-well development run, not an unseen-well blind validation:
+it can rank saturation and occurrence candidates by the known transfer wells,
+exports larger review heatmaps, and adds feature-family weighting diagnostics
+for equation/geomechanics packages. Core data remain auxiliary/reliability
+evidence only, and stability remains context/admissibility unless a valid
+spatial/depth/stratigraphic join is documented.
 
 Use `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md` and
 `docs/SCIENCE_TO_ML_LOGIC_LADDER.md` as the review base for the next work
