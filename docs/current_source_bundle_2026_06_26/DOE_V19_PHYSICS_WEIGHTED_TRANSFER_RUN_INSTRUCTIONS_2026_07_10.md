@@ -10,6 +10,10 @@ V19 is a known-four-well development run built from the V15-V18 review results.
 It is designed to improve saturation and occurrence scores on the current four
 wells while keeping the claim boundary clear.
 
+Before running, read:
+
+`docs/V19_V20_FINAL_TEST_LOCK_PLAN_2026-07-10.md`
+
 Default split remains:
 
 ```text
@@ -19,13 +23,22 @@ train WellC -> score WellA + WellB + WellD
 Unlike V18, V19 can rank the selected saturation and occurrence candidates by
 the known transfer-well score. This is useful for the current project goal, but
 it must be described as development optimization, not blind new-well validation.
+The default candidate list is now locked from the V15-V18 evidence review; do
+not widen it unless the search is explicitly reopened.
 
 ## Key V19 Changes
 
 - Uses `CODE_VERSION = "V19_physics_weighted_transfer_ann"`.
 - Adds `V19_TRANSFER_SELECTION_MODE=development_transfer_ranked` by default.
-- Separately ranks hydrate saturation and hydrate occurrence candidates.
-- Adds feature-family weighting diagnostics for equation/geomechanics features.
+- Separately ranks hydrate saturation and hydrate occurrence candidates, with
+  saturation set to RMSE-first / MAE / R2 and occurrence set to balanced
+  accuracy / F1 / ROC-AUC.
+- Restricts default Ridge candidates to alpha 1 and alpha 10.
+- Restricts default core reliability weight testing to strength 2.0.
+- Restricts default ANN/WLC comparison to the prior `rho+phi+Rt` WLC/triplet
+  with the fixed V15-informed ANN preset.
+- Adds one feature-family weighting diagnostic for equation/geomechanics
+  features at weight 0.25 after MinMax scaling.
 - Applies weight trials after MinMax scaling so weights actually affect Ridge
   style models.
 - Enlarges heatmap, annotation, label, and paper-figure font sizes.
@@ -71,11 +84,14 @@ Prioritize:
 
 1. Which model/feature set wins when V19 ranks by known transfer-well score?
 2. Does occurrence need a different feature set or logistic setting than
-   saturation?
-3. Do equation/geomechanics down-weights help, hurt, or only help one well?
-4. Does core reliability weighting improve transfer metrics consistently?
-5. Does the stability audit still block stability from `X`?
-6. Are the larger heatmaps readable enough for slides and the Word document?
+   saturation, judged by balanced accuracy first?
+3. Did the selected candidate hold up across WellA, WellB, and WellD
+   separately, or did one well degrade?
+4. Do equation/geomechanics down-weights help, hurt, or only help one well?
+5. Does the single core reliability strength 2.0 improve transfer metrics
+   consistently?
+6. Does the stability audit still block stability from `X`?
+7. Are the larger heatmaps readable enough for slides and the Word document?
 
 ## Email Packet
 
