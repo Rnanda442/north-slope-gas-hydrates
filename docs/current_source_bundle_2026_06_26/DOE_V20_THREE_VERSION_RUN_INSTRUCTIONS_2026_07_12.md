@@ -1,6 +1,7 @@
 # DOE V20 Three-Version Run Instructions
 
 Date: 2026-07-12
+Updated: 2026-07-13 for final email/share-packet export behavior
 
 Use this V19-style full DOE/Anaconda notebook:
 
@@ -48,6 +49,10 @@ identifiers, or runtime logs to Git.
    Comparison`.
 4. Optional row-level V20 predictions are written only when
    `V20_WRITE_PREDICTIONS=1`. Do not move row-level predictions to GitHub.
+5. Run the final export cell after section `4B` completes. The final cell now
+   validates the required V20 row-free tables before creating the clean summary,
+   ZIP, V20 review folder, or Outlook draft. If a required V20 table is missing
+   or failed, the cell raises an error instead of creating a misleading packet.
 
 ## Expected Outputs
 
@@ -67,6 +72,14 @@ Key V20 comparison files:
 | `v20_saturation_bin_metrics_<run_slug>.csv` | Per-well saturation-bin error/bias checks |
 | `v20_feature_weights_<run_slug>.csv` | Exact feature weights used by each V20 version |
 | `v20_hydrate02_core_prior_audit_<run_slug>.csv` | HYDRATE-02 core-prior fit status and tiny-core warning |
+| `v20_packet_audit_<run_slug>.csv` | Export guardrail showing which V20 packet tables were found in memory or loaded from CSV |
+
+The clean summary workbook included in the email/review packet must contain
+these V20 sheets: `v20_saturation`, `v20_occurrence`, `v20_sat_bins`,
+`v20_feature_weights`, `v20_core_prior`, and `v20_packet_audit`. The share ZIP
+and V20 review folder include the row-free V20 CSV files and
+`v20_three_variant_manifest_<run_slug>.json`; row-level prediction CSVs and
+fitted model bundles stay local only.
 
 ## Claim Control
 

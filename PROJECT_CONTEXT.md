@@ -1,6 +1,6 @@
 # North Slope Gas Hydrates Project Context
 
-Last updated: 2026-07-10
+Last updated: 2026-07-13
 
 ## Purpose
 
@@ -141,7 +141,7 @@ predictions.
 As of 2026-07-12, V20 is available as a V19-style full DOE/Anaconda
 notebook at
 `doe_anaconda_final_kit/DOE_MASTER_ML_PIPELINE_EQUATION_FIRST_V20_THREE_VERSION_COMPARISON_ANN.ipynb`.
-It follows the same full-notebook structure as V15-V19 and adds section `4B. V20 Three Fixed-Variant Comparison` for V20A baseline-safe, V20B equation-dominance, and V20C HYDRATE-02 core-prior diagnostic. Use `actual_core_data_combined.xlsx` in
+It follows the same full-notebook structure as V15-V19 and adds section `4B. V20 Three Fixed-Variant Comparison` for V20A baseline-safe, V20B equation-dominance, and V20C HYDRATE-02 core-prior diagnostic. As of 2026-07-13, the final export/email block validates the required row-free V20 tables before building the clean workbook, ZIP, V20 review folder, or Outlook draft; the clean summary must include `v20_saturation`, `v20_occurrence`, `v20_sat_bins`, `v20_feature_weights`, `v20_core_prior`, and `v20_packet_audit`. Use `actual_core_data_combined.xlsx` in
 `Downloads/Northslopedatasets06052026`; private model matrices, predictions,
 outputs, fitted models, and runtime logs stay out of Git.
 The parameter evidence board is now implemented as a public-safe registry at
