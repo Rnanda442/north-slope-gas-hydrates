@@ -138,6 +138,14 @@ cards, feature families, exclusion reasons, validation-status flags,
 dataset/sheet inventory, final-claim blockers, public-safe summary export, and
 the stability-to-ML contract without committing approved rows or row-level
 predictions.
+As of 2026-07-12, V20 is available as a self-contained DOE/Anaconda
+notebook at
+`doe_anaconda_final_kit/DOE_MASTER_ML_PIPELINE_EQUATION_FIRST_V20_THREE_VERSION_COMPARISON.ipynb`.
+It contains markdown explanations and runnable code for the three fixed V20
+variants: V20A baseline-safe, V20B equation-dominance, and V20C HYDRATE-02
+core-prior diagnostic. Use `actual_core_data_combined.xlsx` in
+`Downloads/Northslopedatasets06052026`; private model matrices, predictions,
+outputs, fitted models, and runtime logs stay out of Git.
 The parameter evidence board is now implemented as a public-safe registry at
 `data/public_ml_products/public_parameter_evidence_registry_2026-06-16.csv`,
 with loader/validation logic in `dashboard/parameter_evidence.py`, tests in

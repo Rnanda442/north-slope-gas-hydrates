@@ -1,6 +1,6 @@
 # Current Artifact Index
 
-Last updated: 2026-07-10
+Last updated: 2026-07-12
 
 This index lists the current authoritative, reference, superseded, and
 needs-review artifacts that future sessions are likely to touch. Status values
@@ -14,6 +14,7 @@ are limited to `active`, `superseded`, `reference`, and `needs review`.
 | Project context | `PROJECT_CONTEXT.md` | Concise living project memory | active | Yes | Update after meaningful project orientation changes. |
 | North Slope project base | `docs/NORTH_SLOPE_PROJECT_BASE.md` | Broader base, deliverable inventory, and working rules | active | Yes | Use after the first-read handoff. |
 | Architecture and activity map | `docs/PROJECT_ARCHITECTURE_AND_ACTIVITY_MAP.md` | Architecture, workstreams, priorities, decisions, activity log | active | Yes | Update for milestones, blockers, dependency changes, priority changes, and next actions. |
+| V20 self-contained DOE notebook | `doe_anaconda_final_kit/DOE_MASTER_ML_PIPELINE_EQUATION_FIRST_V20_THREE_VERSION_COMPARISON.ipynb` | Downloadable Anaconda/Jupyter notebook with markdown explanations and runnable code for V20A baseline-safe, V20B equation-dominance, and V20C HYDRATE-02 core-prior comparison | active | Yes | Requires `actual_core_data_combined.xlsx` plus a private standardized model matrix in the approved runtime. Outputs, row-level predictions, fitted models, and private identifiers stay out of Git. |
 | V5.5 Slide 2 source update deck | `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Slides_2026-06-17.pptx` | Active nine-slide mentor deck update | active | Prefer builder edits | Built from the current V5.5 deck; only Slide 2 was rebuilt with selected USGS/DOE source-backed stability visuals, the DGGS RI 2018-6 Umiat-Gubik geology-layer preview, methane/Structure I baseline language, and the stability-not-proof guardrail. |
 | V5.5 Slide 2 source update companion | `docs/project_blueprints/V5_5_SLIDE2_SOURCE_UPDATE_North_Slope_Gas_Hydrate_ML_Workflow_Companion_2026-06-17.docx` | Active mentor-facing Word companion for V5.5 | active | Prefer builder edits | Explains the rebuilt Slide 2 visual choices, source links, hydrate structure types, methane baseline, DOE prototype guardrails, stability-as-context overlay, and visual provenance. |
 | V5.5 Slide 2 source update generated assets | `docs/project_blueprints/presentation_assets/v5_5_slide2_source_update_2026_06_17/` | V5.5 slide PNG panels and contact sheet | active | Rebuild from builder | Contact sheet visually inspected; Slide 2 uses the source-backed stability graph and DGGS geology preview, slide 5 is the DOE prototype/model-run card, slide 8 is the stability-to-ML overlay, and slide 9 is the done/not-claimed/next close. |

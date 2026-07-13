@@ -2,7 +2,13 @@
 
 Date: 2026-07-12
 
-Use this Git-safe V20 scaffold:
+Use this self-contained downloadable DOE notebook first:
+
+```text
+doe_anaconda_final_kit/DOE_MASTER_ML_PIPELINE_EQUATION_FIRST_V20_THREE_VERSION_COMPARISON.ipynb
+```
+
+The support runner and config files remain in:
 
 ```text
 doe_anaconda_final_kit/v20_three_versions/
@@ -51,9 +57,13 @@ V15-V18 now auto-detect that combined workbook first. V20 reads its
 HYDRATE-02 prior from sheet `12_Candidate_Sh_Targets`. The older standalone
 candidate CSV remains a fallback only when the combined workbook is missing.
 
-## Plan-Only Check
+## Notebook Plan Check
 
-From the repo root:
+Open the V20 comparison notebook in Anaconda/Jupyter and run through the plan-check cell. The plan cell does not need private data.
+
+## Script Plan-Only Check
+
+From the repo root, the support script can also print the same plan:
 
 ```powershell
 python doe_anaconda_final_kit/v20_three_versions/run_v20_three_versions.py --print-plan

@@ -11,6 +11,19 @@ versions:
 | V20B | `equation_dominance` | Stress-test the user's reversed-weight idea: primary measured/safe log variables get weight 0.25 and equation/geomechanics variables get weight 1.0. |
 | V20C | `hydrate02_core_prior` | Use the HYDRATE-02 Table S1 core `Sh(IW)` rows only as a frozen external porosity-to-saturation prior/auxiliary feature. This is not target backfill and not validation truth for the four active wells. |
 
+
+## Downloadable DOE Notebook
+
+Use the top-level self-contained notebook for DOE/Anaconda:
+
+```text
+doe_anaconda_final_kit/DOE_MASTER_ML_PIPELINE_EQUATION_FIRST_V20_THREE_VERSION_COMPARISON.ipynb
+```
+
+That notebook contains markdown explanations and all runnable V20 code. The
+Python script in this folder is retained as the support/reference runner, but
+the notebook above is the file to download from GitHub for Anaconda.
+
 ## Boundary
 
 GitHub contains only this scaffold, configs, and run instructions. Approved
