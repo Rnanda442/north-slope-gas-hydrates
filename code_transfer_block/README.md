@@ -35,9 +35,11 @@ script at a time.
   `Downloads/Northslopedatasets06052026/V16_output_review_<run_id>/` and
   opening a saved Outlook draft. This standalone helper remains useful only if
   the final notebook cell needs to be rerun outside the notebook.
-- `v25_grouped_log_region_holdout_fix.py` - paste-in V25 helper block that
-  rebuilds the grouped-log WellA-vs-WellC region-holdout comparison without
-  crashing when the metrics table already has a `task_type` column.
+- `v25_grouped_log_region_holdout_fix.py` - full replacement code cell for the
+  V25 notebook section `4. V25 Core-Aware Auxiliary Learning And Final 3-to-1
+  Report Review`. Copy the whole file into that failed cell; it keeps the V25
+  report-review logic and fixes the grouped-log WellA-vs-WellC comparison
+  crash when the metrics table already has a `task_type` column.
 - `anaconda_commands.txt` - short command list for the DOE prompt.
 
 The V15/V16 full notebooks are intentionally not duplicated here; the GitHub-facing
