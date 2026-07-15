@@ -340,6 +340,7 @@ and approved-data figures become available.
 
 | Date | Activity | Result |
 |---|---|---|
+| 2026-07-15 | Patched V21-V23 core-aware diagnostic scoring | Updated the masked multi-task ANN diagnostic in the V21, V22, and V23 notebooks so missing validation hydrate targets are skipped before metric scoring instead of crashing with `Input contains NaN`; the metric row now reports scored and unscored row counts. |
 | 2026-07-15 | Added V23 WellC-held-out DOE/Anaconda comparator | Added `doe_anaconda_final_kit/DOE_MASTER_ML_PIPELINE_EQUATION_FIRST_V23_WELLC_HOLDOUT_3TO1_REPORT_PIPELINE.ipynb` so the primary split trains on WellA+WellB+WellD and tests held-out WellC, with the same row-free review packet audit/checklist behavior as the hardened V22 notebook. |
 | 2026-07-13 | Fixed the V20 email/share packet export contract | Updated the V20 notebook final block so clean summaries, ZIPs, review folders, and Outlook drafts include validated row-free V20 comparison sheets and fail before email creation if required V20 outputs are missing |
 | 2026-06-16 | Organized the future-agent handoff base | Added `docs/AGENT_START_HERE.md`, `docs/CURRENT_ARTIFACT_INDEX.md`, and `docs/PROJECT_PROMPT_LIBRARY.md`; updated the context, project base, and architecture map so future sessions start from one short file set before deeper docs |
