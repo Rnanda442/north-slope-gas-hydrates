@@ -1,6 +1,6 @@
 # North Slope Gas Hydrates Project Context
 
-Last updated: 2026-07-13
+Last updated: 2026-07-15
 
 ## Purpose
 
@@ -34,14 +34,17 @@ regional geology and stability context
 
 ## Current Focus
 
-The current DOE/Anaconda ML notebook is
-`doe_anaconda_final_kit/DOE_MASTER_ML_PIPELINE_EQUATION_FIRST_V19_PHYSICS_WEIGHTED_TRANSFER_ANN.ipynb`.
-V19 is a known-four-well development run, not an unseen-well blind validation:
-it can rank saturation and occurrence candidates by the known transfer wells,
-exports larger review heatmaps, and adds feature-family weighting diagnostics
-for equation/geomechanics packages. Core data remain auxiliary/reliability
-evidence only, and stability remains context/admissibility unless a valid
-spatial/depth/stratigraphic join is documented.
+The current GitHub-facing DOE/Anaconda ML notebook is
+`doe_anaconda_final_kit/DOE_MASTER_ML_PIPELINE_EQUATION_FIRST_V25_GROUPED_LOG_REGION_HOLDOUT_REPORT_PIPELINE.ipynb`.
+V25 keeps the V21-V23 three-wells-train / one-well-held-out report-pipeline
+structure and adds a row-free grouped-log comparison sheet for the WellA
+Canada/Mallik holdout and the WellC Alaska North Slope holdout. The comparison
+uses the leakage-safe leave-one-well-out 3-to-1 candidate metrics already
+exported by the notebook; it is a known-four-well development comparison, not
+an unseen-well blind validation or gas-origin proof by itself. Core data remain
+auxiliary/reliability evidence only, and stability remains
+context/admissibility unless a valid spatial/depth/stratigraphic join is
+documented.
 
 Use `docs/PROJECT_DIRECTION_LOCK_FOR_REVIEW.md` and
 `docs/SCIENCE_TO_ML_LOGIC_LADDER.md` as the review base for the next work
