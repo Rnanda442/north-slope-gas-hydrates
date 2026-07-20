@@ -6,6 +6,18 @@ instructions only.
 
 ## Current Comparison Notebook
 
+Use V26 for the ANN scatter packet:
+
+```text
+DOE_MASTER_ML_PIPELINE_EQUATION_FIRST_V26_ANN_LOO_SCATTER_PACKET.ipynb
+```
+
+V26 is based on the V22 WellA-held-out ANN run family, which is the run family
+tied to the high WellA ANN result. It keeps the DOE/Anaconda raw-data loader and
+review-packet pattern, then runs ANN-only leave-one-well-out splits for WellA,
+WellB, WellC, and WellD. Its default WLC is
+`EQ_full_except_density_porosity_no_target_leakage`.
+
 Use V22 for the WellA-heldout comparison run:
 
 ```text
@@ -18,10 +30,11 @@ the V21 or earlier WellC-heldout packet to compare area-specific transfer
 behavior. V22 outputs use their own `v22_wella_holdout_3to1_report_pipeline`
 slug and `V22_output_review_<RUN_ID>` review folder.
 
-## ANN Leave-One-Well-Out Scatter Runner
+## Optional ANN Leave-One-Well-Out Scatter Runner
 
-Use this script when the presentation needs ANN-only scatter plots instead of
-linear/Ridge scatter plots:
+The normal DOE/Anaconda handoff is the V26 notebook above. This script is only a
+small command-line helper for cases where a private model matrix has already
+been exported and the full notebook does not need to be rerun:
 
 ```text
 run_ann_loo_scatter_plots.py
