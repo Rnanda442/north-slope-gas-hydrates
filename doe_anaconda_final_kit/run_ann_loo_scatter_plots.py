@@ -12,6 +12,9 @@ import argparse
 import json
 import math
 import os
+import shutil
+import subprocess
+import zipfile
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
@@ -457,6 +460,205 @@ def plot_contact_sheet(image_paths: list[Path], output_path: Path) -> None:
     sheet.save(output_path)
 
 
+def ps_quote(path: Path) -> str:
+    return "'" + str(path).replace("'", "''") + "'"
+
+
+def copy_existing(src: Path, dest_dir: Path, copied_paths: list[Path], subdir: str | None = None) -> Path | None:
+    if not src.exists():
+        return None
+    target_dir = dest_dir / subdir if subdir else dest_dir
+    target_dir.mkdir(parents=True, exist_ok=True)
+    dest = target_dir / src.name
+    shutil.copy2(src, dest)
+    copied_paths.append(dest)
+    return dest
+
+
+def write_email_packet(
+    output_dir: Path,
+    cfg: AnnConfig,
+    model_matrix: Path,
+    heldout_wells: list[str],
+    features: list[str],
+    selected_df: pd.DataFrame,
+    metrics_path: Path,
+    selected_path: Path,
+    weights_path: Path,
+    contact_sheet_path: Path,
+    figure_paths: list[Path],
+    note_path: Path,
+    open_outlook_draft: bool,
+) -> dict[str, object]:
+    review_dir = output_dir / "ann_loo_email_packet"
+    review_dir.mkdir(parents=True, exist_ok=True)
+
+    copied_paths: list[Path] = []
+    review_metrics_path = copy_existing(metrics_path, review_dir, copied_paths)
+    review_summary_path = copy_existing(selected_path, review_dir, copied_paths)
+    review_weights_path = copy_existing(weights_path, review_dir, copied_paths)
+    review_contact_sheet_path = copy_existing(contact_sheet_path, review_dir, copied_paths)
+    copy_existing(note_path, review_dir, copied_paths)
+    review_figure_paths = [p for p in (copy_existing(path, review_dir, copied_paths, subdir="figures") for path in figure_paths) if p]
+
+    share_manifest_path = review_dir / "ann_loo_share_manifest.json"
+    share_manifest = {
+        "code_version": CODE_VERSION,
+        "created": datetime.now().isoformat(timespec="seconds"),
+        "wlc_name": cfg.wlc_name,
+        "heldout_wells": heldout_wells,
+        "features_used": features,
+        "scatter_selection": cfg.scatter_selection,
+        "model_matrix_name_only": model_matrix.name,
+        "row_level_predictions_included": False,
+        "summary_rows": selected_df.to_dict(orient="records"),
+        "boundary_note": "Compact packet for review. It excludes row-level prediction CSVs and the private model matrix.",
+    }
+    share_manifest_path.write_text(json.dumps(share_manifest, indent=2), encoding="utf-8")
+    copied_paths.append(share_manifest_path)
+
+    packet_readme_path = review_dir / "ANN_LOO_EMAIL_PACKET_README.txt"
+    packet_readme_path.write_text(
+        "\n".join(
+            [
+                f"North Slope Gas Hydrate ML {CODE_VERSION} ANN scatter packet",
+                f"Created: {datetime.now().isoformat(timespec='seconds')}",
+                f"WLC: {cfg.wlc_name}",
+                f"Held-out wells: {' + '.join(heldout_wells)}",
+                "",
+                "This packet is the compact handoff output for ANN-only held-out-well scatter plots.",
+                "It excludes the private model matrix and row-level prediction CSVs.",
+                "",
+                "Use first:",
+                "- ann_loo_scatter_contact_sheet.png for the four scatter plots in one image.",
+                "- ann_loo_fold_summary.csv for the selected R2/RMSE values.",
+                "- figures/ for individual held-out-well scatter PNGs.",
+                "",
+                "Wording note:",
+                "- WLC feature weights are input-feature weights, not neural-network hidden-layer weights.",
+                "- If best_r2 is used, call the plot a best-realization visual, not an unbiased model-selection claim.",
+                "",
+                "Review before sending outside the DOE environment.",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    copied_paths.append(packet_readme_path)
+
+    share_packet_zip = review_dir / f"share_packet_{CODE_VERSION}.zip"
+    packet_files = [path for path in copied_paths if path.exists() and path != share_packet_zip]
+    with zipfile.ZipFile(share_packet_zip, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        for path in packet_files:
+            zf.write(path, arcname=str(path.relative_to(review_dir)))
+
+    outlook_script_path = review_dir / f"open_outlook_draft_{CODE_VERSION}.ps1"
+    attachments = [
+        share_packet_zip,
+        review_contact_sheet_path,
+        review_summary_path,
+        packet_readme_path,
+    ]
+    attachment_array = ", ".join(ps_quote(path) for path in attachments if path and path.exists())
+    outlook_script_path.write_text(
+        f'''$ErrorActionPreference = "Stop"
+$to = $env:PERSONAL_REVIEW_EMAIL
+$attachments = @({attachment_array})
+$outlook = New-Object -ComObject Outlook.Application
+$mail = $outlook.CreateItem(0)
+if ($to) {{ $mail.To = $to }}
+$mail.Subject = "North Slope ML {CODE_VERSION} ANN scatter packet"
+$mail.Body = @"
+Attached is the compact ANN leave-one-well-out scatter packet.
+
+Review folder:
+{review_dir}
+
+This packet is intended for review only. Please check the data boundary before sending outside the DOE environment.
+"@
+foreach ($packetPath in $attachments) {{
+    if (Test-Path -LiteralPath $packetPath) {{
+        $mail.Attachments.Add($packetPath) | Out-Null
+    }}
+}}
+$mail.Save()
+$mail.Display()
+try {{ $mail.GetInspector.Activate() }} catch {{}}
+Write-Host "Saved and opened Outlook draft."
+Write-Host "Review folder: {review_dir}"
+Write-Host "Attachments:"
+$attachments | ForEach-Object {{ Write-Host " - $_" }}
+''',
+        encoding="utf-8",
+    )
+
+    audit_path = review_dir / "ann_loo_email_packet_audit.csv"
+    required_artifacts = [
+        ("share_packet_zip", share_packet_zip),
+        ("contact_sheet_png", review_contact_sheet_path),
+        ("fold_summary_csv", review_summary_path),
+        ("metrics_by_realization_csv", review_metrics_path),
+        ("wlc_feature_weights_csv", review_weights_path),
+        ("packet_readme", packet_readme_path),
+        ("share_manifest_json", share_manifest_path),
+        ("outlook_draft_helper", outlook_script_path),
+    ]
+    audit_df = pd.DataFrame(
+        [
+            {
+                "artifact": name,
+                "path": str(path) if path else "",
+                "exists": bool(path and path.exists()),
+                "size_bytes": path.stat().st_size if path and path.exists() and path.is_file() else None,
+            }
+            for name, path in required_artifacts
+        ]
+    )
+    audit_df.to_csv(audit_path, index=False)
+    with zipfile.ZipFile(share_packet_zip, "a", compression=zipfile.ZIP_DEFLATED) as zf:
+        zf.write(audit_path, arcname=audit_path.name)
+
+    outlook_status = f"automatic Outlook draft skipped; run {outlook_script_path} manually"
+    if open_outlook_draft and os.name == "nt":
+        try:
+            completed = subprocess.run(
+                [
+                    "powershell",
+                    "-NoProfile",
+                    "-ExecutionPolicy",
+                    "Bypass",
+                    "-File",
+                    str(outlook_script_path),
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+                timeout=90,
+            )
+            outlook_status = f"PowerShell exit code {completed.returncode}"
+            if completed.stdout.strip():
+                print("ANN LOO Outlook helper stdout:")
+                print(completed.stdout.strip())
+            if completed.stderr.strip():
+                print("ANN LOO Outlook helper stderr:")
+                print(completed.stderr.strip())
+        except Exception as exc:
+            outlook_status = f"automatic Outlook draft failed: {exc}"
+            print("ANN LOO Outlook draft helper did not run automatically:", exc)
+
+    return {
+        "email_packet_dir": str(review_dir),
+        "share_packet_zip": str(share_packet_zip),
+        "packet_readme": str(packet_readme_path),
+        "packet_audit_csv": str(audit_path),
+        "outlook_draft_script": str(outlook_script_path),
+        "outlook_draft_status": outlook_status,
+        "review_contact_sheet": str(review_contact_sheet_path) if review_contact_sheet_path else "",
+        "review_fold_summary": str(review_summary_path) if review_summary_path else "",
+        "review_figures": [str(path) for path in review_figure_paths],
+    }
+
+
 def run_ann_loo(
     model_matrix: Path,
     output_dir: Path,
@@ -467,6 +669,8 @@ def run_ann_loo(
     compute_derived: bool,
     save_private_predictions: bool,
     occurrence_threshold: float,
+    create_email_packet: bool,
+    open_outlook_draft: bool,
 ) -> dict[str, object]:
     load_ml_globals()
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -614,6 +818,24 @@ def run_ann_loo(
         encoding="utf-8",
     )
 
+    email_outputs: dict[str, object] = {}
+    if create_email_packet:
+        email_outputs = write_email_packet(
+            output_dir=output_dir,
+            cfg=cfg,
+            model_matrix=model_matrix,
+            heldout_wells=heldout_wells,
+            features=features,
+            selected_df=selected_df,
+            metrics_path=metrics_path,
+            selected_path=selected_path,
+            weights_path=weights_path,
+            contact_sheet_path=contact_sheet_path,
+            figure_paths=figure_paths,
+            note_path=note,
+            open_outlook_draft=open_outlook_draft,
+        )
+
     manifest = {
         "code_version": CODE_VERSION,
         "created": datetime.now().isoformat(timespec="seconds"),
@@ -633,6 +855,7 @@ def run_ann_loo(
             "figure_dir": str(figure_dir),
             "contact_sheet": str(contact_sheet_path),
             "readme": str(note),
+            **email_outputs,
         },
         "boundary_note": "Runtime outputs may contain private row-level predictions. Keep them out of GitHub unless separately reviewed.",
     }
@@ -668,6 +891,17 @@ def print_plan(args: argparse.Namespace) -> None:
         "ann_config": asdict(cfg),
         "known_reference_metrics": REFERENCE_FINAL_ANN_METRICS,
         "default_output_dir": str(runtime_output_dir()),
+        "email_packet": {
+            "created_by_default": True,
+            "contents": [
+                "share_packet_V26_ann_loo_scatter_plots.zip",
+                "ann_loo_scatter_contact_sheet.png",
+                "ann_loo_fold_summary.csv",
+                "individual scatter PNGs",
+                "Outlook draft helper PowerShell script",
+            ],
+            "automatic_outlook_draft_default": os.name == "nt",
+        },
         "boundary_note": "Code can go to GitHub. Private model matrices and row-level predictions should not.",
     }
     print(json.dumps(plan, indent=2))
@@ -702,6 +936,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--min-feature-count", type=int, default=int(os.environ.get("ANN_LOO_MIN_FEATURE_COUNT", "3")))
     parser.add_argument("--no-compute-derived", action="store_true", help="Do not add simple derived features such as log10_rt or impedance.")
     parser.add_argument("--no-private-predictions", action="store_true", help="Skip row-level selected prediction CSV output.")
+    parser.add_argument("--no-email-packet", action="store_true", help="Skip compact ZIP packet and Outlook draft helper output.")
+    parser.add_argument("--no-open-outlook-draft", action="store_true", help="Create the packet/helper but do not automatically open Outlook.")
     parser.add_argument("--occurrence-threshold", type=float, default=float(os.environ.get("ANN_LOO_OCCURRENCE_THRESHOLD", DEFAULT_OCCURRENCE_THRESHOLD)))
     parser.add_argument("--print-plan", action="store_true")
     return parser
@@ -736,6 +972,7 @@ def main() -> None:
         realizations=args.realizations,
         scatter_selection=args.scatter_selection,
     )
+    env_open_outlook = os.environ.get("ANN_LOO_OPEN_OUTLOOK_DRAFT", "1").strip().lower() not in {"0", "false", "no"}
     output_dir = Path(args.output_dir) if args.output_dir else runtime_output_dir()
     manifest = run_ann_loo(
         model_matrix=Path(args.model_matrix_csv),
@@ -747,6 +984,8 @@ def main() -> None:
         compute_derived=not args.no_compute_derived,
         save_private_predictions=not args.no_private_predictions,
         occurrence_threshold=args.occurrence_threshold,
+        create_email_packet=not args.no_email_packet,
+        open_outlook_draft=env_open_outlook and not args.no_open_outlook_draft,
     )
     print(json.dumps(manifest, indent=2))
 

@@ -62,6 +62,22 @@ Outputs go under ignored `outputs_runtime/ann_loo_scatter_plots/` unless
 tables include `ann_loo_fold_summary.csv`, `ann_loo_metrics_by_realization.csv`,
 and `ann_loo_wlc_feature_weights.csv`.
 
+The runner also creates an email packet by default:
+
+```text
+outputs_runtime/ann_loo_scatter_plots/<run_time>/ann_loo_email_packet/
+```
+
+That folder contains `share_packet_V26_ann_loo_scatter_plots.zip`, a contact
+sheet PNG, the fold summary CSV, individual scatter PNGs, and
+`open_outlook_draft_V26_ann_loo_scatter_plots.ps1`. On Windows it tries to open
+an Outlook draft automatically, using `PERSONAL_REVIEW_EMAIL` if that
+environment variable is set. To make the packet but not open Outlook, add:
+
+```powershell
+--no-open-outlook-draft
+```
+
 Important wording: the WLC feature weights are input-feature weights, not raw
 neural-network hidden-layer weights. If `best_r2` scatter selection is used,
 use the figure as a best-realization visual rather than an unbiased
