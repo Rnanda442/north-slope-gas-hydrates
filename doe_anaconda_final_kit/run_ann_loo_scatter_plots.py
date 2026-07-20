@@ -29,6 +29,15 @@ DEFAULT_TARGET = "hydrate_saturation_reference"
 DEFAULT_HELDOUT_WELLS = ["WellA", "WellB", "WellC", "WellD"]
 DEFAULT_OCCURRENCE_THRESHOLD = 0.05
 DEFAULT_WLC = "EQ_full_except_density_porosity_no_target_leakage"
+SATURATION_BIN_EDGES = [-0.001, 0.01, 0.05, 0.20, 0.50, 1.000001]
+SATURATION_BIN_LABELS = ["zero_trace", "trace_occurrence", "low", "moderate", "high"]
+SATURATION_BIN_DISPLAY = {
+    "zero_trace": "zero / trace",
+    "trace_occurrence": "trace / occurrence",
+    "low": "low",
+    "moderate": "moderate",
+    "high": "high",
+}
 
 WELL_METADATA = {
     "WellA": {"region": "Canada", "origin": "thermogenic", "color": "#6D5BD0"},
@@ -349,6 +358,247 @@ def occurrence_from_regression(y_true: np.ndarray, y_pred: np.ndarray, threshold
     }
 
 
+def saturation_bin_bias(
+    pred_df: pd.DataFrame,
+    target_col: str,
+    heldout_well: str,
+    train_wells: str,
+    wlc_name: str,
+    realization: int,
+    selection_strategy: str,
+) -> pd.DataFrame:
+    if pred_df.empty:
+        return pd.DataFrame()
+    temp = pred_df.copy()
+    temp["reference"] = normalize_fraction(temp[target_col])
+    temp["prediction"] = normalize_fraction(temp["prediction"])
+    temp = temp[temp["reference"].notna() & temp["prediction"].notna()].copy()
+    if temp.empty:
+        return pd.DataFrame()
+    temp["saturation_bin"] = pd.cut(
+        temp["reference"],
+        bins=SATURATION_BIN_EDGES,
+        labels=SATURATION_BIN_LABELS,
+        include_lowest=True,
+    )
+    rows = []
+    for bin_name, group in temp.groupby("saturation_bin", observed=False):
+        valid = group[["reference", "prediction"]].dropna()
+        if valid.empty:
+            continue
+        residual = valid["prediction"].to_numpy(dtype=float) - valid["reference"].to_numpy(dtype=float)
+        rows.append(
+            {
+                "heldout_well": heldout_well,
+                "train_wells": train_wells,
+                "wlc_name": wlc_name,
+                "selected_realization": realization,
+                "selected_strategy": selection_strategy,
+                "saturation_bin": str(bin_name),
+                "saturation_bin_label": SATURATION_BIN_DISPLAY.get(str(bin_name), str(bin_name)),
+                "n": int(len(valid)),
+                "bias": float(np.mean(residual)),
+                "bias_pp": float(np.mean(residual) * 100.0),
+                "mae_pp": float(np.mean(np.abs(residual)) * 100.0),
+                "rmse_pp": float(math.sqrt(np.mean(residual**2)) * 100.0),
+                "reference_mean_pp": float(valid["reference"].mean() * 100.0),
+                "prediction_mean_pp": float(valid["prediction"].mean() * 100.0),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def well_short_label(well: str) -> str:
+    return well.replace("Well", "") if well.startswith("Well") else well
+
+
+def bias_direction(value: object) -> str:
+    if pd.isna(value):
+        return "no rows"
+    bias = float(value)
+    if bias > 0.5:
+        return "overpredict"
+    if bias < -0.5:
+        return "underpredict"
+    return "near zero"
+
+
+def build_slide8_bias_long(bin_bias_df: pd.DataFrame, selected_df: pd.DataFrame, heldout_wells: list[str]) -> pd.DataFrame:
+    """Create one slide-ready row per held-out well and saturation bin.
+
+    The workbook intentionally contains aggregate bin statistics only. It does
+    not include row-level private predictions or the private model matrix.
+    """
+    selected_lookup = {}
+    if not selected_df.empty:
+        selected_lookup = {str(row["heldout_well"]): row for _, row in selected_df.iterrows()}
+
+    rows: list[dict[str, object]] = []
+    for heldout in heldout_wells:
+        meta = WELL_METADATA.get(heldout, {})
+        selected = selected_lookup.get(heldout, {})
+        for order, bin_name in enumerate(SATURATION_BIN_LABELS, start=1):
+            match = pd.DataFrame()
+            if not bin_bias_df.empty:
+                match = bin_bias_df[
+                    bin_bias_df["heldout_well"].astype(str).eq(heldout)
+                    & bin_bias_df["saturation_bin"].astype(str).eq(bin_name)
+                ]
+            if match.empty:
+                values = {
+                    "n": 0,
+                    "bias": pd.NA,
+                    "bias_pp": pd.NA,
+                    "mae_pp": pd.NA,
+                    "rmse_pp": pd.NA,
+                    "reference_mean_pp": pd.NA,
+                    "prediction_mean_pp": pd.NA,
+                    "data_status": "no_rows_in_bin",
+                }
+            else:
+                source = match.iloc[0]
+                values = {
+                    "n": int(source.get("n", 0)),
+                    "bias": source.get("bias", pd.NA),
+                    "bias_pp": source.get("bias_pp", pd.NA),
+                    "mae_pp": source.get("mae_pp", pd.NA),
+                    "rmse_pp": source.get("rmse_pp", pd.NA),
+                    "reference_mean_pp": source.get("reference_mean_pp", pd.NA),
+                    "prediction_mean_pp": source.get("prediction_mean_pp", pd.NA),
+                    "data_status": "ok",
+                }
+
+            rows.append(
+                {
+                    "heldout_well": heldout,
+                    "well_label": well_short_label(heldout),
+                    "region": meta.get("region", ""),
+                    "origin": meta.get("origin", ""),
+                    "plot_color": meta.get("color", ""),
+                    "train_wells": selected.get("train_wells", ""),
+                    "wlc_name": selected.get("wlc_name", ""),
+                    "selected_realization": selected.get("selected_realization", ""),
+                    "selected_strategy": selected.get("selected_strategy", ""),
+                    "saturation_bin_order": order,
+                    "saturation_bin": bin_name,
+                    "saturation_bin_label": SATURATION_BIN_DISPLAY.get(bin_name, bin_name),
+                    **values,
+                }
+            )
+
+    out = pd.DataFrame(rows)
+    if not out.empty:
+        out["bias_direction"] = out["bias_pp"].map(bias_direction)
+        out["slide8_label"] = out.apply(
+            lambda row: "" if pd.isna(row["bias_pp"]) else f"{float(row['bias_pp']):+.1f}",
+            axis=1,
+        )
+    return out
+
+
+def build_slide8_bias_wide(slide8_long: pd.DataFrame, heldout_wells: list[str]) -> pd.DataFrame:
+    if slide8_long.empty:
+        return pd.DataFrame()
+    base_cols = ["saturation_bin_order", "saturation_bin", "saturation_bin_label"]
+    base = slide8_long[base_cols].drop_duplicates().sort_values("saturation_bin_order").reset_index(drop=True)
+    for heldout in heldout_wells:
+        cut = slide8_long[slide8_long["heldout_well"].eq(heldout)].copy()
+        label = well_short_label(heldout)
+        keep = base_cols + ["bias_pp", "n", "data_status", "slide8_label"]
+        cut = cut[keep].rename(
+            columns={
+                "bias_pp": f"{label}_bias_pp",
+                "n": f"{label}_n",
+                "data_status": f"{label}_data_status",
+                "slide8_label": f"{label}_slide8_label",
+            }
+        )
+        base = base.merge(cut, on=base_cols, how="left")
+    return base
+
+
+def format_excel_workbook(writer: pd.ExcelWriter) -> None:
+    workbook = writer.book
+    for worksheet in writer.sheets.values():
+        worksheet.freeze_panes = "A2"
+        worksheet.sheet_view.showGridLines = False
+        for column_cells in worksheet.columns:
+            values = [str(cell.value) if cell.value is not None else "" for cell in column_cells]
+            width = min(max(max((len(value) for value in values), default=0) + 2, 10), 42)
+            worksheet.column_dimensions[column_cells[0].column_letter].width = width
+    for sheet_name in ["slide8_bias_long", "slide8_bias_wide"]:
+        if sheet_name in writer.sheets:
+            ws = writer.sheets[sheet_name]
+            for cell in ws[1]:
+                cell.font = cell.font.copy(bold=True)
+    if "README" in writer.sheets:
+        ws = writer.sheets["README"]
+        ws.column_dimensions["A"].width = 28
+        ws.column_dimensions["B"].width = 92
+        for cell in ws[1]:
+            cell.font = cell.font.copy(bold=True)
+    workbook.active = workbook.sheetnames.index("slide8_bias_long") if "slide8_bias_long" in workbook.sheetnames else 0
+
+
+def write_slide8_excel_workbook(
+    output_dir: Path,
+    selected_df: pd.DataFrame,
+    bin_bias_df: pd.DataFrame,
+    heldout_wells: list[str],
+    cfg: AnnConfig,
+    target_col: str,
+    occurrence_threshold: float,
+) -> tuple[Path, pd.DataFrame, pd.DataFrame]:
+    workbook_path = output_dir / "ann_loo_slide8_saturation_bin_bias.xlsx"
+    slide8_long = build_slide8_bias_long(bin_bias_df, selected_df, heldout_wells)
+    slide8_wide = build_slide8_bias_wide(slide8_long, heldout_wells)
+    readme = pd.DataFrame(
+        [
+            {"field": "purpose", "value": "Slide 8 source workbook: ANN prediction minus reference by saturation bin for every held-out well."},
+            {"field": "data_boundary", "value": "Aggregate bin statistics only; no row-level predictions, private model matrix, or trained model bundle."},
+            {"field": "bias_definition", "value": "bias_pp = mean(ANN prediction - reference hydrate saturation) in percentage points."},
+            {"field": "bin_source", "value": "Rows are binned by reference hydrate saturation."},
+            {"field": "well_scope", "value": ", ".join(heldout_wells)},
+            {"field": "wlc_name", "value": cfg.wlc_name},
+            {"field": "target_column", "value": target_col},
+            {"field": "occurrence_threshold", "value": occurrence_threshold},
+            {"field": "missing_bin_rule", "value": "If a well has no rows in a bin, n=0 and bias fields stay blank."},
+            {"field": "recommended_slide_sheet", "value": "Use slide8_bias_wide for plotting and slide8_bias_long for audit labels."},
+        ]
+    )
+    try:
+        with pd.ExcelWriter(workbook_path, engine="openpyxl") as writer:
+            slide8_long.to_excel(writer, sheet_name="slide8_bias_long", index=False)
+            slide8_wide.to_excel(writer, sheet_name="slide8_bias_wide", index=False)
+            selected_df.to_excel(writer, sheet_name="fold_summary", index=False)
+            readme.to_excel(writer, sheet_name="README", index=False)
+            format_excel_workbook(writer)
+    except ModuleNotFoundError as exc:
+        raise SystemExit("Missing Excel dependency. Install with: pip install openpyxl") from exc
+    return workbook_path, slide8_long, slide8_wide
+
+
+def copy_slide8_workbook(workbook_path: Path, copy_dir: Path | None, copy_to_downloads: bool) -> list[Path]:
+    targets: list[Path] = []
+    if copy_dir is not None:
+        targets.append(copy_dir)
+    if copy_to_downloads:
+        targets.append(Path.home() / "Downloads")
+
+    copied: list[Path] = []
+    seen: set[Path] = set()
+    for target_dir in targets:
+        resolved = target_dir.expanduser().resolve()
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        resolved.mkdir(parents=True, exist_ok=True)
+        dest = resolved / workbook_path.name
+        shutil.copy2(workbook_path, dest)
+        copied.append(dest)
+    return copied
+
+
 def make_ann(seed: int, cfg: AnnConfig) -> Pipeline:
     ann = MLPRegressor(
         hidden_layer_sizes=cfg.hidden_layer_sizes,
@@ -484,6 +734,8 @@ def write_email_packet(
     selected_df: pd.DataFrame,
     metrics_path: Path,
     selected_path: Path,
+    bin_bias_path: Path,
+    slide8_workbook_path: Path,
     weights_path: Path,
     contact_sheet_path: Path,
     figure_paths: list[Path],
@@ -496,6 +748,8 @@ def write_email_packet(
     copied_paths: list[Path] = []
     review_metrics_path = copy_existing(metrics_path, review_dir, copied_paths)
     review_summary_path = copy_existing(selected_path, review_dir, copied_paths)
+    review_bin_bias_path = copy_existing(bin_bias_path, review_dir, copied_paths)
+    review_slide8_workbook_path = copy_existing(slide8_workbook_path, review_dir, copied_paths)
     review_weights_path = copy_existing(weights_path, review_dir, copied_paths)
     review_contact_sheet_path = copy_existing(contact_sheet_path, review_dir, copied_paths)
     copy_existing(note_path, review_dir, copied_paths)
@@ -532,6 +786,8 @@ def write_email_packet(
                 "Use first:",
                 "- ann_loo_scatter_contact_sheet.png for the four scatter plots in one image.",
                 "- ann_loo_fold_summary.csv for the selected R2/RMSE values.",
+                "- ann_loo_selected_saturation_bin_bias.csv for ANN bias by saturation bin.",
+                "- ann_loo_slide8_saturation_bin_bias.xlsx for slide-ready A-D bin-bias tables.",
                 "- figures/ for individual held-out-well scatter PNGs.",
                 "",
                 "Wording note:",
@@ -555,6 +811,7 @@ def write_email_packet(
     outlook_script_path = review_dir / f"open_outlook_draft_{CODE_VERSION}.ps1"
     attachments = [
         share_packet_zip,
+        review_slide8_workbook_path,
         review_contact_sheet_path,
         review_summary_path,
         packet_readme_path,
@@ -597,6 +854,8 @@ $attachments | ForEach-Object {{ Write-Host " - $_" }}
         ("share_packet_zip", share_packet_zip),
         ("contact_sheet_png", review_contact_sheet_path),
         ("fold_summary_csv", review_summary_path),
+        ("selected_saturation_bin_bias_csv", review_bin_bias_path),
+        ("slide8_saturation_bin_bias_xlsx", review_slide8_workbook_path),
         ("metrics_by_realization_csv", review_metrics_path),
         ("wlc_feature_weights_csv", review_weights_path),
         ("packet_readme", packet_readme_path),
@@ -655,6 +914,7 @@ $attachments | ForEach-Object {{ Write-Host " - $_" }}
         "outlook_draft_status": outlook_status,
         "review_contact_sheet": str(review_contact_sheet_path) if review_contact_sheet_path else "",
         "review_fold_summary": str(review_summary_path) if review_summary_path else "",
+        "review_slide8_workbook": str(review_slide8_workbook_path) if review_slide8_workbook_path else "",
         "review_figures": [str(path) for path in review_figure_paths],
     }
 
@@ -671,6 +931,8 @@ def run_ann_loo(
     occurrence_threshold: float,
     create_email_packet: bool,
     open_outlook_draft: bool,
+    slide8_excel_copy_dir: Path | None,
+    copy_slide8_excel_to_downloads: bool,
 ) -> dict[str, object]:
     load_ml_globals()
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -698,6 +960,7 @@ def run_ann_loo(
 
     metric_rows: list[dict[str, object]] = []
     selected_rows: list[dict[str, object]] = []
+    bin_bias_rows: list[dict[str, object]] = []
     prediction_frames: list[pd.DataFrame] = []
     figure_paths: list[Path] = []
 
@@ -754,6 +1017,17 @@ def run_ann_loo(
         selected_prediction = [p for p in fold_predictions if int(p["realization"].iloc[0]) == selected_realization][0]
         if save_private_predictions:
             prediction_frames.append(selected_prediction)
+        bin_bias_rows.extend(
+            saturation_bin_bias(
+                selected_prediction,
+                target_col=target_col,
+                heldout_well=heldout,
+                train_wells="+".join(train_wells),
+                wlc_name=cfg.wlc_name,
+                realization=selected_realization,
+                selection_strategy=cfg.scatter_selection,
+            ).to_dict(orient="records")
+        )
 
         figure_path = figure_dir / f"ann_loo_scatter_{heldout.lower()}_{cfg.wlc_name}.png"
         plot_scatter(selected_prediction, heldout, cfg, selected_metric, figure_path, target_col)
@@ -769,9 +1043,23 @@ def run_ann_loo(
                 "selected_strategy": cfg.scatter_selection,
                 "selected_r2": float(selected_metric["r2"]),
                 "selected_rmse": float(selected_metric["rmse"]),
+                "selected_occurrence_balanced_accuracy": float(selected_metric["occurrence_balanced_accuracy"]),
+                "selected_occurrence_accuracy": float(selected_metric["occurrence_accuracy"]),
+                "selected_occurrence_precision": float(selected_metric["occurrence_precision"]),
+                "selected_occurrence_recall": float(selected_metric["occurrence_recall"]),
+                "selected_occurrence_f1": float(selected_metric["occurrence_f1"]),
+                "selected_occurrence_reference_positive_rate": float(selected_metric["occurrence_positive_rate_reference"]),
+                "selected_occurrence_predicted_positive_rate": float(selected_metric["occurrence_positive_rate_predicted"]),
+                "selected_occurrence_true_positive": int(selected_metric["occurrence_true_positive"]),
+                "selected_occurrence_false_positive": int(selected_metric["occurrence_false_positive"]),
+                "selected_occurrence_false_negative": int(selected_metric["occurrence_false_negative"]),
+                "selected_occurrence_true_negative": int(selected_metric["occurrence_true_negative"]),
                 "mean_r2_across_realizations": float(fold_metric_df["r2"].mean()),
                 "median_r2_across_realizations": float(fold_metric_df["r2"].median()),
                 "max_r2_across_realizations": float(fold_metric_df["r2"].max()),
+                "mean_occurrence_balanced_accuracy_across_realizations": float(
+                    fold_metric_df["occurrence_balanced_accuracy"].mean()
+                ),
                 "reference_prior_r2_mean_if_available": reference.get("r2_mean", ""),
                 "reference_prior_rmse_mean_if_available": reference.get("rmse_mean", ""),
                 "reference_source": reference.get("source", ""),
@@ -781,12 +1069,29 @@ def run_ann_loo(
 
     metrics_df = pd.DataFrame(metric_rows)
     selected_df = pd.DataFrame(selected_rows)
+    bin_bias_df = pd.DataFrame(bin_bias_rows)
     metrics_path = output_dir / "ann_loo_metrics_by_realization.csv"
     selected_path = output_dir / "ann_loo_fold_summary.csv"
+    bin_bias_path = output_dir / "ann_loo_selected_saturation_bin_bias.csv"
     weights_path = output_dir / "ann_loo_wlc_feature_weights.csv"
     metrics_df.to_csv(metrics_path, index=False)
     selected_df.to_csv(selected_path, index=False)
+    bin_bias_df.to_csv(bin_bias_path, index=False)
     feature_weights.to_csv(weights_path, index=False)
+    slide8_workbook_path, slide8_long_df, slide8_wide_df = write_slide8_excel_workbook(
+        output_dir=output_dir,
+        selected_df=selected_df,
+        bin_bias_df=bin_bias_df,
+        heldout_wells=heldout_wells,
+        cfg=cfg,
+        target_col=target_col,
+        occurrence_threshold=occurrence_threshold,
+    )
+    slide8_copied_paths = copy_slide8_workbook(
+        slide8_workbook_path,
+        copy_dir=slide8_excel_copy_dir,
+        copy_to_downloads=copy_slide8_excel_to_downloads,
+    )
 
     predictions_path = ""
     if save_private_predictions and prediction_frames:
@@ -812,6 +1117,7 @@ def run_ann_loo(
                 "Important wording:",
                 "- WLC feature weights are input-selection weights, not neural hidden-layer weights.",
                 "- If `best_r2` selection is used, the figure is a best-realization visualization, not an unbiased model-selection claim.",
+                f"- Slide 8 workbook: `{slide8_workbook_path.name}` contains A-D bin-bias tables.",
             ]
         )
         + "\n",
@@ -829,6 +1135,8 @@ def run_ann_loo(
             selected_df=selected_df,
             metrics_path=metrics_path,
             selected_path=selected_path,
+            bin_bias_path=bin_bias_path,
+            slide8_workbook_path=slide8_workbook_path,
             weights_path=weights_path,
             contact_sheet_path=contact_sheet_path,
             figure_paths=figure_paths,
@@ -850,6 +1158,11 @@ def run_ann_loo(
         "outputs": {
             "metrics_by_realization": str(metrics_path),
             "fold_summary": str(selected_path),
+            "selected_saturation_bin_bias": str(bin_bias_path),
+            "slide8_saturation_bin_bias_workbook": str(slide8_workbook_path),
+            "slide8_saturation_bin_bias_workbook_copies": [str(path) for path in slide8_copied_paths],
+            "slide8_bias_long_rows": int(len(slide8_long_df)),
+            "slide8_bias_wide_rows": int(len(slide8_wide_df)),
             "wlc_feature_weights": str(weights_path),
             "private_selected_predictions": predictions_path,
             "figure_dir": str(figure_dir),
@@ -897,10 +1210,19 @@ def print_plan(args: argparse.Namespace) -> None:
                 "share_packet_V26_ann_loo_scatter_plots.zip",
                 "ann_loo_scatter_contact_sheet.png",
                 "ann_loo_fold_summary.csv",
+                "ann_loo_selected_saturation_bin_bias.csv",
+                "ann_loo_slide8_saturation_bin_bias.xlsx",
                 "individual scatter PNGs",
                 "Outlook draft helper PowerShell script",
             ],
             "automatic_outlook_draft_default": os.name == "nt",
+        },
+        "slide8_excel": {
+            "created_by_default": True,
+            "output_name": "ann_loo_slide8_saturation_bin_bias.xlsx",
+            "sheets": ["slide8_bias_long", "slide8_bias_wide", "fold_summary", "README"],
+            "copy_to_downloads_flag": "--copy-slide8-excel-to-downloads",
+            "copy_to_custom_dir_flag": "--slide8-excel-copy-dir",
         },
         "boundary_note": "Code can go to GitHub. Private model matrices and row-level predictions should not.",
     }
@@ -938,6 +1260,17 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--no-private-predictions", action="store_true", help="Skip row-level selected prediction CSV output.")
     parser.add_argument("--no-email-packet", action="store_true", help="Skip compact ZIP packet and Outlook draft helper output.")
     parser.add_argument("--no-open-outlook-draft", action="store_true", help="Create the packet/helper but do not automatically open Outlook.")
+    parser.add_argument(
+        "--slide8-excel-copy-dir",
+        default=os.environ.get("ANN_LOO_SLIDE8_EXCEL_COPY_DIR", ""),
+        help="Optional folder to receive a copy of ann_loo_slide8_saturation_bin_bias.xlsx, such as a Google Drive sync folder.",
+    )
+    parser.add_argument(
+        "--copy-slide8-excel-to-downloads",
+        action="store_true",
+        default=os.environ.get("ANN_LOO_COPY_SLIDE8_EXCEL_TO_DOWNLOADS", "").strip().lower() in {"1", "true", "yes"},
+        help="Also copy ann_loo_slide8_saturation_bin_bias.xlsx to ~/Downloads.",
+    )
     parser.add_argument("--occurrence-threshold", type=float, default=float(os.environ.get("ANN_LOO_OCCURRENCE_THRESHOLD", DEFAULT_OCCURRENCE_THRESHOLD)))
     parser.add_argument("--print-plan", action="store_true")
     return parser
@@ -974,6 +1307,7 @@ def main() -> None:
     )
     env_open_outlook = os.environ.get("ANN_LOO_OPEN_OUTLOOK_DRAFT", "1").strip().lower() not in {"0", "false", "no"}
     output_dir = Path(args.output_dir) if args.output_dir else runtime_output_dir()
+    slide8_excel_copy_dir = Path(args.slide8_excel_copy_dir) if args.slide8_excel_copy_dir else None
     manifest = run_ann_loo(
         model_matrix=Path(args.model_matrix_csv),
         output_dir=output_dir,
@@ -986,6 +1320,8 @@ def main() -> None:
         occurrence_threshold=args.occurrence_threshold,
         create_email_packet=not args.no_email_packet,
         open_outlook_draft=env_open_outlook and not args.no_open_outlook_draft,
+        slide8_excel_copy_dir=slide8_excel_copy_dir,
+        copy_slide8_excel_to_downloads=args.copy_slide8_excel_to_downloads,
     )
     print(json.dumps(manifest, indent=2))
 
