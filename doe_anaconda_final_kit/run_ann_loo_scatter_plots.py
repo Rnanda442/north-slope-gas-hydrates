@@ -231,17 +231,85 @@ def read_table(path: Path) -> pd.DataFrame:
     raise ValueError(f"unsupported model matrix file type: {path.suffix}")
 
 
-def load_model_matrix(path: Path, target_col: str) -> pd.DataFrame:
-    df = read_table(path)
+def prepare_model_matrix(df: pd.DataFrame, target_col: str, source_label: str) -> pd.DataFrame:
     required = {"well_alias", target_col}
     missing = sorted(required.difference(df.columns))
     if missing:
-        raise ValueError(f"model matrix missing required columns: {missing}")
+        raise ValueError(f"{source_label} missing required columns: {missing}")
     out = df.copy()
     out[target_col] = normalize_fraction(out[target_col])
     out = out[out[target_col].notna()].copy()
+    if out.empty:
+        raise ValueError(f"{source_label} has no non-null {target_col} rows")
     out["well_alias"] = out["well_alias"].astype(str)
     return out
+
+
+def load_model_matrix(path: Path, target_col: str) -> pd.DataFrame:
+    return prepare_model_matrix(read_table(path), target_col, f"model matrix {path}")
+
+
+NOTEBOOK_MODEL_MATRIX_CANDIDATES = (
+    "features_df",
+    "model_matrix_df",
+    "model_matrix",
+    "model_df",
+    "training_df",
+    "ml_df",
+    "active_df",
+    "df",
+)
+
+
+def find_model_matrix_dataframe_in_namespace(
+    namespace: dict[str, object],
+    target_col: str,
+    wlc_name: str,
+    min_feature_count: int,
+    compute_derived: bool,
+) -> tuple[pd.DataFrame | None, str]:
+    ordered_names = [name for name in NOTEBOOK_MODEL_MATRIX_CANDIDATES if name in namespace]
+    ordered_names.extend(name for name in namespace if name not in ordered_names)
+
+    candidates: list[tuple[tuple[int, int, int, int], str, pd.DataFrame]] = []
+    seen_ids: set[int] = set()
+    for name in ordered_names:
+        value = namespace.get(name)
+        if id(value) in seen_ids or not isinstance(value, pd.DataFrame):
+            continue
+        seen_ids.add(id(value))
+        try:
+            prepared = prepare_model_matrix(value, target_col, f"notebook dataframe {name!r}")
+            feature_frame = add_derived_features(prepared) if compute_derived else prepared
+            features, _ = selected_features(feature_frame, wlc_name, min_feature_count)
+        except Exception:
+            continue
+        wells = sorted(prepared["well_alias"].dropna().astype(str).unique().tolist())
+        preferred_rank = len(NOTEBOOK_MODEL_MATRIX_CANDIDATES)
+        if name in NOTEBOOK_MODEL_MATRIX_CANDIDATES:
+            preferred_rank = NOTEBOOK_MODEL_MATRIX_CANDIDATES.index(name)
+        score = (-preferred_rank, len(features), len(wells), len(prepared))
+        label = f"notebook dataframe `{name}`"
+        candidates.append((score, label, value.copy()))
+
+    if not candidates:
+        return None, ""
+    _, label, frame = max(candidates, key=lambda item: item[0])
+    return frame, label
+
+
+def find_notebook_model_matrix(
+    target_col: str,
+    wlc_name: str,
+    min_feature_count: int,
+    compute_derived: bool,
+) -> tuple[pd.DataFrame | None, str]:
+    try:
+        ipython = get_ipython()  # type: ignore[name-defined]
+    except NameError:
+        return None, ""
+    namespace = getattr(ipython, "user_ns", {}) or {}
+    return find_model_matrix_dataframe_in_namespace(namespace, target_col, wlc_name, min_feature_count, compute_derived)
 
 
 def add_derived_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -728,7 +796,7 @@ def copy_existing(src: Path, dest_dir: Path, copied_paths: list[Path], subdir: s
 def write_email_packet(
     output_dir: Path,
     cfg: AnnConfig,
-    model_matrix: Path,
+    model_matrix_label: str,
     heldout_wells: list[str],
     features: list[str],
     selected_df: pd.DataFrame,
@@ -763,7 +831,7 @@ def write_email_packet(
         "heldout_wells": heldout_wells,
         "features_used": features,
         "scatter_selection": cfg.scatter_selection,
-        "model_matrix_name_only": model_matrix.name,
+        "model_matrix_name_only": model_matrix_label,
         "row_level_predictions_included": False,
         "summary_rows": selected_df.to_dict(orient="records"),
         "boundary_note": "Compact packet for review. It excludes row-level prediction CSVs and the private model matrix.",
@@ -920,7 +988,7 @@ $attachments | ForEach-Object {{ Write-Host " - $_" }}
 
 
 def run_ann_loo(
-    model_matrix: Path,
+    model_matrix: Path | None,
     output_dir: Path,
     target_col: str,
     heldout_wells: list[str],
@@ -933,13 +1001,25 @@ def run_ann_loo(
     open_outlook_draft: bool,
     slide8_excel_copy_dir: Path | None,
     copy_slide8_excel_to_downloads: bool,
+    model_matrix_df: pd.DataFrame | None = None,
+    model_matrix_source: str = "",
 ) -> dict[str, object]:
     load_ml_globals()
     output_dir.mkdir(parents=True, exist_ok=True)
     figure_dir = output_dir / "figures"
     figure_dir.mkdir(parents=True, exist_ok=True)
 
-    df = load_model_matrix(model_matrix, target_col)
+    if model_matrix_df is not None:
+        model_matrix_input_mode = "notebook_dataframe"
+        model_matrix_label = model_matrix_source or "notebook dataframe"
+        df = prepare_model_matrix(model_matrix_df, target_col, model_matrix_label)
+    elif model_matrix is not None:
+        model_matrix_input_mode = "file"
+        model_matrix_label = model_matrix.name
+        df = load_model_matrix(model_matrix, target_col)
+    else:
+        raise ValueError("Provide a model-matrix path or notebook dataframe.")
+
     if compute_derived:
         df = add_derived_features(df)
 
@@ -1129,7 +1209,7 @@ def run_ann_loo(
         email_outputs = write_email_packet(
             output_dir=output_dir,
             cfg=cfg,
-            model_matrix=model_matrix,
+            model_matrix_label=model_matrix_label,
             heldout_wells=heldout_wells,
             features=features,
             selected_df=selected_df,
@@ -1147,7 +1227,8 @@ def run_ann_loo(
     manifest = {
         "code_version": CODE_VERSION,
         "created": datetime.now().isoformat(timespec="seconds"),
-        "model_matrix": str(model_matrix),
+        "model_matrix": str(model_matrix) if model_matrix is not None else model_matrix_label,
+        "model_matrix_input_mode": model_matrix_input_mode,
         "target_column": target_col,
         "heldout_wells": heldout_wells,
         "available_wells": all_wells,
@@ -1198,6 +1279,7 @@ def print_plan(args: argparse.Namespace) -> None:
     plan = {
         "code_version": CODE_VERSION,
         "required_private_input": ["well_alias", args.target_column],
+        "notebook_input_fallback": "If --model-matrix-csv is omitted in Jupyter, the runner looks for a usable `features_df` dataframe.",
         "heldout_wells": parse_wells(args.heldout_wells),
         "default_wlc": args.wlc,
         "default_wlc_features": WLC_FEATURES[args.wlc],
@@ -1315,8 +1397,22 @@ def main() -> None:
         if not args.model_matrix_csv:
             return
 
-    if not args.model_matrix_csv:
-        raise SystemExit("Provide --model-matrix-csv or set ANN_LOO_MODEL_MATRIX. Use --print-plan to view the scaffold without private data.")
+    model_matrix_path = Path(args.model_matrix_csv) if args.model_matrix_csv else None
+    model_matrix_df: pd.DataFrame | None = None
+    model_matrix_source = ""
+    if model_matrix_path is None:
+        model_matrix_df, model_matrix_source = find_notebook_model_matrix(
+            target_col=args.target_column,
+            wlc_name=args.wlc,
+            min_feature_count=args.min_feature_count,
+            compute_derived=not args.no_compute_derived,
+        )
+        if model_matrix_df is None:
+            raise SystemExit(
+                "Provide --model-matrix-csv, set ANN_LOO_MODEL_MATRIX, or run this after the V26 "
+                "notebook cell that defines a usable `features_df` dataframe."
+            )
+        print(f"Using {model_matrix_source} as the ANN LOO model matrix.")
 
     cfg = AnnConfig(
         wlc_name=args.wlc,
@@ -1339,7 +1435,7 @@ def main() -> None:
     output_dir = Path(args.output_dir) if args.output_dir else runtime_output_dir()
     slide8_excel_copy_dir = Path(args.slide8_excel_copy_dir) if args.slide8_excel_copy_dir else None
     manifest = run_ann_loo(
-        model_matrix=Path(args.model_matrix_csv),
+        model_matrix=model_matrix_path,
         output_dir=output_dir,
         target_col=args.target_column,
         heldout_wells=parse_wells(args.heldout_wells),
@@ -1352,6 +1448,8 @@ def main() -> None:
         open_outlook_draft=env_open_outlook and not args.no_open_outlook_draft,
         slide8_excel_copy_dir=slide8_excel_copy_dir,
         copy_slide8_excel_to_downloads=args.copy_slide8_excel_to_downloads,
+        model_matrix_df=model_matrix_df,
+        model_matrix_source=model_matrix_source,
     )
     print(json.dumps(manifest, indent=2))
 
