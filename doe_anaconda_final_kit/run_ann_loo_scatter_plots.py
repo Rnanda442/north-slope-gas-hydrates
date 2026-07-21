@@ -1276,9 +1276,39 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def is_jupyter_kernel_arg(arg: str) -> bool:
+    return arg in {"-f", "--f"} or arg.startswith("-f=") or arg.startswith("--f=")
+
+
+def parse_args_notebook_safe(parser: argparse.ArgumentParser) -> argparse.Namespace:
+    """Parse CLI args while tolerating Jupyter's injected kernel-file arg.
+
+    Running this helper from a notebook can add an argument such as
+    ``--f=C:\\...\\kernel-*.json`` to ``sys.argv``. That argument belongs to
+    ipykernel, not this runner. We ignore only that Jupyter argument and still
+    fail on real unknown runner flags so typos do not pass silently.
+    """
+    args, unknown = parser.parse_known_args()
+    unexpected: list[str] = []
+    skip_next = False
+    for arg in unknown:
+        if skip_next:
+            skip_next = False
+            continue
+        if arg in {"-f", "--f"}:
+            skip_next = True
+            continue
+        if is_jupyter_kernel_arg(arg):
+            continue
+        unexpected.append(arg)
+    if unexpected:
+        parser.error("unrecognized arguments: " + " ".join(unexpected))
+    return args
+
+
 def main() -> None:
     parser = build_parser()
-    args = parser.parse_args()
+    args = parse_args_notebook_safe(parser)
 
     if args.print_plan:
         print_plan(args)
