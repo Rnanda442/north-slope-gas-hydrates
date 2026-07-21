@@ -1410,7 +1410,8 @@ def main() -> None:
         if model_matrix_df is None:
             raise SystemExit(
                 "Provide --model-matrix-csv, set ANN_LOO_MODEL_MATRIX, or run this after the V26 "
-                "notebook cell that defines a usable `features_df` dataframe."
+                "notebook cell that defines a usable `features_df` dataframe. If using %run, use "
+                "`%run -i ./run_ann_loo_scatter_plots.py --copy-slide8-excel-to-downloads`."
             )
         print(f"Using {model_matrix_source} as the ANN LOO model matrix.")
 
