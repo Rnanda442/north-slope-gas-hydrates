@@ -32,9 +32,10 @@ slug and `V22_output_review_<RUN_ID>` review folder.
 
 ## Optional ANN Leave-One-Well-Out Scatter Runner
 
-The normal DOE/Anaconda handoff is the V26 notebook above. This script is only a
-small command-line helper for cases where a private model matrix has already
-been exported and the full notebook does not need to be rerun:
+The normal DOE/Anaconda handoff is the V26 notebook above. This script is a
+small helper for cases where a private model matrix has already been exported
+or where the V26 notebook has already built the in-memory `features_df` model
+matrix:
 
 ```text
 run_ann_loo_scatter_plots.py
@@ -59,7 +60,9 @@ python doe_anaconda_final_kit/run_ann_loo_scatter_plots.py --print-plan
 
 If the runner is called from inside a Jupyter notebook, it safely ignores the
 kernel `-f/--f kernel.json` argument that Jupyter adds automatically. Real
-unknown runner flags still fail.
+unknown runner flags still fail. When no `--model-matrix-csv` is provided, the
+runner also looks for the V26 notebook's in-memory `features_df` dataframe and
+uses it as the model matrix.
 
 Dependencies:
 
@@ -72,6 +75,15 @@ Run it on a private model matrix:
 ```powershell
 python doe_anaconda_final_kit/run_ann_loo_scatter_plots.py `
   --model-matrix-csv "C:\path\to\private_model_matrix.csv"
+```
+
+Or, after running the V26 notebook cells that build `features_df`, run the
+helper from a notebook cell without exporting a CSV first:
+
+```python
+import os
+os.environ["ANN_LOO_COPY_SLIDE8_EXCEL_TO_DOWNLOADS"] = "1"
+main()
 ```
 
 To put the slide 8 Excel workbook somewhere easy to upload to Drive, add:
