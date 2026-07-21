@@ -81,7 +81,7 @@ Or, after running the V26 notebook cells that build `features_df`, run the
 updated helper from a notebook cell without exporting a CSV first:
 
 ```python
-%run ./run_ann_loo_scatter_plots.py --copy-slide8-excel-to-downloads
+%run -i ./run_ann_loo_scatter_plots.py --copy-slide8-excel-to-downloads
 ```
 
 To put the slide 8 Excel workbook somewhere easy to upload to Drive, add:
