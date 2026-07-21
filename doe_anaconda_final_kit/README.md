@@ -57,6 +57,10 @@ View the plan without reading private data:
 python doe_anaconda_final_kit/run_ann_loo_scatter_plots.py --print-plan
 ```
 
+If the runner is called from inside a Jupyter notebook, it safely ignores the
+kernel `-f/--f kernel.json` argument that Jupyter adds automatically. Real
+unknown runner flags still fail.
+
 Dependencies:
 
 ```powershell
