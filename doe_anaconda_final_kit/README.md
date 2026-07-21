@@ -78,12 +78,10 @@ python doe_anaconda_final_kit/run_ann_loo_scatter_plots.py `
 ```
 
 Or, after running the V26 notebook cells that build `features_df`, run the
-helper from a notebook cell without exporting a CSV first:
+updated helper from a notebook cell without exporting a CSV first:
 
 ```python
-import os
-os.environ["ANN_LOO_COPY_SLIDE8_EXCEL_TO_DOWNLOADS"] = "1"
-main()
+%run ./run_ann_loo_scatter_plots.py --copy-slide8-excel-to-downloads
 ```
 
 To put the slide 8 Excel workbook somewhere easy to upload to Drive, add:
