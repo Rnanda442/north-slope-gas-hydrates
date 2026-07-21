@@ -111,6 +111,17 @@ and WellD. The fold summary includes the selected ANN
 occurrence-style scores derived from the saturation threshold, so Slides 8-9 can
 use ANN bin-bias and ANN occurrence checks after the next run.
 
+The V26 notebook itself also writes a private helper input CSV:
+
+```text
+ann_loo_model_matrix_<RUN_SLUG>.csv
+```
+
+It is written under `OUTPUT_DIR` and copied to `~/Downloads`. Use that file as
+`--model-matrix-csv` when the notebook kernel no longer has `features_df` in
+memory. This is row-level model input, so it is intentionally excluded from the
+share packet ZIP.
+
 The runner also creates an email packet by default:
 
 ```text
