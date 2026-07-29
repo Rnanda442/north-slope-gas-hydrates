@@ -144,6 +144,55 @@ neural-network hidden-layer weights. If `best_r2` scatter selection is used,
 use the figure as a best-realization visual rather than an unbiased
 model-selection claim.
 
+## V27 Audience Q&A Diagnostic Packet
+
+Use V27 when you need source-backed answers to mentor/audience questions rather
+than a new ANN training run:
+
+```text
+DOE_MASTER_ML_PIPELINE_EQUATION_FIRST_V27_QNA_DIAGNOSTICS_PACKET.ipynb
+run_qna_diagnostics_v27.py
+```
+
+V27 reads the private V26 model matrix and optional V26 output folder, then
+creates aggregate tables for:
+
+- stability readiness and public stability-screen matches
+- QC/caliper-mask readiness and pass/review error summaries
+- occurrence threshold sensitivity
+- saturation-vs-occurrence failure modes
+- ambiguity from log-family disagreement
+- feature-family importance grouped as resistivity, elastic, lithology, and
+  density/porosity evidence
+- a compact email packet and Outlook draft helper
+
+View the plan without reading private data:
+
+```powershell
+python doe_anaconda_final_kit/run_qna_diagnostics_v27.py --print-plan
+```
+
+Run it after V26 outputs are available:
+
+```powershell
+python doe_anaconda_final_kit/run_qna_diagnostics_v27.py `
+  --model-matrix-csv "C:\path\to\ann_loo_model_matrix_v26_ann_loo_scatter_packet.csv" `
+  --v26-output-dir "C:\path\to\ann_helper_full_<run_time>" `
+  --importance-csv "C:\path\to\ann_permutation_importance.csv"
+```
+
+Outputs go under ignored `outputs_runtime/qna_diagnostics_v27/` unless
+`--output-dir` is passed. To open the final email draft packet, add:
+
+```powershell
+--open-outlook-draft
+```
+
+Important wording: V27 does not prove hydrate stability by itself. If the model
+matrix lacks interval stability columns or pressure-temperature pairs, V27 will
+report that stability is a needed join/input rather than pretending the model
+already used it.
+
 ## Current Final Report Notebook
 
 Use V21 for the final report pipeline:
